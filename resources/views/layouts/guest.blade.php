@@ -51,10 +51,6 @@
 
         <!-- JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-        <script>
-            // Configure axios for Laravel
-            axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-            window.axios = axios;
-        </script>
+        <script src="{{ asset('js/guest.js') }}"></script>
     </body>
 </html>

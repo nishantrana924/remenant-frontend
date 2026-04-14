@@ -8,6 +8,10 @@ module.exports = {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
     ],
+    safelist: [
+        'opacity-100',
+        'translate-x-0',
+    ],
 
     theme: {
         extend: {
