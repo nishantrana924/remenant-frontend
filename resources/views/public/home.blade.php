@@ -3,6 +3,189 @@
 @section('title', config('app.name', 'Remenant Health').' - Home')
 
 @section('content')
+    @php
+        $products = [
+            [
+                'title' => 'Remenant Glutathione Effervescent Formula (500mg)',
+                'tagline' => 'Glow from Within',
+                'description' => 'A powerful antioxidant blend designed to support detoxification, enhance skin glow, and promote overall wellness.',
+                'price' => '₹1,999',
+                'color' => 'from-red-500 to-rose-500',
+                'benefits' => ['Liver Detoxification', 'Anti-Aging Support', 'UV Protection', 'Cellular Repair', 'Brain Health'],
+            ],
+            [
+                'title' => 'Remenant Vitamin C Effervescent Formula (1000mg)',
+                'tagline' => 'Strong Immunity, Everyday Energy',
+                'description' => 'Boost your immunity and daily energy with a high-strength Vitamin C formula enriched with Zinc and Vitamin D.',
+                'price' => '₹1,799',
+                'color' => 'from-orange-500 to-amber-500',
+                'benefits' => ['Fast Wound Healing', 'Respiratory Health', 'Mood Elevation', 'Iron Absorption', 'Collagen Support'],
+            ],
+            [
+                'title' => 'Remenant Biotin Effervescent Formula',
+                'tagline' => 'Beauty & Strength in Every Sip',
+                'description' => 'A beauty-focused formula designed to strengthen hair, enhance skin glow, and support healthy nails from within.',
+                'price' => '₹1,699',
+                'color' => 'from-emerald-500 to-lime-500',
+                'benefits' => ['Helps Reduce Hair Thinning', 'Promotes Glowy Skin', 'Supports Nail Strength', 'Improves Scalp Health', 'Supports Balanced Metabolism'],
+            ],
+            [
+                'title' => 'Remenant ACV Effervescent Formula',
+                'tagline' => 'Refresh. Detox. Balance.',
+                'description' => 'A refreshing wellness formula that supports digestion, detox, and weight management with Apple Cider Vinegar.',
+                'price' => '₹1,599',
+                'color' => 'from-green-500 to-emerald-500',
+                'benefits' => ['Supports Blood Sugar Balance', 'Promotes Clear Skin', 'Instant Refreshment', 'Helps Maintain pH Balance', 'Appetite Control Support'],
+            ],
+        ];
+    @endphp
+
+    <section class="bg-[var(--bg-main)]">
+        <div class="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+            <div
+                class="hero-slider relative overflow-hidden rounded-3xl ring-1 ring-black/5"
+                data-hero-slider
+                data-interval="4500"
+            >
+                <div class="hero-slider__viewport">
+                    <div class="hero-slide is-active" data-slide>
+                        <picture>
+                            <source media="(max-width: 640px)" srcset="https://assets.myntassets.com/f_webp,w_768,c_limit,fl_progressive,dpr_2.0/assets/images/2021/6/9/f8f09845-e453-49f8-ac3f-445fde6b59791623250209264-DK_Flip-Flops.jpg">
+                            <img
+                                src="https://assets.myntassets.com/f_webp,w_1400,c_limit,fl_progressive,dpr_2.0/assets/images/2021/6/9/f8f09845-e453-49f8-ac3f-445fde6b59791623250209264-DK_Flip-Flops.jpg"
+                                alt="Deals banner 1"
+                                loading="eager"
+                            >
+                        </picture>
+                    </div>
+                    <div class="hero-slide" data-slide>
+                        <picture>
+                            <source media="(max-width: 640px)" srcset="https://assets.myntassets.com/f_webp,w_768,c_limit,fl_progressive,dpr_2.0/assets/images/2021/6/9/f008298e-a446-4863-afdb-a1b75ab99aa81623250209248-DK_WFH.jpg">
+                            <img
+                                src="https://assets.myntassets.com/f_webp,w_1400,c_limit,fl_progressive,dpr_2.0/assets/images/2021/6/9/f008298e-a446-4863-afdb-a1b75ab99aa81623250209248-DK_WFH.jpg"
+                                alt="Deals banner 2"
+                                loading="lazy"
+                            >
+                        </picture>
+                    </div>
+                    <div class="hero-slide" data-slide>
+                        <picture>
+                            <source media="(max-width: 640px)" srcset="https://assets.myntassets.com/f_webp,w_768,c_limit,fl_progressive,dpr_2.0/assets/images/2021/6/8/b07ef9e8-b1b7-4b9d-9d15-e633d7ac70a91623162255312-DK-MAIN-BANNER.jpg">
+                            <img
+                                src="https://assets.myntassets.com/f_webp,w_1400,c_limit,fl_progressive,dpr_2.0/assets/images/2021/6/8/b07ef9e8-b1b7-4b9d-9d15-e633d7ac70a91623162255312-DK-MAIN-BANNER.jpg"
+                                alt="Deals banner 3"
+                                loading="lazy"
+                            >
+                        </picture>
+                    </div>
+                    <div class="hero-slide" data-slide>
+                        <picture>
+                            <source media="(max-width: 640px)" srcset="https://assets.myntassets.com/f_webp,w_768,c_limit,fl_progressive,dpr_2.0/assets/images/2021/6/9/182c7932-31f3-44a7-bcac-fe141fd412d21623250209232-DK_KidsWear.jpg">
+                            <img
+                                src="https://assets.myntassets.com/f_webp,w_1400,c_limit,fl_progressive,dpr_2.0/assets/images/2021/6/9/182c7932-31f3-44a7-bcac-fe141fd412d21623250209232-DK_KidsWear.jpg"
+                                alt="Deals banner 4"
+                                loading="lazy"
+                            >
+                        </picture>
+                    </div>
+                    <div class="hero-slide" data-slide>
+                        <picture>
+                            <source media="(max-width: 640px)" srcset="https://assets.myntassets.com/f_webp,w_768,c_limit,fl_progressive,dpr_2.0/assets/images/2021/6/9/64365564-c127-409f-b021-39287ef57d041623250209213-DK_OmniStyles.jpg">
+                            <img
+                                src="https://assets.myntassets.com/f_webp,w_1400,c_limit,fl_progressive,dpr_2.0/assets/images/2021/6/9/64365564-c127-409f-b021-39287ef57d041623250209213-DK_OmniStyles.jpg"
+                                alt="Deals banner 5"
+                                loading="lazy"
+                            >
+                        </picture>
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    class="hero-slider__nav hero-slider__nav--prev"
+                    aria-label="Previous slide"
+                    data-prev
+                >
+                    <i data-lucide="chevron-left" class="h-6 w-6"></i>
+                </button>
+                <button
+                    type="button"
+                    class="hero-slider__nav hero-slider__nav--next"
+                    aria-label="Next slide"
+                    data-next
+                >
+                    <i data-lucide="chevron-right" class="h-6 w-6"></i>
+                </button>
+
+                <div class="hero-slider__dots" role="tablist" aria-label="Hero slides">
+                    <button type="button" class="hero-dot is-active" aria-label="Slide 1" data-dot></button>
+                    <button type="button" class="hero-dot" aria-label="Slide 2" data-dot></button>
+                    <button type="button" class="hero-dot" aria-label="Slide 3" data-dot></button>
+                    <button type="button" class="hero-dot" aria-label="Slide 4" data-dot></button>
+                    <button type="button" class="hero-dot" aria-label="Slide 5" data-dot></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Trust / highlight strip (full width) -->
+    <section class="bg-[var(--bg-main)]">
+        <div class="mx-auto max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#FFF2E8] via-[#FFE7D5] to-[#FDE7D7] px-4 py-7 ring-1 ring-[#f4c8a8]/60 sm:px-8">
+                <!-- Decorative fruit background icons -->
+                <div class="pointer-events-none absolute -left-2 top-6 flex flex-col gap-3 opacity-85 sm:left-4">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/65 text-xl shadow-sm">🍉</span>
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/60 text-lg shadow-sm">🍓</span>
+                </div>
+                <div class="pointer-events-none absolute -right-2 bottom-6 flex flex-col gap-3 opacity-85 sm:right-4">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/65 text-xl shadow-sm">🍊</span>
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/60 text-lg shadow-sm">🍏</span>
+                </div>
+
+                <p class="text-center text-xl font-extrabold tracking-tight text-[color:var(--secondary)] sm:text-2xl">
+                    Trusted by Thousands Across India
+                </p>
+
+                <div class="relative mt-6 grid grid-cols-3 gap-2 sm:gap-4">
+                    <div class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
+                        <img
+                            src="{{ asset('images/icons/clinically-tested.png') }}"
+                            alt="Clinically tested"
+                            class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16"
+                        >
+                        <p class="text-[10px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                            Clean Label<br>Certified
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
+                        <img
+                            src="{{ asset('images/icons/premium-quality.png') }}"
+                            alt="Premium quality"
+                            class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16"
+                        >
+                        <p class="text-[10px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                            Premium Quality<br>Ingredients
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
+                        <img
+                            src="{{ asset('images/icons/safe-daily-use.png') }}"
+                            alt="Safe and effective"
+                            class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16"
+                        >
+                        <p class="text-[10px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                            Safe &amp; Effective<br>Daily Use
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="bg-[var(--bg-light)]">
         <div class="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:px-8">
             <div class="lg:col-span-7">
@@ -29,13 +212,17 @@
                         </span>
                     </div>
                     <div class="mt-4 grid grid-cols-2 gap-3">
-                        @for ($i = 0; $i < 4; $i++)
+                        @foreach ($products as $product)
                             <div class="rounded-2xl bg-[var(--bg-section)] p-3">
-                                <div class="aspect-square w-full rounded-xl bg-white/80 ring-1 ring-black/5"></div>
-                                <p class="mt-2 text-sm font-semibold text-[color:var(--text-primary)]">Product {{ $i + 1 }}</p>
-                                <p class="text-xs text-[color:var(--text-secondary)]">₹1,999</p>
+                                <div class="aspect-square w-full rounded-xl bg-gradient-to-br {{ $product['color'] }} p-[1px]">
+                                    <div class="flex h-full w-full items-center justify-center rounded-[11px] bg-white/90">
+                                        <span class="text-center text-xs font-extrabold text-[color:var(--secondary)] px-2">{{ $product['tagline'] }}</span>
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-sm font-semibold text-[color:var(--text-primary)]">{{ $product['title'] }}</p>
+                                <p class="text-xs text-[color:var(--text-secondary)]">{{ $product['price'] }}</p>
                             </div>
-                        @endfor
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -47,29 +234,51 @@
             <div class="flex items-end justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-extrabold text-[color:var(--text-primary)]">Best Sellers</h2>
-                    <p class="mt-1 text-sm text-[color:var(--text-secondary)]">Starter grid — we’ll replace with real products later.</p>
+                    <p class="mt-1 text-sm text-[color:var(--text-secondary)]">4 flagship formulas crafted for beauty, immunity, and daily wellness.</p>
                 </div>
                 <a href="#all" class="rounded-full bg-black/5 px-4 py-2 text-sm font-semibold hover:bg-black/10 transition">View all</a>
             </div>
 
-            <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                @for ($i = 0; $i < 8; $i++)
+            <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                @foreach ($products as $product)
                     <div class="group rounded-3xl bg-white p-4 shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
-                        <div class="aspect-square w-full rounded-2xl bg-[var(--bg-section)] ring-1 ring-black/5"></div>
+                        <div class="aspect-square w-full rounded-2xl bg-gradient-to-br {{ $product['color'] }} p-[1px] ring-1 ring-black/5">
+                            <div class="flex h-full w-full items-center justify-center rounded-[15px] bg-white/90 px-3 text-center">
+                                <p class="text-sm font-extrabold text-[color:var(--secondary)]">{{ $product['tagline'] }}</p>
+                            </div>
+                        </div>
                         <div class="mt-3 flex items-start justify-between gap-3">
                             <div>
-                                <p class="text-sm font-bold text-[color:var(--text-primary)]">Item {{ $i + 1 }}</p>
-                                <p class="text-xs text-[color:var(--text-secondary)]">Short description</p>
+                                <p class="text-sm font-bold text-[color:var(--text-primary)]">{{ $product['title'] }}</p>
+                                <p class="mt-1 text-xs text-[color:var(--text-secondary)]">{{ $product['description'] }}</p>
                             </div>
-                            <p class="text-sm font-extrabold text-[color:var(--primary)]">₹2,499</p>
+                            <p class="shrink-0 text-sm font-extrabold text-[color:var(--primary)]">{{ $product['price'] }}</p>
                         </div>
+                        <ul class="mt-3 space-y-1">
+                            @foreach (array_slice($product['benefits'], 0, 2) as $benefit)
+                                <li class="text-xs text-[color:var(--text-secondary)]">• {{ $benefit }}</li>
+                            @endforeach
+                        </ul>
                         <button class="mt-3 w-full rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition group-hover:opacity-95">
                             Add to cart
                         </button>
                     </div>
-                @endfor
+                @endforeach
             </div>
         </div>
+    </section>
+
+        <!-- Full-width promo image section -->
+        <section class="w-full">
+        <picture>
+            <source media="(max-width: 640px)" srcset="{{ asset('images/banners/promo-mobile.jpg') }}">
+            <img
+                src="{{ asset('images/banners/promo-desktop.jpg') }}"
+                alt="Promotional banner"
+                class="block h-auto w-full object-cover"
+                loading="lazy"
+            >
+        </picture>
     </section>
 @endsection
 
