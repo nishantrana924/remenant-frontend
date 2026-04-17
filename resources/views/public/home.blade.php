@@ -276,9 +276,7 @@
                 src="{{ asset('images/banners/promo-desktop.jpg') }}"
                 alt="Promotional banner"
                 class="block h-auto w-full object-cover"
-                loading="lazy"
-            >
+                loading="lazy">
         </picture>
-    </section>
+        </section>
 @endsection
-
