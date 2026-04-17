@@ -203,24 +203,32 @@
                 </div>
             </div>
 
-            <div class="lg:col-span-5">
-                <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
-                    <div class="flex items-center justify-between">
-                        <p class="text-sm font-semibold text-[color:var(--text-primary)]">Featured</p>
-                        <span class="rounded-full bg-[var(--primary-soft)] px-3 py-1 text-xs font-semibold text-[color:var(--primary)]">
-                            Hot
-                        </span>
-                    </div>
-                    <div class="mt-4 grid grid-cols-2 gap-3">
-                        @foreach ($products as $product)
-                            <div class="rounded-2xl bg-[var(--bg-section)] p-3">
-                                <div class="aspect-square w-full rounded-xl bg-gradient-to-br {{ $product['color'] }} p-[1px]">
-                                    <div class="flex h-full w-full items-center justify-center rounded-[11px] bg-white/90">
-                                        <span class="text-center text-xs font-extrabold text-[color:var(--secondary)] px-2">{{ $product['tagline'] }}</span>
+                    <div class="lg:col-span-5">
+                        @php
+                            $featuredCards = [
+                                ['image' => 'remanent018.png', 'name' => 'Wellness Boost', 'price' => '19.99'],
+                                ['image' => 'remanent019.png', 'name' => 'Glow Formula', 'price' => '21.49'],
+                                ['image' => 'remanent020.png', 'name' => 'Herb Blend', 'price' => '18.99'],
+                                ['image' => 'remanent021.png', 'name' => 'Daily Care', 'price' => '20.00'],
+                            ];
+                        @endphp
+                        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-semibold" style="color: var(--text-primary);">Featured</p>
+                                <span class="rounded-full px-3 py-1 text-xs font-semibold" style="background: var(--primary-soft); color: var(--primary);">
+                                    Hot
+                                </span>
+                            </div>
+                            <div class="mt-4 grid grid-cols-2 gap-3">
+                                @foreach ($featuredCards as $card)
+                                    <div class="rounded-2xl overflow-hidden bg-[var(--bg-section)] ring-1 ring-black/5 shadow-sm">
+                                        <img src="{{ asset('images/one/'.$card['image']) }}" alt="{{ $card['name'] }}" class="aspect-square w-full object-cover" />
+                                        <div class="px-3 py-3">
+                                            <p class="text-sm font-semibold" style="color: var(--text-primary);">{{ $card['name'] }}</p>
+                                            <p class="text-xs" style="color: var(--text-secondary);">${{ $card['price'] }}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <p class="mt-2 text-sm font-semibold text-[color:var(--text-primary)]">{{ $product['title'] }}</p>
-                                <p class="text-xs text-[color:var(--text-secondary)]">{{ $product['price'] }}</p>
+                                @endforeach
                             </div>
                         @endforeach
                     </div>
@@ -229,39 +237,65 @@
         </div>
     </section>
 
-    <section id="shop" class="bg-[var(--bg-main)]">
-        <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <div class="flex items-end justify-between gap-4">
-                <div>
-                    <h2 class="text-2xl font-extrabold text-[color:var(--text-primary)]">Best Sellers</h2>
-                    <p class="mt-1 text-sm text-[color:var(--text-secondary)]">4 flagship formulas crafted for beauty, immunity, and daily wellness.</p>
-                </div>
-                <a href="#all" class="rounded-full bg-black/5 px-4 py-2 text-sm font-semibold hover:bg-black/10 transition">View all</a>
-            </div>
+            <section id="shop" class="bg-[var(--bg-main)]">
+                <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                    <div class="flex items-end justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold" style="color: var(--text-primary);">Best Sellers</h2>
+                            <p class="mt-3 max-w-2xl text-sm" style="color: var(--text-secondary);">Discover products you’ll love. A clean, fast storefront UI inspired by your reference — with brand colors controlled via CSS variables.</p>
+                            <p class="mt-1 text-sm" style="color: var(--text-secondary);">Starter grid — we’ll replace with real products later.</p>
+                        </div>
+                        <a href="#all" class="rounded-full bg-black/5 px-4 py-2 text-sm font-semibold hover:bg-black/10 transition">View all</a>
+                    </div>
 
-            <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                @foreach ($products as $product)
-                    <div class="group rounded-3xl bg-white p-4 shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
-                        <div class="aspect-square w-full rounded-2xl bg-gradient-to-br {{ $product['color'] }} p-[1px] ring-1 ring-black/5">
-                            <div class="flex h-full w-full items-center justify-center rounded-[15px] bg-white/90 px-3 text-center">
-                                <p class="text-sm font-extrabold text-[color:var(--secondary)]">{{ $product['tagline'] }}</p>
+                    @php
+                        $bestSellers = [
+                            ['image' => 'remanent010.png', 'name' => 'Healthy Glow', 'price' => '24'],
+                            ['image' => 'remanent011.png', 'name' => 'Daily Wellness', 'price' => '28'],
+                            ['image' => 'remanent012.png', 'name' => 'Natural Boost', 'price' => '22'],
+                            ['image' => 'remanent013.png', 'name' => 'Pure Essentials', 'price' => '30'],
+                            ['image' => 'remanent014.png', 'name' => 'Herbal Care', 'price' => '26'],
+                            ['image' => 'remanent015.png', 'name' => 'Calm Restore', 'price' => '29'],
+                            ['image' => 'remanent016.png', 'name' => 'Vital Mix', 'price' => '21'],
+                            ['image' => 'remanent017.png', 'name' => 'Daily Ritual', 'price' => '27'],
+                        ];
+                    @endphp
+
+                    <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                        @foreach ($bestSellers as $item)
+                            <div class="group rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
+                                <div class="overflow-hidden rounded-t-3xl bg-[var(--bg-section)] ring-1 ring-black/5">
+                                    <img src="{{ asset('images/one/'.$item['image']) }}" alt="{{ $item['name'] }}" class="h-48 w-full object-cover transition duration-300 group-hover:scale-105" />
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div>
+                                            <p class="text-sm font-bold" style="color: var(--text-primary);">{{ $item['name'] }}</p>
+                                            <p class="mt-1 text-xs" style="color: var(--text-secondary);">Starter product card</p>
+                                        </div>
+                                        <p class="text-sm font-extrabold" style="color: var(--primary);">${{ $item['price'] }}</p>
+                                    </div>
+                                    <button class="mt-4 w-full rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition group-hover:opacity-95">
+                                        Add to cart
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mt-3 flex items-start justify-between gap-3">
-                            <div>
-                                <p class="text-sm font-bold text-[color:var(--text-primary)]">{{ $product['title'] }}</p>
-                                <p class="mt-1 text-xs text-[color:var(--text-secondary)]">{{ $product['description'] }}</p>
-                            </div>
-                            <p class="shrink-0 text-sm font-extrabold text-[color:var(--primary)]">{{ $product['price'] }}</p>
-                        </div>
-                        <ul class="mt-3 space-y-1">
-                            @foreach (array_slice($product['benefits'], 0, 2) as $benefit)
-                                <li class="text-xs text-[color:var(--text-secondary)]">• {{ $benefit }}</li>
-                            @endforeach
-                        </ul>
-                        <button class="mt-3 w-full rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition group-hover:opacity-95">
-                            Add to cart
-                        </button>
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="border-t border-black/5 bg-[var(--bg-main)] py-6">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center space-x-2 mb-2 md:mb-0">
+                            <img
+                                src="{{ asset('images/logo/remenant-health-logo.jpg') }}"
+                                alt="{{ config('app.name', 'Remenant Health') }} logo"
+                                class="h-5 w-5 rounded object-contain"
+                            >
+                        <span class="text-sm font-semibold" style="color: var(--text-primary);">{{ config('app.name', 'Remenant Health') }}</span>
                     </div>
                 @endforeach
             </div>
