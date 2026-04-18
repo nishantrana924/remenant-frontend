@@ -8,17 +8,22 @@
 
     function initSlider(root) {
         const slides = Array.from(root.querySelectorAll('[data-slide]'));
+        const track = root.querySelector('[data-slider-track]');
         const dots = Array.from(root.querySelectorAll('[data-dot]'));
         const prevBtn = root.querySelector('[data-prev]');
         const nextBtn = root.querySelector('[data-next]');
 
-        if (slides.length === 0) return;
+        if (slides.length === 0 || !track) return;
 
         let index = clampIndex(Number(root.getAttribute('data-index') || 0), slides.length);
         let timer = null;
         const intervalMs = Number(root.getAttribute('data-interval') || 4000);
 
         function render() {
+            // Sliding transition
+            const offset = -index * 100;
+            track.style.transform = `translateX(${offset}%)`;
+
             slides.forEach((el, i) => el.classList.toggle('is-active', i === index));
             dots.forEach((el, i) => el.classList.toggle('is-active', i === index));
             root.setAttribute('data-index', String(index));
@@ -68,11 +73,7 @@
             });
         });
 
-        // Pause on hover / focus (desktop)
-        root.addEventListener('mouseenter', stop);
-        root.addEventListener('mouseleave', start);
-        root.addEventListener('focusin', stop);
-        root.addEventListener('focusout', start);
+        // REMOVED: Pause on hover / focus as requested by user
 
         // Basic swipe support
         let startX = 0;
