@@ -176,10 +176,10 @@
 
                 <div class="hero-slider__dots" role="tablist" aria-label="Hero slides">
                     <button type="button" class="hero-dot is-active" aria-label="Slide 1" data-dot></button>
-                    <button type="button" class="hero-dot" aria-label="Slide 2" data-dot></button>
-                    <button type="button" class="hero-dot" aria-label="Slide 3" data-dot></button>
-                    <button type="button" class="hero-dot" aria-label="Slide 4" data-dot></button>
-                    <button type="button" class="hero-dot" aria-label="Slide 5" data-dot></button>
+                    <button type="button" class="hero-dot" aria-label="Slide 2" aria-label="Slide 2" data-dot></button>
+                    <button type="button" class="hero-dot" aria-label="Slide 3" aria-label="Slide 3" data-dot></button>
+                    <button type="button" class="hero-dot" aria-label="Slide 4" aria-label="Slide 4" data-dot></button>
+                    <button type="button" class="hero-dot" aria-label="Slide 5" aria-label="Slide 5" data-dot></button>
                 </div>
             </div>
         </div>
@@ -326,13 +326,13 @@
                     </div>
                 </div>
 
-                <div class="relative overflow-hidden -my-6 py-6">
-                    <div class="flex gap-6 transition-transform duration-700 ease-in-out cursor-grab active:cursor-grabbing" data-combo-slider-track>
+                <div class="relative overflow-hidden -my-6 py-6" style="touch-action: pan-y;">
+                    <div class="flex gap-6 transition-transform duration-700 ease-in-out cursor-grab active:cursor-grabbing select-none" data-combo-slider-track>
                     @foreach ($combos as $combo)
                         @php
                             $discount = (int) round((1 - ($combo['price'] / max(1, $combo['mrp']))) * 100);
                         @endphp
-                        <div class="group relative flex w-[85vw] flex-shrink-0 snap-start flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition sm:w-[500px] sm:flex-row">
+                        <a href="#" class="group relative flex w-[85vw] flex-shrink-0 snap-start flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition sm:w-[500px] sm:flex-row no-underline">
                             <div class="relative aspect-square w-full overflow-hidden bg-[var(--bg-section)] sm:aspect-auto sm:w-[220px]">
                                 <img
                                     src="{{ asset('images/products/'.$combo['image']) }}"
@@ -355,12 +355,12 @@
                                         <p class="text-xs text-[color:var(--text-muted)] line-through">₹{{ number_format($combo['mrp']) }}</p>
                                         <p class="text-xl font-extrabold text-[color:var(--text-primary)]">₹{{ number_format($combo['price']) }}</p>
                                     </div>
-                                    <button type="button" class="rounded-full bg-[color:var(--secondary)] px-4 py-2 text-xs font-extrabold text-white hover:opacity-95 transition">
+                                    <span class="rounded-full bg-[color:var(--secondary)] px-4 py-2 text-xs font-extrabold text-white hover:opacity-95 transition group-hover:scale-105 transform duration-300">
                                         Grab Combo
-                                    </button>
+                                    </span>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     @endforeach
                     </div>
                 </div>
@@ -369,13 +369,13 @@
     </section>
     
     <!-- Why Remenant Banner (Short Height) -->
-    <section class="relative overflow-visible mt-8 mb-32">
+    <section class="relative overflow-visible my-8 lg:my-20">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="relative overflow-hidden rounded-[2rem] bg-[var(--bg-sage)] px-8 py-12 sm:px-16 sm:py-16">
+            <div class="relative rounded-[2rem] bg-[var(--bg-sage)] px-8 pt-10 pb-0 sm:px-16 sm:pt-16 sm:pb-16 lg:py-16">
                 <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
                     
-                    <!-- Content Right -->
-                    <div class="relative z-20 order-2 lg:order-2 text-center lg:text-left">
+                    <!-- Content Right (Text) -->
+                    <div class="relative z-20 order-1 lg:order-2 text-center lg:text-left">
                         <h2 class="text-3xl font-extrabold tracking-tight text-[color:var(--text-primary)] sm:text-4xl">
                             Need Expert Health Advice? <br class="hidden sm:block"> We are Here to Help
                         </h2>
@@ -403,13 +403,13 @@
                         </div>
                     </div>
 
-                    <!-- Mockup Left (Overflowing) -->
-                    <div class="relative order-1 lg:order-1 flex justify-center lg:block">
-                        <div class="lg:absolute lg:-bottom-32 lg:left-0 w-[280px] sm:w-[350px] lg:w-[450px]">
+                    <!-- Mockup Left (Image) -->
+                    <div class="order-2 lg:order-1 flex justify-center lg:block">
+                        <div class="lg:absolute relative bottom-0 left-0 w-full lg:w-[480px] flex justify-center lg:justify-start pointer-events-none">
                             <img 
-                                src="{{ asset('images/products/remenant-product15.jpg') }}" 
-                                alt="App Mockup" 
-                                class="w-full rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-4 ring-white/30 transform lg:-rotate-6 hover:rotate-0 transition duration-500"
+                                src="{{ asset('images/home/remenant-bg.png') }}" 
+                                alt="Why Remenant" 
+                                class="w-[320px] sm:w-[380px] lg:w-full h-auto block"
                             >
                         </div>
                     </div>
@@ -423,40 +423,43 @@
     </section>
 
     <!-- How it Works section -->
-    <section class="bg-[var(--bg-light)]">
-        <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-                <div>
-                    <h2 class="text-3xl font-extrabold tracking-tight text-[color:var(--text-primary)] sm:text-4xl">Drop. Fizz. Enjoy.</h2>
-                    <p class="mt-4 text-lg text-[color:var(--text-secondary)]">The smartest way to take your daily supplements. Our effervescent formula ensures maximum absorption and great taste.</p>
+    <section class="bg-[var(--bg-peach)] py-10 lg:py-14 text-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
+                <!-- Left Content -->
+                <div class="order-2 lg:order-1">
+                    <h2 class="text-3xl font-extrabold tracking-tight sm:text-5xl text-white">Drop. Fizz. Enjoy.</h2>
+                    <p class="mt-6 text-lg text-white/90">The smartest way to take your daily supplements. Our effervescent formula ensures maximum absorption and a refreshing taste.</p>
                     
-                    <div class="mt-10 space-y-8">
+                    <div class="mt-12 space-y-8">
                         @php
                             $steps = [
                                 ['title' => 'Drop 1 Tablet', 'desc' => 'Drop one effervescent tablet into 200ml of water.', 'icon' => 'droplets'],
                                 ['title' => 'Watch it Fizz', 'desc' => 'Wait for the tablet to dissolve completely.', 'icon' => 'wind'],
-                                ['title' => 'Sip & Refresh', 'desc' => 'Enjoy your delicious, nutrient-packed wellness drink.', 'icon' => 'drink'],
+                                ['title' => 'Sip & Refresh', 'desc' => 'Enjoy your delicious, nutrient-packed wellness drink.', 'icon' => 'cup-soda'],
                             ];
                         @endphp
                         @foreach ($steps as $index => $step)
-                            <div class="flex gap-4">
-                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-sm font-bold text-white">
+                            <div class="flex gap-5">
+                                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white font-bold text-[var(--bg-peach)] shadow-sm">
                                     {{ $index + 1 }}
                                 </span>
                                 <div>
-                                    <h4 class="font-bold text-[color:var(--text-primary)]">{{ $step['title'] }}</h4>
-                                    <p class="text-sm text-[color:var(--text-secondary)]">{{ $step['desc'] }}</p>
+                                    <h4 class="text-lg font-bold text-white">{{ $step['title'] }}</h4>
+                                    <p class="mt-1 text-sm text-white/80">{{ $step['desc'] }}</p>
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 </div>
-                <div class="relative">
-                    <div class="aspect-square rounded-3xl bg-gradient-to-br from-[var(--primary-soft)] to-white p-8 ring-1 ring-black/5">
+
+                <!-- Right Image -->
+                <div class="order-1 lg:order-2">
+                    <div class="relative max-w-sm mx-auto lg:max-w-md">
                         <img 
-                            src="{{ asset('images/products/remenant-product10.jpg') }}" 
+                            src="{{ asset('images/home/remenant-bg2.jpg') }}" 
                             alt="How it works" 
-                            class="h-full w-full object-contain"
+                            class="w-full h-auto object-contain rounded-[2rem] transition-transform duration-500 hover:scale-105"
                         >
                     </div>
                 </div>
@@ -464,100 +467,279 @@
         </div>
     </section>
 
-    <!-- Support / Ingredients Section -->
-    <section class="bg-[var(--bg-main)]">
-        <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-            <div class="rounded-3xl bg-[#1D1D1F] px-8 py-16 text-white sm:px-16 sm:py-24">
-                <div class="mx-auto max-w-3xl text-center">
-                    <h2 class="text-3xl font-extrabold tracking-tight sm:text-5xl">Engineered for Excellence.</h2>
-                    <p class="mt-6 text-xl text-gray-400">We combine clinical research with premium plant-based ingredients to deliver wellness that actually works.</p>
+    <!-- Infinite Brand Marquee -->
+    <section class="bg-[var(--secondary)] py-4 overflow-hidden">
+        <div class="marquee select-none">
+            <div class="marquee__track gap-12 sm:gap-20">
+                @php
+                    $highlights = [
+                        'Clinically Tested', '100% Vegan', 'Sugar Free',
+                        'Fast Absorption', 'Made in India', 'GMO Free',
+                        'Gluten Free', 'Non-Toxic', 'Lab Verified'
+                    ];
+                @endphp
+                @foreach(range(1, 3) as $i) {{-- Duplicate for infinite loop --}}
+                    @foreach ($highlights as $highlight)
+                        <div class="flex items-center gap-4 text-white">
+                            <span class="text-xl font-extrabold tracking-tighter sm:text-2xl uppercase italic opacity-90">{{ $highlight }}</span>
+                            <span class="h-1.5 w-1.5 rounded-full bg-[var(--primary)]"></span>
+                        </div>
+                    @endforeach
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Products Section -->
+    <section class="py-16 bg-white overflow-hidden">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-8 items-stretch">
+                <!-- Category Banner Card -->
+                <div class="relative w-full lg:w-[450px] shrink-0 overflow-hidden rounded-[2.5rem] bg-[#FFF0F3] ring-1 ring-black/5">
+                    <div class="absolute inset-0 px-8 py-10 z-20 flex flex-col justify-between">
+                        <div>
+                            <h2 class="text-6xl font-black italic tracking-tighter text-[#E91E63] uppercase leading-none">Weight</h2>
+                            <p class="mt-4 text-[#C2185B]/70 font-bold max-w-[200px]">Natural detox & metabolism support for your goals.</p>
+                        </div>
+                        <a href="#" class="inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-sm font-black text-[#E91E63] shadow-xl hover:bg-pink-50 transition-all hover:scale-105 uppercase tracking-widest self-start">
+                            Shop All
+                        </a>
+                    </div>
+                    <!-- Banner Image (Woman with product) -->
+                    <img 
+                        src="{{ asset('images/home/remenant-bg.png') }}" 
+                        alt="Weight Category" 
+                        class="absolute bottom-0 right-[-10%] h-[90%] w-auto object-contain object-bottom select-none pointer-events-none z-10"
+                    >
+                    <!-- Background Accent -->
+                    <div class="absolute bottom-0 left-0 right-0 h-1/2 bg-[#FFD1DC] rounded-t-[3rem] z-0 opacity-40"></div>
                 </div>
-                
-                <div class="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
-                    <div class="text-center">
-                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/10">
-                            <i data-lucide="microscope" class="h-8 w-8 text-[var(--primary)]"></i>
-                        </div>
-                        <h3 class="mt-6 text-xl font-bold">Clinically Proven</h3>
-                        <p class="mt-2 text-gray-400">Formulas backed by scientific research and testing.</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/10">
-                            <i data-lucide="leaf" class="h-8 w-8 text-[var(--primary)]"></i>
-                        </div>
-                        <h3 class="mt-6 text-xl font-bold">100% Vegan</h3>
-                        <p class="mt-2 text-gray-400">Clean, plant-based ingredients with zero animal products.</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/10">
-                            <i data-lucide="check-circle" class="h-8 w-8 text-[var(--primary)]"></i>
-                        </div>
-                        <h3 class="mt-6 text-xl font-bold">Certified Clean</h3>
-                        <p class="mt-2 text-gray-400">No harmful chemicals, heavy metals, or artificial fillers.</p>
+
+                <!-- Product Scroll Section -->
+                <div class="flex-1 overflow-hidden py-2" data-category-slider-container>
+                    <div class="flex gap-6 transition-transform duration-500 ease-in-out cursor-grab active:cursor-grabbing no-scrollbar" data-category-slider-track>
+                        @php
+                            $categoryProducts = [
+                                [
+                                    'title' => 'Apple Cider Vinegar',
+                                    'price' => 1225,
+                                    'mrp' => 1440,
+                                    'image' => 'remenant-product13.jpg',
+                                    'rating' => 4.8,
+                                    'discount' => 14
+                                ],
+                                [
+                                    'title' => 'ACV Cqr Plus Premium',
+                                    'price' => 1299,
+                                    'mrp' => 1500,
+                                    'image' => 'remenant-product12.jpg',
+                                    'rating' => 4.6,
+                                    'discount' => 13
+                                ],
+                                [
+                                    'title' => 'ACV Hot Brew Mix',
+                                    'price' => 1245,
+                                    'mrp' => 1400,
+                                    'image' => 'remenant-product11.jpg',
+                                    'rating' => 4.6,
+                                    'discount' => 11
+                                ],
+                                [
+                                    'title' => 'ACV Effervescent Tabs',
+                                    'price' => 1199,
+                                    'mrp' => 1350,
+                                    'image' => 'remenant-product131.jpg',
+                                    'rating' => 4.7,
+                                    'discount' => 11
+                                ]
+                            ];
+                        @endphp
+                        @foreach ($categoryProducts as $p)
+                        <a href="#" class="w-[300px] flex-shrink-0 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group snap-start no-underline">
+                            <div class="relative aspect-square overflow-hidden">
+                                <!-- Enhanced Tags -->
+                                <span class="absolute top-4 left-4 bg-[#E91E63] text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-full z-10 shadow-lg">Weight</span>
+                                <span class="absolute top-4 right-4 bg-[#4CAF50] text-white text-[10px] font-black px-3 py-1.5 rounded-full z-10 shadow-lg">{{ $p['discount'] }}% OFF</span>
+                                
+                                <img 
+                                    src="{{ asset('images/products/'.$p['image']) }}" 
+                                    alt="{{ $p['title'] }}" 
+                                    class="w-full h-full object-cover transition duration-700 group-hover:scale-110"
+                                >
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-lg font-extrabold text-gray-900 leading-tight h-12 line-clamp-2">{{ $p['title'] }}</h3>
+                                <div class="mt-2 flex items-center gap-1">
+                                    <i data-lucide="star" class="h-3 w-3 fill-orange-400 text-orange-400"></i>
+                                    <span class="text-[11px] font-bold text-gray-500">{{ $p['rating'] }} | Weight Management</span>
+                                </div>
+                                <div class="mt-6 flex items-center justify-between gap-4">
+                                    <div class="flex flex-col text-left">
+                                        <span class="text-xs text-gray-400 line-through tracking-tighter decoration-1">₹{{ number_format($p['mrp']) }}</span>
+                                        <p class="text-2xl font-black text-gray-900 leading-none">₹{{ number_format($p['price']) }}</p>
+                                    </div>
+                                    <span class="bg-[#4CAF50] hover:bg-[#388E3C] text-white px-6 py-3 rounded-2xl text-sm font-black transition-all transform active:scale-95 shadow-lg shadow-green-100 flex items-center gap-2 group/btn">
+                                        <i data-lucide="plus" class="h-4 w-4 transition-transform group-hover/btn:rotate-90"></i> ADD
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                        @endforeach
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Full Width Banner Section -->
+    <section class="w-full overflow-hidden leading-[0]">
+        <picture class="w-full">
+            <!-- Mobile Image -->
+            <source media="(max-width: 640px)" srcset="{{ asset('images/banners/mobile-bg/remenant-bg4.jpg') }}">
+            <!-- Desktop Image -->
+            <img 
+                src="{{ asset('images/banners/remenant-bg21.jpg') }}" 
+                alt="Remenant Wellness" 
+                class="w-full h-auto"
+                loading="lazy"
+            >
+        </picture>
+    </section>
+
     <!-- Testimonials Section -->
-    <section class="bg-[var(--bg-light)]">
+    <section class="bg-[#FDF9F6] relative overflow-hidden">
+        <!-- Floating decorative elements -->
+        <div class="section-decor top-20 left-[5%] text-6xl opacity-10 animate-float" style="animation-delay: 0s;">🍏</div>
+        <div class="section-decor bottom-20 right-[8%] text-5xl opacity-10 animate-float" style="animation-delay: 1.5s;">🍊</div>
+        <div class="section-decor top-1/2 right-[3%] text-4xl opacity-10 animate-float" style="animation-delay: 3s;">🍓</div>
+        <div class="section-decor bottom-40 left-[10%] text-5xl opacity-10 animate-float" style="animation-delay: 4.5s;">🍉</div>
+        <div class="section-decor top-40 right-1/4 text-4xl opacity-5 animate-float" style="animation-delay: 2.5s;">🍋</div>
         <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <div class="text-center">
                 <h2 class="text-3xl font-extrabold text-[color:var(--text-primary)]">Loved by Our Community</h2>
                 <p class="mt-4 text-lg text-[color:var(--text-secondary)]">Join thousands who have made Remenant a part of their daily ritual.</p>
             </div>
             
-            <div class="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div class="mt-16 testimonial-marquee">
                 @php
                     $testimonials = [
-                        ['name' => 'Ananya S.', 'text' => 'The Glutathione tablets have completely changed my morning routine. My skin is noticeably brighter!', 'rating' => 5],
-                        ['name' => 'Rahul M.', 'text' => 'Finally a Vitamin C supplement that actually tastes good and feels effective. No more boring pills.', 'rating' => 5],
-                        ['name' => 'Priya K.', 'text' => 'Perfect for my busy lifestyle. I just drop a tablet in my bottle and I am good to go. Love the Biotin!', 'rating' => 5],
+                        ['name' => 'Ananya Sharma', 'location' => 'Mumbai', 'text' => 'The Glutathione tablets have completely changed my morning routine. My skin is noticeably brighter and I feel more confident!', 'rating' => 5],
+                        ['name' => 'Rahul Mehta', 'location' => 'Bangalore', 'text' => 'Finally a Vitamin C supplement that actually tastes good and feels effective. No more boring pills or chalky tablets.', 'rating' => 5],
+                        ['name' => 'Priya Kapoor', 'location' => 'Delhi', 'text' => 'Perfect for my busy lifestyle. I just drop a tablet in my bottle and I am good to go. Love the Biotin formula!', 'rating' => 5],
+                        ['name' => 'Vikram Rao', 'location' => 'Pune', 'text' => 'Best ACV tablets I have tried. No bad aftertaste and helped with my digestion significantly. Highly recommend for detox.', 'rating' => 5],
+                        ['name' => 'Sneha Patil', 'location' => 'Hyderabad', 'text' => 'Quality ingredients and great packaging. You can tell they care about the product. The results speak for themselves!', 'rating' => 5],
+                        ['name' => 'Arjun Gupta', 'location' => 'Chennai', 'text' => 'The energy boost from the Vitamin C combo is real. Feeling much more active throughout the day without the jitter.', 'rating' => 5],
                     ];
                 @endphp
-                @foreach ($testimonials as $testimonial)
-                    <div class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5">
-                        <div class="flex gap-1 text-orange-400">
-                            @for ($i = 0; $i < $testimonial['rating']; $i++)
-                                <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            @endfor
-                        </div>
-                        <p class="mt-4 text-lg font-semibold italic text-[color:var(--text-primary)]">"{{ $testimonial['text'] }}"</p>
-                        <div class="mt-6 flex items-center gap-3">
-                            <div class="h-10 w-10 rounded-full bg-[var(--primary-soft)] flex items-center justify-center font-bold text-[var(--primary)]">
-                                {{ substr($testimonial['name'], 0, 1) }}
+
+                <div class="testimonial-track">
+                    @foreach ($testimonials as $testimonial)
+                        <div class="w-[350px] shrink-0 rounded-[2.5rem] bg-white p-10 shadow-xl shadow-gray-100/50 ring-1 ring-black/[0.02] flex flex-col relative overflow-hidden group">
+                            <!-- Quote Mark -->
+                            <div class="absolute -right-4 -top-4 opacity-[0.03] transform rotate-12 transition-transform group-hover:rotate-0 duration-700">
+                                <i data-lucide="quote" class="h-32 w-32 text-black"></i>
                             </div>
-                            <span class="font-bold text-[color:var(--text-primary)]">{{ $testimonial['name'] }}</span>
+
+                            <div class="flex gap-1 text-orange-400">
+                                @for ($i = 0; $i < $testimonial['rating']; $i++)
+                                    <i data-lucide="star" class="h-4 w-4 fill-current"></i>
+                                @endfor
+                            </div>
+
+                            <div class="mt-8 flex-1">
+                                <p class="text-xl font-bold leading-relaxed text-gray-900">"{{ $testimonial['text'] }}"</p>
+                            </div>
+
+                            <div class="mt-10 flex items-center gap-4">
+                                <div class="h-14 w-14 rounded-full bg-gradient-to-br from-[var(--primary)] to-orange-400 flex items-center justify-center font-black text-white text-xl shadow-lg">
+                                    {{ substr($testimonial['name'], 0, 1) }}
+                                </div>
+                                <div>
+                                    <h4 class="font-black text-gray-900 leading-none flex items-center gap-2">
+                                        {{ $testimonial['name'] }}
+                                        <i data-lucide="check-circle-2" class="h-4 w-4 text-blue-500 fill-blue-50"></i>
+                                    </h4>
+                                    <p class="mt-1.5 text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $testimonial['location'] }} • Verified Buyer</p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
+
+                <!-- Second track for infinite loop -->
+                <div class="testimonial-track" aria-hidden="true">
+                    @foreach ($testimonials as $testimonial)
+                        <div class="w-[350px] shrink-0 rounded-[2.5rem] bg-white p-10 shadow-xl shadow-gray-100/50 ring-1 ring-black/[0.02] flex flex-col relative overflow-hidden group">
+                            <!-- Quote Mark -->
+                            <div class="absolute -right-4 -top-4 opacity-[0.03] transform rotate-12 transition-transform group-hover:rotate-0 duration-700">
+                                <i data-lucide="quote" class="h-32 w-32 text-black"></i>
+                            </div>
+
+                            <div class="flex gap-1 text-orange-400">
+                                @for ($i = 0; $i < $testimonial['rating']; $i++)
+                                    <i data-lucide="star" class="h-4 w-4 fill-current"></i>
+                                @endfor
+                            </div>
+
+                            <div class="mt-8 flex-1">
+                                <p class="text-xl font-bold leading-relaxed text-gray-900">"{{ $testimonial['text'] }}"</p>
+                            </div>
+
+                            <div class="mt-10 flex items-center gap-4">
+                                <div class="h-14 w-14 rounded-full bg-gradient-to-br from-[var(--primary)] to-orange-400 flex items-center justify-center font-black text-white text-xl shadow-lg">
+                                    {{ substr($testimonial['name'], 0, 1) }}
+                                </div>
+                                <div>
+                                    <h4 class="font-black text-gray-900 leading-none flex items-center gap-2">
+                                        {{ $testimonial['name'] }}
+                                        <i data-lucide="check-circle-2" class="h-4 w-4 text-blue-500 fill-blue-50"></i>
+                                    </h4>
+                                    <p class="mt-1.5 text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $testimonial['location'] }} • Verified Buyer</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Newsletter Section -->
-    <section class="bg-[var(--bg-main)]">
-        <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-            <div class="relative overflow-hidden rounded-3xl bg-[var(--primary)] px-8 py-16 text-center text-white sm:px-16">
-                <!-- Background decoration -->
-                <div class="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
-                <div class="pointer-events-none absolute -left-24 -bottom-24 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
-                
-                <h2 class="relative text-3xl font-extrabold sm:text-4xl">Join the Wellness Revolution</h2>
-                <p class="relative mt-4 text-lg text-white/80">Subscribe to get exclusive offers, wellness tips, and early access to new launches.</p>
-                
-                <form class="relative mt-10 mx-auto flex max-w-md flex-col gap-3 sm:flex-row">
-                    <input 
-                        type="email" 
-                        placeholder="Enter your email" 
-                        class="flex-1 rounded-full border-none bg-white px-6 py-3 text-black placeholder:text-gray-400 focus:ring-2 focus:ring-white/50"
-                        required
-                    >
-                    <button type="submit" class="rounded-full bg-black px-8 py-3 font-bold transition hover:bg-black/80">
-                        Subscribe
-                    </button>
-                </form>
+    <!-- About Section (Reference Style) -->
+    <section id="about" class="bg-[#FDFBF0] py-16 sm:py-20">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-black italic text-[#074D3D] tracking-tight sm:text-5xl">About Remenant</h2>
+            <div class="mt-6 max-w-6xl">
+                <p class="text-base font-bold text-[#074D3D]/90 leading-relaxed sm:text-lg">
+                    Remenant is one of India's most trusted brands in the Skincare & Wellness space. As a Clean-Label Project Certified brand, we strive to bring you non-GMO, vegan, toxin-free products that you can easily add to your daily lifestyle. 
+                    <a href="/about" class="text-[#0FA47B] underline font-black ml-1 hover:text-[#074D3D] transition-colors">Read More</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Marquee Section -->
+    <section class="bg-[#074D3D] py-6 overflow-hidden border-t border-white/5">
+        <div class="marquee select-none">
+            <div class="marquee__track gap-12 sm:gap-24">
+                @php
+                    $bottomFeatures = [
+                        ['icon' => 'truck', 'text' => 'Free Express Shipping'],
+                        ['icon' => 'shield-check', 'text' => '100% Secure Checkout'],
+                        ['icon' => 'leaf', 'text' => '100% Vegan & Non-GMO'],
+                        ['icon' => 'refresh-cw', 'text' => 'Hassle-Free Returns'],
+                        ['icon' => 'award', 'text' => 'GMP Certified Quality'],
+                        ['icon' => 'heart', 'text' => 'Proudly Made in India'],
+                    ];
+                @endphp
+                @foreach(range(1, 4) as $i)
+                    @foreach ($bottomFeatures as $f)
+                        <div class="flex items-center gap-6 text-white/90">
+                            <i data-lucide="{{ $f['icon'] }}" class="h-5 w-5 text-[#0FA47B]"></i>
+                            <span class="text-xs font-black uppercase tracking-[0.25em] whitespace-nowrap">{{ $f['text'] }}</span>
+                            <div class="h-1 w-1 rounded-full bg-[#0FA47B]/30 ml-4"></div>
+                        </div>
+                    @endforeach
+                @endforeach
             </div>
         </div>
     </section>

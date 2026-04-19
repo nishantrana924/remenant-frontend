@@ -5,7 +5,7 @@
 >
     <!-- Sidebar panel -->
     <aside
-        class="absolute left-0 top-0 h-full w-[320px] -translate-x-full bg-white shadow-2xl transition-transform duration-200 sm:w-[360px]"
+        class="absolute left-0 top-0 h-full w-[320px] -translate-x-full bg-[var(--sidebar-bg)] shadow-2xl transition-transform duration-200 sm:w-[360px]"
         data-sidebar-panel
         role="dialog"
         aria-modal="true"
@@ -15,7 +15,7 @@
         <div class="flex items-center justify-between border-b border-black/5 px-5 py-4">
             <div class="flex items-center gap-3">
                 <img
-                    src="{{ asset('images/logo/remenant-health-logo.png') }}"
+                    src="{{ asset('images/logo/remenant-health-logo2.png') }}"
                     alt="{{ config('app.name', 'Remenant Health') }} logo"
                     class="h-9 w-auto object-contain"
                 >

@@ -1,20 +1,15 @@
 (() => {
-    const CONTAINER_SELECTOR = '[data-combo-slider-container]';
-    const TRACK_SELECTOR = '[data-combo-slider-track]';
-    const NEXT_SELECTOR = '[data-combo-next]';
-    const PREV_SELECTOR = '[data-combo-prev]';
-    const INTERVAL_MS = 4000;
+    const CONTAINER_SELECTOR = '[data-category-slider-container]';
+    const TRACK_SELECTOR = '[data-category-slider-track]';
 
-    function initComboSlider(container) {
+    function initCategorySlider(container) {
         const track = container.querySelector(TRACK_SELECTOR);
-        const nextBtn = container.querySelector(NEXT_SELECTOR);
-        const prevBtn = container.querySelector(PREV_SELECTOR);
         if (!track) return;
 
         let originalSlides = Array.from(track.children);
         if (originalSlides.length === 0) return;
 
-        // Clone multiple items for a smoother infinite look on all screens
+        // Clone multiple items for a smoother infinite look
         const clonesCount = 4;
         for (let i = 0; i < clonesCount; i++) {
             const firstClone = originalSlides[i % originalSlides.length].cloneNode(true);
@@ -26,17 +21,16 @@
         const allSlides = Array.from(track.children);
         let currentIndex = clonesCount;
         let isTransitioning = false;
-        let autoPlayTimer = null;
 
         function getSlideWidth() {
-            const firstSlide = track.querySelector('.group');
+            const firstSlide = track.querySelector('.snap-start');
             if (!firstSlide) return 0;
-            return firstSlide.offsetWidth + 24;
+            return firstSlide.offsetWidth + 24; // Width + gap-6
         }
 
         function updatePosition(animate = true) {
             const width = getSlideWidth();
-            track.style.transition = animate ? 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
+            track.style.transition = animate ? 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
             track.style.transform = `translateX(${-currentIndex * width}px)`;
         }
 
@@ -70,38 +64,15 @@
             }, { once: true });
         }
 
-        function startAutoPlay() {
-            stopAutoPlay();
-            autoPlayTimer = setInterval(moveNext, INTERVAL_MS);
-        }
-
-        function stopAutoPlay() {
-            if (autoPlayTimer) clearInterval(autoPlayTimer);
-        }
-
-        // Event Listeners
-        nextBtn?.addEventListener('click', () => {
-            stopAutoPlay();
-            moveNext();
-            startAutoPlay();
-        });
-
-        prevBtn?.addEventListener('click', () => {
-            stopAutoPlay();
-            movePrev();
-            startAutoPlay();
-        });
-
         // Initialize position
         window.addEventListener('resize', () => updatePosition(false));
 
         // Initial render
         setTimeout(() => {
             updatePosition(false);
-            startAutoPlay();
         }, 100);
 
-        // Unified drag/touch logic
+        // Drag/Touch logic
         let isDown = false;
         let startX;
         let startY;
@@ -110,7 +81,6 @@
         let wasDragged = false;
 
         function onDragStart(pageX, pageY) {
-            stopAutoPlay();
             isDown = true;
             isScrolling = false;
             wasDragged = false;
@@ -128,14 +98,12 @@
             const walk = pageX - startX;
             const walkY = pageY - startY;
 
-            // If moving more vertically than horizontally on start, assume scrolling
             if (Math.abs(walkY) > Math.abs(walk) && Math.abs(walkY) > 5) {
                 isScrolling = true;
                 isDown = false;
                 return;
             }
 
-            // Prevent scroll if we're dragging horizontally
             if (Math.abs(walk) > 5) {
                 wasDragged = true;
                 track.style.transform = `translateX(${currentTranslate + walk}px)`;
@@ -146,8 +114,9 @@
             if (!isDown) return;
             isDown = false;
             const width = getSlideWidth();
-            const transform = track.style.transform;
-            const currentX = parseInt(transform.replace('translateX(', '').replace('px)', '')) || 0;
+            const style = window.getComputedStyle(track);
+            const matrix = new WebKitCSSMatrix(style.transform);
+            const currentX = matrix.m41;
             const movedBy = currentX - (-currentIndex * width);
 
             if (Math.abs(movedBy) > width / 5) {
@@ -156,16 +125,14 @@
             } else {
                 updatePosition();
             }
-            startAutoPlay();
         }
 
-        // Mouse Events
+        // Events
         track.addEventListener('mousedown', (e) => onDragStart(e.pageX, e.pageY));
         window.addEventListener('mousemove', (e) => onDragMove(e.pageX, e.pageY));
         window.addEventListener('mouseup', onDragEnd);
         track.ondragstart = () => false;
 
-        // Touch Events
         track.addEventListener('touchstart', (e) => onDragStart(e.touches[0].pageX, e.touches[0].pageY), { passive: true });
         track.addEventListener('touchmove', (e) => onDragMove(e.touches[0].pageX, e.touches[0].pageY), { passive: true });
         track.addEventListener('touchend', onDragEnd);
@@ -176,11 +143,11 @@
                 e.preventDefault();
                 e.stopPropagation();
             }
-        }, true); // Use capture phase to catch clicks on links
+        }, true);
     }
 
     function init() {
-        document.querySelectorAll(CONTAINER_SELECTOR).forEach(initComboSlider);
+        document.querySelectorAll(CONTAINER_SELECTOR).forEach(initCategorySlider);
     }
 
     if (document.readyState === 'loading') {

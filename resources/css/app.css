@@ -18,6 +18,7 @@
         --bg-light: #F8F9FB;
         --bg-section: #F3F4F6;
         --bg-sage: #bbc9aa;
+        --bg-peach: #df8e86;
 
         /* Text */
         --text-primary: #111827;
@@ -29,6 +30,12 @@
         --warning: #F59E0B;
         --error: #EF4444;
         --info: #3B82F6;
+        --sidebar-bg: #FDF9F6;
+    }
+
+    ::selection {
+        background: var(--primary);
+        color: white;
     }
 
     body {
@@ -94,7 +101,7 @@
         align-items: center;
         gap: 14px;
         padding-right: 14px;
-        animation: marquee-scroll 18s linear infinite;
+        animation: marquee-scroll 30s linear infinite;
         will-change: transform;
     }
 
@@ -116,6 +123,57 @@
         .marquee__track {
             animation: none;
         }
+    }
+
+    /* Testimonial Marquee */
+    .testimonial-marquee {
+        display: flex;
+        overflow: hidden;
+        user-select: none;
+        gap: 32px;
+        mask-image: linear-gradient(to right, transparent 0, black 10%, black 90%, transparent 100%);
+    }
+
+    .testimonial-track {
+        display: flex;
+        flex-shrink: 0;
+        gap: 32px;
+        min-width: 100%;
+        animation: testimonial-scroll 60s linear infinite;
+    }
+
+    .testimonial-marquee:hover .testimonial-track {
+        animation-play-state: paused;
+    }
+
+    @keyframes testimonial-scroll {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(calc(-100% - 32px));
+        }
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0) rotate(0deg);
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(5deg);
+        }
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .section-decor {
+        @apply pointer-events-none absolute select-none;
     }
 
     /* Hero slider */
@@ -242,7 +300,9 @@
 
     [data-hero-slider],
     [data-combo-slider-container],
-    [data-combo-slider-track] {
+    [data-combo-slider-track],
+    [data-category-slider-container],
+    [data-category-slider-track] {
         user-select: none;
         -webkit-user-drag: none;
     }
@@ -256,5 +316,14 @@
     [data-combo-slider-track] {
         will-change: transform;
         display: flex;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 }

@@ -37,6 +37,7 @@
     <script src="{{ asset('js/public-account.js') }}"></script>
     <script src="{{ asset('js/public-hero-slider.js') }}"></script>
     <script src="{{ asset('js/public-combo-slider.js') }}"></script>
+    <script src="{{ asset('js/public-category-slider.js') }}"></script>
     @stack('scripts')
 </body>
 </html>
