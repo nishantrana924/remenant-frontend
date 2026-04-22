@@ -8,6 +8,10 @@ Route::get('/', function () {
     return view('public.home');
 });
 
+Route::get('/about', function () {
+    return view('public.about');
+})->name('about');
+
 // Admin routes (all authenticated users are admins)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])

@@ -53,9 +53,9 @@
                     <i data-lucide="grid-3x3" class="h-5 w-5 text-gray-600"></i>
                     Categories
                 </a>
-                <a href="#cart" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
-                    <i data-lucide="shopping-cart" class="h-5 w-5 text-gray-600"></i>
-                    Cart
+                <a href="{{ route('about') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
+                    <i data-lucide="info" class="h-5 w-5 text-gray-600"></i>
+                    About Us
                 </a>
             </nav>
 
