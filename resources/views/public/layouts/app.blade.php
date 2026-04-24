@@ -22,9 +22,7 @@
         @include('public.layouts.sidebar')
 
         <main class="flex-1">
-            <div class="overflow-x-hidden">
-                @yield('content')
-            </div>
+            @yield('content')
         </main>
 
         @include('public.layouts.footer')

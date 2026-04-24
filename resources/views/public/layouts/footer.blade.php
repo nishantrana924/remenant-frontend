@@ -1,8 +1,8 @@
 <footer class="border-t border-black/5 bg-[var(--bg-sage)] overflow-hidden">
-    <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-6">
+    <div class="mx-auto max-w-[1600px] px-4 py-20 sm:px-6 lg:px-12">
+        <div class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-12">
             <!-- Brand Column -->
-            <div class="lg:col-span-2">
+            <div class="lg:col-span-3">
                 <a href="/" class="inline-flex">
                     <img src="{{ asset('images/logo/remenant-health-logo.png') }}" alt="Remenant Health"
                         class="h-10 w-auto object-contain">
@@ -13,7 +13,8 @@
                 </p>
                 <!-- Social Links (Using SVGs for reliability) -->
                 <div class="mt-8 flex items-center gap-3">
-                    <a href="https://www.instagram.com/remenant_health?igsh=cm1lcjIzbWRteTk4" target="_blank" aria-label="Instagram"
+                    <a href="https://www.instagram.com/remenant_health?igsh=cm1lcjIzbWRteTk4" target="_blank"
+                        aria-label="Instagram"
                         class="group flex h-10 w-10 items-center justify-center rounded-xl bg-white/50 text-[color:var(--text-primary)] ring-1 ring-black/5 hover:bg-black hover:text-white transition-all duration-300 shadow-sm">
                         <svg class="h-5 w-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
                             <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
@@ -21,7 +22,8 @@
                             <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
                         </svg>
                     </a>
-                    <a href="https://www.facebook.com/share/18Pdh9bjAU/?mibextid=wwXIfr" target="_blank" aria-label="Facebook"
+                    <a href="https://www.facebook.com/share/18Pdh9bjAU/?mibextid=wwXIfr" target="_blank"
+                        aria-label="Facebook"
                         class="group flex h-10 w-10 items-center justify-center rounded-xl bg-white/50 text-[color:var(--text-primary)] ring-1 ring-black/5 hover:bg-black hover:text-white transition-all duration-300 shadow-sm">
                         <svg class="h-5 w-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
                             <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
@@ -31,7 +33,7 @@
             </div>
 
             <!-- Links Columns -->
-            <div>
+            <div class="lg:col-span-2">
                 <h3 class="text-xs font-extrabold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">Catalog
                 </h3>
                 <ul class="mt-6 space-y-3 text-sm font-medium">
@@ -46,22 +48,24 @@
                 </ul>
             </div>
 
-            <div>
+            <div class="lg:col-span-2">
                 <h3 class="text-xs font-extrabold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">Company
                 </h3>
                 <ul class="mt-6 space-y-3 text-sm font-medium">
-                    <li><a href="{{ route('about') }}" class="text-[color:var(--text-primary)]/70 hover:text-black transition">About Us</a></li>
+                    <li><a href="{{ route('about') }}"
+                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">About Us</a></li>
                     <li><a href="#"
                             class="text-[color:var(--text-primary)]/70 hover:text-black transition">Sustainability</a>
                     </li>
                     <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Why
                             Effervescent?</a></li>
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Contact
+                    <li><a href="{{ route('contact') }}"
+                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">Contact
                             Us</a></li>
                 </ul>
             </div>
 
-            <div>
+            <div class="lg:col-span-2">
                 <h3 class="text-xs font-extrabold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">
                     Assistance</h3>
                 <ul class="mt-6 space-y-3 text-sm font-medium">
@@ -71,13 +75,14 @@
                             Guide</a></li>
                     <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Refund
                             Policy</a></li>
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Help
+                    <li><a href="{{ route('contact') }}"
+                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">Help
                             Center</a></li>
                 </ul>
             </div>
 
             <!-- Location/Contact -->
-            <div>
+            <div class="lg:col-span-3">
                 <h3 class="text-xs font-extrabold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">
                     Headquarters</h3>
                 <address class="mt-6 not-italic text-sm leading-relaxed text-[color:var(--text-primary)]/70">
@@ -86,7 +91,11 @@
                     Gujarat, India
                 </address>
                 <div class="mt-4 text-sm font-extrabold text-black">
-                    support@remenant.com
+                    <a href="tel:+918849550164" class="hover:underline">+91 8849550164</a> </br>
+                    <a href="tel:+919662342235" class="hover:underline">+91 9662342235</a>
+                </div>
+                <div class="mt-4 text-sm font-extrabold text-black">
+                    <a href="mailto:support@remenanthealth.com" class="hover:underline">support@remenanthealth.com</a>
                 </div>
             </div>
         </div>

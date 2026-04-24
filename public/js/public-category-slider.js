@@ -92,7 +92,7 @@
             track.style.transition = 'none';
         }
 
-        function onDragMove(pageX, pageY) {
+        function onDragMove(pageX, pageY, e) {
             if (!isDown || isScrolling) return;
 
             const walk = pageX - startX;
@@ -105,6 +105,7 @@
             }
 
             if (Math.abs(walk) > 5) {
+                if (e && e.cancelable) e.preventDefault();
                 wasDragged = true;
                 track.style.transform = `translateX(${currentTranslate + walk}px)`;
             }
@@ -129,12 +130,12 @@
 
         // Events
         track.addEventListener('mousedown', (e) => onDragStart(e.pageX, e.pageY));
-        window.addEventListener('mousemove', (e) => onDragMove(e.pageX, e.pageY));
+        window.addEventListener('mousemove', (e) => onDragMove(e.pageX, e.pageY, e));
         window.addEventListener('mouseup', onDragEnd);
         track.ondragstart = () => false;
 
-        track.addEventListener('touchstart', (e) => onDragStart(e.touches[0].pageX, e.touches[0].pageY), { passive: true });
-        track.addEventListener('touchmove', (e) => onDragMove(e.touches[0].pageX, e.touches[0].pageY), { passive: true });
+        track.addEventListener('touchstart', (e) => onDragStart(e.touches[0].pageX, e.touches[0].pageY), { passive: false });
+        track.addEventListener('touchmove', (e) => onDragMove(e.touches[0].pageX, e.touches[0].pageY, e), { passive: false });
         track.addEventListener('touchend', onDragEnd);
 
         // Prevent link clicks when dragging

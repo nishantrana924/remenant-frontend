@@ -4,60 +4,11 @@
 
 @section('content')
     @php
-        $products = [
-            [
-                'title' => 'Remenant Vitamin C Effervescent',
-                'tagline' => 'Immunity & Skin Health',
-                'description' => 'A refreshing citrus burst designed to boost your immunity and support radiant skin health.',
-                'price' => 1799,
-                'mrp' => 2499,
-                'rating' => 4.8,
-                'reviews' => 1243,
-                'image' => 'remenant-product11.jpg',
-                'color' => 'from-orange-500 to-amber-500',
-                'benefits' => ['Immunity Boost', 'Skin Glow', 'Collagen Support', 'Antioxidant Protection', 'Daily Energy'],
-            ],
-            [
-                'title' => 'Remenant Biotin Effervescent',
-                'tagline' => 'Beauty & Strength',
-                'description' => 'Targeted formula for hair strength, nail health, and glowing skin from within.',
-                'price' => 1699,
-                'mrp' => 2399,
-                'rating' => 4.7,
-                'reviews' => 982,
-                'image' => 'remenant-product12.jpg',
-                'color' => 'from-emerald-500 to-lime-500',
-                'benefits' => ['Hair Growth', 'Nail Strength', 'Skin Radiance', 'Metabolic Support', 'Healthy Scalp'],
-            ],
-            [
-                'title' => 'Remenant ACV Effervescent',
-                'tagline' => 'Metabolism & Digestion',
-                'description' => 'A metabolism booster and digestive aid without the harsh taste of liquid vinegar.',
-                'price' => 1599,
-                'mrp' => 2199,
-                'rating' => 4.6,
-                'reviews' => 761,
-                'image' => 'remenant-product13.jpg',
-                'color' => 'from-green-500 to-emerald-500',
-                'benefits' => ['Metabolism Booster', 'Digestive Aid', 'Weight Management', 'Detox Support', 'Sugar Balance'],
-            ],
-            [
-                'title' => 'Remenant Glutathione Effervescent',
-                'tagline' => 'Master Antioxidant',
-                'description' => 'The ultimate formula for skin brightening, detoxification, and overall cellular wellness.',
-                'price' => 1999,
-                'mrp' => 2999,
-                'rating' => 4.9,
-                'reviews' => 604,
-                'image' => 'remenant-product10.jpg',
-                'color' => 'from-red-500 to-rose-500',
-                'benefits' => ['Skin Brightening', 'Master Antioxidant', 'Locker Detox', 'Cellular Repair', 'Anti-Aging'],
-            ],
-        ];
 
         $combos = [
             [
                 'title' => 'Ultimate Immunity Duo',
+                'slug' => 'ultimate-immunity-duo',
                 'tagline' => 'Double the Protection',
                 'description' => 'Vitamin C (1000mg) + Vitamin D3 & Zinc combo for peak immunity.',
                 'price' => 3299,
@@ -67,6 +18,7 @@
             ],
             [
                 'title' => 'Glow & Strength Bundle',
+                'slug' => 'glow-strength-bundle',
                 'tagline' => 'Complete Beauty Care',
                 'description' => 'Glutathione + Biotin combination for hair, skin and nail health.',
                 'price' => 3499,
@@ -76,6 +28,7 @@
             ],
             [
                 'title' => 'Daily Wellness Pack',
+                'slug' => 'daily-wellness-pack',
                 'tagline' => 'Pure Energy',
                 'description' => 'ACV + Vitamin C mix for digestion and long-lasting energy.',
                 'price' => 2899,
@@ -85,6 +38,7 @@
             ],
             [
                 'title' => 'Skin Transformation Kit',
+                'slug' => 'skin-transformation-kit',
                 'tagline' => 'Radiant Results',
                 'description' => 'Premium Collagen + Glutathione for age-defying skin.',
                 'price' => 4599,
@@ -168,7 +122,7 @@
         <div class="w-full">
             <div
                 class="relative overflow-hidden bg-gradient-to-r from-[#FFF2E8] via-[#FFE7D5] to-[#FDE7D7] px-4 py-8 sm:px-8">
-                <div class="mx-auto max-w-7xl">
+                <div class="mx-auto max-w-[1600px]">
                     <!-- Decorative fruit background icons -->
                     <div class="pointer-events-none absolute -left-2 top-6 flex flex-col gap-3 opacity-85 sm:left-4">
                         <span
@@ -221,7 +175,7 @@
     </section>
 
     <section id="shop" class="bg-[var(--bg-main)]">
-        <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[1600px] px-4 py-10 sm:px-6 lg:px-12">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <h2 class="text-2xl font-extrabold text-[color:var(--text-primary)]">Best Sellers</h2>
@@ -229,7 +183,7 @@
                         Shop our best-selling wellness formulas.
                     </p>
                 </div>
-                <a href="#all"
+                <a href="{{ route('products.index') }}"
                     class="self-start rounded-full bg-black/5 px-4 py-2 text-sm font-semibold hover:bg-black/10 transition sm:self-auto">View
                     all</a>
             </div>
@@ -239,8 +193,9 @@
                     @php
                         $discount = (int) round((1 - ($product['price'] / max(1, $product['mrp']))) * 100);
                     @endphp
-                    <div
-                        class="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
+                        <div
+                            class="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
+                            <a href="{{ route('products.show', $product['slug']) }}" class="absolute inset-0 z-[5]"></a>
                         <button type="button"
                             class="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 ring-1 ring-black/10 hover:bg-white transition"
                             aria-label="Add to wishlist">
@@ -275,11 +230,11 @@
                                 </div>
                             </div>
 
-                            <div class="mt-auto pt-3">
-                                <button type="button"
-                                    class="w-full rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
+                            <div class="mt-auto pt-3 relative z-10">
+                                <a href="{{ route('products.show', $product['slug']) }}"
+                                    class="block w-full text-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
                                     Add to cart
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -313,14 +268,14 @@
                     </div>
                 </div>
 
-                <div class="relative overflow-hidden -my-6 py-6" style="touch-action: pan-y;">
+                <div class="relative overflow-hidden -my-6 py-6" style="touch-action: pan-y pinch-zoom;">
                     <div class="flex gap-6 transition-transform duration-700 ease-in-out cursor-grab active:cursor-grabbing select-none"
                         data-combo-slider-track>
                         @foreach ($combos as $combo)
                             @php
                                 $discount = (int) round((1 - ($combo['price'] / max(1, $combo['mrp']))) * 100);
                             @endphp
-                            <a href="#"
+                            <a href="{{ route('products.show', $combo['slug']) }}"
                                 class="group relative flex w-[85vw] flex-shrink-0 snap-start flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition sm:w-[500px] sm:flex-row no-underline">
                                 <div
                                     class="relative aspect-square w-full overflow-hidden bg-[var(--bg-section)] sm:aspect-auto sm:w-[220px]">
@@ -364,7 +319,7 @@
 
     <!-- Why Remenant Banner (Short Height) -->
     <section class="relative overflow-visible my-8 lg:my-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="relative rounded-[2rem] bg-[var(--bg-sage)] px-8 pt-10 pb-0 sm:px-16 sm:pt-16 sm:pb-16 lg:py-16">
                 <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
 
@@ -424,7 +379,7 @@
 
     <!-- How it Works section -->
     <section class="bg-[var(--bg-peach)] py-10 lg:py-14 text-white">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
                 <!-- Left Content -->
                 <div class="order-2 lg:order-1">
@@ -498,7 +453,7 @@
 
     <!-- Category Products Section -->
     <section class="py-16 bg-white overflow-hidden">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="flex flex-col lg:flex-row gap-8 items-stretch">
                 <!-- Category Banner Card -->
                 <div
@@ -523,7 +478,7 @@
                 </div>
 
                 <!-- Product Scroll Section -->
-                <div class="flex-1 overflow-hidden py-2" data-category-slider-container>
+                <div class="flex-1 overflow-hidden py-2" data-category-slider-container style="touch-action: pan-y pinch-zoom;">
                     <div class="flex gap-6 transition-transform duration-500 ease-in-out cursor-grab active:cursor-grabbing no-scrollbar"
                         data-category-slider-track>
                         @php
@@ -563,7 +518,7 @@
                             ];
                         @endphp
                         @foreach ($categoryProducts as $p)
-                            <a href="#"
+                            <a href="{{ route('products.index') }}"
                                 class="w-[300px] flex-shrink-0 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group snap-start no-underline">
                                 <div class="relative aspect-square overflow-hidden">
                                     <!-- Enhanced Tags -->
@@ -628,7 +583,7 @@
         <div class="section-decor bottom-40 left-[10%] text-5xl opacity-10 animate-float" style="animation-delay: 4.5s;">🍉
         </div>
         <div class="section-decor top-40 right-1/4 text-4xl opacity-5 animate-float" style="animation-delay: 2.5s;">🍋</div>
-        <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[1600px] px-4 py-20 sm:px-6 lg:px-12">
             <div class="text-center">
                 <h2 class="text-3xl font-extrabold text-[color:var(--text-primary)]">Loved by Our Community</h2>
                 <p class="mt-4 text-lg text-[color:var(--text-secondary)]">Join thousands who have made Remenant a part of
@@ -729,7 +684,7 @@
 
     <!-- Trust & Certifications Section -->
     <section class="bg-[#F5F8F7] py-16 sm:py-24 border-y border-black/5 overflow-hidden">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-extrabold text-[color:var(--text-primary)]">Our Quality Commitment</h2>
                 <p class="mt-4 text-lg text-[color:var(--text-secondary)]">We adhere to the highest international standards to ensure every REMENANT product is pure and effective.</p>
@@ -766,7 +721,7 @@
 
     <!-- About Section (Reference Style) -->
     <section id="about" class="bg-[#FDFBF0] py-16 sm:py-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <h2 class="text-4xl font-black italic text-[#074D3D] tracking-tight sm:text-5xl">About Remenant</h2>
             <div class="mt-6 max-w-6xl">
                 <p class="text-base font-bold text-[#074D3D]/90 leading-relaxed sm:text-lg">
