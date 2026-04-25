@@ -22,9 +22,7 @@
         @include('public.layouts.sidebar')
 
         <main class="flex-1">
-            <div class="overflow-x-hidden">
-                @yield('content')
-            </div>
+            @yield('content')
         </main>
 
         @include('public.layouts.footer')
@@ -36,6 +34,8 @@
     <script src="{{ asset('js/public-header.js') }}"></script>
     <script src="{{ asset('js/public-account.js') }}"></script>
     <script src="{{ asset('js/public-hero-slider.js') }}"></script>
+    <script src="{{ asset('js/public-combo-slider.js') }}"></script>
+    <script src="{{ asset('js/public-category-slider.js') }}"></script>
     @stack('scripts')
 </body>
 </html>
