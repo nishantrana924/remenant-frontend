@@ -102,7 +102,7 @@
                 touchDrag: true,
                 mouseDrag: true,
                 responsive: {
-                    0: { items: 1.1, stagePadding: 20 },
+                    0: { items: 1 },
                     640: { items: 2 },
                     1024: { items: 3 },
                     1280: { items: 3 }
@@ -218,6 +218,29 @@
         }
         .combo-carousel .item, .category-carousel .item {
             padding: 10px 0;
+        }
+        .category-carousel .owl-stage-outer {
+            padding: 12px 0;
+        }
+        .category-carousel .owl-item {
+            display: flex;
+            height: auto;
+        }
+        .category-carousel .item {
+            height: 100%;
+        }
+        .combo-carousel .owl-stage-outer {
+            padding: 12px 0;
+        }
+        .combo-carousel .owl-stage {
+            display: flex;
+        }
+        .combo-carousel .owl-item {
+            display: flex;
+            height: auto;
+        }
+        .combo-card {
+            min-height: 100%;
         }
     </style>
     @endpush
@@ -376,41 +399,38 @@
                             @php
                                 $discount = (int) round((1 - ($combo['price'] / max(1, $combo['mrp']))) * 100);
                             @endphp
-                            <a href="{{ route('products.show', $combo['slug']) }}"
-                                class="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition sm:flex-row no-underline">
-                                <div
-                                    class="relative aspect-square w-full overflow-hidden bg-[var(--bg-section)] sm:aspect-auto sm:w-[220px]">
-                                    <img src="{{ asset('images/products/' . $combo['image']) }}" alt="{{ $combo['title'] }}"
-                                        class="h-full w-full object-cover transition duration-500 group-hover:scale-110"
-                                        loading="lazy">
+                            <div class="item">
+                                <a href="{{ route('products.show', $combo['slug']) }}"
+                                    class="combo-card group relative flex h-[210px] w-full flex-row overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 transition hover:shadow-md no-underline">
                                     <div
-                                        class="absolute left-3 top-3 rounded-full bg-black/80 backdrop-blur-sm px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">
-                                        {{ $combo['badge'] }}
+                                        class="relative h-full w-[44%] overflow-hidden bg-[var(--bg-section)] sm:w-[42%]">
+                                        <img src="{{ asset('images/products/' . $combo['image']) }}" alt="{{ $combo['title'] }}"
+                                            class="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                                            loading="lazy">
+                                        <div
+                                            class="absolute left-3 top-3 rounded-full bg-black/80 backdrop-blur-sm px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">
+                                            {{ $combo['badge'] }}
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="flex flex-1 flex-col p-6">
-                                    <p class="text-xs font-extrabold tracking-wide text-[color:var(--primary)] uppercase">Save
-                                        {{ $discount }}% Today</p>
-                                    <h3 class="mt-1 text-lg font-extrabold text-[color:var(--text-primary)] leading-tight">
-                                        {{ $combo['title'] }}</h3>
-                                    <p class="mt-2 text-sm text-[color:var(--text-secondary)] line-clamp-2">
-                                        {{ $combo['description'] }}</p>
-
-                                    <div class="mt-auto pt-6 flex items-center justify-between gap-4">
-                                        <div class="flex flex-col">
+                                    <div class="flex h-full flex-1 flex-col p-4 sm:p-5">
+                                        <p class="text-xs font-extrabold tracking-wide text-[color:var(--primary)] uppercase">Save
+                                            {{ $discount }}% Today</p>
+                                        <h3 class="mt-2 line-clamp-2 min-h-[3rem] text-lg font-extrabold leading-tight text-[color:var(--text-primary)]">
+                                            {{ $combo['title'] }}</h3>
+                                        <div class="mt-2 flex flex-col">
                                             <p class="text-xs text-[color:var(--text-muted)] line-through">
                                                 ₹{{ number_format($combo['mrp']) }}</p>
-                                            <p class="text-xl font-extrabold text-[color:var(--text-primary)]">
+                                            <p class="text-2xl font-extrabold leading-none text-[color:var(--text-primary)]">
                                                 ₹{{ number_format($combo['price']) }}</p>
                                         </div>
                                         <span
-                                            class="rounded-full bg-[color:var(--secondary)] px-4 py-2 text-xs font-extrabold text-white hover:opacity-95 transition group-hover:scale-105 transform duration-300">
+                                            class="mt-auto inline-flex min-h-[2.5rem] w-fit items-center rounded-full bg-[color:var(--secondary)] px-4 py-2 text-xs font-extrabold text-white transition duration-300 group-hover:scale-105 hover:opacity-95">
                                             Grab Combo
                                         </span>
                                     </div>
-                                </div>
-                            </a>
+                                </a>
+                            </div>
                         @endforeach
                 </div>
             </div>
@@ -552,7 +572,7 @@
     </section>
 
     <!-- Category Products Section -->
-    <section class="py-16 bg-white overflow-hidden">
+    <section class="bg-white py-16">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="flex flex-col lg:flex-row gap-8 items-stretch">
                 <!-- Category Banner Card -->
@@ -617,8 +637,8 @@
                         @endphp
                         @foreach ($categoryProducts as $p)
                             <a href="{{ route('products.index') }}"
-                                class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group no-underline">
-                                <div class="relative aspect-square overflow-hidden">
+                                class="group flex h-full min-h-[430px] flex-col overflow-hidden rounded-[2rem] border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl no-underline">
+                                <div class="relative aspect-[1/1] overflow-hidden">
                                     <!-- Enhanced Tags -->
                                     <span
                                         class="absolute top-4 left-4 bg-[#E91E63] text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-full z-10 shadow-lg">Weight</span>
@@ -629,15 +649,15 @@
                                     <img src="{{ asset('images/products/' . $p['image']) }}" alt="{{ $p['title'] }}"
                                         class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
                                 </div>
-                                <div class="p-6">
-                                    <h3 class="text-lg font-extrabold text-gray-900 leading-tight h-12 line-clamp-2">
+                                <div class="flex flex-1 flex-col p-5">
+                                    <h3 class="line-clamp-2 min-h-[3.4rem] text-xl font-extrabold leading-tight text-gray-900">
                                         {{ $p['title'] }}</h3>
                                     <div class="mt-2 flex items-center gap-1">
                                         <i data-lucide="star" class="h-3 w-3 fill-orange-400 text-orange-400"></i>
                                         <span class="text-[11px] font-bold text-gray-500">{{ $p['rating'] }} | Weight
                                             Management</span>
                                     </div>
-                                    <div class="mt-6 flex items-center justify-between gap-4">
+                                    <div class="mt-auto flex items-end justify-between gap-3 pt-5">
                                         <div class="flex flex-col text-left">
                                             <span
                                                 class="text-xs text-gray-400 line-through tracking-tighter decoration-1">₹{{ number_format($p['mrp']) }}</span>
@@ -645,7 +665,7 @@
                                                 ₹{{ number_format($p['price']) }}</p>
                                         </div>
                                         <span
-                                            class="bg-[#4CAF50] hover:bg-[#388E3C] text-white px-6 py-3 rounded-2xl text-sm font-black transition-all transform active:scale-95 shadow-lg shadow-green-100 flex items-center gap-2 group/btn">
+                                            class="inline-flex min-h-[2.75rem] items-center gap-2 rounded-2xl bg-[#4CAF50] px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-green-100 transition-all hover:bg-[#388E3C] active:scale-95 group/btn">
                                             <i data-lucide="plus"
                                                 class="h-4 w-4 transition-transform group-hover/btn:rotate-90"></i> ADD
                                         </span>
