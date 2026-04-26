@@ -3,6 +3,22 @@
 @section('title', $product['title'] . ' - ' . config('app.name', 'Remenant Health'))
 
 @section('content')
+    @push('styles')
+    <style>
+        /* Prevent flicker on reload: show first slide immediately */
+        .product-gallery-carousel:not(.owl-loaded) {
+            display: flex;
+            overflow: hidden;
+        }
+        .product-gallery-carousel:not(.owl-loaded) > div:not(:first-child) {
+            display: none;
+        }
+        .product-gallery-carousel:not(.owl-loaded) > div:first-child {
+            width: 100%;
+            display: block;
+        }
+    </style>
+    @endpush
     <div class="bg-[var(--bg-main)]">
         <!-- Breadcrumbs -->
         <nav class="mx-auto max-w-[1600px] px-4 pt-6 sm:px-6 lg:px-12" aria-label="Breadcrumb">
@@ -20,37 +36,46 @@
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
                 
                 <!-- Left: Product Images -->
-                <div class="space-y-4">
-                    <div class="relative aspect-[16/9] overflow-hidden rounded-[2rem] bg-[var(--bg-section)] ring-1 ring-black/5 shadow-sm">
-                        <img id="main-product-image" src="{{ asset('images/products/' . $product['image']) }}" 
-                             alt="{{ $product['title'] }}" 
-                             class="h-full w-full object-contain cursor-zoom-in select-none">
-                        
-                        <!-- Actions -->
-                        <div class="absolute right-6 top-6 flex flex-col gap-3 z-20">
-                            <button type="button" class="flex h-11 w-11 items-center justify-center rounded-full bg-white/95 shadow-xl ring-1 ring-black/5 hover:bg-white transition active:scale-95" aria-label="Share product">
-                                <i data-lucide="share-2" class="h-5 w-5 text-gray-800"></i>
-                            </button>
-                            <button type="button" class="flex h-11 w-11 items-center justify-center rounded-full bg-white/95 shadow-xl ring-1 ring-black/5 hover:bg-white transition active:scale-95 group" aria-label="Add to wishlist">
-                                <i data-lucide="heart" class="h-5 w-5 text-gray-800 group-hover:fill-red-500 group-hover:text-red-500 transition"></i>
-                            </button>
+                <div class="space-y-6">
+                    <div class="relative group/gallery">
+                        <div class="product-gallery-carousel owl-carousel owl-theme">
+                            @foreach(array_merge([$product['image']], $product['gallery']) as $index => $img)
+                                <div class="relative aspect-[16/9] overflow-hidden rounded-[2rem] bg-[var(--bg-section)] ring-1 ring-black/5 shadow-sm cursor-zoom-in"
+                                     onclick="openLightbox({{ $index }})">
+                                    <img src="{{ asset('images/products/' . $img) }}" 
+                                         alt="{{ $product['title'] }}" 
+                                         class="h-full w-full object-contain select-none">
+                                    
+                                    <!-- Discount Badge (Only on first slide) -->
+                                    @if($loop->first)
+                                        @php
+                                            $discount = (int) round((1 - ($product['price'] / max(1, $product['mrp']))) * 100);
+                                        @endphp
+                                        <div class="absolute left-6 top-6 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-black text-white shadow-lg z-10">
+                                            -{{ $discount }}% OFF
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
                         </div>
 
-                        <!-- Discount Badge -->
-                        @php
-                            $discount = (int) round((1 - ($product['price'] / max(1, $product['mrp']))) * 100);
-                        @endphp
-                        <div class="absolute left-6 top-6 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-black text-white shadow-lg z-10">
-                            -{{ $discount }}% OFF
+                        <!-- Custom Nav Buttons -->
+                        <div class="absolute inset-0 flex items-center justify-between px-4 pointer-events-none z-20">
+                            <button type="button" data-gallery-prev class="pointer-events-auto h-12 w-12 rounded-full bg-white/90 backdrop-blur-md shadow-2xl flex items-center justify-center transition-all duration-300 active:scale-95 ring-1 ring-black/10 opacity-0 lg:opacity-40 group-hover/gallery:opacity-100">
+                                <i data-lucide="chevron-left" class="h-7 w-7 text-black"></i>
+                            </button>
+                            <button type="button" data-gallery-next class="pointer-events-auto h-12 w-12 rounded-full bg-white/90 backdrop-blur-md shadow-2xl flex items-center justify-center transition-all duration-300 active:scale-95 ring-1 ring-black/10 opacity-0 lg:opacity-40 group-hover/gallery:opacity-100">
+                                <i data-lucide="chevron-right" class="h-7 w-7 text-black"></i>
+                            </button>
                         </div>
                     </div>
 
                     <!-- Gallery Thumbnails -->
-                    <div class="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
-                        @foreach($product['gallery'] as $img)
+                    <div class="flex gap-4 overflow-x-auto pb-2 no-scrollbar gallery-thumbs">
+                        @foreach(array_merge([$product['image']], $product['gallery']) as $index => $img)
                             <button type="button" 
-                                    onclick="document.getElementById('main-product-image').src='{{ asset('images/products/' . $img) }}'"
-                                    class="relative aspect-square w-24 shrink-0 overflow-hidden rounded-2xl bg-white ring-1 ring-black/5 hover:ring-[var(--primary)] transition shadow-sm">
+                                    data-index="{{ $index }}"
+                                    class="gallery-thumb relative aspect-square w-24 shrink-0 overflow-hidden rounded-2xl bg-white ring-1 ring-black/5 hover:ring-[var(--primary)] transition shadow-sm {{ $index === 0 ? 'ring-2 ring-[var(--primary)]' : '' }}">
                                 <img src="{{ asset('images/products/' . $img) }}" alt="Gallery image" class="h-full w-full object-contain">
                             </button>
                         @endforeach
@@ -519,7 +544,7 @@
                     <a href="{{ route('products.index') }}" class="hidden sm:inline-flex rounded-full bg-orange-50 text-[color:var(--primary)] px-8 py-3 text-xs font-black uppercase tracking-widest hover:bg-orange-100 transition ring-1 ring-orange-100">View All Collections</a>
                 </div>
 
-                <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="related-carousel owl-carousel owl-theme">
                     @foreach($relatedProducts as $rp)
                         <a href="{{ route('products.show', $rp['slug']) }}" class="group block">
                             <div class="relative aspect-square overflow-hidden rounded-[2.5rem] bg-[var(--bg-section)] ring-1 ring-black/5 mb-6">
@@ -569,16 +594,16 @@
     <!-- Image Lightbox Modal -->
     <div id="lightbox-modal" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-[#0a1a0f]/95 backdrop-blur-sm transition-all duration-300">
         <!-- Close Button -->
-        <button type="button" onclick="closeLightbox()" class="absolute right-6 top-6 z-[110] flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition">
+        <button type="button" onclick="closeLightbox()" class="absolute right-6 top-6 z-[110] flex h-12 w-12 items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-red-500 transition-all duration-300 shadow-2xl ring-1 ring-white/20">
             <i data-lucide="x" class="h-6 w-6"></i>
         </button>
 
         <!-- Navigation -->
-        <button type="button" onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 z-[110] flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 transition sm:left-8">
-            <i data-lucide="chevron-left" class="h-8 w-8"></i>
+        <button type="button" onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 z-[110] flex h-14 w-14 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-black transition-all duration-300 sm:left-8 group shadow-2xl ring-1 ring-black/10">
+            <i data-lucide="chevron-left" class="h-8 w-8 transition-transform group-hover:-translate-x-1"></i>
         </button>
-        <button type="button" onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 z-[110] flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-white hover:bg-white/10 transition sm:right-8">
-            <i data-lucide="chevron-right" class="h-8 w-8"></i>
+        <button type="button" onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 z-[110] flex h-14 w-14 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-black transition-all duration-300 sm:right-8 group shadow-2xl ring-1 ring-black/10">
+            <i data-lucide="chevron-right" class="h-8 w-8 transition-transform group-hover:translate-x-1"></i>
         </button>
 
         <!-- Main Image -->
@@ -603,6 +628,53 @@
             @endforeach
         ];
         
+        $(document).ready(function(){
+            if(window.lucide) window.lucide.createIcons();
+            const $gallery = $(".product-gallery-carousel");
+            
+            $gallery.owlCarousel({
+                items: 1,
+                loop: false,
+                dots: false,
+                nav: false,
+                smartSpeed: 800,
+                onChanged: function(event) {
+                    const index = event.item.index;
+                    currentImageIndex = index;
+                    $(".gallery-thumb").removeClass("ring-2 ring-[var(--primary)]");
+                    $(`.gallery-thumb[data-index="${index}"]`).addClass("ring-2 ring-[var(--primary)]");
+                }
+            });
+
+            $(".gallery-thumb").on("click", function() {
+                const index = $(this).data("index");
+                $gallery.trigger("to.owl.carousel", [index, 300]);
+            });
+
+            $("[data-gallery-prev]").on("click", function() {
+                $gallery.trigger("prev.owl.carousel");
+            });
+
+            $("[data-gallery-next]").on("click", function() {
+                $gallery.trigger("next.owl.carousel");
+            });
+
+            $(".related-carousel").owlCarousel({
+                items: 1,
+                margin: 24,
+                loop: false,
+                autoplay: false,
+                nav: false,
+                dots: false,
+                responsive: {
+                    0: { items: 1.2, stagePadding: 20 },
+                    640: { items: 2 },
+                    1024: { items: 3 },
+                    1280: { items: 4 }
+                }
+            });
+        });
+        
         let currentImageIndex = 0;
         const modal = document.getElementById('lightbox-modal');
         const lightboxImg = document.getElementById('lightbox-image');
@@ -618,6 +690,8 @@
             modal.classList.add('flex');
             document.body.style.overflow = 'hidden';
             
+            if(window.lucide) window.lucide.createIcons();
+
             setTimeout(() => {
                 lightboxImg.classList.remove('scale-95', 'opacity-0');
                 lightboxImg.classList.add('scale-100', 'opacity-100');
