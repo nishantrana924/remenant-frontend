@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <a href="#cart"
+                    <a href="{{ route('cart') }}"
                         class="header-btn inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
                         aria-label="Cart">
                         <i data-lucide="shopping-cart" class="h-6 w-6"></i>
@@ -103,7 +103,7 @@
                         <i data-lucide="search" class="h-5 w-5"></i>
                     </span>
                     <input type="search" placeholder="Search for products…"
-                        class="w-full rounded-full border border-white/25 bg-white/15 py-3 pl-11 pr-4 text-white placeholder:text-white/70 outline-none ring-0 focus:border-white/40 focus:bg-white/20">
+                        class="w-full rounded-full border border-white/30 bg-white/10 py-3 pl-11 pr-4 text-white placeholder:text-white/60 outline-none transition-all duration-300 focus:bg-white/20 focus:ring-0 focus:border-white/50 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
                 </div>
             </div>
         </div>
@@ -130,13 +130,13 @@
                         <i data-lucide="search" class="h-5 w-5"></i>
                     </span>
                     <input type="search" placeholder="Search for products…"
-                        class="w-full rounded-full border border-white/25 bg-white/15 py-2 pl-10 pr-4 text-white placeholder:text-white/70 outline-none ring-0 focus:border-white/40 focus:bg-white/20">
+                        class="w-full rounded-full border border-white/30 bg-white/10 py-2 pl-10 pr-4 text-white placeholder:text-white/60 outline-none transition-all duration-300 focus:max-w-[580px] focus:bg-white/20 focus:ring-0 focus:border-white/50 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
                 </div>
             </div>
 
             <!-- Actions -->
             <div class="flex items-center gap-2">
-                <a href="#cart"
+                <a href="{{ route('cart') }}"
                     class="header-btn inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
                     aria-label="Cart">
                     <i data-lucide="shopping-cart" class="h-5 w-5"></i>

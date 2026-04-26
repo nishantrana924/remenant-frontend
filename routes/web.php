@@ -16,6 +16,10 @@ Route::get('/contact', function () {
     return view('public.contact');
 })->name('contact');
 
+Route::get('/cart', function () {
+    return view('public.cart');
+})->name('cart');
+
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
 
