@@ -207,3 +207,21 @@
         </div>
     </div>
 </header>
+
+<style>
+    /* Reinforce sticky behavior */
+    [data-public-header] {
+        position: -webkit-sticky !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 100 !important;
+        width: 100% !important;
+        display: block !important;
+    }
+
+    /* Ensure parents don't break sticky */
+    html,
+    body {
+        overflow-x: visible !important;
+    }
+</style>

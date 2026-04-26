@@ -6,7 +6,7 @@
         const header = document.querySelector(HEADER_SELECTOR);
         if (!header) return;
 
-        const isScrolled = window.scrollY > 8;
+        const isScrolled = window.scrollY > 10;
 
         const mobileSearch = header.querySelector(MOBILE_SEARCH_SELECTOR);
         if (mobileSearch) {
@@ -15,8 +15,12 @@
     }
 
     function init() {
-        onScroll();
-        window.addEventListener('scroll', onScroll, { passive: true });
+        try {
+            onScroll();
+            window.addEventListener('scroll', onScroll, { passive: true });
+        } catch (e) {
+            console.error('Error initializing public header:', e);
+        }
     }
 
     if (document.readyState === 'loading') {
