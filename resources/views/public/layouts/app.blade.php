@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,33 +12,40 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Owl Carousel CSS -->
+    <link rel="stylesheet" href="{{ asset('plugins/owlcarousel/assets/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/owlcarousel/assets/owl.theme.default.min.css') }}">
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 
-<body class="font-sans antialiased bg-[var(--bg-main)] overflow-x-hidden">
+<body class="font-sans antialiased bg-[var(--bg-main)]">
     <div class="min-h-screen flex flex-col">
         @include('public.layouts.header')
         @include('public.layouts.sidebar')
 
-        <main class="flex-1">
+        <main class="flex-1 overflow-x-hidden">
             @yield('content')
         </main>
 
         @include('public.layouts.footer')
     </div>
 
+    <script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('plugins/owlcarousel/owl.carousel.min.js') }}"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="{{ asset('js/icons.js') }}"></script>
     <script src="{{ asset('js/public-sidebar.js') }}"></script>
     <script src="{{ asset('js/public-header.js') }}"></script>
     <script src="{{ asset('js/public-account.js') }}"></script>
-    <script src="{{ asset('js/public-hero-slider.js') }}"></script>
     <script src="{{ asset('js/public-combo-slider.js') }}"></script>
     <script src="{{ asset('js/public-category-slider.js') }}"></script>
     @stack('scripts')
 </body>
-</html>
 
+</html>
