@@ -22,6 +22,7 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    @stack('styles')
 </head>
 
 <body class="font-sans antialiased bg-[var(--bg-main)]">
@@ -43,8 +44,6 @@
     <script src="{{ asset('js/public-sidebar.js') }}"></script>
     <script src="{{ asset('js/public-header.js') }}"></script>
     <script src="{{ asset('js/public-account.js') }}"></script>
-    <script src="{{ asset('js/public-combo-slider.js') }}"></script>
-    <script src="{{ asset('js/public-category-slider.js') }}"></script>
     @stack('scripts')
 </body>
 

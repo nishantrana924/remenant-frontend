@@ -75,28 +75,88 @@
     @push('scripts')
     <script>
         $(document).ready(function(){
+            // Hero Slider
             $(".hero-carousel").owlCarousel({
                 items: 1,
                 loop: true,
                 autoplay: true,
-                autoplayTimeout: 2000,
-                autoplayHoverPause: true,
+                autoplayTimeout: 4000,
+                autoplayHoverPause: false,
                 nav: false,
                 dots: true,
                 smartSpeed: 800,
                 autoHeight: false
             });
+
+            // Combo Offers Slider
+            const comboCarousel = $(".combo-carousel").owlCarousel({
+                items: 1,
+                margin: 24,
+                loop: true,
+                autoplay: true,
+                autoplayTimeout: 4000,
+                autoplayHoverPause: true,
+                smartSpeed: 1000,
+                nav: false,
+                dots: false,
+                touchDrag: true,
+                mouseDrag: true,
+                responsive: {
+                    0: { items: 1.1, stagePadding: 20 },
+                    640: { items: 2 },
+                    1024: { items: 3 },
+                    1280: { items: 3 }
+                }
+            });
+
+            // Custom Nav for Combo
+            $('[data-combo-prev]').click(function() {
+                comboCarousel.trigger('prev.owl.carousel');
+            });
+            $('[data-combo-next]').click(function() {
+                comboCarousel.trigger('next.owl.carousel');
+            });
+
+            // Category Slider
+            $(".category-carousel").owlCarousel({
+                items: 1,
+                margin: 24,
+                loop: true,
+                autoplay: false,
+                nav: false,
+                dots: false,
+                responsive: {
+                    0: { items: 1, stagePadding: 40 },
+                    640: { items: 2 },
+                    1024: { items: 3 },
+                    1280: { items: 4 }
+                }
+            });
         });
     </script>
+    @endpush
+
+    @push('styles')
     <style>
         .hero-carousel {
             width: 100%;
             position: relative;
             display: block !important; /* Ensure visibility before JS loads */
-            min-height: 400px;
+            min-height: 450px;
+            background: var(--bg-section);
         }
 
-        /* Pre-loader: Show only the first item before Owl initializes to prevent vertical stacking */
+        /* Prevent layout shift: Show only the first item before Owl initializes */
+        .hero-carousel:not(.owl-loaded) {
+            display: flex !important;
+            overflow: hidden;
+        }
+
+        .hero-carousel:not(.owl-loaded) .item {
+            width: 100%;
+            flex: 0 0 100%;
+        }
+
         .hero-carousel:not(.owl-loaded) .item:not(:first-child) {
             display: none;
         }
@@ -124,7 +184,7 @@
                 aspect-ratio: 1 / 1;
             }
             .hero-carousel .hero-img {
-                object-fit: contain;
+                object-fit: cover; /* Changed from contain to cover for better look */
             }
         }
 
@@ -153,9 +213,11 @@
             width: 20px !important;
             border-radius: 4px;
         }
-        /* Remove default owl theme margin */
-        .hero-carousel.owl-theme .owl-dots .owl-dot:hover span {
-            background: rgba(255, 255, 255, 0.7) !important;
+        .owl-carousel .owl-item {
+            will-change: transform;
+        }
+        .combo-carousel .item, .category-carousel .item {
+            padding: 10px 0;
         }
     </style>
     @endpush
@@ -169,13 +231,13 @@
                 class="relative overflow-hidden bg-gradient-to-r from-[#FFF2E8] via-[#FFE7D5] to-[#FDE7D7] px-4 py-8 sm:px-8">
                 <div class="mx-auto max-w-[1600px]">
                     <!-- Decorative fruit background icons -->
-                    <div class="pointer-events-none absolute -left-2 top-6 flex flex-col gap-3 opacity-85 sm:left-4">
+                    <div class="pointer-events-none absolute -left-4 top-6 hidden flex-col gap-3 opacity-50 sm:flex sm:left-4">
                         <span
                             class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/65 text-xl shadow-sm">🍉</span>
                         <span
                             class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/60 text-lg shadow-sm">🍓</span>
                     </div>
-                    <div class="pointer-events-none absolute -right-2 bottom-6 flex flex-col gap-3 opacity-85 sm:right-4">
+                    <div class="pointer-events-none absolute -right-4 bottom-6 hidden flex-col gap-3 opacity-50 sm:flex sm:right-4">
                         <span
                             class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/65 text-xl shadow-sm">🍊</span>
                         <span
@@ -191,7 +253,7 @@
                             class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
                             <img src="{{ asset('images/icons/clinically-tested.png') }}" alt="Clinically tested"
                                 class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16">
-                            <p class="text-[10px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                            <p class="text-[11px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
                                 Clean Label<br>Certified
                             </p>
                         </div>
@@ -200,7 +262,7 @@
                             class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
                             <img src="{{ asset('images/icons/premium-quality.png') }}" alt="Premium quality"
                                 class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16">
-                            <p class="text-[10px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                            <p class="text-[11px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
                                 Premium Quality<br>Ingredients
                             </p>
                         </div>
@@ -209,7 +271,7 @@
                             class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
                             <img src="{{ asset('images/icons/safe-daily-use.png') }}" alt="Safe and effective"
                                 class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16">
-                            <p class="text-[10px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                            <p class="text-[11px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
                                 Safe &amp; Effective<br>Daily Use
                             </p>
                         </div>
@@ -287,19 +349,15 @@
             </div>
 
             <!-- Combo Offers Section -->
-            <div class="mt-12 relative" data-combo-slider-container>
+            <div class="mt-12 relative">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-10">
                     <div>
-                        {{-- <span
-                            class="text-xs font-extrabold uppercase tracking-widest text-[color:var(--primary)]">Special
-                            Bundles</span> --}}
                         <h2 class="mt-2 text-4xl font-extrabold text-[color:var(--text-primary)]">Combo Offers</h2>
                         <p class="mt-4 max-w-2xl text-[color:var(--text-secondary)]">
                             We curate the perfect health combinations to help you achieve your wellness goals faster and
                             more affordably.
                         </p>
                     </div>
-
                     <!-- Slider Navigation -->
                     <div class="hidden sm:flex items-center gap-3">
                         <button type="button" data-combo-prev
@@ -313,15 +371,13 @@
                     </div>
                 </div>
 
-                <div class="relative overflow-hidden -my-6 py-6" style="touch-action: pan-y pinch-zoom;">
-                    <div class="flex gap-6 transition-transform duration-700 ease-in-out cursor-grab active:cursor-grabbing select-none"
-                        data-combo-slider-track>
+                <div class="combo-carousel owl-carousel owl-theme">
                         @foreach ($combos as $combo)
                             @php
                                 $discount = (int) round((1 - ($combo['price'] / max(1, $combo['mrp']))) * 100);
                             @endphp
                             <a href="{{ route('products.show', $combo['slug']) }}"
-                                class="group relative flex w-[85vw] flex-shrink-0 snap-start flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition sm:w-[500px] sm:flex-row no-underline">
+                                class="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition sm:flex-row no-underline">
                                 <div
                                     class="relative aspect-square w-full overflow-hidden bg-[var(--bg-section)] sm:aspect-auto sm:w-[220px]">
                                     <img src="{{ asset('images/products/' . $combo['image']) }}" alt="{{ $combo['title'] }}"
@@ -356,7 +412,6 @@
                                 </div>
                             </a>
                         @endforeach
-                    </div>
                 </div>
             </div>
         </div>
@@ -502,7 +557,7 @@
             <div class="flex flex-col lg:flex-row gap-8 items-stretch">
                 <!-- Category Banner Card -->
                 <div
-                    class="relative w-full lg:w-[450px] shrink-0 overflow-hidden rounded-[2.5rem] bg-[#FFF0F3] ring-1 ring-black/5">
+                    class="relative w-full lg:w-[450px] min-h-[420px] lg:min-h-0 shrink-0 overflow-hidden rounded-[2.5rem] bg-[#FFF0F3] ring-1 ring-black/5">
                     <div class="absolute inset-0 px-8 py-10 z-20 flex flex-col justify-between">
                         <div>
                             <h2 class="text-6xl font-black italic tracking-tighter text-[#E91E63] uppercase leading-none">
@@ -523,9 +578,7 @@
                 </div>
 
                 <!-- Product Scroll Section -->
-                <div class="flex-1 overflow-hidden py-2" data-category-slider-container style="touch-action: pan-y pinch-zoom;">
-                    <div class="flex gap-6 transition-transform duration-500 ease-in-out cursor-grab active:cursor-grabbing no-scrollbar"
-                        data-category-slider-track>
+                <div class="flex-1 category-carousel owl-carousel owl-theme py-2">
                         @php
                             $categoryProducts = [
                                 [
@@ -564,7 +617,7 @@
                         @endphp
                         @foreach ($categoryProducts as $p)
                             <a href="{{ route('products.index') }}"
-                                class="w-[300px] flex-shrink-0 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group snap-start no-underline">
+                                class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group no-underline">
                                 <div class="relative aspect-square overflow-hidden">
                                     <!-- Enhanced Tags -->
                                     <span
@@ -600,7 +653,6 @@
                                 </div>
                             </a>
                         @endforeach
-                    </div>
                 </div>
             </div>
         </div>
