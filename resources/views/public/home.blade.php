@@ -50,70 +50,115 @@
     @endphp
 
     <section class="bg-[var(--bg-main)]">
-        <div class="w-full">
-            <div class="hero-slider relative overflow-hidden" data-hero-slider data-interval="4500">
-                <div class="hero-slider__viewport">
-                    <div class="hero-slider__track" data-slider-track>
-                        <div class="hero-slide is-active" data-slide>
-                            <picture>
-                                <source media="(max-width: 640px)"
-                                    srcset="{{ asset('images/banners/mobile-bg/remenant-bg1.jpg') }}">
-                                <img src="{{ asset('images/banners/remenant-bg22.jpg') }}" alt="Remenant Health Banner 1"
-                                    loading="eager">
-                            </picture>
-                        </div>
-                        <div class="hero-slide" data-slide>
-                            <picture>
-                                <source media="(max-width: 640px)"
-                                    srcset="{{ asset('images/banners/mobile-bg/remenant-bg2.jpg') }}">
-                                <img src="{{ asset('images/banners/remenant-bg20.jpg') }}" alt="Remenant Health Banner 2"
-                                    loading="lazy">
-                            </picture>
-                        </div>
-                        <div class="hero-slide" data-slide>
-                            <picture>
-                                <source media="(max-width: 640px)"
-                                    srcset="{{ asset('images/banners/mobile-bg/remenant-bg3.jpg') }}">
-                                <img src="{{ asset('images/banners/remenant-bg19.jpg') }}" alt="Remenant Health Banner 3"
-                                    loading="lazy">
-                            </picture>
-                        </div>
-                        <div class="hero-slide" data-slide>
-                            <picture>
-                                <source media="(max-width: 640px)"
-                                    srcset="{{ asset('images/banners/mobile-bg/remenant-bg4.jpg') }}">
-                                <img src="{{ asset('images/banners/remenant-bg18.jpg') }}" alt="Remenant Health Banner 4"
-                                    loading="lazy">
-                            </picture>
-                        </div>
-                        <div class="hero-slide" data-slide>
-                            <picture>
-                                <source media="(max-width: 640px)"
-                                    srcset="{{ asset('images/banners/mobile-bg/remenant-bg5.jpg') }}">
-                                <img src="{{ asset('images/banners/remenant-bg21.jpg') }}" alt="Remenant Health Banner 5"
-                                    loading="lazy">
-                            </picture>
-                        </div>
-                    </div>
+        <div class="hero-carousel owl-carousel owl-theme">
+            @php
+                $slides = [
+                    ['desktop' => 'remenant-bg22.jpg', 'mobile' => 'remenant-bg1.jpg', 'alt' => 'Banner 1'],
+                    ['desktop' => 'remenant-bg20.jpg', 'mobile' => 'remenant-bg2.jpg', 'alt' => 'Banner 2'],
+                    ['desktop' => 'remenant-bg19.jpg', 'mobile' => 'remenant-bg3.jpg', 'alt' => 'Banner 3'],
+                    ['desktop' => 'remenant-bg18.jpg', 'mobile' => 'remenant-bg4.jpg', 'alt' => 'Banner 4'],
+                    ['desktop' => 'remenant-bg21.jpg', 'mobile' => 'remenant-bg5.jpg', 'alt' => 'Banner 5'],
+                ];
+            @endphp
+            @foreach($slides as $slide)
+                <div class="item">
+                    <picture>
+                        <source media="(max-width: 640px)" srcset="{{ asset('images/banners/mobile-bg/' . $slide['mobile']) }}">
+                        <img src="{{ asset('images/banners/' . $slide['desktop']) }}" alt="{{ $slide['alt'] }}" 
+                             class="hero-img" loading="{{ $loop->first ? 'eager' : 'lazy' }}">
+                    </picture>
                 </div>
-
-                <button type="button" class="hero-slider__nav hero-slider__nav--prev" aria-label="Previous slide" data-prev>
-                    <i data-lucide="chevron-left" class="h-6 w-6"></i>
-                </button>
-                <button type="button" class="hero-slider__nav hero-slider__nav--next" aria-label="Next slide" data-next>
-                    <i data-lucide="chevron-right" class="h-6 w-6"></i>
-                </button>
-
-                <div class="hero-slider__dots" role="tablist" aria-label="Hero slides">
-                    <button type="button" class="hero-dot is-active" aria-label="Slide 1" data-dot></button>
-                    <button type="button" class="hero-dot" aria-label="Slide 2" aria-label="Slide 2" data-dot></button>
-                    <button type="button" class="hero-dot" aria-label="Slide 3" aria-label="Slide 3" data-dot></button>
-                    <button type="button" class="hero-dot" aria-label="Slide 4" aria-label="Slide 4" data-dot></button>
-                    <button type="button" class="hero-dot" aria-label="Slide 5" aria-label="Slide 5" data-dot></button>
-                </div>
-            </div>
+            @endforeach
         </div>
     </section>
+
+    @push('scripts')
+    <script>
+        $(document).ready(function(){
+            $(".hero-carousel").owlCarousel({
+                items: 1,
+                loop: true,
+                autoplay: true,
+                autoplayTimeout: 2000,
+                autoplayHoverPause: true,
+                nav: false,
+                dots: true,
+                smartSpeed: 800,
+                autoHeight: false
+            });
+        });
+    </script>
+    <style>
+        .hero-carousel {
+            width: 100%;
+            position: relative;
+            display: block !important; /* Ensure visibility before JS loads */
+            min-height: 400px;
+        }
+
+        /* Pre-loader: Show only the first item before Owl initializes to prevent vertical stacking */
+        .hero-carousel:not(.owl-loaded) .item:not(:first-child) {
+            display: none;
+        }
+
+        .hero-carousel .item {
+            width: 100%;
+            position: relative;
+            background: var(--bg-section);
+            aspect-ratio: 1200 / 450;
+            overflow: hidden;
+        }
+        .hero-carousel .hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Mobile View Aspect Ratio (1200x1200) */
+        @media (max-width: 640px) {
+            .hero-carousel {
+                min-height: 300px;
+            }
+            .hero-carousel .item {
+                aspect-ratio: 1 / 1;
+            }
+            .hero-carousel .hero-img {
+                object-fit: contain;
+            }
+        }
+
+        /* Custom Owl Dots Styling */
+        .hero-carousel .owl-dots {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        .hero-carousel .owl-dot span {
+            width: 8px !important;
+            height: 8px !important;
+            margin: 0 !important;
+            background: rgba(255, 255, 255, 0.4) !important;
+            border-radius: 50%;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        .hero-carousel .owl-dot.active span {
+            background: #fff !important;
+            width: 20px !important;
+            border-radius: 4px;
+        }
+        /* Remove default owl theme margin */
+        .hero-carousel.owl-theme .owl-dots .owl-dot:hover span {
+            background: rgba(255, 255, 255, 0.7) !important;
+        }
+    </style>
+    @endpush
 
 
 
@@ -318,9 +363,9 @@
     </section>
 
     <!-- Why Remenant Banner (Short Height) -->
-    <section class="relative overflow-visible my-8 lg:my-20">
+    <section class="relative overflow-hidden my-8 lg:my-20">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-            <div class="relative rounded-[2rem] bg-[var(--bg-sage)] px-8 pt-10 pb-0 sm:px-16 sm:pt-16 sm:pb-16 lg:py-16">
+            <div class="relative overflow-hidden rounded-[2rem] bg-[var(--bg-sage)] px-8 pt-10 pb-0 sm:px-16 sm:pt-16 sm:pb-16 lg:py-16">
                 <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
 
                     <!-- Content Right (Text) -->

@@ -266,9 +266,9 @@
     </section>
 
     <!-- Why Remenant Banner (Short Height - Customized for About) -->
-    <section class="relative overflow-visible my-8 lg:my-20">
+    <section class="relative overflow-hidden my-8 lg:my-20">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-            <div class="relative rounded-[2rem] bg-[var(--bg-peach)] px-8 pt-10 pb-0 sm:px-16 sm:pt-16 sm:pb-16 lg:py-16 border border-white/10 shadow-2xl">
+            <div class="relative overflow-hidden rounded-[2rem] bg-[var(--bg-peach)] px-8 pt-10 pb-0 sm:px-16 sm:pt-16 sm:pb-16 lg:py-16 border border-white/10 shadow-2xl">
                 <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
 
                     <!-- Content Right (Text) -->
