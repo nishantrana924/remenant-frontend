@@ -1,9 +1,9 @@
 <!-- Sidebar overlay -->
-<div class="fixed inset-0 z-[60] hidden bg-black/50 opacity-0 backdrop-blur-[1px] transition-opacity duration-200"
+<div class="fixed inset-0 z-[130] hidden bg-black/50 opacity-0 backdrop-blur-[1px] transition-opacity duration-200"
     data-sidebar-overlay>
     <!-- Sidebar panel -->
     <aside
-        class="absolute left-0 top-0 h-full w-[320px] -translate-x-full bg-[var(--sidebar-bg)] shadow-2xl transition-transform duration-200 sm:w-[360px]"
+        class="absolute left-0 top-0 h-full w-[88vw] max-w-[360px] -translate-x-full overflow-y-auto bg-[var(--sidebar-bg)] shadow-2xl transition-transform duration-200 sm:w-[360px]"
         data-sidebar-panel role="dialog" aria-modal="true" aria-label="Sidebar" tabindex="-1">
         <div class="flex items-center justify-between border-b border-black/5 px-5 py-4">
             <div class="flex items-center gap-3">

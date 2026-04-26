@@ -16,38 +16,55 @@
         <!-- Tailwind CSS -->
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     </head>
-    <body class="font-sans antialiased bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center py-6 sm:py-0 px-4">
-            <div class="w-full sm:max-w-md">
-                <!-- Logo -->
-                <div class="text-center mb-8">
-                    <a href="/" class="inline-flex items-center space-x-2">
+    <body class="font-sans antialiased bg-[color:var(--bg-primary)] text-[color:var(--text-primary)]">
+        <!-- Dynamic Background -->
+        <div class="fixed inset-0 -z-10 overflow-hidden">
+            <div class="absolute -top-[10%] -left-[10%] h-[40%] w-[40%] rounded-full bg-[color:var(--primary)]/5 blur-[120px]"></div>
+            <div class="absolute top-[20%] -right-[5%] h-[35%] w-[35%] rounded-full bg-[color:var(--secondary)]/5 blur-[100px]"></div>
+            <div class="absolute -bottom-[10%] left-[20%] h-[30%] w-[30%] rounded-full bg-[color:var(--primary)]/5 blur-[80px]"></div>
+        </div>
+
+        <div class="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div class="w-full max-w-[480px]">
+                <!-- Logo Section -->
+                <div class="mb-12 text-center">
+                    <a href="/" class="group inline-block transition-transform hover:scale-105">
                         <img
-                            src="{{ asset('images/logo/remenant-health-logo.jpg') }}"
+                            src="{{ asset('images/logo/remenant-health-logo.png') }}"
                             alt="{{ config('app.name', 'Remenant Health') }} logo"
-                            class="h-12 w-12 rounded-lg object-contain"
+                            class="mx-auto h-20 w-auto object-contain drop-shadow-2xl"
                         >
-                        <span class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            {{ config('app.name', 'Shipping Product') }}
-                        </span>
                     </a>
                 </div>
 
-                <!-- Card -->
-                <div class="bg-white/80 backdrop-blur-md shadow-xl rounded-2xl border border-gray-200/50 overflow-hidden">
-                    <div class="px-6 py-8">
-                        {{ $slot }}
-                    </div>
+                <!-- Main Card -->
+                <div class="overflow-hidden rounded-[3rem] bg-white p-8 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] ring-1 ring-black/5 sm:p-12">
+                    {{ $slot }}
                 </div>
 
-                <!-- Back to Home -->
-                <div class="text-center mt-6">
-                    <a href="/" class="text-sm text-gray-600 hover:text-blue-600 transition">
-                        ← Back to Home
+                <!-- Footer Links -->
+                <div class="mt-12 flex items-center justify-center gap-8">
+                    <a href="/" class="group flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 transition hover:text-[color:var(--primary)]">
+                        <i data-lucide="arrow-left" class="h-4 w-4 transition-transform group-hover:-translate-x-1"></i>
+                        Back to Home
+                    </a>
+                    <span class="h-1 w-1 rounded-full bg-gray-200"></span>
+                    <a href="{{ route('about') }}" class="text-xs font-black uppercase tracking-widest text-gray-400 transition hover:text-[color:var(--primary)]">
+                        Support
                     </a>
                 </div>
             </div>
         </div>
+
+        <!-- Lucide Icons -->
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <script>
+            lucide.createIcons();
+        </script>
+        
+        <!-- Alpine.js -->
+        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    </body>
 
         <!-- JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

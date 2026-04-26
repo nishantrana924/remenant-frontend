@@ -579,9 +579,9 @@
 
             <!-- Buttons -->
             <div class="flex flex-1 items-center gap-3 max-w-[600px] lg:flex-none lg:w-[450px]">
-                <button type="button" class="flex-1 h-14 rounded-2xl bg-[var(--primary)] text-white font-black uppercase tracking-[0.1em] text-xs shadow-lg shadow-[var(--primary)]/20 active:scale-95 transition hover:brightness-105">
+                <a href="{{ route('cart') }}" class="flex-1 h-14 flex items-center justify-center rounded-2xl bg-[var(--primary)] text-white font-black uppercase tracking-[0.1em] text-xs shadow-lg shadow-[var(--primary)]/20 active:scale-95 transition hover:brightness-105">
                     Add to Cart
-                </button>
+                </a>
                 <button type="button" class="flex-1 h-14 rounded-2xl bg-[var(--secondary)] text-white font-black uppercase tracking-[0.1em] text-xs shadow-lg shadow-[var(--secondary)]/20 active:scale-95 transition hover:brightness-105">
                     Buy It Now
                 </button>
