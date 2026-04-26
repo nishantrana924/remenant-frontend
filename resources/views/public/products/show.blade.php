@@ -16,12 +16,12 @@
         </nav>
 
         <!-- Product Hero Section -->
-        <section class="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-12">
-            <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
+        <section class="mx-auto max-w-[1600px] px-4 py-2 sm:px-6 lg:px-12">
+            <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
                 
                 <!-- Left: Product Images -->
                 <div class="space-y-4">
-                    <div class="relative aspect-square overflow-hidden rounded-[2.5rem] bg-[var(--bg-section)] ring-1 ring-black/5 shadow-sm">
+                    <div class="relative aspect-[16/9] overflow-hidden rounded-[2rem] bg-[var(--bg-section)] ring-1 ring-black/5 shadow-sm">
                         <img id="main-product-image" src="{{ asset('images/products/' . $product['image']) }}" 
                              alt="{{ $product['title'] }}" 
                              class="h-full w-full object-contain cursor-zoom-in select-none">
@@ -59,9 +59,9 @@
 
                 <!-- Right: Product Info -->
                 <div class="flex flex-col">
-                    <div class="border-b border-black/5 pb-8">
-                        <p class="text-sm font-black uppercase tracking-[0.2em] text-[color:var(--primary)]">{{ $product['tagline'] }}</p>
-                        <h1 class="mt-2 text-4xl font-black tracking-tight text-[color:var(--text-primary)] sm:text-5xl leading-tight">
+                    <div class="border-b border-black/5 pb-4">
+                        <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--primary)]">{{ $product['tagline'] }}</p>
+                        <h1 class="mt-1 text-2xl font-black tracking-tight text-[color:var(--text-primary)] sm:text-4xl leading-tight">
                             {{ $product['title'] }}
                         </h1>
                         
@@ -80,19 +80,19 @@
                         </div>
                     </div>
 
-                    <div class="py-10">
+                    <div class="py-4">
                         <!-- Hot Deal Badge -->
                         <div class="inline-flex items-center rounded-md bg-[#008A48] px-3 py-1.5 mb-6">
                             <span class="text-sm font-black uppercase tracking-wider text-white">Hot Deal</span>
                         </div>
                         
-                        <div class="flex items-center flex-wrap gap-x-6 gap-y-4">
+                        <div class="flex items-center flex-wrap gap-x-4 gap-y-2 sm:gap-x-6 sm:gap-y-4">
                             <div class="flex items-center text-[#008A48]">
-                                <i data-lucide="arrow-down" class="h-9 w-9 stroke-[4px]"></i>
-                                <span class="text-5xl font-black">{{ $discount }}%</span>
+                                <i data-lucide="arrow-down" class="h-6 w-6 sm:h-9 sm:w-9 stroke-[4px]"></i>
+                                <span class="text-3xl sm:text-5xl font-black">{{ $discount }}%</span>
                             </div>
-                            <span class="text-3xl font-black text-gray-400/50 line-through decoration-gray-400/30">₹{{ number_format($product['mrp']) }}</span>
-                            <span class="text-6xl font-black text-[color:var(--text-primary)] tracking-tight">₹{{ number_format($product['price']) }}</span>
+                            <span class="text-xl sm:text-3xl font-black text-gray-400/50 line-through decoration-gray-400/30">₹{{ number_format($product['mrp']) }}</span>
+                            <span class="text-4xl sm:text-6xl font-black text-[color:var(--text-primary)] tracking-tight">₹{{ number_format($product['price']) }}</span>
                         </div>
                         <p class="mt-2 text-xs font-bold text-[color:var(--text-muted)] uppercase tracking-wider">Inclusive of all taxes</p>
 
@@ -142,7 +142,7 @@
                         </script>
 
                         <!-- Highlights -->
-                        <div class="mt-8 grid grid-cols-2 gap-4">
+                        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @foreach(array_slice($product['benefits'], 0, 4) as $benefit)
                                 <div class="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-black/5">
                                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--primary-soft)] text-[color:var(--primary)]">
@@ -158,23 +158,34 @@
                     </div>
 
 
-                    <!-- Trust Signals -->
-                    <div class="mt-10 flex items-center justify-between border-t border-black/5 pt-8">
-                        <div class="flex flex-col items-center gap-2">
-                            <i data-lucide="truck" class="h-6 w-6 text-[color:var(--text-muted)]"></i>
-                            <p class="text-[10px] font-black uppercase tracking-tighter">Fast Delivery</p>
+                    <!-- Enhanced Trust Signals -->
+                    <div class="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 sm:flex sm:flex-wrap sm:items-center sm:justify-between border-t border-black/5 pt-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-[color:var(--primary)] shadow-sm">
+                                <i data-lucide="truck" class="h-6 w-6"></i>
+                            </div>
+                            <p class="text-[11px] font-black uppercase tracking-[0.1em] text-[color:var(--text-primary)] leading-tight">Fast <br> Delivery</p>
                         </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <i data-lucide="shield-check" class="h-6 w-6 text-[color:var(--text-muted)]"></i>
-                            <p class="text-[10px] font-black uppercase tracking-tighter">100% Secure</p>
+
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 shadow-sm">
+                                <i data-lucide="shield-check" class="h-6 w-6"></i>
+                            </div>
+                            <p class="text-[11px] font-black uppercase tracking-[0.1em] text-[color:var(--text-primary)] leading-tight">100% <br> Secure</p>
                         </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <i data-lucide="refresh-cw" class="h-6 w-6 text-[color:var(--text-muted)]"></i>
-                            <p class="text-[10px] font-black uppercase tracking-tighter">Easy Returns</p>
+
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-600 shadow-sm">
+                                <i data-lucide="refresh-cw" class="h-6 w-6"></i>
+                            </div>
+                            <p class="text-[11px] font-black uppercase tracking-[0.1em] text-[color:var(--text-primary)] leading-tight">Easy <br> Returns</p>
                         </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <i data-lucide="leaf" class="h-6 w-6 text-[color:var(--text-muted)]"></i>
-                            <p class="text-[10px] font-black uppercase tracking-tighter">Vegan & Pure</p>
+
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-sm">
+                                <i data-lucide="leaf" class="h-6 w-6"></i>
+                            </div>
+                            <p class="text-[11px] font-black uppercase tracking-[0.1em] text-[color:var(--text-primary)] leading-tight">Vegan <br> & Pure</p>
                         </div>
                     </div>
                 </div>
@@ -182,115 +193,116 @@
         </section>
 
 
-        <!-- Product Information Accordion -->
-        <section class="py-24 bg-white border-t border-black/5">
+        <!-- Product Information TRUE Table Layout -->
+        <section class="py-8 sm:py-16 bg-white">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-                <div class="space-y-4">
-                    <!-- Description -->
-                    <div class="border-b border-black/5 pb-4">
-                        <button onclick="toggleAccordion('desc')" class="flex w-full items-center justify-between py-8 text-left group">
-                            <span class="text-2xl font-black uppercase tracking-[0.2em] text-[color:var(--text-primary)]">Description</span>
-                            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 group-hover:bg-[var(--primary-soft)] transition">
-                                <i data-lucide="plus" id="icon-desc" class="h-5 w-5 text-[color:var(--primary)] transition-transform duration-500"></i>
+                <div class="overflow-hidden rounded-3xl bg-white">
+                    
+                    <!-- Table Header Row -->
+                    <div class="hidden md:grid grid-cols-3 bg-gray-50/50 border-b border-black/5">
+                        <div class="p-6 border-r border-black/10">
+                            <div class="flex items-center gap-4 bg-white shadow-sm rounded-2xl px-6 py-3 w-fit ring-1 ring-black/5">
+                                <i data-lucide="info" class="h-6 w-6 text-orange-600"></i>
+                                <span class="text-lg font-black uppercase tracking-[0.1em] text-gray-800">Description</span>
                             </div>
-                        </button>
-                        <div id="content-desc" class="hidden animate-in fade-in slide-in-from-top-4 duration-500 pb-12">
-                            <div class="prose prose-lg max-w-none">
-                                <p class="text-lg leading-relaxed text-[color:var(--text-secondary)]">
-                                    {{ $product['long_description'] }}
-                                </p>
-                                <p class="text-lg leading-relaxed text-[color:var(--text-secondary)] mt-6">
-                                    Our commitment to your wellness starts with transparency. Every ingredient is carefully selected for its purity and potency, ensuring that you receive a product that is not only effective but also aligns with a clean-label lifestyle.
-                                </p>
+                        </div>
+                        <div class="p-6 border-r border-black/10">
+                            <div class="flex items-center gap-4 bg-white shadow-sm rounded-2xl px-6 py-3 w-fit ring-1 ring-black/5">
+                                <i data-lucide="clipboard-list" class="h-6 w-6 text-blue-600"></i>
+                                <span class="text-lg font-black uppercase tracking-[0.1em] text-gray-800">Specifications</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-4 bg-white shadow-sm rounded-2xl px-6 py-3 w-fit ring-1 ring-black/5">
+                                <i data-lucide="building-2" class="h-6 w-6 text-emerald-600"></i>
+                                <span class="text-lg font-black uppercase tracking-[0.1em] text-gray-800">Brand Info</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Specifications -->
-                    <div class="border-b border-black/5 pb-4">
-                        <button onclick="toggleAccordion('specs')" class="flex w-full items-center justify-between py-8 text-left group">
-                            <span class="text-2xl font-black uppercase tracking-[0.2em] text-[color:var(--text-primary)]">Specifications</span>
-                            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 group-hover:bg-[var(--primary-soft)] transition">
-                                <i data-lucide="plus" id="icon-specs" class="h-5 w-5 text-[color:var(--primary)] transition-transform duration-500"></i>
+                    <!-- Table Content Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-3">
+                        
+                        <!-- Cell 1: Description -->
+                        <div class="p-8 sm:p-10 border-r border-black/10">
+                            <!-- Mobile Header -->
+                            <div class="md:hidden flex items-center gap-3 mb-6 py-2 border-b border-black/5">
+                                <i data-lucide="info" class="h-5 w-5 text-orange-600"></i>
+                                <span class="text-sm font-black uppercase tracking-widest text-gray-400">Description</span>
                             </div>
-                        </button>
-                        <div id="content-specs" class="hidden animate-in fade-in slide-in-from-top-4 duration-500 pb-12">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8">
+                            
+                            <p class="text-base sm:text-lg leading-relaxed text-gray-600 font-medium">
+                                {{ $product['long_description'] }}
+                            </p>
+                            <div class="mt-8 space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-2 w-2 rounded-full bg-orange-400"></div>
+                                    <span class="text-xs font-black uppercase tracking-widest text-gray-500">Clinically Formulated</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="h-2 w-2 rounded-full bg-orange-400"></div>
+                                    <span class="text-xs font-black uppercase tracking-widest text-gray-500">100% Vegan & Clean</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cell 2: Specifications -->
+                        <div class="p-8 sm:p-10 border-r border-black/10 bg-gray-50/10">
+                            <!-- Mobile Header -->
+                            <div class="md:hidden flex items-center gap-3 mb-6 py-2 border-b border-black/5">
+                                <i data-lucide="clipboard-list" class="h-5 w-5 text-blue-600"></i>
+                                <span class="text-sm font-black uppercase tracking-widest text-gray-400">Specifications</span>
+                            </div>
+
+                            <div class="space-y-6">
                                 @foreach($product['specs'] as $label => $value)
-                                    <div class="flex items-center justify-between border-b border-black/5 pb-4">
-                                        <span class="text-xs font-black uppercase tracking-[0.2em] text-gray-400">{{ $label }}</span>
-                                        <span class="text-lg font-bold text-[color:var(--text-primary)]">{{ $value }}</span>
+                                    <div class="flex items-center justify-between border-b border-black/5 pb-4 last:border-0">
+                                        <span class="text-xs font-black uppercase tracking-widest text-gray-400">{{ $label }}</span>
+                                        <span class="text-base font-black text-gray-800">{{ $value }}</span>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Manufacturer Info -->
-                    <div class="border-b border-black/5 pb-4">
-                        <button onclick="toggleAccordion('mfg')" class="flex w-full items-center justify-between py-8 text-left group">
-                            <span class="text-2xl font-black uppercase tracking-[0.2em] text-[color:var(--text-primary)]">Manufacturer Info</span>
-                            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 group-hover:bg-[var(--primary-soft)] transition">
-                                <i data-lucide="plus" id="icon-mfg" class="h-5 w-5 text-[color:var(--primary)] transition-transform duration-500"></i>
+                        <!-- Cell 3: Brand Info -->
+                        <div class="p-8 sm:p-10">
+                            <!-- Mobile Header -->
+                            <div class="md:hidden flex items-center gap-3 mb-6 py-2 border-b border-black/5">
+                                <i data-lucide="building-2" class="h-5 w-5 text-emerald-600"></i>
+                                <span class="text-sm font-black uppercase tracking-widest text-gray-400">Brand Info</span>
                             </div>
-                        </button>
-                        <div id="content-mfg" class="hidden animate-in fade-in slide-in-from-top-4 duration-500 pb-12">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
-                                <div class="space-y-8">
-                                    <div>
-                                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-2">Marketed By</span>
-                                        <p class="text-lg font-bold">Remenant Health Private Limited</p>
-                                        <p class="text-sm text-gray-500 mt-2">Wellness Plaza, BKC, Mumbai - 400051, India</p>
-                                    </div>
-                                    <div>
-                                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-2">FSSAI Number</span>
-                                        <p class="text-lg font-bold">10022022000456</p>
-                                    </div>
+
+                            <div class="space-y-8">
+                                <div>
+                                    <span class="text-xs font-black uppercase tracking-widest text-gray-400">Marketed By</span>
+                                    <p class="mt-2 text-lg font-black text-gray-800">Remenant Health Private Limited</p>
+                                    <p class="text-sm font-bold text-gray-500">BKC, Mumbai - 400051</p>
                                 </div>
-                                <div class="space-y-8">
-                                    <div>
-                                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-2">Customer Care</span>
-                                        <p class="text-lg font-bold text-[color:var(--primary)]">care@remenanthealth.com</p>
-                                        <p class="text-sm text-gray-500 mt-2">Toll Free: 1800-123-4567</p>
-                                    </div>
-                                    <div>
-                                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-2">Country of Origin</span>
-                                        <p class="text-lg font-bold">Made in India</p>
-                                    </div>
+                                <div class="pt-6 border-t border-black/5">
+                                    <span class="text-xs font-black uppercase tracking-widest text-gray-400">Customer Support</span>
+                                    <p class="mt-2 text-lg font-black text-orange-600">care@remenanthealth.com</p>
+                                </div>
+                                <div class="inline-flex items-center gap-3 rounded-xl bg-emerald-50 px-5 py-2.5 ring-1 ring-emerald-500/10">
+                                    <i data-lucide="shield-check" class="h-5 w-5 text-emerald-600"></i>
+                                    <span class="text-xs font-black uppercase tracking-widest text-emerald-700">FSSAI Certified</span>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </section>
 
-        <script>
-            function toggleAccordion(id) {
-                const content = document.getElementById('content-' + id);
-                const icon = document.getElementById('icon-' + id);
-                const isHidden = content.classList.contains('hidden');
-                
-                // Toggle current
-                if (isHidden) {
-                    content.classList.remove('hidden');
-                    icon.style.transform = 'rotate(45deg)';
-                } else {
-                    content.classList.add('hidden');
-                    icon.style.transform = 'rotate(0deg)';
-                }
-            }
-        </script>
 
-        <!-- How to Use Section (Redesigned) -->
-        <section class="py-24 bg-white border-t border-black/5">
+        <section class="py-12 sm:py-24 bg-white border-t border-black/5">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-                <div class="rounded-[3rem] bg-black p-8 sm:p-20 text-white overflow-hidden relative">
-                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-20 lg:items-center">
+                <div class="rounded-[2rem] sm:rounded-[3rem] bg-[var(--bg-dark)] p-6 sm:p-20 text-[color:var(--text-white)] overflow-hidden relative shadow-2xl">
+                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 lg:items-center">
                         <!-- Left: Product Highlights -->
                         <div>
                             <h2 class="text-xs font-black uppercase tracking-[0.4em] text-[color:var(--primary)] mb-6">Experience Excellence</h2>
-                            <h3 class="text-5xl font-black italic tracking-tighter uppercase mb-12">Product Highlights</h3>
+                            <h3 class="text-3xl sm:text-5xl font-black italic tracking-tighter uppercase mb-8 sm:mb-12 text-black">Product Highlights</h3>
                             <div class="space-y-8">
                                 <div class="flex items-center gap-6">
                                     <div class="h-2 w-2 rounded-full bg-[var(--primary)] shadow-[0_0_15px_var(--primary)]"></div>
@@ -312,32 +324,32 @@
                         </div>
 
                         <!-- Right: The Ritual -->
-                        <div class="bg-white/5 backdrop-blur-sm rounded-[2.5rem] p-8 sm:p-12 border border-white/10">
-                            <h2 class="text-3xl font-black italic tracking-tighter uppercase mb-12 flex items-center gap-4">
+                        <div class="bg-orange-400 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 border border-white/10 shadow-inner">
+                            <h2 class="text-2xl sm:text-3xl font-black tracking-tighter uppercase mb-10 sm:mb-12 flex items-center gap-4 text-white">
                                 <span class="h-px flex-1 bg-white/20"></span>
                                 The Ritual
                                 <span class="h-px flex-1 bg-white/20"></span>
                             </h2>
-                            <div class="space-y-10">
+                            <div class="space-y-10 ">
                                 <div class="flex gap-8 group">
                                     <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary)] font-black text-white text-2xl shadow-xl shadow-[var(--primary)]/20 transition-transform group-hover:rotate-12">1</span>
                                     <div>
-                                        <h4 class="text-xl font-bold uppercase tracking-widest">Drop it</h4>
-                                        <p class="mt-2 text-base text-white/50 leading-relaxed">Drop one tablet into 200ml of water.</p>
+                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Drop it</h4>
+                                        <p class="mt-2 text-base text-white/90 leading-relaxed">Drop one tablet into 200ml of water.</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-8 group">
-                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/5 font-black text-white text-2xl transition-transform group-hover:rotate-12">2</span>
+                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/5 font-black text-[color:var(--text-white)] text-2xl transition-transform group-hover:rotate-12">2</span>
                                     <div>
-                                        <h4 class="text-xl font-bold uppercase tracking-widest">Fizz it</h4>
-                                        <p class="mt-2 text-base text-white/50 leading-relaxed">Watch the pure wellness dissolve.</p>
+                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Fizz it</h4>
+                                        <p class="mt-2 text-base text-white/90 leading-relaxed">Watch the pure wellness dissolve.</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-8 group">
-                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/5 font-black text-white text-2xl transition-transform group-hover:rotate-12">3</span>
+                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/5 font-black text-[color:var(--text-white)] text-2xl transition-transform group-hover:rotate-12">3</span>
                                     <div>
-                                        <h4 class="text-xl font-bold uppercase tracking-widest">Fuel Up</h4>
-                                        <p class="mt-2 text-base text-white/50 leading-relaxed">Drink and take on your day.</p>
+                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Fuel Up</h4>
+                                        <p class="mt-2 text-base text-white/90 leading-relaxed">Drink and take on your day.</p>
                                     </div>
                                 </div>
                             </div>
@@ -352,54 +364,64 @@
         </section>
 
         <!-- Reviews Section -->
-        <section id="reviews" class="py-24 bg-[var(--bg-main)] scroll-mt-24">
+        <section id="reviews" class="py-12 sm:py-24 bg-[var(--bg-main)] scroll-mt-24">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
                 <div class="flex flex-col lg:flex-row gap-16">
                     <!-- Left: Rating Summary (Sticky) -->
                     <div class="lg:w-1/3 lg:sticky lg:top-32 h-fit">
-                        <h2 class="text-4xl font-black italic tracking-tight text-[color:var(--text-primary)]">Customer Reviews</h2>
-                        <div class="mt-8 flex items-end gap-4">
-                            <span class="text-7xl font-black leading-none">{{ $product['rating'] }}</span>
-                            <div class="flex flex-col gap-1 pb-1">
-                                <div class="flex text-orange-400">
-                                    @for($i = 0; $i < 5; $i++)
-                                        <i data-lucide="star" class="h-5 w-5 fill-current"></i>
-                                    @endfor
-                                </div>
-                                <span class="text-sm font-bold text-[color:var(--text-secondary)]">Based on {{ number_format($product['reviews']) }} reviews</span>
-                            </div>
-                        </div>
-
-                        <!-- Rating Bars -->
-                        <div class="mt-10 space-y-4">
-                            @php
-                                $ratings = [
-                                    ['stars' => 5, 'count' => 850],
-                                    ['stars' => 4, 'count' => 100],
-                                    ['stars' => 3, 'count' => 20],
-                                    ['stars' => 2, 'count' => 8],
-                                    ['stars' => 1, 'count' => 4],
-                                ];
-                            @endphp
-                            @foreach($ratings as $r)
-                                <div class="flex items-center gap-4">
-                                    <span class="w-4 text-sm font-bold text-[color:var(--text-secondary)]">{{ $r['stars'] }}</span>
-                                    <i data-lucide="star" class="h-3 w-3 text-orange-400 fill-current"></i>
-                                    <div class="flex-1 h-2 rounded-full bg-black/5 overflow-hidden">
-                                        <div class="h-full bg-orange-400 rounded-full" style="width: {{ ($r['count'] / 982) * 100 }}%"></div>
+                        <div class="p-8 sm:p-10 rounded-[2.5rem] bg-white shadow-sm ring-1 ring-black/5">
+                            <h2 class="text-3xl sm:text-4xl font-black italic tracking-tight text-[color:var(--text-primary)]">Customer Reviews</h2>
+                            <div class="mt-8 flex items-end gap-5">
+                                <span class="text-7xl font-black leading-none text-[color:var(--text-primary)]">{{ $product['rating'] }}</span>
+                                <div class="flex flex-col gap-1 pb-1">
+                                    <div class="flex text-orange-400">
+                                        @for($i = 0; $i < 5; $i++)
+                                            <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+                                        @endfor
                                     </div>
-                                    <span class="w-12 text-xs font-bold text-[color:var(--text-muted)] text-right">{{ $r['count'] }}</span>
+                                    <span class="text-sm font-bold text-[color:var(--text-secondary)]">Based on {{ number_format($product['reviews']) }} reviews</span>
                                 </div>
-                            @endforeach
-                        </div>
+                            </div>
 
-                        <button type="button" class="mt-12 w-full rounded-2xl bg-black py-5 text-sm font-black uppercase tracking-widest text-white shadow-xl hover:bg-black/90 transition active:scale-95">
-                            Write a review
-                        </button>
+                            <!-- Rating Bars -->
+                            <div class="mt-10 space-y-4">
+                                @php
+                                    $ratings = [
+                                        ['stars' => 5, 'count' => 850],
+                                        ['stars' => 4, 'count' => 100],
+                                        ['stars' => 3, 'count' => 20],
+                                        ['stars' => 2, 'count' => 8],
+                                        ['stars' => 1, 'count' => 4],
+                                    ];
+                                @endphp
+                                @foreach($ratings as $r)
+                                    <div class="flex items-center gap-4">
+                                        <span class="w-4 text-xs font-black text-[color:var(--text-secondary)]">{{ $r['stars'] }}</span>
+                                        <i data-lucide="star" class="h-3 w-3 text-orange-400 fill-current"></i>
+                                        <div class="flex-1 h-1.5 rounded-full bg-black/5 overflow-hidden">
+                                            <div class="h-full bg-orange-400 rounded-full" style="width: {{ ($r['count'] / 982) * 100 }}%"></div>
+                                        </div>
+                                        <span class="w-12 text-xs font-bold text-[color:var(--text-muted)] text-right">{{ $r['count'] }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <button type="button" class="mt-10 w-full rounded-2xl bg-[var(--primary)] py-5 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-[var(--primary)]/20 hover:bg-[var(--primary-hover)] transition active:scale-95">
+                                Write a review
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Right: Review List -->
-                    <div class="flex-1 space-y-12">
+                    <div class="flex-1 space-y-8">
+                        <!-- Filters -->
+                        <div class="flex items-center justify-between border-b border-black/5 pb-8">
+                            <h3 class="text-xl font-black uppercase tracking-wider text-[color:var(--text-primary)]">Most Relevant</h3>
+                            <button class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[color:var(--primary)]">
+                                <i data-lucide="filter" class="h-4 w-4"></i>
+                                Filter Reviews
+                            </button>
+                        </div>
                         @php
                             $sampleReviews = [
                                 [
@@ -430,37 +452,40 @@
                         @endphp
 
                         @foreach($sampleReviews as $review)
-                            <div class="border-b border-black/5 pb-12 last:border-0">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white font-black">
+                            <div class="bg-white p-8 sm:p-10 rounded-[2.5rem] shadow-sm ring-1 ring-black/5 transition-all hover:ring-[var(--primary)]/20 hover:shadow-md">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-[color:var(--primary)] font-black text-lg">
                                             {{ substr($review['name'], 0, 1) }}
                                         </div>
                                         <div>
-                                            <h4 class="font-black text-[color:var(--text-primary)] leading-none">{{ $review['name'] }}</h4>
+                                            <h4 class="font-black text-[color:var(--text-primary)] text-lg leading-none">{{ $review['name'] }}</h4>
                                             @if($review['verified'])
-                                                <span class="mt-1 flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-green-600">
+                                                <div class="mt-1.5 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-2 py-0.5 rounded-full w-fit">
                                                     <i data-lucide="check-circle" class="h-3 w-3"></i>
                                                     Verified Buyer
-                                                </span>
+                                                </div>
                                             @endif
                                         </div>
                                     </div>
                                     <span class="text-xs font-bold text-[color:var(--text-muted)]">{{ $review['date'] }}</span>
                                 </div>
 
-                                <div class="mt-6 flex text-orange-400">
+                                <div class="mt-8 flex text-orange-400 gap-0.5">
                                     @for($i = 0; $i < $review['rating']; $i++)
                                         <i data-lucide="star" class="h-4 w-4 fill-current"></i>
                                     @endfor
+                                    @for($i = 0; $i < 5 - $review['rating']; $i++)
+                                        <i data-lucide="star" class="h-4 w-4 text-gray-200"></i>
+                                    @endfor
                                 </div>
 
-                                <h5 class="mt-4 text-xl font-black text-[color:var(--text-primary)]">{{ $review['title'] }}</h5>
-                                <p class="mt-3 text-base leading-relaxed text-[color:var(--text-secondary)]">
+                                <h5 class="mt-4 text-xl font-black text-[color:var(--text-primary)] tracking-tight">{{ $review['title'] }}</h5>
+                                <p class="mt-4 text-base leading-relaxed text-[color:var(--text-secondary)]">
                                     {{ $review['content'] }}
                                 </p>
 
-                                <div class="mt-6 flex items-center gap-6">
+                                <div class="mt-8 flex items-center gap-6 pt-8 border-t border-black/5">
                                     <button type="button" class="flex items-center gap-2 text-xs font-bold text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)] transition">
                                         <i data-lucide="thumbs-up" class="h-4 w-4"></i>
                                         Helpful (12)
@@ -473,9 +498,11 @@
                             </div>
                         @endforeach
 
-                        <button type="button" class="font-black text-[color:var(--primary)] hover:underline underline-offset-4 tracking-widest uppercase text-sm">
-                            Load more reviews
-                        </button>
+                        <div class="pt-8 flex justify-center">
+                            <button class="rounded-full bg-white px-8 py-4 text-sm font-black uppercase tracking-widest text-[color:var(--text-primary)] shadow-sm ring-1 ring-black/5 hover:ring-[var(--primary)] transition">
+                                Load More Reviews
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -489,7 +516,7 @@
                         <h2 class="text-3xl font-black italic tracking-tight text-[color:var(--text-primary)]">You may also like</h2>
                         <p class="mt-2 text-[color:var(--text-secondary)] font-bold">Complete your wellness routine.</p>
                     </div>
-                    <a href="{{ route('products.index') }}" class="hidden sm:inline-flex rounded-full bg-black/5 px-6 py-2.5 text-sm font-black uppercase tracking-widest hover:bg-black/10 transition">View All</a>
+                    <a href="{{ route('products.index') }}" class="hidden sm:inline-flex rounded-full bg-orange-50 text-[color:var(--primary)] px-8 py-3 text-xs font-black uppercase tracking-widest hover:bg-orange-100 transition ring-1 ring-orange-100">View All Collections</a>
                 </div>
 
                 <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -540,7 +567,7 @@
     <!-- Spacer for Sticky Bar -->
     <div class="h-24"></div>
     <!-- Image Lightbox Modal -->
-    <div id="lightbox-modal" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-black/95 backdrop-blur-sm transition-all duration-300">
+    <div id="lightbox-modal" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-[#0a1a0f]/95 backdrop-blur-sm transition-all duration-300">
         <!-- Close Button -->
         <button type="button" onclick="closeLightbox()" class="absolute right-6 top-6 z-[110] flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition">
             <i data-lucide="x" class="h-6 w-6"></i>

@@ -5,98 +5,87 @@
 @section('content')
 
     <!-- Contact Hero Section -->
-    <section class="relative overflow-hidden bg-[var(--bg-main)] py-16 lg:py-24 border-b border-black/5">
-        <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
+    <section class="relative overflow-hidden bg-[var(--bg-sage)] py-20 lg:py-28 border-b border-black/5">
+        <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12 relative z-10">
             <div class="text-center">
-                <span class="text-sm font-extrabold uppercase tracking-widest text-[color:var(--primary)]">Contact
-                    Support</span>
-                <h1 class="mt-4 text-5xl font-extrabold tracking-tight text-[color:var(--text-primary)] sm:text-7xl">
-                    How Can We Help?
+                <span class="inline-block px-4 py-1.5 rounded-full bg-white/50 text-xs font-semibold uppercase tracking-[0.2em] text-[#074D3D] backdrop-blur-sm">Get in Touch</span>
+                <h1 class="mt-6 text-5xl font-semibold italic tracking-tight text-[#074D3D] sm:text-7xl lg:text-8xl">
+                    Let's Connect
                 </h1>
-                <p class="mt-8 mx-auto max-w-2xl text-xl leading-relaxed text-[color:var(--text-secondary)]">
-                    Whether you have a question about our products, an order, or our team is here for you.
+                <p class="mt-8 mx-auto max-w-2xl text-lg font-medium leading-relaxed text-[#074D3D]/80 sm:text-xl">
+                    Have a question or just want to say hi? We're always here to listen and help you on your wellness journey.
                 </p>
             </div>
         </div>
 
-        <!-- Background Decoration -->
-        <div class="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-[var(--primary)]/5 blur-3xl"></div>
-        <div class="absolute -left-24 -bottom-24 h-96 w-96 rounded-full bg-black/5 blur-3xl"></div>
+        <!-- Decorative Floating Elements (Branded) -->
+        <div class="pointer-events-none absolute -left-12 top-20 text-7xl opacity-20 animate-float" style="animation-delay: 0s;">🌿</div>
+        <div class="pointer-events-none absolute -right-12 bottom-10 text-6xl opacity-20 animate-float" style="animation-delay: 2s;">🍉</div>
+        <div class="pointer-events-none absolute left-1/4 -top-10 text-5xl opacity-10 animate-float" style="animation-delay: 4s;">🍊</div>
+        
+        <!-- Background Blurs -->
+        <div class="absolute -right-24 -top-24 h-[500px] w-[500px] rounded-full bg-white/30 blur-3xl"></div>
+        <div class="absolute -left-24 -bottom-24 h-[500px] w-[500px] rounded-full bg-black/5 blur-3xl"></div>
     </section>
 
 
     <!-- Contact Form & Details Section -->
-    <section class="py-24 bg-white">
+    <section class="py-20 lg:py-24 bg-[#FDF9F6]">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-            <div class="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:items-start">
+            <div class="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-start">
 
                 <!-- Left: Contact Form -->
                 <div class="lg:col-span-7">
-                    <div class="rounded-[3rem] bg-white p-8 sm:p-12 shadow-2xl border border-black/5">
-                        <h2 class="text-3xl font-extrabold text-[color:var(--text-primary)] tracking-tight mb-8">Send Us a
-                            Message</h2>
+                    <div class="rounded-[3rem] bg-white p-10 sm:p-14 shadow-2xl shadow-gray-200/50 border border-black/[0.03] relative overflow-hidden">
+                        <!-- Subtle corner accent -->
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-[var(--bg-sage)] opacity-20 rounded-bl-[5rem] -mr-10 -mt-10"></div>
+                        
+                        <h2 class="text-3xl font-semibold italic text-[#074D3D] tracking-tight mb-10 relative">Drop us a Line</h2>
 
-                        <form action="#" class="space-y-6">
-                            <div>
-                                <label
-                                    class="block text-xs font-black uppercase tracking-widest text-[color:var(--text-secondary)] mb-2">Full
-                                    Name</label>
-                                <input type="text" placeholder="Enter your full name"
-                                    class="w-full rounded-2xl border-black/5 bg-gray-50 px-6 py-4 text-sm font-medium focus:border-[var(--primary)] focus:bg-white focus:ring-0 transition-all outline-none">
+                        <form action="#" class="space-y-8 relative">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2.5 ml-1">Your Name</label>
+                                    <input type="text" placeholder="John Doe"
+                                        class="w-full rounded-2xl border border-gray-100 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-900 focus:border-[var(--primary)] focus:bg-white focus:ring-4 focus:ring-[var(--primary)]/5 transition-all outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2.5 ml-1">Email Address</label>
+                                    <input type="email" placeholder="john@example.com"
+                                        class="w-full rounded-2xl border border-gray-100 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-900 focus:border-[var(--primary)] focus:bg-white focus:ring-4 focus:ring-[var(--primary)]/5 transition-all outline-none">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2.5 ml-1">Phone Number</label>
+                                    <input type="tel" placeholder="+91 00000 00000"
+                                        class="w-full rounded-2xl border border-gray-100 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-900 focus:border-[var(--primary)] focus:bg-white focus:ring-4 focus:ring-[var(--primary)]/5 transition-all outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2.5 ml-1">I'm asking about</label>
+                                    <div class="relative">
+                                        <select class="w-full rounded-2xl border border-gray-100 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-900 focus:border-[var(--primary)] focus:bg-white focus:ring-4 focus:ring-[var(--primary)]/5 transition-all outline-none appearance-none">
+                                            <option>General Support</option>
+                                            <option>Order Tracking</option>
+                                            <option>Product Guidance</option>
+                                            <option>Bulk/Business</option>
+                                        </select>
+                                        <i data-lucide="chevron-down" class="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"></i>
+                                    </div>
+                                </div>
                             </div>
 
                             <div>
-                                <label
-                                    class="block text-xs font-black uppercase tracking-widest text-[color:var(--text-secondary)] mb-2">Email
-                                    Address</label>
-                                <input type="email" placeholder="Enter your email address"
-                                    class="w-full rounded-2xl border-black/5 bg-gray-50 px-6 py-4 text-sm font-medium focus:border-[var(--primary)] focus:bg-white focus:ring-0 transition-all outline-none">
-                            </div>
-
-                            <div>
-                                <label
-                                    class="block text-xs font-black uppercase tracking-widest text-[color:var(--text-secondary)] mb-2">Phone
-                                    Number</label>
-                                <input type="tel" placeholder="Enter you phone number"
-                                    class="w-full rounded-2xl border-black/5 bg-gray-50 px-6 py-4 text-sm font-medium focus:border-[var(--primary)] focus:bg-white focus:ring-0 transition-all outline-none">
-                            </div>
-
-                            <div>
-                                <label
-                                    class="block text-xs font-black uppercase tracking-widest text-[color:var(--text-secondary)] mb-2">Subject</label>
-                                <select
-                                    class="w-full rounded-2xl border-black/5 bg-gray-50 px-6 py-4 text-sm font-medium focus:border-[var(--primary)] focus:bg-white focus:ring-0 transition-all outline-none appearance-none">
-                                    <option>General Inquiry</option>
-                                    <option>Order Support</option>
-                                    <option>Product Information</option>
-                                    <option>Payment & Refunds</option>
-                                    <option>Bulk Order Related</option>
-                                    <option>Business Partnership</option>
-                                    <option>Other</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label
-                                    class="block text-xs font-black uppercase tracking-widest text-[color:var(--text-secondary)] mb-2">Message</label>
-                                <textarea rows="6" placeholder="How can we help you?"
-                                    class="w-full rounded-2xl border-black/5 bg-gray-50 px-6 py-4 text-sm font-medium focus:border-[var(--primary)] focus:bg-white focus:ring-0 transition-all outline-none resize-none"></textarea>
-                            </div>
-
-                            <div class="flex items-start gap-3">
-                                <input type="checkbox" id="terms"
-                                    class="mt-1 h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none"
-                                    required>
-                                <label for="terms" class="text-sm font-medium text-gray-600">
-                                    I accept the <a href="#" class="text-[var(--primary)] hover:underline">Terms and
-                                        Conditions</a> and <a href="#" class="text-[var(--primary)] hover:underline">Privacy
-                                        Policy</a>
-                                </label>
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2.5 ml-1">Your Message</label>
+                                <textarea rows="5" placeholder="Tell us how we can help..."
+                                    class="w-full rounded-2xl border border-gray-100 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-900 focus:border-[var(--primary)] focus:bg-white focus:ring-4 focus:ring-[var(--primary)]/5 transition-all outline-none resize-none"></textarea>
                             </div>
 
                             <button type="submit"
-                                class="w-full rounded-2xl bg-black py-5 text-sm font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:bg-black/90 hover:-translate-y-1 active:scale-95">
-                                Send Message
+                                class="w-full rounded-2xl brand-gradient py-5 text-sm font-black uppercase tracking-[0.25em] text-white shadow-xl shadow-orange-200/50 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3">
+                                <span>Send Message</span>
+                                <i data-lucide="send" class="h-4 w-4"></i>
                             </button>
                         </form>
                     </div>
@@ -104,100 +93,58 @@
 
                 <!-- Right: Contact Info Card -->
                 <div class="lg:col-span-5">
-                    <div class="rounded-[3rem] bg-gray-50 p-10 border border-black/5 shadow-xl space-y-10">
-
-                        <!-- Headquarters Section -->
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-4">
-                                <div
-                                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-black text-white shadow-lg">
-                                    <i data-lucide="map-pin" class="h-6 w-6"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-black text-black uppercase tracking-wider leading-tight">
-                                        Headquarters</h3>
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Surat, India</p>
-                                </div>
+                    <div class="rounded-[3rem] bg-white p-10 border border-black/[0.03] shadow-2xl shadow-gray-200/40 space-y-12">
+                        
+                        <!-- Contact Item -->
+                        <div class="flex gap-6">
+                            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary-soft)] text-[var(--primary)] shadow-sm shadow-orange-100">
+                                <i data-lucide="map-pin" class="h-6 w-6"></i>
                             </div>
-                            <address class="not-italic text-gray-600 leading-relaxed font-medium sm:pl-16 mt-2 sm:mt-0">
-                                224, Ambika pinnacle, lajamani chowk,<br>
-                                mota varachha, surat,<br>
-                                Gujarat, India - 394101
-                            </address>
+                            <div>
+                                <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Our Studio</h3>
+                                <p class="text-lg font-medium text-gray-900 leading-relaxed">
+                                    224, Ambika pinnacle, Lajamani chowk,<br>
+                                    Mota Varachha, Surat, Gujarat - 394101
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="h-px bg-black/5"></div>
-
-                        <!-- WhatsApp Section -->
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-4">
-                                <div
-                                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#25D366] text-white shadow-lg">
-                                    <svg class="h-6 w-6 fill-current" viewBox="0 0 24 24">
-                                        <path
-                                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-black text-[#25D366] uppercase tracking-wider leading-tight">
-                                        WhatsApp</h3>
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Instant Support</p>
-                                </div>
+                        <!-- Contact Item -->
+                        <div class="flex gap-6">
+                            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#E8F9F1] text-[#25D366] shadow-sm shadow-green-100">
+                                <i data-lucide="message-circle" class="h-6 w-6"></i>
                             </div>
-                            <div class="sm:pl-16 space-y-4 mt-2 sm:mt-0">
-                                <p class="text-sm text-gray-600 font-medium leading-relaxed">Need help right now? Chat with
-                                    our experts for instant guidance.</p>
-                                <a href="https://wa.me/yournumber" target="_blank"
-                                    class="inline-flex items-center justify-center rounded-xl bg-[#25D366] px-6 py-3 text-xs font-black uppercase tracking-wider text-white transition-all hover:bg-[#20bd5c] hover:-translate-y-1">
-                                    Chat Now
+                            <div>
+                                <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Instant Help</h3>
+                                <p class="text-lg font-medium text-gray-900 mb-4">Chat with us on WhatsApp for quick support.</p>
+                                <a href="https://wa.me/yournumber" class="inline-flex items-center gap-2 text-sm font-semibold text-[#25D366] hover:gap-3 transition-all">
+                                    START CHAT <i data-lucide="arrow-right" class="h-4 w-4"></i>
                                 </a>
                             </div>
                         </div>
 
-                        <div class="h-px bg-black/5"></div>
-
-                        <!-- Call Section -->
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-4">
-                                <div
-                                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-600 text-white shadow-lg">
-                                    <i data-lucide="phone" class="h-6 w-6"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-black text-orange-600 uppercase tracking-wider leading-tight">
-                                        Call Us</h3>
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Direct Support</p>
-                                </div>
+                        <!-- Contact Item -->
+                        <div class="flex gap-6">
+                            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gray-100 text-gray-600 shadow-sm shadow-gray-200">
+                                <i data-lucide="phone" class="h-6 w-6"></i>
                             </div>
-                            <div class="sm:pl-16 flex flex-col gap-2 mt-2 sm:mt-0">
-                                <a href="tel:+918849550164"
-                                    class="text-lg font-black text-black hover:text-orange-600 transition-colors">+91
-                                    8849550164</a>
-                                <a href="tel:+919662342235"
-                                    class="text-lg font-black text-black hover:text-orange-600 transition-colors">+91
-                                    9662342235</a>
+                            <div>
+                                <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Call Us</h3>
+                                <div class="flex flex-col gap-1">
+                                    <a href="tel:+918849550164" class="text-lg font-semibold text-gray-900 hover:text-[var(--primary)] transition-colors">+91 88495 50164</a>
+                                    <a href="tel:+919662342235" class="text-lg font-semibold text-gray-900 hover:text-[var(--primary)] transition-colors">+91 96623 42235</a>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="h-px bg-black/5"></div>
-
-                        <!-- Email Section -->
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-4">
-                                <div
-                                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary)] text-white shadow-lg">
-                                    <i data-lucide="mail" class="h-6 w-6"></i>
-                                </div>
-                                <div>
-                                    <h3
-                                        class="text-lg font-black text-[var(--primary)] uppercase tracking-wider leading-tight">
-                                        Email Us</h3>
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">24/7 Inquiry</p>
-                                </div>
+                        <!-- Contact Item -->
+                        <div class="flex gap-6">
+                            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#F0F4FF] text-[var(--info)] shadow-sm shadow-blue-100">
+                                <i data-lucide="mail" class="h-6 w-6"></i>
                             </div>
-                            <div class="sm:pl-16 mt-2 sm:mt-0">
-                                <a href="mailto:support@remenanthealth.com"
-                                    class="text-lg font-black text-black hover:text-[var(--primary)] transition-colors break-all">
+                            <div>
+                                <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Email Support</h3>
+                                <a href="mailto:support@remenanthealth.com" class="text-lg font-semibold text-gray-900 hover:text-[var(--primary)] transition-colors break-all">
                                     support@remenanthealth.com
                                 </a>
                             </div>
@@ -207,11 +154,10 @@
                 </div>
             </div>
         </div>
-        </div>
     </section>
 
     <!-- Map/Visual Section (Optional Mockup) -->
-    <section class="pb-24 bg-white">
+    <section class="pb-16 bg-white">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div
                 class="relative h-[400px] overflow-hidden rounded-[3rem] bg-[var(--bg-section)] shadow-2xl border border-black/5">

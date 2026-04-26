@@ -75,26 +75,55 @@
 
         // REMOVED: Pause on hover / focus as requested by user
 
-        // Basic swipe support
+        // Enhanced real-time swipe support
         let startX = 0;
-        let deltaX = 0;
+        let currentX = 0;
+        let isDragging = false;
+        let trackWidth = 0;
+
         root.addEventListener('touchstart', (e) => {
-            startX = e.touches?.[0]?.clientX ?? 0;
-            deltaX = 0;
+            startX = e.touches[0].pageX;
+            currentX = startX; // Initialize currentX
+            trackWidth = track.offsetWidth;
+            isDragging = true;
+            stop();
+            
+            // Remove transition during drag for real-time response
+            track.style.transition = 'none';
         }, { passive: true });
+
         root.addEventListener('touchmove', (e) => {
-            const x = e.touches?.[0]?.clientX ?? 0;
-            deltaX = x - startX;
+            if (!isDragging) return;
+            currentX = e.touches[0].pageX;
+            const deltaX = currentX - startX;
+            
+            // Calculate current translation in pixels
+            const currentOffsetPx = -(index * trackWidth);
+            const newTranslatePx = currentOffsetPx + deltaX;
+            
+            track.style.transform = `translateX(${newTranslatePx}px)`;
         }, { passive: true });
-        root.addEventListener('touchend', () => {
-            if (Math.abs(deltaX) > 40) {
-                stop();
+
+        root.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const deltaX = currentX - startX;
+            const threshold = trackWidth / 4; // Swipe 25% of width to change slide
+
+            // Restore transition
+            track.style.transition = '';
+
+            if (Math.abs(deltaX) > threshold) {
                 if (deltaX < 0) next();
                 else prev();
-                start();
+            } else {
+                render(); // Snap back to current
             }
+            
+            start();
             startX = 0;
-            deltaX = 0;
+            currentX = 0;
         });
 
         render();

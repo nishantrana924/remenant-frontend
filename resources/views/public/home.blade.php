@@ -124,13 +124,13 @@
                 class="relative overflow-hidden bg-gradient-to-r from-[#FFF2E8] via-[#FFE7D5] to-[#FDE7D7] px-4 py-8 sm:px-8">
                 <div class="mx-auto max-w-[1600px]">
                     <!-- Decorative fruit background icons -->
-                    <div class="pointer-events-none absolute -left-2 top-6 flex flex-col gap-3 opacity-85 sm:left-4">
+                    <div class="pointer-events-none absolute -left-4 top-6 hidden flex-col gap-3 opacity-50 sm:flex sm:left-4">
                         <span
                             class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/65 text-xl shadow-sm">🍉</span>
                         <span
                             class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/60 text-lg shadow-sm">🍓</span>
                     </div>
-                    <div class="pointer-events-none absolute -right-2 bottom-6 flex flex-col gap-3 opacity-85 sm:right-4">
+                    <div class="pointer-events-none absolute -right-4 bottom-6 hidden flex-col gap-3 opacity-50 sm:flex sm:right-4">
                         <span
                             class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/65 text-xl shadow-sm">🍊</span>
                         <span
@@ -146,7 +146,7 @@
                             class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
                             <img src="{{ asset('images/icons/clinically-tested.png') }}" alt="Clinically tested"
                                 class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16">
-                            <p class="text-[10px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                            <p class="text-[11px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
                                 Clean Label<br>Certified
                             </p>
                         </div>
@@ -155,7 +155,7 @@
                             class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
                             <img src="{{ asset('images/icons/premium-quality.png') }}" alt="Premium quality"
                                 class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16">
-                            <p class="text-[10px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                            <p class="text-[11px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
                                 Premium Quality<br>Ingredients
                             </p>
                         </div>
@@ -164,7 +164,7 @@
                             class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
                             <img src="{{ asset('images/icons/safe-daily-use.png') }}" alt="Safe and effective"
                                 class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16">
-                            <p class="text-[10px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                            <p class="text-[11px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
                                 Safe &amp; Effective<br>Daily Use
                             </p>
                         </div>
@@ -457,7 +457,7 @@
             <div class="flex flex-col lg:flex-row gap-8 items-stretch">
                 <!-- Category Banner Card -->
                 <div
-                    class="relative w-full lg:w-[450px] shrink-0 overflow-hidden rounded-[2.5rem] bg-[#FFF0F3] ring-1 ring-black/5">
+                    class="relative w-full lg:w-[450px] min-h-[420px] lg:min-h-0 shrink-0 overflow-hidden rounded-[2.5rem] bg-[#FFF0F3] ring-1 ring-black/5">
                     <div class="absolute inset-0 px-8 py-10 z-20 flex flex-col justify-between">
                         <div>
                             <h2 class="text-6xl font-black italic tracking-tighter text-[#E91E63] uppercase leading-none">

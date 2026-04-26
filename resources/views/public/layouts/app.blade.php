@@ -16,7 +16,8 @@
     <!-- CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
-<body class="font-sans antialiased bg-[var(--bg-main)]">
+
+<body class="font-sans antialiased bg-[var(--bg-main)] overflow-x-hidden">
     <div class="min-h-screen flex flex-col">
         @include('public.layouts.header')
         @include('public.layouts.sidebar')
