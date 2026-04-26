@@ -1,6 +1,6 @@
 <!-- Top promo bar (NOT sticky) -->
 <div class="bg-[var(--secondary)] text-white">
-    <div class="mx-auto flex max-w-[1600px] items-center px-4 py-2 text-sm sm:px-6 lg:px-12">
+    <div class="mx-auto flex max-w-[1600px] items-center px-4 py-3 text-sm sm:px-6 lg:px-12">
         <div class="marquee flex-1">
             <div class="marquee__track">
                 <span class="marquee__item font-semibold">Get our Exclusive Best Sellers!</span>
@@ -21,7 +21,7 @@
 
 <!-- Main header (sticky) -->
 <header class="public-header public-header-main brand-gradient sticky top-0 z-50" data-public-header>
-    <div class="mx-auto max-w-[1600px] px-4 py-3 sm:px-6 lg:px-12">
+    <div class="mx-auto max-w-[1600px] px-4 py-4 sm:px-6 lg:px-12">
         <!-- Mobile header -->
         <div class="sm:hidden">
             <div class="flex items-center justify-between gap-3">
@@ -97,7 +97,7 @@
             </div>
 
             <!-- Mobile search bar -->
-            <div class="public-mobile-search mt-3" data-mobile-search>
+            <div class="public-mobile-search mt-4" data-mobile-search>
                 <div class="relative">
                     <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/80">
                         <i data-lucide="search" class="h-5 w-5"></i>

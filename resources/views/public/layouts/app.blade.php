@@ -44,6 +44,37 @@
     <script src="{{ asset('js/public-sidebar.js') }}"></script>
     <script src="{{ asset('js/public-header.js') }}"></script>
     <script src="{{ asset('js/public-account.js') }}"></script>
+    <!-- Lenis Smooth Scroll -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
+    <script>
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true,
+            wheelMultiplier: 1,
+            touchMultiplier: 2,
+            infinite: false,
+        })
+
+        function raf(time) {
+            lenis.raf(time)
+            requestAnimationFrame(raf)
+        }
+
+        requestAnimationFrame(raf)
+
+        // Anchor link scroll sync
+        $(document).on('click', 'a[href^="#"]', function(e) {
+            const target = this.getAttribute('href');
+            if (target && target !== '#') {
+                const element = document.querySelector(target);
+                if (element) {
+                    e.preventDefault();
+                    lenis.scrollTo(target);
+                }
+            }
+        });
+    </script>
     @stack('scripts')
 </body>
 
