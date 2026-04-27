@@ -125,11 +125,30 @@
                 autoplay: false,
                 nav: false,
                 dots: false,
+                smartSpeed: 700,
                 responsive: {
-                    0: { items: 1, stagePadding: 40 },
-                    640: { items: 2 },
-                    1024: { items: 3 },
-                    1280: { items: 4 }
+                    0: { items: 1, stagePadding: 24 },
+                    640: { items: 2, stagePadding: 0 },
+                    1024: { items: 2, stagePadding: 0 },
+                    1280: { items: 3, stagePadding: 0 }
+                }
+            });
+
+            // Testimonials Slider (Owl only)
+            $(".testimonial-carousel").owlCarousel({
+                items: 1,
+                margin: 24,
+                loop: true,
+                autoplay: true,
+                autoplayTimeout: 3500,
+                autoplayHoverPause: true,
+                nav: false,
+                dots: false,
+                smartSpeed: 800,
+                responsive: {
+                    0: { items: 1, stagePadding: 16 },
+                    768: { items: 2, stagePadding: 0 },
+                    1280: { items: 3, stagePadding: 0 }
                 }
             });
         });
@@ -216,11 +235,36 @@
         .owl-carousel .owl-item {
             will-change: transform;
         }
+        /* Prevent brief flicker/jump before Owl initialization */
+        .combo-carousel:not(.owl-loaded),
+        .category-carousel:not(.owl-loaded),
+        .testimonial-carousel:not(.owl-loaded) {
+            display: flex !important;
+            overflow: hidden;
+        }
+        .combo-carousel:not(.owl-loaded) .item,
+        .category-carousel:not(.owl-loaded) .item,
+        .testimonial-carousel:not(.owl-loaded) .item {
+            width: 100%;
+            flex: 0 0 100%;
+        }
+        .combo-carousel:not(.owl-loaded) .item:not(:first-child),
+        .category-carousel:not(.owl-loaded) .item:not(:first-child),
+        .testimonial-carousel:not(.owl-loaded) .item:not(:first-child) {
+            display: none;
+        }
         .combo-carousel .item, .category-carousel .item {
+            padding: 10px 0;
+        }
+        .testimonial-carousel .item {
             padding: 10px 0;
         }
         .category-carousel .owl-stage-outer {
             padding: 12px 0;
+        }
+        .category-carousel .owl-stage {
+            display: flex;
+            align-items: stretch;
         }
         .category-carousel .owl-item {
             display: flex;
@@ -240,6 +284,16 @@
             height: auto;
         }
         .combo-card {
+            min-height: 100%;
+        }
+        .testimonial-carousel .owl-stage {
+            display: flex;
+        }
+        .testimonial-carousel .owl-item {
+            display: flex;
+            height: auto;
+        }
+        .testimonial-card {
             min-height: 100%;
         }
     </style>
@@ -636,42 +690,44 @@
                             ];
                         @endphp
                         @foreach ($categoryProducts as $p)
-                            <a href="{{ route('products.index') }}"
-                                class="group flex h-full min-h-[430px] flex-col overflow-hidden rounded-[2rem] border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl no-underline">
-                                <div class="relative aspect-[1/1] overflow-hidden">
-                                    <!-- Enhanced Tags -->
-                                    <span
-                                        class="absolute top-4 left-4 bg-[#E91E63] text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-full z-10 shadow-lg">Weight</span>
-                                    <span
-                                        class="absolute top-4 right-4 bg-[#4CAF50] text-white text-[10px] font-black px-3 py-1.5 rounded-full z-10 shadow-lg">{{ $p['discount'] }}%
-                                        OFF</span>
-
-                                    <img src="{{ asset('images/products/' . $p['image']) }}" alt="{{ $p['title'] }}"
-                                        class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
-                                </div>
-                                <div class="flex flex-1 flex-col p-5">
-                                    <h3 class="line-clamp-2 min-h-[3.4rem] text-xl font-extrabold leading-tight text-gray-900">
-                                        {{ $p['title'] }}</h3>
-                                    <div class="mt-2 flex items-center gap-1">
-                                        <i data-lucide="star" class="h-3 w-3 fill-orange-400 text-orange-400"></i>
-                                        <span class="text-[11px] font-bold text-gray-500">{{ $p['rating'] }} | Weight
-                                            Management</span>
-                                    </div>
-                                    <div class="mt-auto flex items-end justify-between gap-3 pt-5">
-                                        <div class="flex flex-col text-left">
-                                            <span
-                                                class="text-xs text-gray-400 line-through tracking-tighter decoration-1">₹{{ number_format($p['mrp']) }}</span>
-                                            <p class="text-2xl font-black text-gray-900 leading-none">
-                                                ₹{{ number_format($p['price']) }}</p>
-                                        </div>
+                            <div class="item h-full">
+                                <a href="{{ route('products.index') }}"
+                                    class="group flex h-full min-h-[430px] flex-col overflow-hidden rounded-[2rem] border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl no-underline">
+                                    <div class="relative aspect-[1/1] overflow-hidden">
+                                        <!-- Enhanced Tags -->
                                         <span
-                                            class="inline-flex min-h-[2.75rem] items-center gap-2 rounded-2xl bg-[#4CAF50] px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-green-100 transition-all hover:bg-[#388E3C] active:scale-95 group/btn">
-                                            <i data-lucide="plus"
-                                                class="h-4 w-4 transition-transform group-hover/btn:rotate-90"></i> ADD
-                                        </span>
+                                            class="absolute top-4 left-4 bg-[#E91E63] text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-full z-10 shadow-lg">Weight</span>
+                                        <span
+                                            class="absolute top-4 right-4 bg-[#4CAF50] text-white text-[10px] font-black px-3 py-1.5 rounded-full z-10 shadow-lg">{{ $p['discount'] }}%
+                                            OFF</span>
+
+                                        <img src="{{ asset('images/products/' . $p['image']) }}" alt="{{ $p['title'] }}"
+                                            class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
                                     </div>
-                                </div>
-                            </a>
+                                    <div class="flex flex-1 flex-col p-5">
+                                        <h3 class="line-clamp-2 min-h-[3.4rem] text-xl font-extrabold leading-tight text-gray-900">
+                                            {{ $p['title'] }}</h3>
+                                        <div class="mt-2 flex items-center gap-1">
+                                            <i data-lucide="star" class="h-3 w-3 fill-orange-400 text-orange-400"></i>
+                                            <span class="text-[11px] font-bold text-gray-500">{{ $p['rating'] }} | Weight
+                                                Management</span>
+                                        </div>
+                                        <div class="mt-auto flex items-end justify-between gap-3 pt-5">
+                                            <div class="flex flex-col text-left">
+                                                <span
+                                                    class="text-xs text-gray-400 line-through tracking-tighter decoration-1">₹{{ number_format($p['mrp']) }}</span>
+                                                <p class="text-2xl font-black text-gray-900 leading-none">
+                                                    ₹{{ number_format($p['price']) }}</p>
+                                            </div>
+                                            <span
+                                                class="inline-flex min-h-[2.75rem] items-center gap-2 rounded-2xl bg-[#4CAF50] px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-green-100 transition-all hover:bg-[#388E3C] active:scale-95 group/btn">
+                                                <i data-lucide="plus"
+                                                    class="h-4 w-4 transition-transform group-hover/btn:rotate-90"></i> ADD
+                                            </span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
                         @endforeach
                 </div>
             </div>
@@ -707,7 +763,7 @@
                     their daily ritual.</p>
             </div>
 
-            <div class="mt-16 testimonial-marquee">
+            <div class="mt-16 testimonial-carousel owl-carousel owl-theme">
                 @php
                     $testimonials = [
                         ['name' => 'Ananya Sharma', 'location' => 'Mumbai', 'text' => 'The Glutathione tablets have completely changed my morning routine. My skin is noticeably brighter and I feel more confident!', 'rating' => 5],
@@ -719,10 +775,10 @@
                     ];
                 @endphp
 
-                <div class="testimonial-track">
-                    @foreach ($testimonials as $testimonial)
+                @foreach ($testimonials as $testimonial)
+                    <div class="item">
                         <div
-                            class="w-[350px] shrink-0 rounded-[2.5rem] bg-white p-10 shadow-xl shadow-gray-100/50 ring-1 ring-black/[0.02] flex flex-col relative overflow-hidden group">
+                            class="testimonial-card rounded-[2.5rem] bg-white p-10 shadow-xl shadow-gray-100/50 ring-1 ring-black/[0.02] flex flex-col relative overflow-hidden group">
                             <!-- Quote Mark -->
                             <div
                                 class="absolute -right-4 -top-4 opacity-[0.03] transform rotate-12 transition-transform group-hover:rotate-0 duration-700">
@@ -754,47 +810,8 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
-
-                <!-- Second track for infinite loop -->
-                <div class="testimonial-track" aria-hidden="true">
-                    @foreach ($testimonials as $testimonial)
-                        <div
-                            class="w-[350px] shrink-0 rounded-[2.5rem] bg-white p-10 shadow-xl shadow-gray-100/50 ring-1 ring-black/[0.02] flex flex-col relative overflow-hidden group">
-                            <!-- Quote Mark -->
-                            <div
-                                class="absolute -right-4 -top-4 opacity-[0.03] transform rotate-12 transition-transform group-hover:rotate-0 duration-700">
-                                <i data-lucide="quote" class="h-32 w-32 text-black"></i>
-                            </div>
-
-                            <div class="flex gap-1 text-orange-400">
-                                @for ($i = 0; $i < $testimonial['rating']; $i++)
-                                    <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                                @endfor
-                            </div>
-
-                            <div class="mt-8 flex-1">
-                                <p class="text-xl font-bold leading-relaxed text-gray-900">"{{ $testimonial['text'] }}"</p>
-                            </div>
-
-                            <div class="mt-10 flex items-center gap-4">
-                                <div
-                                    class="h-14 w-14 rounded-full bg-gradient-to-br from-[var(--primary)] to-orange-400 flex items-center justify-center font-black text-white text-xl shadow-lg">
-                                    {{ substr($testimonial['name'], 0, 1) }}
-                                </div>
-                                <div>
-                                    <h4 class="font-black text-gray-900 leading-none flex items-center gap-2">
-                                        {{ $testimonial['name'] }}
-                                        <i data-lucide="check-circle-2" class="h-4 w-4 text-blue-500 fill-blue-50"></i>
-                                    </h4>
-                                    <p class="mt-1.5 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                                        {{ $testimonial['location'] }} • Verified Buyer</p>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </section>

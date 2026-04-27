@@ -17,95 +17,133 @@
             width: 100%;
             display: block;
         }
+        .lightbox-carousel:not(.owl-loaded) {
+            display: flex;
+            overflow: hidden;
+        }
+        .lightbox-carousel:not(.owl-loaded) > div:not(:first-child) {
+            display: none;
+        }
+        .lightbox-carousel:not(.owl-loaded) > div:first-child {
+            width: 100%;
+            display: block;
+        }
+        /* Mobile-first: edge-to-edge product image */
+        .product-gallery-shell .owl-stage-outer {
+            border-radius: 0;
+        }
+        @media (min-width: 640px) {
+            .product-gallery-shell .owl-stage-outer {
+                border-radius: 2rem;
+            }
+        }
+        /* Keep modal image frame consistent */
+        .lightbox-frame {
+            width: min(94vw, 1240px);
+            height: clamp(300px, 76vh, 860px);
+        }
+        .lightbox-carousel .owl-stage-outer,
+        .lightbox-carousel .owl-stage,
+        .lightbox-carousel .owl-item,
+        .lightbox-carousel .owl-item > div {
+            height: 100%;
+        }
+        .lightbox-nav-btn {
+            height: 3.5rem;
+            width: 3.5rem;
+        }
+        @media (max-width: 640px) {
+            .lightbox-frame {
+                width: 96vw;
+                height: 62vh;
+            }
+            .lightbox-nav-btn {
+                height: 2.75rem;
+                width: 2.75rem;
+            }
+        }
     </style>
     @endpush
     <div class="bg-[var(--bg-main)]">
-        <!-- Breadcrumbs -->
-        <nav class="mx-auto max-w-[1600px] px-4 pt-6 sm:px-6 lg:px-12" aria-label="Breadcrumb">
-            <ol class="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-[color:var(--text-muted)]">
-                <li><a href="/" class="hover:text-[color:var(--primary)] transition">Home</a></li>
-                <li><i data-lucide="chevron-right" class="h-3 w-3"></i></li>
-                <li><a href="{{ route('products.index') }}" class="hover:text-[color:var(--primary)] transition">Shop</a></li>
-                <li><i data-lucide="chevron-right" class="h-3 w-3"></i></li>
-                <li class="text-[color:var(--text-primary)]">{{ $product['title'] }}</li>
-            </ol>
-        </nav>
+        @php
+            $galleryImages = array_values(array_unique(array_merge([$product['image']], $product['gallery'])));
+        @endphp
 
         <!-- Product Hero Section -->
         <section class="mx-auto max-w-[1600px] px-4 py-2 sm:px-6 lg:px-12">
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
                 
                 <!-- Left: Product Images -->
-                <div class="space-y-6">
-                    <div class="relative group/gallery">
-                        <div class="product-gallery-carousel owl-carousel owl-theme">
-                            @foreach(array_merge([$product['image']], $product['gallery']) as $index => $img)
-                                <div class="relative aspect-[16/9] overflow-hidden rounded-[2rem] bg-[var(--bg-section)] ring-1 ring-black/5 shadow-sm cursor-zoom-in"
-                                     onclick="openLightbox({{ $index }})">
-                                    <img src="{{ asset('images/products/' . $img) }}" 
-                                         alt="{{ $product['title'] }}" 
-                                         class="h-full w-full object-contain select-none">
-                                    
-                                    <!-- Discount Badge (Only on first slide) -->
-                                    @if($loop->first)
-                                        @php
-                                            $discount = (int) round((1 - ($product['price'] / max(1, $product['mrp']))) * 100);
-                                        @endphp
-                                        <div class="absolute left-6 top-6 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-black text-white shadow-lg z-10">
-                                            -{{ $discount }}% OFF
-                                        </div>
-                                    @endif
-                                </div>
+                <div class="space-y-6 self-start lg:sticky lg:top-0 lg:h-fit">
+                    <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-4">
+                        <div class="hidden sm:flex gap-3 sm:gap-4 overflow-x-auto lg:order-first lg:flex-col lg:overflow-y-auto lg:max-h-[620px] lg:w-24 lg:shrink-0 no-scrollbar product-other-images">
+                            @foreach($galleryImages as $index => $img)
+                                <button type="button" 
+                                        data-index="{{ $index }}"
+                                        class="product-other-image-thumb relative aspect-square w-20 sm:w-24 shrink-0 overflow-hidden rounded-2xl bg-white border-2 transition-colors duration-200 shadow-sm {{ $index === 0 ? 'border-[var(--primary)]' : 'border-transparent hover:border-[var(--primary)]/70' }}">
+                                    <img src="{{ asset('images/products/' . $img) }}" alt="Product other image" class="h-full w-full object-contain">
+                                </button>
                             @endforeach
                         </div>
 
-                        <!-- Custom Nav Buttons -->
-                        <div class="absolute inset-0 flex items-center justify-between px-4 pointer-events-none z-20">
-                            <button type="button" data-gallery-prev class="pointer-events-auto h-12 w-12 rounded-full bg-white/90 backdrop-blur-md shadow-2xl flex items-center justify-center transition-all duration-300 active:scale-95 ring-1 ring-black/10 opacity-0 lg:opacity-40 group-hover/gallery:opacity-100">
-                                <i data-lucide="chevron-left" class="h-7 w-7 text-black"></i>
+                    <div class="relative group/gallery product-gallery-shell overflow-hidden -mx-4 rounded-none bg-[var(--bg-section)] ring-1 ring-black/5 shadow-sm sm:mx-0 sm:rounded-[2rem]">
+                        <div class="absolute right-3 top-3 sm:right-4 sm:top-4 z-30 flex flex-col gap-2">
+                            <button type="button" aria-label="Add to wishlist" class="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-[color:var(--text-primary)] shadow-lg ring-1 ring-black/10 transition hover:text-[color:var(--primary)] active:scale-95">
+                                <i data-lucide="heart" class="h-5 w-5"></i>
                             </button>
-                            <button type="button" data-gallery-next class="pointer-events-auto h-12 w-12 rounded-full bg-white/90 backdrop-blur-md shadow-2xl flex items-center justify-center transition-all duration-300 active:scale-95 ring-1 ring-black/10 opacity-0 lg:opacity-40 group-hover/gallery:opacity-100">
-                                <i data-lucide="chevron-right" class="h-7 w-7 text-black"></i>
+                            <button type="button" aria-label="Share product" class="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-[color:var(--text-primary)] shadow-lg ring-1 ring-black/10 transition hover:text-[color:var(--primary)] active:scale-95">
+                                <i data-lucide="send" class="h-5 w-5"></i>
                             </button>
+                        </div>
+                        <div class="product-gallery-carousel owl-carousel owl-theme">
+                            @foreach($galleryImages as $index => $img)
+                                <div class="relative aspect-square overflow-hidden cursor-zoom-in"
+                                     onclick="openLightbox({{ $index }})">
+                                    <img src="{{ asset('images/products/' . $img) }}" 
+                                         width="1200"
+                                         height="1200"
+                                         alt="{{ $product['title'] }}" 
+                                         class="h-full w-full object-contain select-none">
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    </div>
+                    <div class="sm:hidden px-2 mt-2">
+                        <div data-mobile-image-track class="relative h-[2px] w-full rounded-full bg-black/15 overflow-hidden">
+                            <div data-mobile-image-progress class="absolute left-0 top-0 h-full rounded-full bg-black/80 transition-transform duration-300 ease-out will-change-transform"></div>
                         </div>
                     </div>
 
-                    <!-- Gallery Thumbnails -->
-                    <div class="flex gap-4 overflow-x-auto pb-2 no-scrollbar gallery-thumbs">
-                        @foreach(array_merge([$product['image']], $product['gallery']) as $index => $img)
-                            <button type="button" 
-                                    data-index="{{ $index }}"
-                                    class="gallery-thumb relative aspect-square w-24 shrink-0 overflow-hidden rounded-2xl bg-white ring-1 ring-black/5 hover:ring-[var(--primary)] transition shadow-sm {{ $index === 0 ? 'ring-2 ring-[var(--primary)]' : '' }}">
-                                <img src="{{ asset('images/products/' . $img) }}" alt="Gallery image" class="h-full w-full object-contain">
-                            </button>
-                        @endforeach
-                    </div>
                 </div>
 
                 <!-- Right: Product Info -->
                 <div class="flex flex-col">
                     <div class="border-b border-black/5 pb-4">
                         <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--primary)]">{{ $product['tagline'] }}</p>
-                        <h1 class="mt-1 text-2xl font-black tracking-tight text-[color:var(--text-primary)] sm:text-4xl leading-tight">
+                        <h1 class="mt-1 text-[1.65rem] font-black tracking-tight text-[color:var(--text-primary)] leading-[1.1] sm:text-4xl sm:leading-tight">
                             {{ $product['title'] }}
                         </h1>
                         
-                        <div class="mt-6 flex items-center gap-6">
-                            <a href="#reviews" class="flex items-center gap-6 group">
-                                <div class="flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1.5 text-orange-600 group-hover:bg-orange-100 transition">
+                        <div class="mt-6 flex items-start justify-between gap-3 sm:items-center sm:gap-6">
+                            <a href="#reviews" class="flex items-center gap-3 sm:gap-6 group min-w-0">
+                                <div class="flex shrink-0 items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1.5 text-orange-600 group-hover:bg-orange-100 transition">
                                     <i data-lucide="star" class="h-5 w-5 fill-current"></i>
                                     <span class="text-sm font-black">{{ $product['rating'] }}</span>
                                 </div>
-                                <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--primary)] transition underline decoration-dotted underline-offset-4">{{ number_format($product['reviews']) }} Verified Reviews</span>
+                                <span class="text-[11px] sm:text-sm font-bold leading-tight text-[color:var(--text-secondary)] group-hover:text-[color:var(--primary)] transition underline decoration-dotted underline-offset-4">{{ number_format($product['reviews']) }} Verified Reviews</span>
                             </a>
-                            <span class="inline-flex items-center gap-1.5 text-sm font-bold text-green-600">
-                                <i data-lucide="check-circle" class="h-4 w-4"></i>
+                            <span class="inline-flex shrink-0 items-center gap-1.5 text-xs sm:text-sm font-bold text-green-600">
+                                <i data-lucide="check-circle" class="h-4 w-4 sm:h-4 sm:w-4"></i>
                                 In Stock
                             </span>
                         </div>
                     </div>
 
                     <div class="py-4">
+                        @php
+                            $discount = (int) round((1 - ($product['price'] / max(1, $product['mrp']))) * 100);
+                        @endphp
                         <!-- Hot Deal Badge -->
                         <div class="inline-flex items-center rounded-md bg-[#008A48] px-3 py-1.5 mb-6">
                             <span class="text-sm font-black uppercase tracking-wider text-white">Hot Deal</span>
@@ -393,7 +431,7 @@
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
                 <div class="flex flex-col lg:flex-row gap-16">
                     <!-- Left: Rating Summary (Sticky) -->
-                    <div class="lg:w-1/3 lg:sticky lg:top-32 h-fit">
+                    <div class="lg:w-1/3 lg:self-start lg:sticky lg:top-28 h-fit">
                         <div class="p-8 sm:p-10 rounded-[2.5rem] bg-white shadow-sm ring-1 ring-black/5">
                             <h2 class="text-3xl sm:text-4xl font-black italic tracking-tight text-[color:var(--text-primary)]">Customer Reviews</h2>
                             <div class="mt-8 flex items-end gap-5">
@@ -592,28 +630,39 @@
     <!-- Spacer for Sticky Bar -->
     <div class="h-24"></div>
     <!-- Image Lightbox Modal -->
-    <div id="lightbox-modal" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-[#0a1a0f]/95 backdrop-blur-sm transition-all duration-300">
+    <div id="lightbox-modal" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-[#0a1a0f]/95 backdrop-blur-sm transition-all duration-300 p-3 sm:p-6">
         <!-- Close Button -->
-        <button type="button" onclick="closeLightbox()" class="absolute right-6 top-6 z-[110] flex h-12 w-12 items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-red-500 transition-all duration-300 shadow-2xl ring-1 ring-white/20">
+        <button type="button" data-lightbox-close class="absolute right-3 top-3 sm:right-6 sm:top-6 z-[110] flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-red-500 transition-all duration-300 shadow-2xl ring-1 ring-white/20">
             <i data-lucide="x" class="h-6 w-6"></i>
         </button>
 
         <!-- Navigation -->
-        <button type="button" onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 z-[110] flex h-14 w-14 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-black transition-all duration-300 sm:left-8 group shadow-2xl ring-1 ring-black/10">
-            <i data-lucide="chevron-left" class="h-8 w-8 transition-transform group-hover:-translate-x-1"></i>
+        <button type="button" data-lightbox-prev class="lightbox-nav-btn absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-[110] hidden sm:flex items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-black transition-all duration-300 group shadow-2xl ring-1 ring-black/10">
+            <i data-lucide="chevron-left" class="h-6 w-6 sm:h-7 sm:w-7 transition-transform group-hover:-translate-x-1"></i>
         </button>
-        <button type="button" onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 z-[110] flex h-14 w-14 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-black transition-all duration-300 sm:right-8 group shadow-2xl ring-1 ring-black/10">
-            <i data-lucide="chevron-right" class="h-8 w-8 transition-transform group-hover:translate-x-1"></i>
+        <button type="button" data-lightbox-next class="lightbox-nav-btn absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-[110] hidden sm:flex items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-black transition-all duration-300 group shadow-2xl ring-1 ring-black/10">
+            <i data-lucide="chevron-right" class="h-6 w-6 sm:h-7 sm:w-7 transition-transform group-hover:translate-x-1"></i>
         </button>
 
-        <!-- Main Image -->
-        <div class="relative h-full w-full p-4 sm:p-20 flex items-center justify-center">
-            <img id="lightbox-image" src="" alt="Lightbox" class="max-h-full max-w-full object-contain transition-transform duration-500 scale-95 opacity-0 cursor-grab">
+        <!-- Main Image Carousel -->
+        <div class="relative h-full w-full flex items-center justify-center">
+            <div class="lightbox-frame">
+                <div class="lightbox-carousel owl-carousel owl-theme h-full w-full">
+                @foreach($galleryImages as $img)
+                    <div class="relative flex h-full w-full items-center justify-center" data-lightbox-slide>
+                        <div class="absolute inset-0 flex items-center justify-center" data-image-loader>
+                            <x-dot-spinner class="[--uib-size:2.6rem] [--uib-color:#ffffff]" />
+                        </div>
+                        <img src="{{ asset('images/products/' . $img) }}" alt="{{ $product['title'] }}" data-lightbox-image class="h-full w-full object-contain select-none">
+                    </div>
+                @endforeach
+                </div>
+            </div>
         </div>
 
         <!-- Thumbnails/Counter -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-[110]">
-            <p class="text-sm font-black tracking-widest text-white/50 uppercase">
+        <div class="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-[110]">
+            <p class="rounded-full bg-black/40 px-3 py-1 text-xs sm:text-sm font-black tracking-widest text-white/70 uppercase">
                 <span id="lightbox-current" class="text-white">1</span> / <span id="lightbox-total">1</span>
             </p>
         </div>
@@ -622,8 +671,7 @@
     @push('scripts')
     <script>
         const gallery = [
-            '{{ asset("images/products/" . $product["image"]) }}',
-            @foreach($product['gallery'] as $img)
+            @foreach($galleryImages as $img)
                 '{{ asset("images/products/" . $img) }}',
             @endforeach
         ];
@@ -631,6 +679,68 @@
         $(document).ready(function(){
             if(window.lucide) window.lucide.createIcons();
             const $gallery = $(".product-gallery-carousel");
+            const $lightbox = $(".lightbox-carousel");
+            const $modal = $("#lightbox-modal");
+            const $currentCounter = $("#lightbox-current");
+            const $totalCounter = $("#lightbox-total");
+            const $galleryPrev = $("[data-gallery-prev]");
+            const $galleryNext = $("[data-gallery-next]");
+            const $lightboxPrev = $("[data-lightbox-prev]");
+            const $lightboxNext = $("[data-lightbox-next]");
+            const $mobileImageTrack = $("[data-mobile-image-track]");
+            const $mobileImageProgress = $("[data-mobile-image-progress]");
+            const $lightboxImages = $("[data-lightbox-image]");
+            let currentImageIndex = 0;
+            $totalCounter.text(gallery.length);
+
+            function setNavDisabled($btn, isDisabled) {
+                $btn.toggleClass("!opacity-0 !pointer-events-none invisible", isDisabled);
+            }
+
+            function updateGalleryNavState(index) {
+                setNavDisabled($galleryPrev, index <= 0);
+                setNavDisabled($galleryNext, index >= gallery.length - 1);
+            }
+
+            function updateLightboxNavState(index) {
+                setNavDisabled($lightboxPrev, index <= 0);
+                setNavDisabled($lightboxNext, index >= gallery.length - 1);
+            }
+
+            function updateMobileImageProgress(index) {
+                if (!$mobileImageProgress.length || !$mobileImageTrack.length || gallery.length <= 0) return;
+                const trackWidth = $mobileImageTrack.width() || 0;
+                if (trackWidth <= 0) return;
+
+                const segmentWidth = trackWidth / gallery.length;
+                const indicatorWidth = Math.max(segmentWidth, 24);
+                const maxOffset = Math.max(trackWidth - indicatorWidth, 0);
+                const targetOffset = Math.min(segmentWidth * index, maxOffset);
+
+                $mobileImageProgress.css({
+                    width: `${indicatorWidth}px`,
+                    transform: `translateX(${targetOffset}px)`
+                });
+            }
+
+            function hideImageLoader(imgEl) {
+                const $slide = $(imgEl).closest("[data-lightbox-slide]");
+                $slide.find("[data-image-loader]").addClass("hidden");
+            }
+
+            function initLightboxImageLoaders() {
+                $lightboxImages.each(function() {
+                    const img = this;
+                    if (img.complete && img.naturalWidth > 0) {
+                        hideImageLoader(img);
+                        return;
+                    }
+
+                    $(img).one("load error", function() {
+                        hideImageLoader(img);
+                    });
+                });
+            }
             
             $gallery.owlCarousel({
                 items: 1,
@@ -641,22 +751,89 @@
                 onChanged: function(event) {
                     const index = event.item.index;
                     currentImageIndex = index;
-                    $(".gallery-thumb").removeClass("ring-2 ring-[var(--primary)]");
-                    $(`.gallery-thumb[data-index="${index}"]`).addClass("ring-2 ring-[var(--primary)]");
+                    $currentCounter.text(index + 1);
+                    $(".product-other-image-thumb")
+                        .removeClass("border-[var(--primary)]")
+                        .addClass("border-transparent");
+                    $(`.product-other-image-thumb[data-index="${index}"]`)
+                        .removeClass("border-transparent hover:border-[var(--primary)]/70")
+                        .addClass("border-[var(--primary)]");
+                    updateGalleryNavState(index);
+                    updateMobileImageProgress(index);
                 }
             });
 
-            $(".gallery-thumb").on("click", function() {
+            $lightbox.owlCarousel({
+                items: 1,
+                loop: false,
+                dots: false,
+                nav: false,
+                smartSpeed: 500,
+                mouseDrag: true,
+                touchDrag: true,
+                pullDrag: true,
+                onChanged: function(event) {
+                    const index = event.item.index;
+                    currentImageIndex = index;
+                    $currentCounter.text(index + 1);
+                    $gallery.trigger("to.owl.carousel", [index, 200, true]);
+                    updateLightboxNavState(index);
+                }
+            });
+
+            initLightboxImageLoaders();
+
+            $(".product-other-image-thumb").on("click", function() {
                 const index = $(this).data("index");
                 $gallery.trigger("to.owl.carousel", [index, 300]);
             });
 
-            $("[data-gallery-prev]").on("click", function() {
+            $galleryPrev.on("click", function() {
                 $gallery.trigger("prev.owl.carousel");
             });
 
-            $("[data-gallery-next]").on("click", function() {
+            $galleryNext.on("click", function() {
                 $gallery.trigger("next.owl.carousel");
+            });
+
+            $lightboxPrev.on("click", function() {
+                $lightbox.trigger("prev.owl.carousel");
+            });
+
+            $lightboxNext.on("click", function() {
+                $lightbox.trigger("next.owl.carousel");
+            });
+
+            $("[data-lightbox-close]").on("click", function() {
+                $modal.addClass("hidden").removeClass("flex");
+                $("body").css("overflow", "");
+            });
+
+            window.openLightbox = function(index) {
+                currentImageIndex = index;
+                $currentCounter.text(index + 1);
+                $modal.removeClass("hidden").addClass("flex");
+                $("body").css("overflow", "hidden");
+
+                // Owl inside hidden modal can calculate wrong widths; refresh after visible.
+                requestAnimationFrame(function() {
+                    $lightbox.trigger("refresh.owl.carousel");
+                    $lightbox.trigger("to.owl.carousel", [index, 0, true]);
+                    updateLightboxNavState(index);
+                    if (window.lucide) window.lucide.createIcons();
+                });
+            };
+
+            window.closeLightbox = function() {
+                $modal.addClass("hidden").removeClass("flex");
+                $("body").css("overflow", "");
+            };
+
+            $(document).on("keydown", function(e) {
+                if ($modal.hasClass("hidden")) return;
+                if (e.key === "Escape") window.closeLightbox();
+                if (e.key === "ArrowRight") $lightbox.trigger("next.owl.carousel");
+                if (e.key === "ArrowLeft") $lightbox.trigger("prev.owl.carousel");
             });
 
             $(".related-carousel").owlCarousel({
@@ -673,214 +850,14 @@
                     1280: { items: 4 }
                 }
             });
+
+            updateGalleryNavState(0);
+            updateLightboxNavState(0);
+            updateMobileImageProgress(0);
+            $(window).on("resize", function() {
+                updateMobileImageProgress(currentImageIndex);
+            });
         });
-        
-        let currentImageIndex = 0;
-        const modal = document.getElementById('lightbox-modal');
-        const lightboxImg = document.getElementById('lightbox-image');
-        const currentCounter = document.getElementById('lightbox-current');
-        const totalCounter = document.getElementById('lightbox-total');
-
-        totalCounter.innerText = gallery.length;
-
-        function openLightbox(index) {
-            currentImageIndex = index;
-            updateLightboxContent();
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-            
-            if(window.lucide) window.lucide.createIcons();
-
-            setTimeout(() => {
-                lightboxImg.classList.remove('scale-95', 'opacity-0');
-                lightboxImg.classList.add('scale-100', 'opacity-100');
-            }, 50);
-        }
-
-        function closeLightbox() {
-            lightboxImg.classList.add('scale-95', 'opacity-0');
-            lightboxImg.classList.remove('scale-100', 'opacity-100');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.body.style.overflow = '';
-            }, 300);
-        }
-
-        function updateLightboxContent(direction = 'next') {
-            const offset = direction === 'next' ? 60 : -60;
-            
-            // Fast slide out
-            lightboxImg.style.transition = 'transform 0.2s ease-in';
-            lightboxImg.style.transform = `translateX(${-offset}px)`;
-            
-            setTimeout(() => {
-                // Change source
-                lightboxImg.src = gallery[currentImageIndex];
-                currentCounter.innerText = currentImageIndex + 1;
-                
-                // Position for slide in
-                lightboxImg.style.transition = 'none';
-                lightboxImg.style.transform = `translateX(${offset}px)`;
-                
-                // Slide in
-                setTimeout(() => {
-                    lightboxImg.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
-                    lightboxImg.style.transform = 'translateX(0)';
-                }, 20);
-            }, 200);
-        }
-
-        function nextImage() {
-            currentImageIndex = (currentImageIndex + 1) % gallery.length;
-            updateLightboxContent('next');
-        }
-
-        function prevImage() {
-            currentImageIndex = (currentImageIndex - 1 + gallery.length) % gallery.length;
-            updateLightboxContent('prev');
-        }
-
-        // Close on Esc key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeLightbox();
-            if (e.key === 'ArrowRight') nextImage();
-            if (e.key === 'ArrowLeft') prevImage();
-        });
-
-        // Close on backdrop click (but not on image)
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal || e.target.tagName === 'DIV') {
-                // closeLightbox();
-            }
-        });
-
-        // Swipe/Drag logic
-        let touchStartX = 0;
-        let touchEndX = 0;
-        let isDragging = false;
-        let dragStartX = 0;
-
-        lightboxImg.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
-        lightboxImg.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe(nextImage, prevImage);
-        }, { passive: true });
-
-        lightboxImg.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            dragStartX = e.screenX;
-            lightboxImg.style.cursor = 'grabbing';
-            e.preventDefault();
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            const diff = e.screenX - dragStartX;
-            if (modal.classList.contains('flex')) {
-                lightboxImg.style.transform = `translateX(${diff}px)`;
-            } else if (isMainDragging) {
-                const mainImg = document.getElementById('main-product-image');
-                mainImg.style.transform = `translateX(${diff}px)`;
-            }
-        });
-
-        window.addEventListener('mouseup', (e) => {
-            if (isDragging) {
-                isDragging = false;
-                lightboxImg.style.cursor = 'grab';
-                const diff = e.screenX - dragStartX;
-                lightboxImg.style.transform = ''; 
-                if (Math.abs(diff) > 50) {
-                    if (diff > 0) prevImage();
-                    else nextImage();
-                }
-            }
-            if (isMainDragging) {
-                isMainDragging = false;
-                const mainImg = document.getElementById('main-product-image');
-                mainImg.style.cursor = 'zoom-in';
-                const diff = e.screenX - dragStartX;
-                mainImg.style.transform = '';
-                
-                // If the movement was very small, treat it as a click and open lightbox
-                if (Math.abs(diff) < 5) {
-                    openLightbox(currentImageIndex);
-                } else if (Math.abs(diff) > 50) {
-                    if (diff > 0) prevMainImage();
-                    else nextMainImage();
-                }
-            }
-        });
-
-        // Main Image Swipe/Drag
-        let isMainDragging = false;
-        const mainImg = document.getElementById('main-product-image');
-
-        mainImg.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
-        mainImg.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            const diff = touchEndX - touchStartX;
-            
-            if (Math.abs(diff) < 5) {
-                openLightbox(currentImageIndex);
-            } else if (Math.abs(diff) > 50) {
-                if (diff > 0) prevMainImage();
-                else nextMainImage();
-            }
-        }, { passive: true });
-
-        mainImg.addEventListener('mousedown', (e) => {
-            isMainDragging = true;
-            dragStartX = e.screenX;
-            mainImg.style.cursor = 'grabbing';
-            e.preventDefault();
-        });
-
-        function nextMainImage() {
-            currentImageIndex = (currentImageIndex + 1) % gallery.length;
-            updateMainImage('next');
-        }
-
-        function prevMainImage() {
-            currentImageIndex = (currentImageIndex - 1 + gallery.length) % gallery.length;
-            updateMainImage('prev');
-        }
-
-        function updateMainImage(direction = 'next') {
-            const mainImg = document.getElementById('main-product-image');
-            const offset = direction === 'next' ? 40 : -40;
-            
-            mainImg.style.transition = 'transform 0.15s ease-in';
-            mainImg.style.transform = `translateX(${-offset}px)`;
-            
-            setTimeout(() => {
-                mainImg.src = gallery[currentImageIndex];
-                mainImg.style.transition = 'none';
-                mainImg.style.transform = `translateX(${offset}px)`;
-                
-                setTimeout(() => {
-                    mainImg.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)';
-                    mainImg.style.transform = 'translateX(0)';
-                }, 20);
-            }, 150);
-        }
-
-        function handleSwipe(nextFn, prevFn) {
-            const diff = touchEndX - touchStartX;
-            if (Math.abs(diff) > 50) {
-                if (diff > 0) prevFn();
-                else nextFn();
-            }
-        }
     </script>
     @endpush
 @endsection
