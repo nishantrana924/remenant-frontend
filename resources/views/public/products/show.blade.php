@@ -119,9 +119,9 @@
 
                 <!-- Right: Product Info -->
                 <div class="flex flex-col">
-                    <div class="border-b border-black/5 pb-4">
-                        <p class="text-xs font-black uppercase tracking-[0.2em] text-[color:var(--primary)]">{{ $product['tagline'] }}</p>
-                        <h1 class="mt-1 text-[1.65rem] font-black tracking-tight text-[color:var(--text-primary)] leading-[1.1] sm:text-4xl sm:leading-tight">
+                    <div class="pb-4">
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--primary)]">{{ $product['tagline'] }}</p>
+                        <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-[color:var(--text-primary)] sm:text-5xl lg:text-6xl">
                             {{ $product['title'] }}
                         </h1>
                         
@@ -257,28 +257,28 @@
 
 
         <!-- Product Information TRUE Table Layout -->
-        <section class="py-8 sm:py-16 bg-white">
+        <section class="py-12 sm:py-20 bg-white">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-                <div class="overflow-hidden rounded-3xl bg-white">
+                <div class="overflow-hidden border-t border-black/10">
                     
                     <!-- Table Header Row -->
-                    <div class="hidden md:grid grid-cols-3 bg-gray-50/50 border-b border-black/5">
-                        <div class="p-6 border-r border-black/10">
-                            <div class="flex items-center gap-4 bg-white shadow-sm rounded-2xl px-6 py-3 w-fit ring-1 ring-black/5">
-                                <i data-lucide="info" class="h-6 w-6 text-orange-600"></i>
-                                <span class="text-lg font-black uppercase tracking-[0.1em] text-gray-800">Description</span>
+                    <div class="hidden md:grid grid-cols-3 border-b border-black/10">
+                        <div class="p-8 border-r border-black/10">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="info" class="h-5 w-5 text-orange-600"></i>
+                                <span class="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Description</span>
                             </div>
                         </div>
-                        <div class="p-6 border-r border-black/10">
-                            <div class="flex items-center gap-4 bg-white shadow-sm rounded-2xl px-6 py-3 w-fit ring-1 ring-black/5">
-                                <i data-lucide="clipboard-list" class="h-6 w-6 text-blue-600"></i>
-                                <span class="text-lg font-black uppercase tracking-[0.1em] text-gray-800">Specifications</span>
+                        <div class="p-8 border-r border-black/10">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="clipboard-list" class="h-5 w-5 text-blue-600"></i>
+                                <span class="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Specifications</span>
                             </div>
                         </div>
-                        <div class="p-6">
-                            <div class="flex items-center gap-4 bg-white shadow-sm rounded-2xl px-6 py-3 w-fit ring-1 ring-black/5">
-                                <i data-lucide="building-2" class="h-6 w-6 text-emerald-600"></i>
-                                <span class="text-lg font-black uppercase tracking-[0.1em] text-gray-800">Brand Info</span>
+                        <div class="p-8">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="building-2" class="h-5 w-5 text-emerald-600"></i>
+                                <span class="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Brand Info</span>
                             </div>
                         </div>
                     </div>
@@ -287,7 +287,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3">
                         
                         <!-- Cell 1: Description -->
-                        <div class="p-8 sm:p-10 border-r border-black/10">
+                        <div class="p-8 sm:p-10 md:border-r border-black/10">
                             <!-- Mobile Header -->
                             <div class="md:hidden flex items-center gap-3 mb-6 py-2 border-b border-black/5">
                                 <i data-lucide="info" class="h-5 w-5 text-orange-600"></i>
@@ -310,7 +310,7 @@
                         </div>
 
                         <!-- Cell 2: Specifications -->
-                        <div class="p-8 sm:p-10 border-r border-black/10 bg-gray-50/10">
+                        <div class="p-8 sm:p-10 md:border-r border-black/10">
                             <!-- Mobile Header -->
                             <div class="md:hidden flex items-center gap-3 mb-6 py-2 border-b border-black/5">
                                 <i data-lucide="clipboard-list" class="h-5 w-5 text-blue-600"></i>
@@ -358,6 +358,7 @@
         </section>
 
 
+            {{-- product Highlights --}}
         <section class="py-12 sm:py-24 bg-white border-t border-black/5">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
                 <div class="rounded-[2rem] sm:rounded-[3rem] bg-[var(--bg-dark)] p-6 sm:p-20 text-[color:var(--text-white)] overflow-hidden relative shadow-2xl">
