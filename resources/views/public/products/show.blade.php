@@ -359,70 +359,101 @@
 
 
             {{-- product Highlights --}}
-        <section class="py-12 sm:py-24 bg-white border-t border-black/5">
+        <!-- Product Highlights & Ritual Section -->
+        <section class="py-20 sm:py-32 bg-white overflow-hidden border-t border-black/5">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-                <div class="rounded-[2rem] sm:rounded-[3rem] bg-[var(--bg-dark)] p-6 sm:p-20 text-[color:var(--text-white)] overflow-hidden relative shadow-2xl">
-                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 lg:items-center">
-                        <!-- Left: Product Highlights -->
-                        <div>
-                            <h2 class="text-xs font-black uppercase tracking-[0.4em] text-[color:var(--primary)] mb-6">Experience Excellence</h2>
-                            <h3 class="text-3xl sm:text-5xl font-black italic tracking-tighter uppercase mb-8 sm:mb-12 text-black">Product Highlights</h3>
-                            <div class="space-y-8">
-                                <div class="flex items-center gap-6">
-                                    <div class="h-2 w-2 rounded-full bg-[var(--primary)] shadow-[0_0_15px_var(--primary)]"></div>
-                                    <p class="text-xl font-bold italic opacity-90">100% Bioavailable Effervescent Formula</p>
-                                </div>
-                                <div class="flex items-center gap-6">
-                                    <div class="h-2 w-2 rounded-full bg-[var(--primary)] shadow-[0_0_15px_var(--primary)]"></div>
-                                    <p class="text-xl font-bold italic opacity-90">Clean Label Certified Ingredients</p>
-                                </div>
-                                <div class="flex items-center gap-6">
-                                    <div class="h-2 w-2 rounded-full bg-[var(--primary)] shadow-[0_0_15px_var(--primary)]"></div>
-                                    <p class="text-xl font-bold italic opacity-90">Zero Sugar & No Artificial Colors</p>
-                                </div>
-                                <div class="flex items-center gap-6">
-                                    <div class="h-2 w-2 rounded-full bg-[var(--primary)] shadow-[0_0_15px_var(--primary)]"></div>
-                                    <p class="text-xl font-bold italic opacity-90">Fast Acting & Gentle on the Stomach</p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
+                    
+                    <!-- Left: Highlights -->
+                    <div class="lg:col-span-7">
+                        <span class="inline-block text-xs font-black uppercase tracking-[0.4em] text-[color:var(--primary)] mb-6">Experience Excellence</span>
+                        <h2 class="text-4xl sm:text-6xl font-black tracking-tighter uppercase mb-16 text-[color:var(--text-primary)] leading-[0.9]">
+                            Advanced <br> <span class="text-[color:var(--primary)] italic">Formulation</span>
+                        </h2>
 
-                        <!-- Right: The Ritual -->
-                        <div class="bg-orange-400 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 border border-white/10 shadow-inner">
-                            <h2 class="text-2xl sm:text-3xl font-black tracking-tighter uppercase mb-10 sm:mb-12 flex items-center gap-4 text-white">
-                                <span class="h-px flex-1 bg-white/20"></span>
-                                The Ritual
-                                <span class="h-px flex-1 bg-white/20"></span>
-                            </h2>
-                            <div class="space-y-10 ">
-                                <div class="flex gap-8 group">
-                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary)] font-black text-white text-2xl shadow-xl shadow-[var(--primary)]/20 transition-transform group-hover:rotate-12">1</span>
-                                    <div>
-                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Drop it</h4>
-                                        <p class="mt-2 text-base text-white/90 leading-relaxed">Drop one tablet into 200ml of water.</p>
-                                    </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-12">
+                            <!-- Feature 1 -->
+                            <div class="group">
+                                <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 text-[color:var(--primary)] transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-orange-200/50">
+                                    <i data-lucide="zap" class="h-7 w-7"></i>
                                 </div>
-                                <div class="flex gap-8 group">
-                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/5 font-black text-[color:var(--text-white)] text-2xl transition-transform group-hover:rotate-12">2</span>
-                                    <div>
-                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Fizz it</h4>
-                                        <p class="mt-2 text-base text-white/90 leading-relaxed">Watch the pure wellness dissolve.</p>
-                                    </div>
+                                <h4 class="text-lg font-black uppercase tracking-wider text-[color:var(--text-primary)] mb-3">Maximum Absorption</h4>
+                                <p class="text-base text-[color:var(--text-secondary)] leading-relaxed">100% Bioavailable Effervescent Formula designed for rapid, effective action.</p>
+                            </div>
+
+                            <!-- Feature 2 -->
+                            <div class="group">
+                                <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-emerald-200/50">
+                                    <i data-lucide="leaf" class="h-7 w-7"></i>
                                 </div>
-                                <div class="flex gap-8 group">
-                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/5 font-black text-[color:var(--text-white)] text-2xl transition-transform group-hover:rotate-12">3</span>
-                                    <div>
-                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Fuel Up</h4>
-                                        <p class="mt-2 text-base text-white/90 leading-relaxed">Drink and take on your day.</p>
-                                    </div>
+                                <h4 class="text-lg font-black uppercase tracking-wider text-[color:var(--text-primary)] mb-3">Pure Ingredients</h4>
+                                <p class="text-base text-[color:var(--text-secondary)] leading-relaxed">Clean Label Certified Ingredients with no hidden additives or fillers.</p>
+                            </div>
+
+                            <!-- Feature 3 -->
+                            <div class="group">
+                                <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-rose-200/50">
+                                    <i data-lucide="ban" class="h-7 w-7"></i>
                                 </div>
+                                <h4 class="text-lg font-black uppercase tracking-wider text-[color:var(--text-primary)] mb-3">Zero Compromise</h4>
+                                <p class="text-base text-[color:var(--text-secondary)] leading-relaxed">Zero Sugar & No Artificial Colors or flavors. Pure wellness in every drop.</p>
+                            </div>
+
+                            <!-- Feature 4 -->
+                            <div class="group">
+                                <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-blue-200/50">
+                                    <i data-lucide="activity" class="h-7 w-7"></i>
+                                </div>
+                                <h4 class="text-lg font-black uppercase tracking-wider text-[color:var(--text-primary)] mb-3">Fast & Gentle</h4>
+                                <p class="text-base text-[color:var(--text-secondary)] leading-relaxed">Fast Acting & Gentle on the Stomach, optimized for daily consumption.</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Background Decor -->
-                    <div class="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[var(--primary)]/20 blur-[100px]"></div>
-                    <div class="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-[var(--secondary)]/10 blur-[100px]"></div>
+                    <!-- Right: The Ritual Card -->
+                    <div class="lg:col-span-5 relative">
+                        <div class="relative z-10 rounded-[3rem] bg-[var(--secondary)] p-8 sm:p-14 overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)]">
+                            <!-- Background Decor -->
+                            <div class="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[var(--primary)]/20 blur-[100px]"></div>
+                            <div class="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-white/5 blur-[80px]"></div>
+                            
+                            <h3 class="relative z-10 text-3xl font-black tracking-tight uppercase text-white mb-12 flex items-center gap-4">
+                                <span class="h-px flex-1 bg-white/10"></span>
+                                The Ritual
+                                <span class="h-px flex-1 bg-white/10"></span>
+                            </h3>
+
+                            <div class="relative z-10 space-y-12">
+                                <div class="flex gap-8 group">
+                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary)] font-black text-white text-2xl shadow-xl shadow-[var(--primary)]/20 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">1</span>
+                                    <div>
+                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Drop it</h4>
+                                        <p class="mt-2 text-base text-white/60 leading-relaxed">Drop one tablet into 200ml of fresh water.</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-8 group">
+                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/10 font-black text-white text-2xl transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">2</span>
+                                    <div>
+                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Fizz it</h4>
+                                        <p class="mt-2 text-base text-white/60 leading-relaxed">Watch the pure wellness dissolve instantly.</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-8 group">
+                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/10 font-black text-white text-2xl transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">3</span>
+                                    <div>
+                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Fuel Up</h4>
+                                        <p class="mt-2 text-base text-white/60 leading-relaxed">Drink and empower your daily wellness goals.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Outer Floating Decor -->
+                        <div class="absolute -top-6 -left-6 h-24 w-24 rounded-full bg-[var(--primary)]/5 blur-3xl animate-pulse"></div>
+                        <div class="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-[var(--primary)]/10 blur-[80px]"></div>
+                    </div>
                 </div>
             </div>
         </section>
