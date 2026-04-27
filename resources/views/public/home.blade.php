@@ -492,9 +492,9 @@
     </section>
 
     <!-- Why Remenant Banner (Short Height) -->
-    <section class="relative overflow-hidden my-8 lg:my-20">
+    <section class="relative my-8 lg:my-20">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-            <div class="relative overflow-hidden rounded-[2rem] bg-[var(--bg-sage)] px-8 pt-10 pb-0 sm:px-16 sm:pt-16 sm:pb-16 lg:py-16">
+            <div class="relative rounded-[2rem] bg-[var(--bg-sage)] px-8 pt-10 pb-0 sm:px-16 sm:pt-16 sm:pb-16 lg:py-16">
                 <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
 
                     <!-- Content Right (Text) -->
@@ -537,16 +537,18 @@
                     <!-- Mockup Left (Image) -->
                     <div class="order-2 lg:order-1 flex justify-center lg:block">
                         <div
-                            class="lg:absolute relative bottom-0 left-0 w-full lg:w-[480px] flex justify-center lg:justify-start pointer-events-none">
+                            class="lg:absolute relative -mt-10 lg:mt-0 bottom-0 left-0 lg:left-10 w-full lg:w-[450px] flex justify-center lg:justify-start pointer-events-none">
                             <img src="{{ asset('images/home/remenant-bg.png') }}" alt="Why Remenant"
-                                class="w-[320px] sm:w-[380px] lg:w-full h-auto block">
+                                class="w-[260px] sm:w-[320px] lg:w-full h-auto block lg:scale-105 lg:origin-bottom transition-transform duration-500 hover:scale-110">
                         </div>
                     </div>
                 </div>
 
-                <!-- Decorative Circles -->
-                <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
-                <div class="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-black/5 blur-3xl"></div>
+                <!-- Decorative elements (Clipped) -->
+                <div class="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
+                    <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+                    <div class="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-black/5 blur-3xl"></div>
+                </div>
             </div>
         </div>
     </section>

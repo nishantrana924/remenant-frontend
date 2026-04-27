@@ -31,34 +31,38 @@
     </section>
 
     <!-- Brand Philosophy Detailed -->
-    <section class="bg-black py-24 text-white overflow-hidden">
+    <section class="bg-white py-24 text-[color:var(--text-primary)] overflow-hidden">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="text-center">
-                <h2 class="text-3xl font-extrabold tracking-tight sm:text-5xl">The Gold Standard</h2>
-                <div class="mt-12 grid grid-cols-1 gap-12 sm:grid-cols-3">
-                    <div class="flex flex-col items-center gap-6 p-8 rounded-3xl bg-white/5 border border-white/10">
-                        <div class="h-14 w-14 rounded-2xl bg-[var(--primary)] flex items-center justify-center">
-                            <i data-lucide="zap" class="h-8 w-8 text-white"></i>
+                <span class="text-xs font-black uppercase tracking-[0.4em] text-[color:var(--primary)] mb-6 block">Our Quality Pledge</span>
+                <h2 class="text-4xl font-extrabold tracking-tight sm:text-6xl uppercase leading-none">The Gold Standard</h2>
+                
+                <div class="mt-20 grid grid-cols-1 gap-8 lg:grid-cols-3">
+                    <!-- Tech 1: Sage -->
+                    <div class="flex flex-col items-center text-center p-12 rounded-[3rem] bg-[var(--bg-sage)] shadow-xl transition-all duration-500 hover:-translate-y-2">
+                        <div class="h-20 w-20 rounded-3xl bg-white flex items-center justify-center shadow-lg mb-8">
+                            <i data-lucide="zap" class="h-10 w-10 text-[color:var(--bg-sage)]"></i>
                         </div>
-                        <h3 class="text-xl font-bold">Effervescent Tech</h3>
-                        <p class="text-sm text-white/60 leading-relaxed">By focusing on Effervescent Technology, we ensure
-                            maximum bioavailability and faster absorption for every single nutrient.</p>
+                        <h3 class="text-2xl font-black uppercase tracking-tight text-[color:var(--text-primary)] mb-4">Effervescent Tech</h3>
+                        <p class="text-lg text-[color:var(--text-primary)]/70 leading-relaxed font-medium">By focusing on Effervescent Technology, we ensure maximum bioavailability and faster absorption for every single nutrient.</p>
                     </div>
-                    <div class="flex flex-col items-center gap-6 p-8 rounded-3xl bg-white/5 border border-white/10">
-                        <div class="h-14 w-14 rounded-2xl bg-[var(--primary)] flex items-center justify-center">
-                            <i data-lucide="shield-check" class="h-8 w-8 text-white"></i>
+
+                    <!-- Tech 2: Peach -->
+                    <div class="flex flex-col items-center text-center p-12 rounded-[3rem] bg-[var(--bg-peach)] shadow-xl transition-all duration-500 hover:-translate-y-2">
+                        <div class="h-20 w-20 rounded-3xl bg-white flex items-center justify-center shadow-lg mb-8">
+                            <i data-lucide="shield-check" class="h-10 w-10 text-[color:var(--bg-peach)]"></i>
                         </div>
-                        <h3 class="text-xl font-bold">Pure & Potent</h3>
-                        <p class="text-sm text-white/60 leading-relaxed">Our chemical engineering expertise allows us to
-                            master the stability and quality of tablets, ensuring every sip is precise.</p>
+                        <h3 class="text-2xl font-black uppercase tracking-tight text-[color:var(--text-primary)] mb-4">Pure & Potent</h3>
+                        <p class="text-lg text-[color:var(--text-primary)]/70 leading-relaxed font-medium">Our chemical engineering expertise allows us to master the stability and quality of tablets, ensuring every sip is precise.</p>
                     </div>
-                    <div class="flex flex-col items-center gap-6 p-8 rounded-3xl bg-white/5 border border-white/10">
-                        <div class="h-14 w-14 rounded-2xl bg-[var(--primary)] flex items-center justify-center">
-                            <i data-lucide="microscope" class="h-8 w-8 text-white"></i>
+
+                    <!-- Tech 3: Soft Orange -->
+                    <div class="flex flex-col items-center text-center p-12 rounded-[3rem] bg-[var(--primary-soft)] shadow-xl transition-all duration-500 hover:-translate-y-2">
+                        <div class="h-20 w-20 rounded-3xl bg-white flex items-center justify-center shadow-lg mb-8">
+                            <i data-lucide="microscope" class="h-10 w-10 text-[color:var(--primary)]"></i>
                         </div>
-                        <h3 class="text-xl font-bold">Effortless Health</h3>
-                        <p class="text-sm text-white/60 leading-relaxed">We believe that staying healthy should be
-                            effortless, scientific, and transparent. No more boring pills.</p>
+                        <h3 class="text-2xl font-black uppercase tracking-tight text-[color:var(--text-primary)] mb-4">Effortless Health</h3>
+                        <p class="text-lg text-[color:var(--text-primary)]/70 leading-relaxed font-medium">We believe that staying healthy should be effortless, scientific, and transparent. No more boring pills.</p>
                     </div>
                 </div>
             </div>
@@ -92,13 +96,13 @@
                         <img src="{{ asset('images/banners/remenant-mission.jpg') }}" alt="Our Mission" class="h-full w-full object-cover transition duration-1000 group-hover:scale-105">
                     </div>
                 </div>
-                <div class="w-full lg:w-[45%] lg:-mr-24 relative z-10 p-6 sm:p-10 lg:p-16 rounded-[3rem] bg-black text-white shadow-2xl">
+                <div class="w-full lg:w-[45%] lg:-mr-24 relative z-10 p-6 sm:p-10 lg:p-16 rounded-[3rem] bg-[var(--bg-sage)] text-[color:var(--text-primary)] shadow-2xl">
                     <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-[var(--primary)] mb-6">
                         <span class="h-px w-8 bg-[var(--primary)]"></span>
                         Our Mission
                     </span>
                     <h2 class="text-4xl font-extrabold leading-tight">Engineering <br> Daily Excellence</h2>
-                    <p class="mt-8 text-lg leading-relaxed text-white/70 font-medium">We are on a mission to simplify health by combining medical precision with engineering brilliance. We create supplements that are not just effective, but a joy to consume every single day.</p>
+                    <p class="mt-8 text-lg leading-relaxed text-[color:var(--text-primary)]/80 font-medium">We are on a mission to simplify health by combining medical precision with engineering brilliance. We create supplements that are not just effective, but a joy to consume every single day.</p>
                 </div>
             </div>
         </div>
@@ -157,66 +161,53 @@
                     with technical brilliance to revolutionize modern wellness.</p>
             </div>
 
-            <div class="space-y-16 lg:space-y-24">
+            <div class="space-y-24 sm:space-y-40">
                 <!-- Founder 1: Dr. Jimmy Thummar -->
-                <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
-                    <div class="w-full lg:w-[45%] group">
-                        <div
-                            class="relative aspect-[4/5] overflow-hidden rounded-[3rem] bg-[#FDF9F6] border border-black/5 shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 lg:items-center">
+                    <div class="lg:col-span-4 group">
+                        <div class="relative aspect-[4/5] overflow-hidden rounded-[3rem] bg-[var(--bg-light)] border border-black/5 shadow-xl transition-all duration-700 group-hover:shadow-2xl">
                             <img src="{{ asset('images/logo/remenant-health-logo.png') }}" alt="Dr. Jimmy Thummar"
-                                class="h-full w-full object-contain p-16 transition duration-700 group-hover:scale-110">
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                            </div>
+                                class="h-full w-full object-contain p-24 transition duration-700 group-hover:scale-105 opacity-40">
                         </div>
                     </div>
-                    <div class="w-full lg:w-[55%] section-reveal">
-                        <div
-                            class="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-black text-white text-xs font-black uppercase tracking-widest mb-6">
-                            <i data-lucide="award" class="h-4 w-4"></i>
-                            Founder & Visionary
-                        </div>
-                        <h3 class="text-4xl font-extrabold text-[color:var(--text-primary)] sm:text-5xl">Dr. Jimmy Thummar
-                        </h3>
-                        <p class="mt-2 text-xl font-bold text-[color:var(--primary)]">MBBS</p>
+                    <div class="lg:col-span-8">
+                        <div class="max-w-2xl">
+                            <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-black text-white text-[10px] font-black uppercase tracking-widest mb-8">
+                                <i data-lucide="award" class="h-3.5 w-3.5 text-[color:var(--primary)]"></i>
+                                Founder & Visionary
+                            </div>
+                            <h3 class="text-4xl font-black text-[color:var(--text-primary)] sm:text-6xl tracking-tighter uppercase leading-none mb-4">Dr. Jimmy Thummar</h3>
+                            <p class="text-2xl font-bold text-[color:var(--primary)] italic mb-10">MBBS</p>
 
-                        <div class="mt-8 space-y-6 text-lg leading-relaxed text-[color:var(--text-secondary)]">
-                            <p>With a solid foundation in medicine, Dr. Thummar is the driving force behind REMENANT. His
-                                medical expertise ensures that every product is designed to fulfill the body’s actual
-                                nutritional gaps.</p>
-                            <p>As the visionary, he ensures that the brand stays committed to health safety and clinical
-                                efficacy, bridging the gap between clinical needs and daily lifestyle.</p>
+                            <div class="space-y-6 text-lg leading-relaxed text-[color:var(--text-secondary)] font-medium">
+                                <p>With a solid foundation in medicine, Dr. Thummar is the driving force behind REMENANT. His medical expertise ensures that every product is designed to fulfill the body’s actual nutritional gaps.</p>
+                                <p>As the visionary, he ensures that the brand stays committed to health safety and clinical efficacy, bridging the gap between clinical needs and daily lifestyle.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Founder 2: Het Lakhani -->
-                <div class="flex flex-col lg:flex-row-reverse items-center gap-8 lg:gap-16">
-                    <div class="w-full lg:w-[45%] group">
-                        <div
-                            class="relative aspect-[4/5] overflow-hidden rounded-[3rem] bg-[var(--bg-section)] border border-black/5 shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 lg:items-center">
+                    <div class="lg:col-span-4 lg:order-2 group">
+                        <div class="relative aspect-[4/5] overflow-hidden rounded-[3rem] bg-[var(--bg-light)] border border-black/5 shadow-xl transition-all duration-700 group-hover:shadow-2xl">
                             <img src="{{ asset('images/logo/remenant-health-logo.png') }}" alt="Het Lakhani"
-                                class="h-full w-full object-contain p-16 transition duration-700 group-hover:scale-110">
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                            </div>
+                                class="h-full w-full object-contain p-24 transition duration-700 group-hover:scale-105 opacity-40">
                         </div>
                     </div>
-                    <div class="w-full lg:w-[55%] section-reveal">
-                        <div
-                            class="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-[var(--primary)] text-white text-xs font-black uppercase tracking-widest mb-6">
-                            <i data-lucide="settings" class="h-4 w-4"></i>
-                            Co-Founder & Operations
-                        </div>
-                        <h3 class="text-4xl font-extrabold text-[color:var(--text-primary)] sm:text-5xl">Het Lakhani</h3>
-                        <p class="mt-2 text-xl font-bold text-[color:var(--primary)] uppercase tracking-wider">Chemical
-                            Engineer</p>
+                    <div class="lg:col-span-8 lg:order-1 lg:text-right">
+                        <div class="max-w-2xl lg:ml-auto">
+                            <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest mb-8">
+                                <i data-lucide="settings" class="h-3.5 w-3.5"></i>
+                                Co-Founder & Operations
+                            </div>
+                            <h3 class="text-4xl font-black text-[color:var(--text-primary)] sm:text-6xl tracking-tighter uppercase leading-none mb-4">Het Lakhani</h3>
+                            <p class="text-2xl font-bold text-[color:var(--primary)] italic mb-10 uppercase tracking-widest">Chemical Engineer</p>
 
-                        <div class="mt-8 space-y-6 text-lg leading-relaxed text-[color:var(--text-secondary)]">
-                            <p>Bringing technical brilliance to the brand, Het Lakhani oversees the complex formulation and
-                                manufacturing processes.</p>
-                            <p>His background in chemical engineering allows REMENANT to master the stability and quality of
-                                effervescent tablets, ensuring that every batch is pure, potent, and precise.</p>
+                            <div class="space-y-6 text-lg leading-relaxed text-[color:var(--text-secondary)] font-medium">
+                                <p>Bringing technical brilliance to the brand, Het Lakhani oversees the complex formulation and manufacturing processes.</p>
+                                <p>His background in chemical engineering allows REMENANT to master the stability and quality of effervescent tablets, ensuring that every batch is pure, potent, and precise.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -266,9 +257,9 @@
     </section>
 
     <!-- Why Remenant Banner (Short Height - Customized for About) -->
-    <section class="relative overflow-hidden my-8 lg:my-20">
+    <section class="relative my-8 lg:my-20">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-            <div class="relative overflow-hidden rounded-[2rem] bg-[var(--bg-peach)] px-8 pt-10 pb-0 sm:px-16 sm:pt-16 sm:pb-16 lg:py-16 border border-white/10 shadow-2xl">
+            <div class="relative rounded-[2rem] bg-[var(--bg-peach)] px-8 pt-10 pb-0 sm:px-16 sm:pt-16 sm:pb-16 lg:py-16 border border-white/10 shadow-2xl">
                 <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
 
                     <!-- Content Right (Text) -->
@@ -309,16 +300,18 @@
                     <!-- Mockup Left (Image) -->
                     <div class="order-2 lg:order-1 flex justify-center lg:block">
                         <div
-                            class="lg:absolute relative bottom-0 left-0 w-full lg:w-[480px] flex justify-center lg:justify-start pointer-events-none">
+                            class="lg:absolute relative -mt-10 lg:mt-0 bottom-0 left-0 lg:left-10 w-full lg:w-[450px] flex justify-center lg:justify-start pointer-events-none">
                             <img src="{{ asset('images/home/remenant-bg1.png') }}" alt="Upgrade Your Health"
-                                class="w-[320px] sm:w-[380px] lg:w-full h-auto block">
+                                class="w-[260px] sm:w-[320px] lg:w-full h-auto block lg:scale-105 lg:origin-bottom transition-transform duration-500 hover:scale-110">
                         </div>
                     </div>
                 </div>
 
-                <!-- Decorative Circles -->
-                <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
-                <div class="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-black/5 blur-3xl"></div>
+                <!-- Decorative elements (Clipped) -->
+                <div class="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
+                    <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+                    <div class="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-black/5 blur-3xl"></div>
+                </div>
             </div>
         </div>
     </section>
