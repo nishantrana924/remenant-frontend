@@ -737,7 +737,9 @@ input:where([type='file']):focus {
         color: white;
     }
 
-
+    html.lenis {
+        height: auto;
+    }
 
     html,
     body {
@@ -5007,6 +5009,10 @@ input:where([type='file']):focus {
 
   .lg\:pt-0 {
     padding-top: 0px;
+  }
+
+  .lg\:pt-5 {
+    padding-top: 1.25rem;
   }
 
   .lg\:text-left {

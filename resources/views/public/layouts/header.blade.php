@@ -1,23 +1,25 @@
-<!-- Top promo bar (NOT sticky) -->
-<div class="bg-[var(--secondary)] text-white">
-    <div class="mx-auto flex max-w-[1600px] items-center px-4 py-3 text-sm sm:px-6 lg:px-12">
-        <div class="marquee flex-1">
-            <div class="marquee__track">
-                <span class="marquee__item font-semibold">Get our Exclusive Best Sellers!</span>
-                <span class="marquee__sep">•</span>
-                <span class="marquee__item font-semibold">Free delivery over ₹999</span>
-                <span class="marquee__sep">•</span>
-                <span class="marquee__item font-semibold">New arrivals every week</span>
-                <span class="marquee__sep">•</span>
-                <span class="marquee__item font-semibold">Get our Exclusive Best Sellers!</span>
-                <span class="marquee__sep">•</span>
-                <span class="marquee__item font-semibold">Free delivery over ₹999</span>
-                <span class="marquee__sep">•</span>
-                <span class="marquee__item font-semibold">New arrivals every week</span>
+@if (request()->routeIs('home'))
+    <!-- Top promo bar (NOT sticky) -->
+    <div class="bg-[var(--secondary)] text-white">
+        <div class="mx-auto flex max-w-[1600px] items-center px-4 py-3 text-sm sm:px-6 lg:px-12">
+            <div class="marquee flex-1">
+                <div class="marquee__track">
+                    <span class="marquee__item font-semibold">Get our Exclusive Best Sellers!</span>
+                    <span class="marquee__sep">•</span>
+                    <span class="marquee__item font-semibold">Free delivery over ₹999</span>
+                    <span class="marquee__sep">•</span>
+                    <span class="marquee__item font-semibold">New arrivals every week</span>
+                    <span class="marquee__sep">•</span>
+                    <span class="marquee__item font-semibold">Get our Exclusive Best Sellers!</span>
+                    <span class="marquee__sep">•</span>
+                    <span class="marquee__item font-semibold">Free delivery over ₹999</span>
+                    <span class="marquee__sep">•</span>
+                    <span class="marquee__item font-semibold">New arrivals every week</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
+@endif
 
 <!-- Main header (sticky) -->
 <header class="public-header public-header-main brand-gradient sticky top-0 z-50" data-public-header>
@@ -97,7 +99,7 @@
             </div>
 
             <!-- Mobile search bar -->
-            <div class="public-mobile-search mt-4" data-mobile-search>
+            <div class="public-mobile-search mt-4 {{ request()->routeIs('products.show') ? 'hidden' : '' }}" data-mobile-search>
                 <div class="relative">
                     <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/80">
                         <i data-lucide="search" class="h-5 w-5"></i>

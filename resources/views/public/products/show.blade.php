@@ -70,7 +70,7 @@
         @endphp
 
         <!-- Product Hero Section -->
-        <section class="mx-auto max-w-[1600px] px-4 py-2 sm:px-6 lg:px-12">
+        <section class="mx-auto max-w-[1600px] px-4 py-2 sm:px-6 lg:px-12 lg:pt-5">
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
                 
                 <!-- Left: Product Images -->
@@ -691,6 +691,7 @@
             const $mobileImageProgress = $("[data-mobile-image-progress]");
             const $lightboxImages = $("[data-lightbox-image]");
             let currentImageIndex = 0;
+            let lockedScrollY = 0;
             $totalCounter.text(gallery.length);
 
             function setNavDisabled($btn, isDisabled) {
@@ -740,6 +741,30 @@
                         hideImageLoader(img);
                     });
                 });
+            }
+
+            function lockBackgroundScroll() {
+                lockedScrollY = window.scrollY || window.pageYOffset || 0;
+                $("body").css({
+                    position: "fixed",
+                    top: `-${lockedScrollY}px`,
+                    left: "0",
+                    right: "0",
+                    width: "100%",
+                    overflow: "hidden"
+                });
+            }
+
+            function unlockBackgroundScroll() {
+                $("body").css({
+                    position: "",
+                    top: "",
+                    left: "",
+                    right: "",
+                    width: "",
+                    overflow: ""
+                });
+                window.scrollTo(0, lockedScrollY);
             }
             
             $gallery.owlCarousel({
@@ -806,7 +831,7 @@
 
             $("[data-lightbox-close]").on("click", function() {
                 $modal.addClass("hidden").removeClass("flex");
-                $("body").css("overflow", "");
+                unlockBackgroundScroll();
             });
 
             window.openLightbox = function(index) {
@@ -822,11 +847,12 @@
                     updateLightboxNavState(index);
                     if (window.lucide) window.lucide.createIcons();
                 });
+                lockBackgroundScroll();
             };
 
             window.closeLightbox = function() {
                 $modal.addClass("hidden").removeClass("flex");
-                $("body").css("overflow", "");
+                unlockBackgroundScroll();
             };
 
             $(document).on("keydown", function(e) {
