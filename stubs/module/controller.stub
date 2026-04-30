@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\BaseController;
+use App\Services\{{class}}Service;
+use App\Http\Requests\Admin\{{class}}Request;
+use Illuminate\Http\Request;
+
+class {{class}}Controller extends BaseController
+{
+    protected $service;
+
+    public function __construct({{class}}Service $service)
+    {
+        $this->service = $service;
+    }
+
+    public function index()
+    {
+        ${{variablePlural}} = $this->service->getAll();
+        return view('admin.{{variablePlural}}.index', compact('{{variablePlural}}'));
+    }
+
+    public function create()
+    {
+        return view('admin.{{variablePlural}}.create');
+    }
+
+    public function store({{class}}Request $request)
+    {
+        $this->service->create($request->validated());
+        return redirect()->route('admin.{{variablePlural}}.index')->with('success', '{{class}} created successfully.');
+    }
+
+    public function edit($id)
+    {
+        ${{variable}} = $this->service->getById($id);
+        return view('admin.{{variablePlural}}.edit', compact('{{variable}}'));
+    }
+
+    public function update({{class}}Request $request, $id)
+    {
+        $this->service->update($id, $request->validated());
+        return redirect()->route('admin.{{variablePlural}}.index')->with('success', '{{class}} updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $this->service->delete($id);
+        return redirect()->route('admin.{{variablePlural}}.index')->with('success', '{{class}} deleted successfully.');
+    }
+}
