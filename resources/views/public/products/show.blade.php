@@ -359,70 +359,82 @@
 
 
             {{-- product Highlights --}}
-        <section class="py-12 sm:py-24 bg-white border-t border-black/5">
+        <!-- Polished Experience Excellence Card -->
+        <section class="py-16 sm:py-28 bg-white border-t border-black/5">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-                <div class="rounded-[2rem] sm:rounded-[3rem] bg-[var(--bg-dark)] p-6 sm:p-20 text-[color:var(--text-white)] overflow-hidden relative shadow-2xl">
-                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 lg:items-center">
-                        <!-- Left: Product Highlights -->
-                        <div>
-                            <h2 class="text-xs font-black uppercase tracking-[0.4em] text-[color:var(--primary)] mb-6">Experience Excellence</h2>
-                            <h3 class="text-3xl sm:text-5xl font-black italic tracking-tighter uppercase mb-8 sm:mb-12 text-black">Product Highlights</h3>
-                            <div class="space-y-8">
-                                <div class="flex items-center gap-6">
-                                    <div class="h-2 w-2 rounded-full bg-[var(--primary)] shadow-[0_0_15px_var(--primary)]"></div>
-                                    <p class="text-xl font-bold italic opacity-90">100% Bioavailable Effervescent Formula</p>
-                                </div>
-                                <div class="flex items-center gap-6">
-                                    <div class="h-2 w-2 rounded-full bg-[var(--primary)] shadow-[0_0_15px_var(--primary)]"></div>
-                                    <p class="text-xl font-bold italic opacity-90">Clean Label Certified Ingredients</p>
-                                </div>
-                                <div class="flex items-center gap-6">
-                                    <div class="h-2 w-2 rounded-full bg-[var(--primary)] shadow-[0_0_15px_var(--primary)]"></div>
-                                    <p class="text-xl font-bold italic opacity-90">Zero Sugar & No Artificial Colors</p>
-                                </div>
-                                <div class="flex items-center gap-6">
-                                    <div class="h-2 w-2 rounded-full bg-[var(--primary)] shadow-[0_0_15px_var(--primary)]"></div>
-                                    <p class="text-xl font-bold italic opacity-90">Fast Acting & Gentle on the Stomach</p>
-                                </div>
-                            </div>
+                <div class="relative rounded-[4rem] bg-[var(--bg-sage)] p-10 lg:p-24 overflow-hidden shadow-2xl shadow-[var(--bg-sage)]/10">
+                    <!-- Premium Background Accents -->
+                    <div class="absolute top-0 right-0 h-full w-1/3 bg-white/5 -skew-x-12 translate-x-20"></div>
+                    <div class="absolute -top-32 -left-32 h-64 w-64 rounded-full bg-white/20 blur-[120px]"></div>
+                    
+                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:items-center">
+                        <!-- Column 1: Editorial Heading -->
+                        <div class="lg:col-span-5">
+                            <h2 class="text-5xl sm:text-7xl font-black tracking-tighter uppercase leading-[0.85] mb-10 text-[color:var(--text-primary)]">
+                                Experience <br> <span class="text-white">Excellence</span>
+                            </h2>
+                            <div class="h-1 w-20 bg-[var(--primary)] rounded-full mb-10"></div>
+                            <p class="text-xl text-[color:var(--text-primary)]/80 leading-relaxed max-w-md font-medium">Advanced effervescent technology designed to seamlessly integrate into your modern lifestyle.</p>
                         </div>
 
-                        <!-- Right: The Ritual -->
-                        <div class="bg-orange-400 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 border border-white/10 shadow-inner">
-                            <h2 class="text-2xl sm:text-3xl font-black tracking-tighter uppercase mb-10 sm:mb-12 flex items-center gap-4 text-white">
-                                <span class="h-px flex-1 bg-white/20"></span>
-                                The Ritual
-                                <span class="h-px flex-1 bg-white/20"></span>
-                            </h2>
-                            <div class="space-y-10 ">
-                                <div class="flex gap-8 group">
-                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary)] font-black text-white text-2xl shadow-xl shadow-[var(--primary)]/20 transition-transform group-hover:rotate-12">1</span>
-                                    <div>
-                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Drop it</h4>
-                                        <p class="mt-2 text-base text-white/90 leading-relaxed">Drop one tablet into 200ml of water.</p>
+                        <!-- Column 2 & 3: Content Grid -->
+                        <div class="lg:col-span-7">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-16 lg:gap-20">
+                                <!-- Highlights Column -->
+                                <div class="space-y-12">
+                                    <div class="flex gap-6 group">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-[color:var(--primary)] backdrop-blur-sm border border-white/20 transition-transform group-hover:scale-110">
+                                            <i data-lucide="zap" class="h-5 w-5"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">Maximum Absorption</h4>
+                                            <p class="text-xs text-[color:var(--text-primary)]/70 leading-relaxed font-medium">100% Bioavailable Formula for rapid action.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-6 group">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-emerald-600 backdrop-blur-sm border border-white/20 transition-transform group-hover:scale-110">
+                                            <i data-lucide="leaf" class="h-5 w-5"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">Pure Ingredients</h4>
+                                            <p class="text-xs text-[color:var(--text-primary)]/70 leading-relaxed font-medium">Clean Label Certified with no additives.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-6 group">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-rose-600 backdrop-blur-sm border border-white/20 transition-transform group-hover:scale-110">
+                                            <i data-lucide="ban" class="h-5 w-5"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">Zero Compromise</h4>
+                                            <p class="text-xs text-[color:var(--text-primary)]/70 leading-relaxed font-medium">No Sugar & No Artificial Colors used.</p>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="flex gap-8 group">
-                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/5 font-black text-[color:var(--text-white)] text-2xl transition-transform group-hover:rotate-12">2</span>
-                                    <div>
-                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Fizz it</h4>
-                                        <p class="mt-2 text-base text-white/90 leading-relaxed">Watch the pure wellness dissolve.</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-8 group">
-                                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/5 font-black text-[color:var(--text-white)] text-2xl transition-transform group-hover:rotate-12">3</span>
-                                    <div>
-                                        <h4 class="text-xl font-bold uppercase tracking-widest text-white">Fuel Up</h4>
-                                        <p class="mt-2 text-base text-white/90 leading-relaxed">Drink and take on your day.</p>
+
+                                <!-- Ritual Column (Timeline) -->
+                                <div class="relative pl-8">
+                                    <div class="absolute left-0 top-2 bottom-2 w-px bg-white/20"></div>
+                                    <div class="space-y-12">
+                                        <div class="relative group/step">
+                                            <div class="absolute -left-10 top-0 h-4 w-4 rounded-full bg-[var(--primary)] border-4 border-[var(--bg-sage)] z-10 transition-transform group-hover/step:scale-125"></div>
+                                            <h4 class="text-xs font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">01. Drop it</h4>
+                                            <p class="text-xs text-[color:var(--text-primary)]/70 font-medium">Dissolve one tablet in 200ml water.</p>
+                                        </div>
+                                        <div class="relative group/step">
+                                            <div class="absolute -left-10 top-0 h-4 w-4 rounded-full bg-white/40 border-4 border-[var(--bg-sage)] z-10 transition-transform group-hover/step:scale-125 group-hover/step:bg-white"></div>
+                                            <h4 class="text-xs font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">02. Fizz it</h4>
+                                            <p class="text-xs text-[color:var(--text-primary)]/70 font-medium">Watch the pure formulation dissolve.</p>
+                                        </div>
+                                        <div class="relative group/step">
+                                            <div class="absolute -left-10 top-0 h-4 w-4 rounded-full bg-white/40 border-4 border-[var(--bg-sage)] z-10 transition-transform group-hover/step:scale-125 group-hover/step:bg-white"></div>
+                                            <h4 class="text-xs font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">03. Fuel Up</h4>
+                                            <p class="text-xs text-[color:var(--text-primary)]/70 font-medium">Drink and take on your day.</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Background Decor -->
-                    <div class="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[var(--primary)]/20 blur-[100px]"></div>
-                    <div class="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-[var(--secondary)]/10 blur-[100px]"></div>
                 </div>
             </div>
         </section>
@@ -574,7 +586,7 @@
 
         <!-- Related Products -->
         <section class="py-20 border-t border-black/5">
-            <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
+            <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
                 <div class="flex items-end justify-between mb-12">
                     <div>
                         <h2 class="text-3xl font-black italic tracking-tight text-[color:var(--text-primary)]">You may also like</h2>
@@ -584,20 +596,59 @@
                 </div>
 
                 <div class="related-carousel owl-carousel owl-theme">
-                    @foreach($relatedProducts as $rp)
-                        <a href="{{ route('products.show', $rp['slug']) }}" class="group block">
-                            <div class="relative aspect-square overflow-hidden rounded-[2.5rem] bg-[var(--bg-section)] ring-1 ring-black/5 mb-6">
-                                <img src="{{ asset('images/products/' . $rp['image']) }}" alt="{{ $rp['title'] }}" class="h-full w-full object-contain p-6 transition duration-500 group-hover:scale-110">
+                    @foreach ($relatedProducts as $rp)
+                        @php
+                            $discount = (int) round((1 - ($rp['price'] / max(1, $rp['mrp']))) * 100);
+                        @endphp
+                        <div class="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white border border-black/5">
+                            <!-- Wishlist Button -->
+                            <button type="button"
+                                class="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-black/5">
+                                <i data-lucide="heart" class="h-5 w-5 text-[color:var(--text-primary)]"></i>
+                            </button>
+
+                            <!-- Product Image -->
+                            <div class="relative aspect-square overflow-hidden bg-gray-50">
+                                <a href="{{ route('products.show', $rp['slug']) }}" class="absolute inset-0 z-[5]"></a>
+                                <img src="{{ asset('images/products/' . $rp['image']) }}" alt="{{ $rp['title'] }}"
+                                    class="h-full w-full object-cover" loading="lazy">
+                                @if($discount > 0)
+                                <div class="absolute left-3 top-3 rounded-full bg-[var(--primary)] px-3 py-1 text-xs font-black text-white shadow-lg">
+                                    -{{ $discount }}%
+                                </div>
+                                @endif
                             </div>
-                            <h3 class="text-lg font-black text-[color:var(--text-primary)] leading-tight group-hover:text-[color:var(--primary)] transition">{{ $rp['title'] }}</h3>
-                            <div class="mt-2 flex items-center justify-between">
-                                <p class="text-xl font-black text-[color:var(--text-primary)]">₹{{ number_format($rp['price']) }}</p>
-                                <div class="flex items-center gap-1 text-orange-500">
-                                    <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                                    <span class="text-xs font-black">{{ $rp['rating'] }}</span>
+
+                            <!-- Product Info -->
+                            <div class="flex flex-1 flex-col p-4">
+                                <p class="text-xs font-extrabold text-[color:var(--primary)] mb-1">
+                                    {{ $rp['tagline'] }}</p>
+                                <h3 class="text-sm font-extrabold text-[color:var(--text-primary)] leading-tight mb-3 line-clamp-2">
+                                    {{ $rp['title'] }}</h3>
+
+                                <div class="flex items-center justify-between gap-3 mb-4">
+                                    <div class="flex items-baseline gap-2">
+                                        <p class="text-lg font-extrabold text-[color:var(--primary)]">
+                                            ₹{{ number_format($rp['price']) }}</p>
+                                        @if($rp['mrp'] > $rp['price'])
+                                        <p class="text-xs font-bold text-gray-400 line-through">
+                                            ₹{{ number_format($rp['mrp']) }}</p>
+                                        @endif
+                                    </div>
+                                    <div class="flex items-center gap-1 rounded-full bg-gray-50 px-2 py-1 text-[10px] font-bold text-gray-500 ring-1 ring-black/5">
+                                        <i data-lucide="star" class="h-3 w-3 text-orange-400 fill-current"></i>
+                                        {{ number_format($rp['rating'], 1) }}
+                                    </div>
+                                </div>
+
+                                <div class="mt-auto relative z-10">
+                                    <a href="{{ route('products.show', $rp['slug']) }}"
+                                        class="block w-full text-center rounded-full bg-[var(--primary)] py-2 text-sm font-black text-white hover:opacity-95 transition shadow-lg shadow-[var(--primary)]/20">
+                                        Add to cart
+                                    </a>
                                 </div>
                             </div>
-                        </a>
+                        </div>
                     @endforeach
                 </div>
             </div>
@@ -865,7 +916,7 @@
 
             $(".related-carousel").owlCarousel({
                 items: 1,
-                margin: 24,
+                margin: 16,
                 loop: false,
                 autoplay: false,
                 nav: false,
@@ -873,8 +924,7 @@
                 responsive: {
                     0: { items: 1.2, stagePadding: 20 },
                     640: { items: 2 },
-                    1024: { items: 3 },
-                    1280: { items: 4 }
+                    1024: { items: 4 }
                 }
             });
 

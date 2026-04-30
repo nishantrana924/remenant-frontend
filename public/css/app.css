@@ -943,6 +943,9 @@ input:where([type='file']):focus {
 .-bottom-\[10\%\] {
   bottom: -10%;
 }
+.-left-10 {
+  left: -2.5rem;
+}
 .-left-12 {
   left: -3rem;
 }
@@ -951,6 +954,9 @@ input:where([type='file']):focus {
 }
 .-left-24 {
   left: -6rem;
+}
+.-left-32 {
+  left: -8rem;
 }
 .-left-4 {
   left: -1rem;
@@ -982,6 +988,9 @@ input:where([type='file']):focus {
 .-top-24 {
   top: -6rem;
 }
+.-top-32 {
+  top: -8rem;
+}
 .-top-4 {
   top: -1rem;
 }
@@ -996,6 +1005,9 @@ input:where([type='file']):focus {
 }
 .bottom-10 {
   bottom: 2.5rem;
+}
+.bottom-2 {
+  bottom: 0.5rem;
 }
 .bottom-20 {
   bottom: 5rem;
@@ -1571,11 +1583,11 @@ input:where([type='file']):focus {
 .w-\[18px\] {
   width: 18px;
 }
+.w-\[260px\] {
+  width: 260px;
+}
 .w-\[30\%\] {
   width: 30%;
-}
-.w-\[320px\] {
-  width: 320px;
 }
 .w-\[35\%\] {
   width: 35%;
@@ -1604,6 +1616,9 @@ input:where([type='file']):focus {
 }
 .w-full {
   width: 100%;
+}
+.w-px {
+  width: 1px;
 }
 .min-w-0 {
   min-width: 0px;
@@ -1656,6 +1671,9 @@ input:where([type='file']):focus {
 .max-w-lg {
   max-width: 32rem;
 }
+.max-w-md {
+  max-width: 28rem;
+}
 .max-w-sm {
   max-width: 24rem;
 }
@@ -1696,8 +1714,16 @@ input:where([type='file']):focus {
   --tw-translate-x: 0px;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
+.translate-x-20 {
+  --tw-translate-x: 5rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
 .rotate-12 {
   --tw-rotate: 12deg;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.-skew-x-12 {
+  --tw-skew-x: -12deg;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 .transform {
@@ -1878,15 +1904,15 @@ input:where([type='file']):focus {
   margin-top: calc(3rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(3rem * var(--tw-space-y-reverse));
 }
-.space-y-16 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-y-reverse: 0;
-  margin-top: calc(4rem * calc(1 - var(--tw-space-y-reverse)));
-  margin-bottom: calc(4rem * var(--tw-space-y-reverse));
-}
 .space-y-2 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+}
+.space-y-24 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(6rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(6rem * var(--tw-space-y-reverse));
 }
 .space-y-3 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
@@ -2026,6 +2052,9 @@ input:where([type='file']):focus {
 .border-2 {
   border-width: 2px;
 }
+.border-4 {
+  border-width: 4px;
+}
 .border-x {
   border-left-width: 1px;
   border-right-width: 1px;
@@ -2060,6 +2089,9 @@ input:where([type='file']):focus {
 }
 .border-\[\#0FA47B\]\/10 {
   border-color: rgb(15 164 123 / 0.1);
+}
+.border-\[var\(--bg-sage\)\] {
+  border-color: var(--bg-sage);
 }
 .border-\[var\(--primary\)\] {
   border-color: var(--primary);
@@ -2129,6 +2161,9 @@ input:where([type='file']):focus {
 }
 .border-white\/10 {
   border-color: rgb(255 255 255 / 0.1);
+}
+.border-white\/20 {
+  border-color: rgb(255 255 255 / 0.2);
 }
 .border-white\/30 {
   border-color: rgb(255 255 255 / 0.3);
@@ -2219,8 +2254,8 @@ input:where([type='file']):focus {
 .bg-\[color\:var\(--secondary\)\] {
   background-color: var(--secondary);
 }
-.bg-\[var\(--bg-dark\)\] {
-  background-color: var(--bg-dark);
+.bg-\[var\(--bg-light\)\] {
+  background-color: var(--bg-light);
 }
 .bg-\[var\(--bg-main\)\] {
   background-color: var(--bg-main);
@@ -2434,6 +2469,9 @@ input:where([type='file']):focus {
 .bg-white\/30 {
   background-color: rgb(255 255 255 / 0.3);
 }
+.bg-white\/40 {
+  background-color: rgb(255 255 255 / 0.4);
+}
 .bg-white\/5 {
   background-color: rgb(255 255 255 / 0.05);
 }
@@ -2473,9 +2511,6 @@ input:where([type='file']):focus {
 .bg-gradient-to-r {
   background-image: linear-gradient(to right, var(--tw-gradient-stops));
 }
-.bg-gradient-to-t {
-  background-image: linear-gradient(to top, var(--tw-gradient-stops));
-}
 .from-\[\#FFF2E8\] {
   --tw-gradient-from: #FFF2E8 var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(255 242 232 / 0) var(--tw-gradient-to-position);
@@ -2484,11 +2519,6 @@ input:where([type='file']):focus {
 .from-\[var\(--primary\)\] {
   --tw-gradient-from: var(--primary) var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-.from-black\/20 {
-  --tw-gradient-from: rgb(0 0 0 / 0.2) var(--tw-gradient-from-position);
-  --tw-gradient-to: rgb(0 0 0 / 0) var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 .from-blue-600 {
@@ -2544,9 +2574,6 @@ input:where([type='file']):focus {
 .to-purple-600 {
   --tw-gradient-to: #9333ea var(--tw-gradient-to-position);
 }
-.to-transparent {
-  --tw-gradient-to: transparent var(--tw-gradient-to-position);
-}
 .fill-blue-50 {
   fill: #eff6ff;
 }
@@ -2592,14 +2619,17 @@ input:where([type='file']):focus {
 .p-10 {
   padding: 2.5rem;
 }
-.p-16 {
-  padding: 4rem;
+.p-12 {
+  padding: 3rem;
 }
 .p-2 {
   padding: 0.5rem;
 }
 .p-2\.5 {
   padding: 0.625rem;
+}
+.p-24 {
+  padding: 6rem;
 }
 .p-3 {
   padding: 0.75rem;
@@ -2635,6 +2665,10 @@ input:where([type='file']):focus {
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+}
+.px-2\.5 {
+  padding-left: 0.625rem;
+  padding-right: 0.625rem;
 }
 .px-3 {
   padding-left: 0.75rem;
@@ -2765,6 +2799,9 @@ input:where([type='file']):focus {
 }
 .pl-6 {
   padding-left: 1.5rem;
+}
+.pl-8 {
+  padding-left: 2rem;
 }
 .pr-12 {
   padding-right: 3rem;
@@ -2939,6 +2976,9 @@ input:where([type='file']):focus {
 .leading-7 {
   line-height: 1.75rem;
 }
+.leading-\[0\.85\] {
+  line-height: 0.85;
+}
 .leading-\[0\] {
   line-height: 0;
 }
@@ -3022,6 +3062,12 @@ input:where([type='file']):focus {
   --tw-text-opacity: 1;
   color: rgb(245 130 32 / var(--tw-text-opacity, 1));
 }
+.text-\[color\:var\(--bg-peach\)\] {
+  color: var(--bg-peach);
+}
+.text-\[color\:var\(--bg-sage\)\] {
+  color: var(--bg-sage);
+}
 .text-\[color\:var\(--primary\)\] {
   color: var(--primary);
 }
@@ -3036,9 +3082,6 @@ input:where([type='file']):focus {
 }
 .text-\[color\:var\(--text-secondary\)\] {
   color: var(--text-secondary);
-}
-.text-\[color\:var\(--text-white\)\] {
-  color: var(--text-white);
 }
 .text-\[var\(--bg-peach\)\] {
   color: var(--bg-peach);
@@ -3179,10 +3222,6 @@ input:where([type='file']):focus {
   --tw-text-opacity: 1;
   color: rgb(251 146 60 / var(--tw-text-opacity, 1));
 }
-.text-orange-500 {
-  --tw-text-opacity: 1;
-  color: rgb(249 115 22 / var(--tw-text-opacity, 1));
-}
 .text-orange-600 {
   --tw-text-opacity: 1;
   color: rgb(234 88 12 / var(--tw-text-opacity, 1));
@@ -3206,6 +3245,10 @@ input:where([type='file']):focus {
   --tw-text-opacity: 1;
   color: rgb(220 38 38 / var(--tw-text-opacity, 1));
 }
+.text-rose-600 {
+  --tw-text-opacity: 1;
+  color: rgb(225 29 72 / var(--tw-text-opacity, 1));
+}
 .text-rose-900 {
   --tw-text-opacity: 1;
   color: rgb(136 19 55 / var(--tw-text-opacity, 1));
@@ -3213,9 +3256,6 @@ input:where([type='file']):focus {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-.text-white\/60 {
-  color: rgb(255 255 255 / 0.6);
 }
 .text-white\/70 {
   color: rgb(255 255 255 / 0.7);
@@ -3314,11 +3354,6 @@ input:where([type='file']):focus {
 .shadow-\[0_-10px_40px_rgba\(0\2c 0\2c 0\2c 0\.05\)\] {
   --tw-shadow: 0 -10px 40px rgba(0,0,0,0.05);
   --tw-shadow-colored: 0 -10px 40px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-.shadow-\[0_0_15px_var\(--primary\)\] {
-  --tw-shadow: 0 0 15px var(--primary);
-  --tw-shadow-colored: 0 0 15px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 .shadow-\[0_32px_64px_-12px_rgba\(0\2c 0\2c 0\2c 0\.08\)\] {
@@ -4170,8 +4205,9 @@ input:where([type='file']):focus {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-.group:hover .group-hover\:rotate-12 {
-  --tw-rotate: 12deg;
+.group\/step:hover .group-hover\/step\:scale-125 {
+  --tw-scale-x: 1.25;
+  --tw-scale-y: 1.25;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
@@ -4187,10 +4223,9 @@ input:where([type='file']):focus {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-.group:hover .group-hover\:scale-\[1\.02\] {
-  --tw-scale-x: 1.02;
-  --tw-scale-y: 1.02;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+.group\/step:hover .group-hover\/step\:bg-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
 }
 
 .group:hover .group-hover\:bg-orange-100 {
@@ -4218,6 +4253,12 @@ input:where([type='file']):focus {
 
 .group:hover .group-hover\:opacity-100 {
   opacity: 1;
+}
+
+.group:hover .group-hover\:shadow-2xl {
+  --tw-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 @media (min-width: 640px) {
@@ -4258,10 +4299,6 @@ input:where([type='file']):focus {
   .sm\:mx-auto {
     margin-left: auto;
     margin-right: auto;
-  }
-
-  .sm\:mb-12 {
-    margin-bottom: 3rem;
   }
 
   .sm\:mb-16 {
@@ -4336,12 +4373,12 @@ input:where([type='file']):focus {
     width: 2.25rem;
   }
 
-  .sm\:w-\[360px\] {
-    width: 360px;
+  .sm\:w-\[320px\] {
+    width: 320px;
   }
 
-  .sm\:w-\[380px\] {
-    width: 380px;
+  .sm\:w-\[360px\] {
+    width: 360px;
   }
 
   .sm\:w-\[42\%\] {
@@ -4378,10 +4415,6 @@ input:where([type='file']):focus {
 
   .sm\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .sm\:grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .sm\:flex-row {
@@ -4445,20 +4478,18 @@ input:where([type='file']):focus {
     row-gap: 1rem;
   }
 
+  .sm\:space-y-40 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(10rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(10rem * var(--tw-space-y-reverse));
+  }
+
   .sm\:self-auto {
     align-self: auto;
   }
 
-  .sm\:rounded-\[2\.5rem\] {
-    border-radius: 2.5rem;
-  }
-
   .sm\:rounded-\[2rem\] {
     border-radius: 2rem;
-  }
-
-  .sm\:rounded-\[3rem\] {
-    border-radius: 3rem;
   }
 
   .sm\:rounded-lg {
@@ -4549,6 +4580,11 @@ input:where([type='file']):focus {
   .sm\:py-24 {
     padding-top: 6rem;
     padding-bottom: 6rem;
+  }
+
+  .sm\:py-28 {
+    padding-top: 7rem;
+    padding-bottom: 7rem;
   }
 
   .sm\:py-3 {
@@ -4689,6 +4725,10 @@ input:where([type='file']):focus {
     position: sticky;
   }
 
+  .lg\:left-10 {
+    left: 2.5rem;
+  }
+
   .lg\:top-0 {
     top: 0px;
   }
@@ -4767,6 +4807,14 @@ input:where([type='file']):focus {
     margin-bottom: 4rem;
   }
 
+  .lg\:ml-auto {
+    margin-left: auto;
+  }
+
+  .lg\:mt-0 {
+    margin-top: 0px;
+  }
+
   .lg\:mt-32 {
     margin-top: 8rem;
   }
@@ -4828,14 +4876,6 @@ input:where([type='file']):focus {
     width: 450px;
   }
 
-  .lg\:w-\[480px\] {
-    width: 480px;
-  }
-
-  .lg\:w-\[55\%\] {
-    width: 55%;
-  }
-
   .lg\:w-\[60\%\] {
     width: 60%;
   }
@@ -4860,8 +4900,18 @@ input:where([type='file']):focus {
     flex-shrink: 0;
   }
 
+  .lg\:origin-bottom {
+    transform-origin: bottom;
+  }
+
   .lg\:translate-x-0 {
     --tw-translate-x: 0px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  }
+
+  .lg\:scale-105 {
+    --tw-scale-x: 1.05;
+    --tw-scale-y: 1.05;
     transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   }
 
@@ -4871,6 +4921,10 @@ input:where([type='file']):focus {
 
   .lg\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .lg\:grid-cols-4 {
@@ -4905,12 +4959,12 @@ input:where([type='file']):focus {
     gap: 0px;
   }
 
-  .lg\:gap-16 {
-    gap: 4rem;
-  }
-
   .lg\:gap-20 {
     gap: 5rem;
+  }
+
+  .lg\:gap-24 {
+    gap: 6rem;
   }
 
   .lg\:gap-4 {
@@ -4921,12 +4975,6 @@ input:where([type='file']):focus {
     --tw-space-y-reverse: 0;
     margin-top: calc(2.5rem * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(2.5rem * var(--tw-space-y-reverse));
-  }
-
-  .lg\:space-y-24 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-y-reverse: 0;
-    margin-top: calc(6rem * calc(1 - var(--tw-space-y-reverse)));
-    margin-bottom: calc(6rem * var(--tw-space-y-reverse));
   }
 
   .lg\:self-start {
@@ -4951,6 +4999,10 @@ input:where([type='file']):focus {
 
   .lg\:p-16 {
     padding: 4rem;
+  }
+
+  .lg\:p-24 {
+    padding: 6rem;
   }
 
   .lg\:px-12 {
@@ -5008,6 +5060,10 @@ input:where([type='file']):focus {
 
   .lg\:text-left {
     text-align: left;
+  }
+
+  .lg\:text-right {
+    text-align: right;
   }
 
   .lg\:text-6xl {
