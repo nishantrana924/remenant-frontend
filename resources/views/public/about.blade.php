@@ -9,16 +9,17 @@
     <section class="relative overflow-hidden bg-[var(--bg-main)] py-6 lg:py-10">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
-                <div>
-                    <span class="text-sm font-extrabold uppercase tracking-widest text-[color:var(--primary)]">Our
+                <div class="relative z-10">
+                    <span class="text-xs font-black uppercase tracking-[0.4em] text-[color:var(--primary)] mb-6 block">Our
                         Philosophy</span>
-                    <h1 class="mt-4 text-5xl font-extrabold tracking-tight text-[color:var(--text-primary)] sm:text-7xl">
-                        Where Science <br> Meets Engineering
+                    <h1 class="text-4xl sm:text-7xl font-black text-[color:var(--text-primary)] leading-[0.9] tracking-tighter mb-8 uppercase">
+                        Where Science <br class="hidden lg:block"> Meets Engineering
                     </h1>
-                    <p class="mt-8 text-xl leading-relaxed text-[color:var(--text-secondary)]">
-                        REMENANT is where medical science meets advanced engineering. We didn't just want to create
-                        supplements; we wanted to create a gold standard in daily nutrition.
-                    </p>
+                    <div class="space-y-6 text-base leading-relaxed text-[color:var(--text-secondary)] font-medium max-w-xl">
+                        <p>
+                            REMENANT is where medical science meets advanced engineering. We set out to engineer a gold standard in daily nutrition by combining clinical medical expertise with precision manufacturing to master the art of bioavailability.
+                        </p>
+                    </div>
                 </div>
                 <div class="relative">
                     <div class="aspect-square overflow-hidden rounded-[3rem] bg-[var(--bg-section)]">
@@ -35,34 +36,34 @@
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="text-center">
                 <span class="text-xs font-black uppercase tracking-[0.4em] text-[color:var(--primary)] mb-6 block">Our Quality Pledge</span>
-                <h2 class="text-4xl font-extrabold tracking-tight sm:text-6xl uppercase leading-none">The Gold Standard</h2>
+                <h2 class="section-heading">The Gold Standard</h2>
                 
                 <div class="mt-20 grid grid-cols-1 gap-8 lg:grid-cols-3">
                     <!-- Tech 1: Sage -->
                     <div class="flex flex-col items-center text-center p-12 rounded-[3rem] bg-[var(--bg-sage)] shadow-xl transition-all duration-500 hover:-translate-y-2">
                         <div class="h-20 w-20 rounded-3xl bg-white flex items-center justify-center shadow-lg mb-8">
-                            <i data-lucide="zap" class="h-10 w-10 text-[color:var(--bg-sage)]"></i>
+                            <i data-lucide="zap" class="h-10 w-10 !text-[#074D3D]"></i>
                         </div>
-                        <h3 class="text-2xl font-black uppercase tracking-tight text-[color:var(--text-primary)] mb-4">Effervescent Tech</h3>
-                        <p class="text-lg text-[color:var(--text-primary)]/70 leading-relaxed font-medium">By focusing on Effervescent Technology, we ensure maximum bioavailability and faster absorption for every single nutrient.</p>
+                        <h3 class="text-xl font-bold uppercase tracking-tight !text-[#074D3D] mb-4">Effervescent Tech</h3>
+                        <p class="text-base !text-[#074D3D]/80 leading-relaxed font-medium">By focusing on Effervescent Technology, we ensure maximum bioavailability and faster absorption for every single nutrient.</p>
                     </div>
 
                     <!-- Tech 2: Peach -->
                     <div class="flex flex-col items-center text-center p-12 rounded-[3rem] bg-[var(--bg-peach)] shadow-xl transition-all duration-500 hover:-translate-y-2">
                         <div class="h-20 w-20 rounded-3xl bg-white flex items-center justify-center shadow-lg mb-8">
-                            <i data-lucide="shield-check" class="h-10 w-10 text-[color:var(--bg-peach)]"></i>
+                            <i data-lucide="shield-check" class="h-10 w-10 !text-[#6B2C24]"></i>
                         </div>
-                        <h3 class="text-2xl font-black uppercase tracking-tight text-[color:var(--text-primary)] mb-4">Pure & Potent</h3>
-                        <p class="text-lg text-[color:var(--text-primary)]/70 leading-relaxed font-medium">Our chemical engineering expertise allows us to master the stability and quality of tablets, ensuring every sip is precise.</p>
+                        <h3 class="text-xl font-bold uppercase tracking-tight !text-[#6B2C24] mb-4">Pure & Potent</h3>
+                        <p class="text-base !text-[#6B2C24]/80 leading-relaxed font-medium">Our chemical engineering expertise allows us to master the stability and quality of tablets, ensuring every sip is precise.</p>
                     </div>
 
                     <!-- Tech 3: Soft Orange -->
                     <div class="flex flex-col items-center text-center p-12 rounded-[3rem] bg-[var(--primary-soft)] shadow-xl transition-all duration-500 hover:-translate-y-2">
                         <div class="h-20 w-20 rounded-3xl bg-white flex items-center justify-center shadow-lg mb-8">
-                            <i data-lucide="microscope" class="h-10 w-10 text-[color:var(--primary)]"></i>
+                            <i data-lucide="microscope" class="h-10 w-10 !text-[#84310B]"></i>
                         </div>
-                        <h3 class="text-2xl font-black uppercase tracking-tight text-[color:var(--text-primary)] mb-4">Effortless Health</h3>
-                        <p class="text-lg text-[color:var(--text-primary)]/70 leading-relaxed font-medium">We believe that staying healthy should be effortless, scientific, and transparent. No more boring pills.</p>
+                        <h3 class="text-xl font-bold uppercase tracking-tight !text-[#84310B] mb-4">Effortless Health</h3>
+                        <p class="text-base !text-[#84310B]/80 leading-relaxed font-medium">We believe that staying healthy should be effortless, scientific, and transparent. No more boring pills.</p>
                     </div>
                 </div>
             </div>
@@ -84,8 +85,8 @@
                         <span class="h-px w-8 bg-[var(--primary)]"></span>
                         Our Vision
                     </span>
-                    <h2 class="text-4xl font-extrabold text-[color:var(--text-primary)] leading-tight">Revolutionizing <br> Modern Longevity</h2>
-                    <p class="mt-8 text-lg leading-relaxed text-[color:var(--text-secondary)] font-medium">To be the global benchmark for bioavailable nutrition, ensuring that every individual has access to the most advanced, science-backed wellness solutions for a life without limits.</p>
+                    <h2 class="section-heading text-left">Revolutionizing <br> Modern Longevity</h2>
+                    <p class="mt-8 text-base leading-relaxed text-[color:var(--text-secondary)] font-medium">To be the global benchmark for bioavailable nutrition, ensuring that every individual has access to the most advanced, science-backed wellness solutions for a life without limits.</p>
                 </div>
             </div>
 
@@ -101,8 +102,8 @@
                         <span class="h-px w-8 bg-[var(--primary)]"></span>
                         Our Mission
                     </span>
-                    <h2 class="text-4xl font-extrabold leading-tight">Engineering <br> Daily Excellence</h2>
-                    <p class="mt-8 text-lg leading-relaxed text-[color:var(--text-primary)]/80 font-medium">We are on a mission to simplify health by combining medical precision with engineering brilliance. We create supplements that are not just effective, but a joy to consume every single day.</p>
+                    <h2 class="section-heading text-left">Engineering <br> Daily Excellence</h2>
+                    <p class="mt-8 text-base leading-relaxed text-[color:var(--text-primary)]/80 font-medium">We are on a mission to simplify health by combining medical precision with engineering brilliance. We create supplements that are not just effective, but a joy to consume every single day.</p>
                 </div>
             </div>
         </div>
@@ -112,9 +113,9 @@
     <section class="py-24 bg-[#F0F4F3] border-y border-black/5">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="text-center mb-20">
-                <span class="text-sm font-extrabold uppercase tracking-widest text-[color:var(--primary)]">How It's
+                <span class="text-xs font-black uppercase tracking-[0.3em] text-[color:var(--primary)]">How It's
                     Made</span>
-                <h2 class="mt-4 text-4xl font-extrabold text-[color:var(--text-primary)]">The Gold Standard Process</h2>
+                <h2 class="section-heading">The Gold Standard Process</h2>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -142,72 +143,77 @@
                         <img src="{{ asset('images/banners/remenant-bg12.jpg') }}" alt="Double-Blind Testing" class="h-full w-full object-cover">
                     </div>
                     <div class="absolute -top-6 left-10 h-14 w-14 rounded-2xl bg-[#074D3D] text-white flex items-center justify-center font-black text-2xl shadow-lg ring-4 ring-white">03</div>
-                    <h3 class="mt-4 text-2xl font-extrabold text-[color:var(--text-primary)]">Double-Blind Testing</h3>
-                    <p class="mt-4 text-[color:var(--text-secondary)] leading-relaxed text-sm font-medium">Every batch undergoes third-party lab testing to guarantee potency and safety. If it doesn't meet the gold standard, it doesn't leave our doors.</p>
+                    <h3 class="mt-4 text-xl font-bold text-[color:var(--text-primary)]">Double-Blind Testing</h3>
+                    <p class="mt-4 text-base text-[color:var(--text-secondary)] leading-relaxed font-medium">Every batch undergoes third-party lab testing to guarantee potency and safety. If it doesn't meet the gold standard, it doesn't leave our doors.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Meet the Founders -->
+    <!-- Meet the Founders: Clean Simple UI -->
     <section class="bg-[var(--bg-main)] py-16 lg:py-24">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-            <div class="text-center mb-12 lg:mb-16">
-                <span class="text-sm font-extrabold uppercase tracking-widest text-[color:var(--primary)]">The Power
-                    Duo</span>
-                <h2 class="mt-4 text-4xl font-extrabold tracking-tight text-[color:var(--text-primary)] sm:text-5xl">Meet
-                    the Founders</h2>
-                <p class="mt-6 mx-auto max-w-2xl text-lg text-[color:var(--text-secondary)]">Combining medical expertise
-                    with technical brilliance to revolutionize modern wellness.</p>
+            <div class="text-center mb-16">
+                <span class="text-xs font-black uppercase tracking-[0.3em] text-[color:var(--primary)]">The People Behind the Standard</span>
+                <h2 class="section-heading mt-4">Meet the Founders</h2>
             </div>
 
-            <div class="space-y-24 sm:space-y-40">
+            <div class="space-y-24 lg:space-y-32">
                 <!-- Founder 1: Dr. Jimmy Thummar -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 lg:items-center">
-                    <div class="lg:col-span-4 group">
-                        <div class="relative aspect-[4/5] overflow-hidden rounded-[3rem] bg-[var(--bg-light)] border border-black/5 shadow-xl transition-all duration-700 group-hover:shadow-2xl">
+                <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
+                    <div class="w-full lg:w-[35%] group">
+                        <div class="relative aspect-square max-w-sm mx-auto overflow-hidden rounded-[2.5rem] bg-white border border-black/5 shadow-xl transition-all duration-500 group-hover:shadow-2xl">
                             <img src="{{ asset('images/logo/remenant-health-logo.png') }}" alt="Dr. Jimmy Thummar"
-                                class="h-full w-full object-contain p-24 transition duration-700 group-hover:scale-105 opacity-40">
+                                class="h-full w-full object-contain p-16 lg:p-20 opacity-40 transition duration-700 group-hover:scale-105">
                         </div>
                     </div>
-                    <div class="lg:col-span-8">
-                        <div class="max-w-2xl">
-                            <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-black text-white text-[10px] font-black uppercase tracking-widest mb-8">
-                                <i data-lucide="award" class="h-3.5 w-3.5 text-[color:var(--primary)]"></i>
-                                Founder & Visionary
+                    <div class="w-full lg:w-[65%]">
+                        <div class="max-w-xl">
+                            <div class="flex items-center mb-6">
+                                <span class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[var(--primary)]">
+                                    <span class="h-px w-6 bg-[var(--primary)]"></span>
+                                    Founder & Visionary
+                                </span>
                             </div>
-                            <h3 class="text-4xl font-black text-[color:var(--text-primary)] sm:text-6xl tracking-tighter uppercase leading-none mb-4">Dr. Jimmy Thummar</h3>
-                            <p class="text-2xl font-bold text-[color:var(--primary)] italic mb-10">MBBS</p>
-
-                            <div class="space-y-6 text-lg leading-relaxed text-[color:var(--text-secondary)] font-medium">
+                            <h3 class="section-heading text-left !text-4xl mb-2">Dr. Jimmy Thummar</h3>
+                            <p class="text-xl font-bold text-[color:var(--primary)] italic mb-8">MBBS</p>
+                            
+                            <div class="space-y-6 text-base leading-relaxed text-[color:var(--text-secondary)] font-medium">
                                 <p>With a solid foundation in medicine, Dr. Thummar is the driving force behind REMENANT. His medical expertise ensures that every product is designed to fulfill the body’s actual nutritional gaps.</p>
                                 <p>As the visionary, he ensures that the brand stays committed to health safety and clinical efficacy, bridging the gap between clinical needs and daily lifestyle.</p>
                             </div>
+
+
                         </div>
                     </div>
                 </div>
 
                 <!-- Founder 2: Het Lakhani -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 lg:items-center">
-                    <div class="lg:col-span-4 lg:order-2 group">
-                        <div class="relative aspect-[4/5] overflow-hidden rounded-[3rem] bg-[var(--bg-light)] border border-black/5 shadow-xl transition-all duration-700 group-hover:shadow-2xl">
+                <div class="flex flex-col lg:flex-row-reverse items-center gap-12 lg:gap-24">
+                    <div class="w-full lg:w-[35%] group">
+                        <div class="relative aspect-square max-w-sm mx-auto overflow-hidden rounded-[2.5rem] bg-white border border-black/5 shadow-xl transition-all duration-500 group-hover:shadow-2xl">
                             <img src="{{ asset('images/logo/remenant-health-logo.png') }}" alt="Het Lakhani"
-                                class="h-full w-full object-contain p-24 transition duration-700 group-hover:scale-105 opacity-40">
+                                class="h-full w-full object-contain p-16 lg:p-20 opacity-40 transition duration-700 group-hover:scale-105">
                         </div>
                     </div>
-                    <div class="lg:col-span-8 lg:order-1 lg:text-right">
-                        <div class="max-w-2xl lg:ml-auto">
-                            <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest mb-8">
-                                <i data-lucide="settings" class="h-3.5 w-3.5"></i>
-                                Co-Founder & Operations
+                    <div class="w-full lg:w-[65%] lg:text-right">
+                        <div class="max-w-xl lg:ml-auto">
+                            <div class="flex items-center lg:flex-row-reverse mb-6">
+                                <span class="inline-flex flex-row-reverse items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[var(--primary)]">
+                                    <span class="h-px w-6 bg-[var(--primary)]"></span>
+                                    Co-Founder & Operations
+                                </span>
+                              
                             </div>
-                            <h3 class="text-4xl font-black text-[color:var(--text-primary)] sm:text-6xl tracking-tighter uppercase leading-none mb-4">Het Lakhani</h3>
-                            <p class="text-2xl font-bold text-[color:var(--primary)] italic mb-10 uppercase tracking-widest">Chemical Engineer</p>
-
-                            <div class="space-y-6 text-lg leading-relaxed text-[color:var(--text-secondary)] font-medium">
+                            <h3 class="section-heading lg:text-right !text-4xl mb-2">Het Lakhani</h3>
+                            <p class="text-xl font-bold text-[color:var(--primary)] italic mb-8 uppercase tracking-widest">Chemical Engineer</p>
+                            
+                            <div class="space-y-6 text-base leading-relaxed text-[color:var(--text-secondary)] font-medium">
                                 <p>Bringing technical brilliance to the brand, Het Lakhani oversees the complex formulation and manufacturing processes.</p>
                                 <p>His background in chemical engineering allows REMENANT to master the stability and quality of effervescent tablets, ensuring that every batch is pure, potent, and precise.</p>
                             </div>
+
+
                         </div>
                     </div>
                 </div>
@@ -219,8 +225,8 @@
     <section class="bg-[#F5F8F7] py-16 sm:py-24 border-y border-black/5 overflow-hidden">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-extrabold text-[color:var(--text-primary)]">Trust & Quality Guaranteed</h2>
-                <p class="mt-4 text-lg text-[color:var(--text-secondary)]">We adhere to the highest international standards
+                <h2 class="section-heading">Trust & Quality Guaranteed</h2>
+                <p class="mt-4 text-base text-[color:var(--text-secondary)] font-medium">We adhere to the highest international standards
                     to ensure every REMENANT product is pure and effective.</p>
             </div>
         </div>
@@ -260,38 +266,35 @@
     <section class="relative my-8 lg:my-20">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="relative rounded-[2rem] bg-[var(--bg-peach)] px-8 pt-10 pb-0 sm:px-16 sm:pt-16 sm:pb-16 lg:py-16 border border-white/10 shadow-2xl">
-                <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
-
-                    <!-- Content Right (Text) -->
+                <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">                    <!-- Content Right (Text) -->
                     <div class="relative z-20 order-1 lg:order-2 text-center lg:text-left">
-                        <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                        <h2 class="section-heading !text-white text-center lg:text-left">
                             Ready to Upgrade Your Health?
                         </h2>
-                        <p class="mt-4 text-base text-white/90 max-w-lg mx-auto lg:mx-0">
+                        <p class="mt-4 text-base text-white/90 max-w-lg mx-auto lg:mx-0 font-medium">
                             Experience the ultimate in bioavailability and convenience. Our science-backed formulations are designed to seamlessly integrate into your modern lifestyle.
                         </p>
-
                         <div class="mt-10 flex flex-wrap justify-center lg:justify-start gap-4">
                             <!-- WhatsApp Button -->
-                            <a href="https://wa.me/yournumber" target="_blank"
-                                class="inline-flex items-center gap-3 rounded-[20px] bg-[#25D366] px-8 py-4 text-white hover:opacity-90 transition shadow-xl hover:-translate-y-1 transition-all duration-300">
+                            <a href="https://wa.me/17567776796" target="_blank"
+                                class="inline-flex items-center gap-3 rounded-[20px] bg-[#25D366] px-8 py-4 hover:opacity-90 transition shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                                 <svg class="h-6 w-6 fill-white" viewBox="0 0 24 24">
                                     <path
                                         d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                                 </svg>
                                 <div class="text-left">
-                                    <p class="text-[10px] uppercase opacity-70 leading-none font-bold tracking-wider text-white">Chat
+                                    <p class="text-[10px] uppercase leading-none font-bold tracking-wider !text-white">Chat
                                         with us</p>
-                                    <p class="text-base font-extrabold leading-tight text-white">WhatsApp</p>
+                                    <p class="text-base font-bold leading-tight !text-white">WhatsApp</p>
                                 </div>
                             </a>
                             <!-- Shop Button -->
                             <a href="/#shop"
-                                class="inline-flex items-center gap-3 rounded-[20px] bg-black px-8 py-4 text-white hover:bg-black/90 transition shadow-xl hover:-translate-y-1 transition-all duration-300">
-                                <i data-lucide="shopping-bag" class="h-6 w-6"></i>
+                                class="inline-flex items-center gap-3 rounded-[20px] bg-black px-8 py-4 hover:bg-black/90 transition shadow-xl hover:-translate-y-1 transition-all duration-300">
+                                <i data-lucide="shopping-bag" class="h-6 w-6 !text-white"></i>
                                 <div class="text-left">
-                                    <p class="text-[10px] uppercase opacity-70 leading-none font-bold tracking-wider">Available now</p>
-                                    <p class="text-base font-extrabold leading-tight">Shop All Products</p>
+                                    <p class="text-[10px] uppercase leading-none font-bold tracking-wider !text-white">Available now</p>
+                                    <p class="text-base font-bold leading-tight !text-white">Shop All Products</p>
                                 </div>
                             </a>
                         </div>

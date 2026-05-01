@@ -7,7 +7,7 @@
                     <img src="{{ asset('images/logo/remenant-health-logo.png') }}" alt="Remenant Health"
                         class="h-10 w-auto object-contain">
                 </a>
-                <p class="mt-6 text-sm leading-relaxed text-[color:var(--text-primary)]/80 max-w-xs">
+                <p class="mt-6 text-sm leading-relaxed text-black/70 max-w-xs">
                     Premium effervescent wellness formulas crafted for immortality. High-bioavailability supplements
                     engineered for modern lives.
                 </p>
@@ -34,7 +34,7 @@
 
             <!-- Links Columns -->
             <div class="lg:col-span-2">
-                <h3 class="text-xs font-extrabold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">Catalog
+                <h3 class="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">Catalog
                 </h3>
                 <ul class="mt-6 space-y-3 text-sm font-medium">
                     <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Best
@@ -49,7 +49,7 @@
             </div>
 
             <div class="lg:col-span-2">
-                <h3 class="text-xs font-extrabold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">Company
+                <h3 class="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">Company
                 </h3>
                 <ul class="mt-6 space-y-3 text-sm font-medium">
                     <li><a href="{{ route('about') }}"
@@ -66,7 +66,7 @@
             </div>
 
             <div class="lg:col-span-2">
-                <h3 class="text-xs font-extrabold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">
+                <h3 class="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">
                     Assistance</h3>
                 <ul class="mt-6 space-y-3 text-sm font-medium">
                     <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Track
@@ -83,18 +83,17 @@
 
             <!-- Location/Contact -->
             <div class="lg:col-span-3">
-                <h3 class="text-xs font-extrabold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">
+                <h3 class="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">
                     Headquarters</h3>
                 <address class="mt-6 not-italic text-sm leading-relaxed text-[color:var(--text-primary)]/70">
                     224 , Ambika pinnacle, lajamani chowk, <br>
                     mota varachha, surat, <br>
                     Gujarat, India
                 </address>
-                <div class="mt-4 text-sm font-extrabold text-black">
-                    <a href="tel:+918849550164" class="hover:underline">+91 8849550164</a> </br>
-                    <a href="tel:+919662342235" class="hover:underline">+91 9662342235</a>
+                <div class="mt-4 text-sm font-bold text-black">
+                    <a href="tel:7567776796" class="hover:underline">756 777 6796</a>
                 </div>
-                <div class="mt-4 text-sm font-extrabold text-black">
+                <div class="mt-4 text-sm font-bold text-black">
                     <a href="mailto:support@remenanthealth.com" class="hover:underline">support@remenanthealth.com</a>
                 </div>
             </div>
@@ -105,7 +104,7 @@
             <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
                 <div
                     class="flex h-9 w-14 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-black/[0.06] transition hover:shadow-md">
-                    <span class="text-[10px] font-black italic text-[#1a1f71]">VISA</span>
+                    <span class="text-[10px] font-bold italic text-[#1a1f71]">VISA</span>
                 </div>
                 <div
                     class="flex h-9 w-14 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-black/[0.06] transition hover:shadow-md">
@@ -116,7 +115,7 @@
                 </div>
                 <div
                     class="flex h-9 w-14 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-black/[0.06] transition hover:shadow-md">
-                    <span class="text-[10px] font-black text-[#003480] italic">RuPay<span
+                    <span class="text-[10px] font-bold text-[#003480] italic">RuPay<span
                             class="text-[#f58220]">❯</span></span>
                 </div>
                 <div
@@ -125,7 +124,7 @@
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 20H4V4h16v16zM4 9h16M9 4v16" />
                     </svg>
-                    <span class="text-[8px] font-black uppercase tracking-wider">Net Banking</span>
+                    <span class="text-[8px] font-bold uppercase tracking-wider">Net Banking</span>
                 </div>
                 <div
                     class="flex h-9 items-center justify-center rounded-lg bg-white px-4 shadow-sm ring-1 ring-black/[0.06] gap-2 transition hover:shadow-md text-black/70">
@@ -136,15 +135,15 @@
                         <circle cx="5.5" cy="18.5" r="2.5" />
                         <circle cx="18.5" cy="18.5" r="2.5" />
                     </svg>
-                    <span class="text-[8px] font-black uppercase tracking-wider">Cash On Delivery</span>
+                    <span class="text-[8px] font-bold uppercase tracking-wider">Cash On Delivery</span>
                 </div>
             </div>
         </div>
 
         <div
-            class="mt-12 border-t border-black/5 pt-8 flex flex-col items-center gap-6 sm:flex-row sm:justify-between text-[11px] sm:text-xs font-medium text-[color:var(--text-primary)]/50">
+            class="mt-12 border-t border-black/5 pt-8 flex flex-col items-center gap-6 sm:flex-row sm:justify-between text-[11px] sm:text-xs font-medium !text-black">
             <div class="flex flex-col items-center gap-4 sm:flex-row sm:gap-8 text-center sm:text-left">
-                <p class="font-bold opacity-80">&copy; {{ date('Y') }} Remenant Health. All rights reserved.</p>
+                <p class="font-semibold !text-black">&copy; {{ date('Y') }} Remenant Health. All rights reserved.</p>
                 <div class="flex items-center gap-6">
                     <a href="#"
                         class="hover:text-black transition border-b border-transparent hover:border-black/20 pb-0.5">Privacy</a>
@@ -156,8 +155,8 @@
             </div>
             <div
                 class="flex items-center gap-2.5 bg-black/[0.04] px-4 py-2 rounded-full border border-black/[0.05] shadow-inner transition hover:bg-black/[0.06]">
-                <span class="opacity-50 text-[10px] uppercase font-bold tracking-tight">Crafted by</span>
-                <span class="font-black text-[color:var(--text-primary)] tracking-tight">Brand Sphere</span>
+                <span class="text-[10px] uppercase font-semibold tracking-tight !text-black">Crafted by</span>
+                <span class="font-bold tracking-tight !text-black">Brand Sphere</span>
             </div>
         </div>
     </div>

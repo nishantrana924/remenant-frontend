@@ -22,6 +22,7 @@ Route::get('/cart', function () {
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/product/{slug}/reviews', [ProductController::class, 'reviews'])->name('products.reviews');
 
 // Admin routes (all authenticated users are admins)
 Route::middleware(['auth', 'verified'])->group(function () {

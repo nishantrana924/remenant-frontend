@@ -1,0 +1,218 @@
+.hero-carousel {
+    width: 100%;
+    position: relative;
+    display: block !important;
+    min-height: 450px;
+    background: var(--bg-section);
+}
+
+/* Prevent layout shift: Show only the first item before Owl initializes */
+.hero-carousel:not(.owl-loaded) {
+    display: flex !important;
+    overflow: hidden;
+}
+
+.hero-carousel:not(.owl-loaded) .item {
+    width: 100%;
+    flex: 0 0 100%;
+}
+
+.hero-carousel:not(.owl-loaded) .item:not(:first-child) {
+    display: none;
+}
+
+.hero-carousel .item {
+    width: 100%;
+    position: relative;
+    background: var(--bg-section);
+    aspect-ratio: 1200 / 450;
+    overflow: hidden;
+}
+
+.hero-carousel .hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Mobile View Aspect Ratio (1200x1200) */
+@media (max-width: 640px) {
+    .hero-carousel {
+        min-height: 300px;
+    }
+
+    .hero-carousel .item {
+        aspect-ratio: 1 / 1;
+    }
+
+    .hero-carousel .hero-img {
+        object-fit: cover;
+    }
+}
+
+/* Custom Owl Dots Styling */
+.hero-carousel .owl-dots {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    text-align: center;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.hero-carousel .owl-dot span {
+    width: 8px !important;
+    height: 8px !important;
+    margin: 0 !important;
+    background: rgba(255, 255, 255, 0.4) !important;
+    border-radius: 50%;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.hero-carousel .owl-dot.active span {
+    background: #fff !important;
+    width: 20px !important;
+    border-radius: 4px;
+}
+
+.owl-carousel .owl-item {
+    will-change: transform;
+}
+
+/* Prevent brief flicker/jump before Owl initialization */
+.combo-carousel:not(.owl-loaded),
+.testimonial-carousel:not(.owl-loaded) {
+    display: grid !important;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 24px;
+    overflow: hidden;
+    min-height: 250px;
+}
+
+/* Simulate stagePadding on mobile for smoother Owl transition */
+@media (max-width: 767px) {
+    .testimonial-carousel:not(.owl-loaded) {
+        padding: 0 15px;
+        grid-template-columns: repeat(1, 1fr);
+        min-height: 380px;
+    }
+
+    .testimonial-carousel:not(.owl-loaded) .item {
+        width: 100%;
+        padding: 0 15px;
+    }
+}
+
+.testimonial-carousel:not(.owl-loaded) {
+    min-height: 300px;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.combo-carousel:not(.owl-loaded) .item,
+.testimonial-carousel:not(.owl-loaded) .item {
+    width: 100%;
+}
+
+/* Responsive Pre-loading Grids */
+@media (min-width: 768px) {
+    .combo-carousel:not(.owl-loaded) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .testimonial-carousel:not(.owl-loaded) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .combo-carousel:not(.owl-loaded) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .testimonial-carousel:not(.owl-loaded) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Hide items that shouldn't be visible in the initial grid to match Owl's 'items' count */
+.combo-carousel:not(.owl-loaded) .item:nth-child(n+2),
+.testimonial-carousel:not(.owl-loaded) .item:nth-child(n+2) {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .combo-carousel:not(.owl-loaded) .item:nth-child(2),
+    .testimonial-carousel:not(.owl-loaded) .item:nth-child(2) {
+        display: block;
+    }
+
+    .combo-carousel:not(.owl-loaded) .item:nth-child(n+3),
+    .testimonial-carousel:not(.owl-loaded) .item:nth-child(n+3) {
+        display: none;
+    }
+}
+
+@media (min-width: 1024px) {
+    .combo-carousel:not(.owl-loaded) .item:nth-child(3),
+    .testimonial-carousel:not(.owl-loaded) .item:nth-child(3) {
+        display: block;
+    }
+
+    .combo-carousel:not(.owl-loaded) .item:nth-child(n+4),
+    .testimonial-carousel:not(.owl-loaded) .item:nth-child(n+4) {
+        display: none;
+    }
+}
+
+.combo-carousel:not(.owl-loaded) .item {
+    min-height: 210px;
+}
+
+.combo-carousel .item {
+    padding: 10px 0;
+}
+
+.testimonial-carousel .item {
+    padding: 10px 0;
+}
+
+.combo-carousel .owl-stage-outer {
+    padding: 12px 0;
+}
+
+.combo-carousel .owl-stage {
+    display: flex;
+}
+
+.combo-carousel .owl-item {
+    display: flex;
+    height: auto;
+}
+
+.combo-card {
+    min-height: 100%;
+}
+
+.testimonial-carousel .owl-stage {
+    display: flex;
+}
+
+.testimonial-carousel .owl-item {
+    display: flex;
+    height: auto;
+}
+
+.testimonial-card {
+    min-height: 100%;
+}
+
+

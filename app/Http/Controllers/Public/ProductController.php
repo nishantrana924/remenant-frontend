@@ -145,4 +145,16 @@ class ProductController extends Controller
 
         return view('public.products.show', compact('product', 'relatedProducts'));
     }
+
+    public function reviews($slug)
+    {
+        $allProducts = $this->getProducts();
+        $product = collect($allProducts)->firstWhere('slug', $slug);
+
+        if (!$product) {
+            abort(404);
+        }
+
+        return view('public.products.reviews', compact('product'));
+    }
 }

@@ -59,7 +59,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2.5 ml-1">Phone Number</label>
-                                    <input type="tel" placeholder="+91 00000 00000"
+                                    <input type="tel" placeholder="756 777 6796"
                                         class="w-full rounded-2xl border border-gray-100 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-900 focus:border-[var(--primary)] focus:bg-white focus:ring-4 focus:ring-[var(--primary)]/5 transition-all outline-none">
                                 </div>
                                 <div>
@@ -117,7 +117,7 @@
                             <div>
                                 <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Instant Help</h3>
                                 <p class="text-lg font-medium text-gray-900 mb-4">Chat with us on WhatsApp for quick support.</p>
-                                <a href="https://wa.me/yournumber" class="inline-flex items-center gap-2 text-sm font-semibold text-[#25D366] hover:gap-3 transition-all">
+                                <a href="https://wa.me/17567776796" class="inline-flex items-center gap-2 text-sm font-semibold text-[#25D366] hover:gap-3 transition-all">
                                     START CHAT <i data-lucide="arrow-right" class="h-4 w-4"></i>
                                 </a>
                             </div>
@@ -131,8 +131,7 @@
                             <div>
                                 <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Call Us</h3>
                                 <div class="flex flex-col gap-1">
-                                    <a href="tel:+918849550164" class="text-lg font-semibold text-gray-900 hover:text-[var(--primary)] transition-colors">+91 88495 50164</a>
-                                    <a href="tel:+919662342235" class="text-lg font-semibold text-gray-900 hover:text-[var(--primary)] transition-colors">+91 96623 42235</a>
+                                    <a href="tel:7567776796" class="text-lg font-semibold text-gray-900 hover:text-[var(--primary)] transition-colors">756 777 6796</a>
                                 </div>
                             </div>
                         </div>
