@@ -20,4 +20,26 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function getStatusColorAttribute()
+    {
+        return match($this->status) {
+            'completed' => 'emerald',
+            'pending' => 'orange',
+            'cancelled' => 'rose',
+            default => 'slate',
+        };
+    }
+
+    public function getDeliveryStatusColorAttribute()
+    {
+        return match($this->delivery_status) {
+            'delivered' => 'emerald',
+            'shipped' => 'blue',
+            'packed' => 'indigo',
+            'pending' => 'orange',
+            'returned' => 'rose',
+            default => 'slate',
+        };
+    }
 }

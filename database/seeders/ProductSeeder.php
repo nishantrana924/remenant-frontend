@@ -10,47 +10,46 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $products = [
+        Product::updateOrCreate(
+            ['slug' => 'vitamin-c-effervescent'],
             [
                 'title' => 'Vitamin C Effervescent',
-                'slug' => 'vitamin-c-effervescent',
                 'tagline' => 'Immunity & Skin Health',
                 'price' => 1799,
                 'mrp' => 2499,
                 'description' => 'A refreshing citrus burst designed to boost your immunity.',
                 'long_description' => '<p>Our Vitamin C Effervescent tablets are the perfect daily companion for your immune system.</p>',
-                'image' => 'remenant-product11.jpg',
-                'gallery' => ['remenant-product11.jpg', 'remenant-product12.jpg'],
-                'color_theme' => 'orange',
-                'color_gradient' => 'from-orange-500 to-amber-500',
+                'image' => 'products/vitamin-c.jpg',
+                'gallery' => ['products/vitamin-c.jpg'],
+                'rating' => 4.8,
+                'reviews' => 1243,
+                'reviews_count' => 1243,
+                'theme_color' => 'orange',
+                'status' => 'published',
                 'benefits' => [
-                    ['title' => 'Immunity Boost', 'desc' => 'Strengthens defenses.', 'icon' => 'shield'],
+                    ['icon' => 'shield', 'title' => 'Immunity Boost', 'desc' => 'Strengthens defenses.'],
+                    ['icon' => 'sparkles', 'title' => 'Skin Glow', 'desc' => 'Supports collagen.'],
+                    ['icon' => 'zap', 'title' => 'Energy Boost', 'desc' => 'Keep moving all day.'],
+                    ['icon' => 'droplets', 'title' => 'Hydration', 'desc' => 'Perfect with 200ml water.'],
                 ],
-                'specs' => ['Flavor' => 'Orange', 'Quantity' => '20 Tablets'],
-                'is_featured' => true,
-            ],
-            [
-                'title' => 'Biotin Effervescent',
-                'slug' => 'biotin-effervescent',
-                'tagline' => 'Beauty & Strength',
-                'price' => 1699,
-                'mrp' => 2399,
-                'description' => 'Targeted formula for hair strength and glowing skin.',
-                'long_description' => '<p>Achieve your beauty goals with our premium Biotin Effervescent tablets.</p>',
-                'image' => 'remenant-product12.jpg',
-                'gallery' => ['remenant-product12.jpg', 'remenant-product10.jpg'],
-                'color_theme' => 'emerald',
-                'color_gradient' => 'from-emerald-500 to-lime-500',
-                'benefits' => [
-                    ['title' => 'Hair Growth', 'desc' => 'Stronger hair.', 'icon' => 'user'],
+                'highlights' => [
+                    '100% Bioavailable Effervescent Formula',
+                    'Clean Label Certified Ingredients',
+                    'Zero Sugar & No Artificial Colors',
+                    'Fast Acting & Gentle on the Stomach'
                 ],
-                'specs' => ['Flavor' => 'Green Apple', 'Quantity' => '20 Tablets'],
-                'is_featured' => true,
-            ],
-        ];
-
-        foreach ($products as $product) {
-            Product::create($product);
-        }
+                'ritual' => [
+                    ['step' => 1, 'title' => 'Drop it', 'desc' => 'Drop one tablet into 200ml of water.'],
+                    ['step' => 2, 'title' => 'Fizz it', 'desc' => 'Watch the pure wellness dissolve.'],
+                    ['step' => 3, 'title' => 'Fuel Up', 'desc' => 'Drink and take on your day.'],
+                ],
+                'specs' => [
+                    'Flavor' => 'Orange Burst',
+                    'Quantity' => '20 Tablets',
+                    'Form' => 'Effervescent Tablets',
+                    'Main Ingredient' => 'Vitamin C (1000mg)'
+                ]
+            ]
+        );
     }
 }

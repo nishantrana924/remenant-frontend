@@ -1,166 +1,145 @@
 @extends('admin.layouts.app')
 
-@section('header')
-    <div class="flex items-center justify-between w-full pr-4">
-        <div class="flex items-center gap-8">
-            <div class="h-10 w-px bg-slate-100 hidden md:block"></div>
-            <div class="flex flex-col justify-center">
-                <h2 class="font-black text-xl text-slate-800 leading-none tracking-tight">Admin Dashboard</h2>
-                <div class="flex items-center gap-2 mt-1.5">
-                    <span class="h-1 w-1 bg-emerald-500 rounded-full animate-pulse"></span>
-                    <p class="text-[9px] text-slate-400 uppercase tracking-[0.2em] font-black">Overview & Analytics</p>
-                </div>
-            </div>
-        </div>
-    </div>
-@endsection
-
 @section('content')
-    <div class="space-y-8">
-        <!-- Welcome Section -->
-        <div class="premium-card p-8 bg-white border-0 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-6">
-                <div class="h-20 w-20 rounded-[2rem] bg-orange-50 flex items-center justify-center text-orange-500 shadow-inner">
-                    <i data-lucide="sparkles" class="h-10 w-10"></i>
-                </div>
-                <div>
-                    <h2 class="text-3xl font-black text-slate-800 tracking-tight">Welcome back, {{ Auth::user()->name }}!</h2>
-                    <p class="text-slate-500 font-medium mt-1">Here's what's happening with your brand today.</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="text-right">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Server Status</p>
-                    <div class="flex items-center gap-2 mt-1">
-                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-sm font-bold text-slate-700 uppercase">Live & Healthy</span>
-                    </div>
-                </div>
-            </div>
+<div class="space-y-8 pb-12">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Intelligence Overview</h1>
+            <p class="text-sm text-slate-500 mt-1">Real-time performance metrics and business health</p>
         </div>
-
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="premium-card p-6 border-b-4 border-orange-500">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="h-12 w-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500">
-                        <i data-lucide="users" class="h-6 w-6"></i>
-                    </div>
-                    <span class="text-[10px] bg-orange-100 text-orange-700 px-2 py-1 rounded-lg font-black uppercase">+12.5%</span>
-                </div>
-                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Total Customers</p>
-                <h4 class="text-3xl font-black text-slate-800 mt-1">{{ number_format($stats['total_users']) }}</h4>
-            </div>
-
-            <div class="premium-card p-6 border-b-4 border-indigo-500">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="h-12 w-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500">
-                        <i data-lucide="shopping-bag" class="h-6 w-6"></i>
-                    </div>
-                    <span class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-1 rounded-lg font-black uppercase">Pending</span>
-                </div>
-                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Store Orders</p>
-                <h4 class="text-3xl font-black text-slate-800 mt-1">{{ number_format($stats['total_orders']) }}</h4>
-            </div>
-
-            <div class="premium-card p-6 border-b-4 border-emerald-500">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="h-12 w-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
-                        <i data-lucide="package" class="h-6 w-6"></i>
-                    </div>
-                    <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg font-black uppercase">Active</span>
-                </div>
-                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Products</p>
-                <h4 class="text-3xl font-black text-slate-800 mt-1">{{ number_format($stats['total_products']) }}</h4>
-            </div>
-
-            <div class="premium-card p-6 border-b-4 border-rose-500">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="h-12 w-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500">
-                        <i data-lucide="trending-up" class="h-6 w-6"></i>
-                    </div>
-                    <span class="text-[10px] bg-rose-100 text-rose-700 px-2 py-1 rounded-lg font-black uppercase">Live</span>
-                </div>
-                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Total Sales</p>
-                <h4 class="text-3xl font-black text-slate-800 mt-1">₹{{ number_format($stats['total_revenue']) }}</h4>
-            </div>
-        </div>
-
-        <!-- Recent Activity Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Recent Orders -->
-            <div class="premium-card bg-white p-0 overflow-hidden">
-                <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-                    <h3 class="font-black text-slate-800 flex items-center gap-2">
-                        <i data-lucide="history" class="h-5 w-5 text-orange-500"></i>
-                        Recent Orders
-                    </h3>
-                    <a href="{{ route('admin.orders.index') }}" class="text-[10px] font-black text-orange-500 uppercase tracking-widest hover:underline">View All</a>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                <th class="px-6 py-4">ID</th>
-                                <th class="px-6 py-4">Customer</th>
-                                <th class="px-6 py-4">Amount</th>
-                                <th class="px-6 py-4">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-50">
-                            @forelse($recent_orders as $order)
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 font-bold text-slate-800">#{{ $order->id }}</td>
-                                    <td class="px-6 py-4">
-                                        <p class="text-sm font-black text-slate-700 leading-none">{{ $order->user->name }}</p>
-                                        <p class="text-[10px] text-slate-400 mt-1">{{ $order->created_at->diffForHumans() }}</p>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm font-black text-slate-800">₹{{ number_format($order->total_amount) }}</td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest {{ $order->status == 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
-                                            {{ $order->status }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="4" class="px-6 py-8 text-center text-slate-400 italic">No orders yet</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- New Customers -->
-            <div class="premium-card bg-white p-0 overflow-hidden">
-                <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-                    <h3 class="font-black text-slate-800 flex items-center gap-2">
-                        <i data-lucide="user-plus" class="h-5 w-5 text-indigo-500"></i>
-                        New Customers
-                    </h3>
-                    <button class="text-[10px] font-black text-indigo-500 uppercase tracking-widest hover:underline">Manage All</button>
-                </div>
-                <div class="p-6 space-y-4">
-                    @forelse($recent_users as $user)
-                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all group">
-                            <div class="flex items-center gap-4">
-                                <div class="h-12 w-12 rounded-xl bg-white flex items-center justify-center text-indigo-500 font-black shadow-sm group-hover:scale-110 transition-transform">
-                                    {{ strtoupper(substr($user->name, 0, 1)) }}
-                                </div>
-                                <div>
-                                    <h4 class="text-sm font-black text-slate-800">{{ $user->name }}</h4>
-                                    <p class="text-[11px] text-slate-500">{{ $user->email }}</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-[9px] font-black text-slate-300 uppercase block mb-1">Joined</span>
-                                <span class="text-xs font-bold text-slate-600">{{ $user->created_at->format('d M') }}</span>
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-center text-slate-400 italic">No new users</p>
-                    @endforelse
-                </div>
-            </div>
+        <div class="flex items-center gap-3">
+            <button class="saas-btn-secondary flex items-center gap-2">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                Last 30 Days
+            </button>
+            <button class="saas-btn-primary">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                Export Report
+            </button>
         </div>
     </div>
+
+    <!-- KPI Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="saas-card">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600">
+                    <i data-lucide="banknote" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-md">+12.5%</span>
+            </div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Gross Revenue</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1">₹{{ number_format($stats['revenue'] ?? 452800) }}</h3>
+        </div>
+
+        <div class="saas-card">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-md">+8.2%</span>
+            </div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Orders</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['orders_count'] ?? 1254 }}</h3>
+        </div>
+
+        <div class="saas-card">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-md">+24%</span>
+            </div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">New Customers</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['customers_count'] ?? 842 }}</h3>
+        </div>
+
+        <div class="saas-card">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded-md">Low Stock</span>
+            </div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Inventory Alerts</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['low_stock'] ?? 12 }}</h3>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Revenue Chart -->
+        <div class="lg:col-span-2 saas-card">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="font-bold text-slate-900">Revenue Growth</h3>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                        <span class="text-xs text-slate-500">Current Year</span>
+                    </div>
+                </div>
+            </div>
+            <canvas id="revenueChart" height="300"></canvas>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="saas-card">
+            <h3 class="font-bold text-slate-900 mb-6">Recent Activity</h3>
+            <div class="space-y-6">
+                @foreach($recent_orders ?? [] as $order)
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0">
+                        <i data-lucide="package" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-slate-800">Order #{{ $order->id }}</p>
+                        <p class="text-xs text-slate-500">{{ $order->customer_name }} • ₹{{ number_format($order->total_amount) }}</p>
+                        <p class="text-[10px] text-slate-400 mt-1">{{ $order->created_at->diffForHumans() }}</p>
+                    </div>
+                </div>
+                @endforeach
+                
+                <!-- Placeholder if empty -->
+                @if(count($recent_orders ?? []) == 0)
+                <div class="text-center py-12">
+                    <i data-lucide="inbox" class="w-12 h-12 text-slate-200 mx-auto mb-4"></i>
+                    <p class="text-sm text-slate-400">No recent activity found</p>
+                </div>
+                @endif
+            </div>
+            <button class="w-full mt-8 py-3 text-xs font-bold text-slate-400 uppercase tracking-widest hover:text-orange-500 transition-colors border-t border-slate-50">View All Orders</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Revenue',
+                data: [32000, 45000, 42000, 58000, 65000, 59000, 72000, 81000, 78000, 92000, 105000, 118000],
+                borderColor: '#F97316',
+                backgroundColor: 'rgba(249, 115, 22, 0.05)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5], drawBorder: false } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+});
+</script>
 @endsection

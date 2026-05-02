@@ -5,86 +5,73 @@
 <aside id="admin-sidebar" class="fixed top-0 left-0 z-50 h-screen bg-white text-slate-600 transform -translate-x-full transition-all duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:z-30 border-r border-slate-100" data-collapsed="false">
     <div class="flex flex-col h-full bg-white">
         <!-- Sidebar Header -->
-        <div class="flex items-center justify-between h-20 px-6 border-b border-slate-50">
-            <div class="flex items-center gap-3 sidebar-header-content">
-                <div class="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                    <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+        <div class="flex items-center h-16 px-6 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
+                    <i data-lucide="zap" class="w-5 h-5 text-white"></i>
                 </div>
-                <div class="sidebar-text">
-                    <h1 class="font-black text-slate-900 text-sm tracking-tight uppercase">REMENANT</h1>
-                    <p class="text-[9px] text-orange-500 font-black uppercase tracking-[0.2em]">Dashboard</p>
-                </div>
+                <h1 class="font-bold text-slate-900 text-sm tracking-tight sidebar-text">REMENANT</h1>
             </div>
-            
-            <button onclick="toggleAdminSidebarCollapse()" class="hidden lg:flex text-slate-400 hover:text-orange-500 p-2 rounded-xl hover:bg-orange-50 transition-all">
-                <i id="admin-header-toggle-icon" data-lucide="chevron-left" class="w-5 h-5"></i>
-            </button>
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
-            <p class="sidebar-text px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Operations</p>
-            
-            <a href="{{ route('admin.dashboard') }}" class="nav-item flex items-center px-4 py-3 {{ request()->routeIs('admin.dashboard') ? 'active-nav-item' : '' }}" title="Dashboard">
-                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                <span class="ml-3 font-bold text-sm sidebar-text">Analytics</span>
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active-nav-item' : '' }}">
+                <i data-lucide="layout-grid" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Intelligence</span>
             </a>
 
-            <a href="{{ route('admin.products.index') }}" class="nav-item flex items-center px-4 py-3 {{ request()->routeIs('admin.products.*') ? 'active-nav-item' : '' }}" title="Products">
-                <i data-lucide="package" class="w-5 h-5"></i>
-                <span class="ml-3 font-bold text-sm sidebar-text">Inventory</span>
+            <a href="{{ route('admin.products.index') }}" class="nav-item {{ request()->routeIs('admin.products.*') ? 'active-nav-item' : '' }}">
+                <i data-lucide="package" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Product Hub</span>
             </a>
 
-            <a href="{{ route('admin.sliders.index') }}" class="nav-item flex items-center px-4 py-3 {{ request()->routeIs('admin.sliders.*') ? 'active-nav-item' : '' }}" title="Sliders">
-                <i data-lucide="monitor" class="w-5 h-5"></i>
-                <span class="ml-3 font-bold text-sm sidebar-text">Banners</span>
+            <a href="{{ route('admin.inventory.index') }}" class="nav-item {{ request()->routeIs('admin.inventory.*') ? 'active-nav-item' : '' }}">
+                <i data-lucide="box" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Stock Logistics</span>
             </a>
 
-            <a href="{{ route('admin.orders.index') }}" class="nav-item flex items-center px-4 py-3 {{ request()->routeIs('admin.orders.*') ? 'active-nav-item' : '' }}" title="Orders">
-                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                <span class="ml-3 font-bold text-sm sidebar-text">Orders</span>
+            <a href="{{ route('admin.orders.index') }}" class="nav-item {{ request()->routeIs('admin.orders.*') ? 'active-nav-item' : '' }}">
+                <i data-lucide="shopping-cart" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Order Flow</span>
             </a>
 
-            <div class="my-6 border-t border-slate-50 mx-4"></div>
-            <p class="sidebar-text px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Administration</p>
-
-            <a href="#" class="nav-item flex items-center px-4 py-3 hover:bg-slate-50 transition" title="Users">
-                <i data-lucide="users" class="w-5 h-5"></i>
-                <span class="ml-3 font-bold text-sm sidebar-text">Team</span>
+            <a href="{{ route('admin.customers.index') }}" class="nav-item {{ request()->routeIs('admin.customers.*') ? 'active-nav-item' : '' }}">
+                <i data-lucide="users" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Customers</span>
             </a>
 
-            <a href="#" class="nav-item flex items-center px-4 py-3 hover:bg-slate-50 transition" title="Settings">
-                <i data-lucide="settings-2" class="w-5 h-5"></i>
-                <span class="ml-3 font-bold text-sm sidebar-text">Configuration</span>
+            <div class="pt-4 pb-2">
+                <p class="sidebar-text px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Branding</p>
+            </div>
+
+            <a href="{{ route('admin.sliders.index') }}" class="nav-item {{ request()->routeIs('admin.sliders.*') ? 'active-nav-item' : '' }}">
+                <i data-lucide="image" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Web Banners</span>
             </a>
         </nav>
 
-        <!-- Sidebar Footer -->
-        <div class="p-4 border-t border-slate-50">
-            <a href="/" target="_blank" class="flex items-center px-4 py-3 text-slate-400 rounded-xl hover:bg-orange-50 hover:text-orange-600 transition-all font-bold text-sm group" title="Visit Site">
-                <i data-lucide="external-link" class="w-5 h-5"></i>
-                <span class="ml-3 sidebar-text">Live Website</span>
+        <div class="p-4 border-t border-slate-100">
+            <a href="/" target="_blank" class="nav-item hover:bg-slate-50 transition-all">
+                <i data-lucide="external-link" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Live Store</span>
             </a>
         </div>
     </div>
 </aside>
 
 <style>
-    #admin-sidebar[data-collapsed="true"] { width: 5.5rem; }
-    #admin-sidebar[data-collapsed="false"] { width: 17rem; }
+    #admin-sidebar[data-collapsed="true"] { width: 4.5rem; }
+    #admin-sidebar[data-collapsed="false"] { width: 15rem; }
     #admin-sidebar[data-collapsed="true"] .sidebar-text { display: none; }
-    
-    #admin-sidebar[data-collapsed="true"] .sidebar-header-content { justify-content: center; width: 100%; }
-    #admin-sidebar[data-collapsed="true"] nav a { justify-content: center; padding-left: 0; padding-right: 0; }
-    #admin-sidebar[data-collapsed="true"] nav a i { margin: 0; }
     
     @media (min-width: 1024px) {
         #admin-main-content {
-            margin-left: 17rem;
+            margin-left: 15rem;
             transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #admin-sidebar[data-collapsed="true"] ~ #admin-main-content {
-            margin-left: 5.5rem;
+            margin-left: 4.5rem;
         }
     }
 

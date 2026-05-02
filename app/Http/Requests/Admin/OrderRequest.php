@@ -16,6 +16,9 @@ class OrderRequest extends FormRequest
         return [
             'status' => 'required|string|in:pending,processing,shipped,completed,cancelled',
             'payment_status' => 'nullable|string|in:pending,paid,failed',
+            'delivery_status' => 'nullable|string|in:pending,packed,shipped,delivered,returned',
+            'tracking_id' => 'nullable|string',
+            'courier_name' => 'nullable|string',
             'address' => 'nullable|string',
             'city' => 'nullable|string',
             'state' => 'nullable|string',

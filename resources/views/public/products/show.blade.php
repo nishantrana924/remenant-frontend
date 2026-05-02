@@ -1,6 +1,15 @@
 @extends('public.layouts.app')
 
-@section('title', $product['title'] . ' - ' . config('app.name', 'Remenant Health'))
+@section('title', $product->meta_title ?: $product->title)
+
+@section('seo')
+    <meta name="description" content="{{ $product->meta_description }}">
+    <meta name="keywords" content="{{ $product->meta_keywords }}">
+    <meta property="og:title" content="{{ $product->meta_title ?: $product->title }}">
+    <meta property="og:description" content="{{ $product->meta_description }}">
+    <meta property="og:image" content="{{ asset('images/products/' . $product->image) }}">
+    <meta property="og:type" content="product">
+@endsection
 
 @section('content')
     @push('styles')
@@ -66,7 +75,7 @@
     @endpush
     <div class="bg-[var(--bg-main)]">
         @php
-            $galleryImages = array_values(array_unique(array_merge([$product['image']], $product['gallery'])));
+            $galleryImages = array_values(array_unique(array_merge([$product->image], $product->gallery)));
         @endphp
 
         <!-- Product Hero Section -->
@@ -102,7 +111,7 @@
                                     <img src="{{ asset('images/products/' . $img) }}" 
                                          width="1200"
                                          height="1200"
-                                         alt="{{ $product['title'] }}" 
+                                         alt="{{ $product->title }}" 
                                          class="h-full w-full object-contain select-none">
                                 </div>
                             @endforeach
@@ -120,18 +129,18 @@
                 <!-- Right: Product Info -->
                 <div class="flex flex-col">
                     <div class="pb-4">
-                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--primary)]">{{ $product['tagline'] }}</p>
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--primary)]">{{ $product->tagline }}</p>
                         <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-[color:var(--text-primary)] sm:text-5xl lg:text-6xl">
-                            {{ $product['title'] }}
+                            {{ $product->title }}
                         </h1>
                         
                         <div class="mt-6 flex items-start justify-between gap-3 sm:items-center sm:gap-6">
                             <a href="#reviews" class="flex items-center gap-3 sm:gap-6 group min-w-0">
                                 <div class="flex shrink-0 items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1.5 text-orange-600 group-hover:bg-orange-100 transition">
                                     <i data-lucide="star" class="h-5 w-5 fill-current"></i>
-                                    <span class="text-sm font-black">{{ $product['rating'] }}</span>
+                                    <span class="text-sm font-black">{{ $product->rating }}</span>
                                 </div>
-                                <span class="text-[11px] sm:text-sm font-bold leading-tight text-[color:var(--text-secondary)] group-hover:text-[color:var(--primary)] transition underline decoration-dotted underline-offset-4">{{ number_format($product['reviews']) }} Verified Reviews</span>
+                                <span class="text-[11px] sm:text-sm font-bold leading-tight text-[color:var(--text-secondary)] group-hover:text-[color:var(--primary)] transition underline decoration-dotted underline-offset-4">{{ number_format($product->reviews) }} Verified Reviews</span>
                             </a>
                             <span class="inline-flex shrink-0 items-center gap-1.5 text-xs sm:text-sm font-bold text-green-600">
                                 <i data-lucide="check-circle" class="h-4 w-4 sm:h-4 sm:w-4"></i>
@@ -142,7 +151,7 @@
 
                     <div class="py-4">
                         @php
-                            $discount = (int) round((1 - ($product['price'] / max(1, $product['mrp']))) * 100);
+                            $discount = (int) round((1 - ($product->price / max(1, $product->mrp))) * 100);
                         @endphp
                         <!-- Hot Deal Badge -->
                         <div class="inline-flex items-center rounded-md bg-[#008A48] px-3 py-1.5 mb-6">
@@ -154,14 +163,14 @@
                                 <i data-lucide="arrow-down" class="h-6 w-6 sm:h-9 sm:w-9 stroke-[4px]"></i>
                                 <span class="text-3xl sm:text-5xl font-black">{{ $discount }}%</span>
                             </div>
-                            <span class="text-xl sm:text-3xl font-black text-gray-400/50 line-through decoration-gray-400/30">₹{{ number_format($product['mrp']) }}</span>
-                            <span class="text-4xl sm:text-6xl font-black text-[color:var(--text-primary)] tracking-tight">₹{{ number_format($product['price']) }}</span>
+                            <span class="text-xl sm:text-3xl font-black text-gray-400/50 line-through decoration-gray-400/30">₹{{ number_format($product->mrp) }}</span>
+                            <span class="text-4xl sm:text-6xl font-black text-[color:var(--text-primary)] tracking-tight">₹{{ number_format($product->price) }}</span>
                         </div>
                         <p class="mt-2 text-xs font-bold text-[color:var(--text-muted)] uppercase tracking-wider">Inclusive of all taxes</p>
 
                         <div class="mt-8 relative group/desc">
                             <div id="product-description" class="text-lg leading-relaxed text-[color:var(--text-secondary)] line-clamp-3 transition-all duration-500">
-                                {{ $product['description'] }}
+                                {{ $product->description }}
                             </div>
                             <button type="button" 
                                     id="read-more-btn"
@@ -206,14 +215,14 @@
 
                         <!-- Highlights -->
                         <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            @foreach(array_slice($product['benefits'], 0, 4) as $benefit)
+                            @foreach(array_slice($product->benefits, 0, 4) as $benefit)
                                 <div class="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-black/5">
                                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--primary-soft)] text-[color:var(--primary)]">
-                                        <i data-lucide="{{ $benefit['icon'] }}" class="h-5 w-5"></i>
+                                        <i data-lucide="{{ $benefit->icon }}" class="h-5 w-5"></i>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-black text-[color:var(--text-primary)]">{{ $benefit['title'] }}</p>
-                                        <p class="text-xs text-[color:var(--text-secondary)]">{{ $benefit['desc'] }}</p>
+                                        <p class="text-sm font-black text-[color:var(--text-primary)]">{{ $benefit->title }}</p>
+                                        <p class="text-xs text-[color:var(--text-secondary)]">{{ $benefit->desc }}</p>
                                     </div>
                                 </div>
                             @endforeach
@@ -295,7 +304,7 @@
                             </div>
                             
                             <p class="text-base sm:text-lg leading-relaxed text-gray-600 font-medium">
-                                {{ $product['long_description'] }}
+                                {{ $product->long_description }}
                             </p>
                             <div class="mt-8 space-y-4">
                                 <div class="flex items-center gap-3">
@@ -318,7 +327,7 @@
                             </div>
 
                             <div class="space-y-6">
-                                @foreach($product['specs'] as $label => $value)
+                                @foreach($product->specs as $label => $value)
                                     <div class="flex items-center justify-between border-b border-black/5 pb-4 last:border-0">
                                         <span class="text-xs font-black uppercase tracking-widest text-gray-400">{{ $label }}</span>
                                         <span class="text-base font-black text-gray-800">{{ $value }}</span>
@@ -358,81 +367,69 @@
         </section>
 
 
-            {{-- product Highlights --}}
-        <!-- Polished Experience Excellence Card -->
-        <section class="py-16 sm:py-28 bg-white border-t border-black/5">
+            {{-- Product Highlights & Ritual --}}
+        <section class="py-12 sm:py-24 bg-white border-t border-black/5">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-                <div class="relative rounded-[4rem] bg-[var(--bg-sage)] p-10 lg:p-24 overflow-hidden shadow-2xl shadow-[var(--bg-sage)]/10">
-                    <!-- Premium Background Accents -->
-                    <div class="absolute top-0 right-0 h-full w-1/3 bg-white/5 -skew-x-12 translate-x-20"></div>
-                    <div class="absolute -top-32 -left-32 h-64 w-64 rounded-full bg-white/20 blur-[120px]"></div>
-                    
-                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:items-center">
-                        <!-- Column 1: Editorial Heading -->
-                        <div class="lg:col-span-5">
-                            <h2 class="text-5xl sm:text-7xl font-black tracking-tighter uppercase leading-[0.85] mb-10 text-[color:var(--text-primary)]">
-                                Experience <br> <span class="text-white">Excellence</span>
-                            </h2>
-                            <div class="h-1 w-20 bg-[var(--primary)] rounded-full mb-10"></div>
-                            <p class="text-xl text-[color:var(--text-primary)]/80 leading-relaxed max-w-md font-medium">Advanced effervescent technology designed to seamlessly integrate into your modern lifestyle.</p>
+                <div class="rounded-[2rem] sm:rounded-[3rem] bg-slate-900 p-6 sm:p-20 text-white overflow-hidden relative shadow-2xl">
+                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 lg:items-center">
+                        <!-- Left: Product Highlights (CKEditor) -->
+                        <div>
+                            <h2 class="text-xs font-black uppercase tracking-[0.4em] text-orange-500 mb-6">Experience Excellence</h2>
+                            <h3 class="text-3xl sm:text-5xl font-black italic tracking-tighter uppercase mb-8 sm:mb-12">Product Highlights</h3>
+                            <div class="prose prose-invert prose-orange max-w-none">
+                                {!! $product->highlights !!}
+                            </div>
                         </div>
 
-                        <!-- Column 2 & 3: Content Grid -->
-                        <div class="lg:col-span-7">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-16 lg:gap-20">
-                                <!-- Highlights Column -->
-                                <div class="space-y-12">
-                                    <div class="flex gap-6 group">
-                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-[color:var(--primary)] backdrop-blur-sm border border-white/20 transition-transform group-hover:scale-110">
-                                            <i data-lucide="zap" class="h-5 w-5"></i>
+                        <!-- Right: The Ritual (Steps) -->
+                        <div class="bg-white/10 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 border border-white/10 shadow-inner">
+                            <h2 class="text-2xl sm:text-3xl font-black tracking-tighter uppercase mb-10 sm:mb-12 flex items-center gap-4">
+                                <span class="h-px flex-1 bg-white/20"></span>
+                                The Ritual
+                                <span class="h-px flex-1 bg-white/20"></span>
+                            </h2>
+                            <div class="space-y-10">
+                                @if($product->ritual && is_array($product->ritual))
+                                    @foreach($product->ritual as $index => $step)
+                                        <div class="flex gap-8 group">
+                                            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-orange-500 font-black text-white text-2xl shadow-xl transition-transform group-hover:rotate-12">{{ $index }}</span>
+                                            <div>
+                                                <h4 class="text-xl font-bold uppercase tracking-widest">{{ $step['title'] ?? '' }}</h4>
+                                                <p class="mt-2 text-base text-white/80 leading-relaxed">{{ $step['desc'] ?? '' }}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h4 class="text-sm font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">Maximum Absorption</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 leading-relaxed font-medium">100% Bioavailable Formula for rapid action.</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-6 group">
-                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-emerald-600 backdrop-blur-sm border border-white/20 transition-transform group-hover:scale-110">
-                                            <i data-lucide="leaf" class="h-5 w-5"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-sm font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">Pure Ingredients</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 leading-relaxed font-medium">Clean Label Certified with no additives.</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-6 group">
-                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-rose-600 backdrop-blur-sm border border-white/20 transition-transform group-hover:scale-110">
-                                            <i data-lucide="ban" class="h-5 w-5"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-sm font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">Zero Compromise</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 leading-relaxed font-medium">No Sugar & No Artificial Colors used.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Ritual Column (Timeline) -->
-                                <div class="relative pl-8">
-                                    <div class="absolute left-0 top-2 bottom-2 w-px bg-white/20"></div>
-                                    <div class="space-y-12">
-                                        <div class="relative group/step">
-                                            <div class="absolute -left-10 top-0 h-4 w-4 rounded-full bg-[var(--primary)] border-4 border-[var(--bg-sage)] z-10 transition-transform group-hover/step:scale-125"></div>
-                                            <h4 class="text-xs font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">01. Drop it</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 font-medium">Dissolve one tablet in 200ml water.</p>
-                                        </div>
-                                        <div class="relative group/step">
-                                            <div class="absolute -left-10 top-0 h-4 w-4 rounded-full bg-white/40 border-4 border-[var(--bg-sage)] z-10 transition-transform group-hover/step:scale-125 group-hover/step:bg-white"></div>
-                                            <h4 class="text-xs font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">02. Fizz it</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 font-medium">Watch the pure formulation dissolve.</p>
-                                        </div>
-                                        <div class="relative group/step">
-                                            <div class="absolute -left-10 top-0 h-4 w-4 rounded-full bg-white/40 border-4 border-[var(--bg-sage)] z-10 transition-transform group-hover/step:scale-125 group-hover/step:bg-white"></div>
-                                            <h4 class="text-xs font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">03. Fuel Up</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 font-medium">Drink and take on your day.</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                    @endforeach
+                                @endif
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {{-- Specs & Brand Heritage --}}
+        <section class="py-12 sm:py-24 bg-white">
+            <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                    <!-- Specifications -->
+                    <div class="p-8 sm:p-12 bg-slate-50 rounded-[3rem] border border-slate-100">
+                        <h3 class="text-2xl font-black uppercase tracking-tight text-slate-900 mb-8 flex items-center gap-3">
+                            <i data-lucide="layers" class="text-orange-500"></i>
+                            Technical Specifications
+                        </h3>
+                        <div class="prose prose-sm max-w-none text-slate-600">
+                            {!! $product->specs !!}
+                        </div>
+                    </div>
+
+                    <!-- Brand Heritage -->
+                    <div class="p-8 sm:p-12 bg-orange-50 rounded-[3rem] border border-orange-100/50">
+                        <h3 class="text-2xl font-black uppercase tracking-tight text-slate-900 mb-8 flex items-center gap-3">
+                            <i data-lucide="award" class="text-orange-600"></i>
+                            Brand Heritage
+                        </h3>
+                        <div class="prose prose-sm max-w-none text-slate-700">
+                            {!! $product->brand_info !!}
                         </div>
                     </div>
                 </div>
@@ -448,14 +445,14 @@
                         <div class="p-8 sm:p-10 rounded-[2.5rem] bg-white shadow-sm ring-1 ring-black/5">
                             <h2 class="text-3xl sm:text-4xl font-black italic tracking-tight text-[color:var(--text-primary)]">Customer Reviews</h2>
                             <div class="mt-8 flex items-end gap-5">
-                                <span class="text-7xl font-black leading-none text-[color:var(--text-primary)]">{{ $product['rating'] }}</span>
+                                <span class="text-7xl font-black leading-none text-[color:var(--text-primary)]">{{ $product->rating }}</span>
                                 <div class="flex flex-col gap-1 pb-1">
                                     <div class="flex text-orange-400">
                                         @for($i = 0; $i < 5; $i++)
                                             <i data-lucide="star" class="h-5 w-5 fill-current"></i>
                                         @endfor
                                     </div>
-                                    <span class="text-sm font-bold text-[color:var(--text-secondary)]">Based on {{ number_format($product['reviews']) }} reviews</span>
+                                    <span class="text-sm font-bold text-[color:var(--text-secondary)]">Based on {{ number_format($product->reviews) }} reviews</span>
                                 </div>
                             </div>
 
@@ -584,9 +581,37 @@
             </div>
         </section>
 
+        {{-- Dynamic FAQs --}}
+        @if($product->faqs && is_array($product->faqs) && count($product->faqs) > 0)
+        <section class="py-12 sm:py-24 bg-slate-50">
+            <div class="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-12">
+                <div class="text-center mb-16">
+                    <h2 class="text-xs font-black uppercase tracking-[0.4em] text-orange-500 mb-4">Got Questions?</h2>
+                    <h3 class="text-3xl sm:text-5xl font-black italic tracking-tighter uppercase text-slate-900">Common Inquiries</h3>
+                </div>
+                
+                <div class="space-y-4 max-w-4xl mx-auto">
+                    @foreach($product->faqs as $index => $faq)
+                        <div x-data="{ open: false }" class="bg-white rounded-[2rem] border border-slate-100 overflow-hidden transition-all hover:shadow-lg hover:shadow-slate-200/50">
+                            <button @click="open = !open" class="w-full p-6 sm:p-8 flex items-center justify-between text-left focus:outline-none">
+                                <span class="text-lg font-black text-slate-900">{{ $faq['question'] ?? '' }}</span>
+                                <div class="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 transition-transform duration-300" :class="open ? 'rotate-180 bg-orange-500 text-white' : ''">
+                                    <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                                </div>
+                            </button>
+                            <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="px-6 pb-6 sm:px-8 sm:pb-8 text-slate-500 leading-relaxed font-medium">
+                                {{ $faq['answer'] ?? '' }}
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+        @endif
+
         <!-- Related Products -->
         <section class="py-20 border-t border-black/5">
-            <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
                 <div class="flex items-end justify-between mb-12">
                     <div>
                         <h2 class="text-3xl font-black italic tracking-tight text-[color:var(--text-primary)]">You may also like</h2>
@@ -596,59 +621,20 @@
                 </div>
 
                 <div class="related-carousel owl-carousel owl-theme">
-                    @foreach ($relatedProducts as $rp)
-                        @php
-                            $discount = (int) round((1 - ($rp['price'] / max(1, $rp['mrp']))) * 100);
-                        @endphp
-                        <div class="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white border border-black/5">
-                            <!-- Wishlist Button -->
-                            <button type="button"
-                                class="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-black/5">
-                                <i data-lucide="heart" class="h-5 w-5 text-[color:var(--text-primary)]"></i>
-                            </button>
-
-                            <!-- Product Image -->
-                            <div class="relative aspect-square overflow-hidden bg-gray-50">
-                                <a href="{{ route('products.show', $rp['slug']) }}" class="absolute inset-0 z-[5]"></a>
-                                <img src="{{ asset('images/products/' . $rp['image']) }}" alt="{{ $rp['title'] }}"
-                                    class="h-full w-full object-cover" loading="lazy">
-                                @if($discount > 0)
-                                <div class="absolute left-3 top-3 rounded-full bg-[var(--primary)] px-3 py-1 text-xs font-black text-white shadow-lg">
-                                    -{{ $discount }}%
-                                </div>
-                                @endif
+                    @foreach($relatedProducts as $rp)
+                        <a href="{{ route('products.show', $rp->slug) }}" class="group block">
+                            <div class="relative aspect-square overflow-hidden rounded-[2.5rem] bg-[var(--bg-section)] ring-1 ring-black/5 mb-6">
+                                <img src="{{ asset('images/products/' . $rp->image) }}" alt="{{ $rp->title }}" class="h-full w-full object-contain p-6 transition duration-500 group-hover:scale-110">
                             </div>
-
-                            <!-- Product Info -->
-                            <div class="flex flex-1 flex-col p-4">
-                                <p class="text-xs font-extrabold text-[color:var(--primary)] mb-1">
-                                    {{ $rp['tagline'] }}</p>
-                                <h3 class="text-sm font-extrabold text-[color:var(--text-primary)] leading-tight mb-3 line-clamp-2">
-                                    {{ $rp['title'] }}</h3>
-
-                                <div class="flex items-center justify-between gap-3 mb-4">
-                                    <div class="flex items-baseline gap-2">
-                                        <p class="text-lg font-extrabold text-[color:var(--primary)]">
-                                            ₹{{ number_format($rp['price']) }}</p>
-                                        @if($rp['mrp'] > $rp['price'])
-                                        <p class="text-xs font-bold text-gray-400 line-through">
-                                            ₹{{ number_format($rp['mrp']) }}</p>
-                                        @endif
-                                    </div>
-                                    <div class="flex items-center gap-1 rounded-full bg-gray-50 px-2 py-1 text-[10px] font-bold text-gray-500 ring-1 ring-black/5">
-                                        <i data-lucide="star" class="h-3 w-3 text-orange-400 fill-current"></i>
-                                        {{ number_format($rp['rating'], 1) }}
-                                    </div>
-                                </div>
-
-                                <div class="mt-auto relative z-10">
-                                    <a href="{{ route('products.show', $rp['slug']) }}"
-                                        class="block w-full text-center rounded-full bg-[var(--primary)] py-2 text-sm font-black text-white hover:opacity-95 transition shadow-lg shadow-[var(--primary)]/20">
-                                        Add to cart
-                                    </a>
+                            <h3 class="text-lg font-black text-[color:var(--text-primary)] leading-tight group-hover:text-[color:var(--primary)] transition">{{ $rp->title }}</h3>
+                            <div class="mt-2 flex items-center justify-between">
+                                <p class="text-xl font-black text-[color:var(--text-primary)]">₹{{ number_format($rp->price) }}</p>
+                                <div class="flex items-center gap-1 text-orange-500">
+                                    <i data-lucide="star" class="h-4 w-4 fill-current"></i>
+                                    <span class="text-xs font-black">{{ $rp->rating }}</span>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     @endforeach
                 </div>
             </div>
@@ -660,10 +646,10 @@
         <div class="mx-auto max-w-[1600px] flex items-center justify-between gap-8 px-4 sm:px-6 lg:px-12">
             <!-- Product Info (Desktop Only) -->
             <div class="hidden md:flex items-center gap-4">
-                <img src="{{ asset('images/products/' . $product['image']) }}" alt="{{ $product['title'] }}" class="h-14 w-14 rounded-xl bg-gray-50 object-contain p-2">
+                <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->title }}" class="h-14 w-14 rounded-xl bg-gray-50 object-contain p-2">
                 <div>
-                    <h4 class="text-sm font-black text-[color:var(--text-primary)] line-clamp-1">{{ $product['title'] }}</h4>
-                    <p class="text-xs font-bold text-[color:var(--primary)]">₹{{ number_format($product['price']) }}</p>
+                    <h4 class="text-sm font-black text-[color:var(--text-primary)] line-clamp-1">{{ $product->title }}</h4>
+                    <p class="text-xs font-bold text-[color:var(--primary)]">₹{{ number_format($product->price) }}</p>
                 </div>
             </div>
 
@@ -705,7 +691,7 @@
                         <div class="absolute inset-0 flex items-center justify-center" data-image-loader>
                             <x-dot-spinner class="[--uib-size:2.6rem] [--uib-color:#ffffff]" />
                         </div>
-                        <img src="{{ asset('images/products/' . $img) }}" alt="{{ $product['title'] }}" data-lightbox-image class="h-full w-full object-contain select-none">
+                        <img src="{{ asset('images/products/' . $img) }}" alt="{{ $product->title }}" data-lightbox-image class="h-full w-full object-contain select-none">
                     </div>
                 @endforeach
                 </div>
@@ -916,7 +902,7 @@
 
             $(".related-carousel").owlCarousel({
                 items: 1,
-                margin: 16,
+                margin: 24,
                 loop: false,
                 autoplay: false,
                 nav: false,
@@ -924,7 +910,8 @@
                 responsive: {
                     0: { items: 1.2, stagePadding: 20 },
                     640: { items: 2 },
-                    1024: { items: 4 }
+                    1024: { items: 3 },
+                    1280: { items: 4 }
                 }
             });
 

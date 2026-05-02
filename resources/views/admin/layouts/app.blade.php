@@ -10,161 +10,205 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         
         <!-- Performance & UI Progress -->
         <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css">
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+        <!-- FilePond -->
+        <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+        <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+        
+        <!-- Select2 -->
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
         <!-- Tailwind CSS -->
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            orange: {
+                                50: '#FFF7ED',
+                                100: '#FFEDD5',
+                                500: '#F97316',
+                                600: '#EA580C',
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
 
+        <!-- CSS Styles -->
         <style>
             :root {
-                --primary: #ea5f06;
-                --primary-hover: #cf5305;
-                --primary-soft: #fff1e8;
+                --primary: #F97316;
+                --primary-hover: #EA580C;
+                --primary-soft: #FFF7ED;
                 --bg-main: #FFFFFF;
-                --bg-light: #FDFDFD;
-                --bg-section: #F8FAFC;
-                --secondary: #FFFFFF;
-                --text-main: #1E293B;
-                --text-muted: #64748B;
-                --brand-gradient: linear-gradient(135deg, #ea5f06, #FF7A1A);
-                --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 10px -2px rgba(0, 0, 0, 0.03);
-                --glass-bg: rgba(255, 255, 255, 0.9);
+                --bg-sidebar: #FFFFFF;
+                --text-main: #111827;
+                --text-muted: #6B7280;
+                --border-color: #E5E7EB;
+                --radius: 12px;
+                --radius-inner: 8px;
+                --shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+                --shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
             }
 
             body {
-                font-family: 'Open Sans', sans-serif !important;
-                background-color: var(--bg-light) !important;
+                font-family: 'Inter', sans-serif !important;
+                background-color: var(--bg-main) !important;
                 color: var(--text-main);
             }
 
-            h1, h2, h3, h4, h5, h6 {
-                font-family: 'Montserrat', sans-serif !important;
-                letter-spacing: -0.01em;
-                color: var(--text-main);
-            }
-
-            /* Premium Finishing */
-            .glass-header {
-                background: var(--glass-bg);
-                backdrop-filter: blur(16px);
-                border-bottom: 1px solid #F1F5F9;
-            }
-
-            .premium-card {
+            /* Clean Card Style */
+            .saas-card {
                 background: white;
-                border-radius: 20px;
-                border: 1px solid #F1F5F9;
-                box-shadow: var(--card-shadow);
-                transition: all 0.3s ease;
-            }
-
-            .premium-card.brand-gradient {
-                background: var(--brand-gradient) !important;
-                border: none;
-                color: white !important;
-            }
-            
-            .premium-card.brand-gradient h2, 
-            .premium-card.brand-gradient h3, 
-            .premium-card.brand-gradient p {
-                color: white !important;
-            }
-
-            .premium-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.08);
-            }
-
-            .premium-input {
-                border-radius: 12px;
-                border: 1px solid #E2E8F0;
-                background: #F8FAFC;
+                border: 1px solid var(--border-color);
+                border-radius: var(--radius);
+                padding: 20px;
                 transition: all 0.2s;
             }
 
-            .premium-input:focus {
-                background: white;
-                border-color: var(--primary);
-                box-shadow: 0 0 0 4px var(--primary-soft);
-                outline: none;
+            .saas-card:hover {
+                box-shadow: var(--shadow-hover);
+                transform: translateY(-2px);
             }
 
-            .premium-button {
-                border-radius: 12px;
-                font-weight: 700;
-                transition: all 0.3s;
+            /* Minimal Form Elements */
+            .saas-label {
+                display: block;
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--text-muted);
+                margin-bottom: 6px;
+            }
+
+            .saas-input {
+                width: 100%;
+                height: 40px;
+                padding: 10px 12px;
+                border: 1px solid var(--border-color);
+                border-radius: var(--radius-inner);
+                font-size: 14px;
+                color: var(--text-main);
+                transition: all 0.2s;
+            }
+
+            .saas-input:focus {
+                border-color: var(--primary);
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+            }
+
+            .saas-btn-primary {
                 background: var(--primary);
                 color: white;
-                box-shadow: 0 4px 12px rgba(234, 95, 6, 0.15);
-            }
-
-            .premium-button:hover {
-                background: var(--primary-hover);
-                transform: translateY(-1px);
-                box-shadow: 0 6px 15px rgba(234, 95, 6, 0.25);
-            }
-
-            /* Admin Sidebar Adjustments */
-            #admin-sidebar {
-                background: white !important;
-                border-right: 1px solid #F1F5F9;
-            }
-
-            .nav-item {
-                color: var(--text-muted);
+                padding: 10px 16px;
+                border-radius: var(--radius-inner);
+                font-weight: 600;
+                font-size: 14px;
                 transition: all 0.2s;
-                border-radius: 12px;
-                margin: 4px 0;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .saas-btn-primary:hover {
+                background: var(--primary-hover);
+                transform: scale(1.02);
+            }
+
+            .saas-btn-secondary {
+                background: white;
+                border: 1px solid var(--border-color);
+                color: var(--text-main);
+                padding: 10px 16px;
+                border-radius: var(--radius-inner);
+                font-weight: 600;
+                font-size: 14px;
+                transition: all 0.2s;
+            }
+
+            .saas-btn-secondary:hover {
+                background: var(--primary-soft);
+                border-color: var(--primary);
+            }
+
+            /* Minimal Table */
+            .saas-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+
+            .saas-table th {
+                background: #F9FAFB;
+                padding: 12px 16px;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-muted);
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .saas-table td {
+                padding: 14px 16px;
+                font-size: 14px;
+                border-bottom: 1px solid #F3F4F6;
+                transition: background 0.2s;
+            }
+
+            .saas-table tr:hover td {
+                background: var(--primary-soft);
+            }
+
+            /* Nav Item Overhaul */
+            .nav-item {
+                display: flex;
+                align-items: center;
+                padding: 10px 16px;
+                color: var(--text-muted);
+                font-weight: 500;
+                font-size: 14px;
+                border-radius: 8px;
+                transition: all 0.2s;
+                margin: 2px 0;
             }
 
             .nav-item:hover {
-                background: #F8FAFC;
+                background: var(--primary-soft);
                 color: var(--primary);
             }
 
             .active-nav-item {
                 background: var(--primary-soft) !important;
                 color: var(--primary) !important;
-                font-weight: 700;
-            }
-            
-            .active-nav-item i {
-                color: var(--primary) !important;
+                font-weight: 600;
             }
 
-            /* Custom scrollbar */
-            ::-webkit-scrollbar {
-                width: 6px;
-            }
-            ::-webkit-scrollbar-track {
-                background: transparent;
-            }
-            ::-webkit-scrollbar-thumb {
-                background: #E2E8F0;
-                border-radius: 10px;
-            }
-            ::-webkit-scrollbar-thumb:hover {
-                background: var(--primary);
-            }
+            /* Scrollbar */
+            ::-webkit-scrollbar { width: 6px; }
+            ::-webkit-scrollbar-track { background: transparent; }
+            ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+            ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
             /* NProgress Custom Style */
             #nprogress .bar {
                 background: var(--primary) !important;
                 height: 3px !important;
             }
-            #nprogress .spinner-icon {
-                border-top-color: var(--primary) !important;
-                border-left-color: var(--primary) !important;
-            }
         </style>
     </head>
     <body class="font-sans antialiased h-screen overflow-hidden">
-        <div class="h-full bg-gray-100 flex overflow-hidden">
+        <div class="h-full bg-white flex overflow-hidden">
             <!-- Sidebar -->
             @include('admin.layouts.sidebar')
 
@@ -184,6 +228,24 @@
         <!-- JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
+        
+        <!-- FilePond -->
+        <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+        <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+        <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+        
+        <!-- SortableJS -->
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+        
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        
+        <!-- Select2 -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+        <!-- CKEditor 5 -->
+        <script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
         <script>
             // Configure axios for Laravel
             axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';

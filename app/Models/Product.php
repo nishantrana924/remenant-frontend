@@ -14,8 +14,20 @@ class Product extends Model
     protected $casts = [
         'gallery' => 'array',
         'benefits' => 'array',
-        'specs' => 'array',
+        'ritual' => 'array',
+        'faqs' => 'array',
+        'highlights' => 'array',
+        'trust_signals' => 'array',
         'is_featured' => 'boolean',
-        'status' => 'boolean',
+        'status' => 'string',
     ];
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
 }

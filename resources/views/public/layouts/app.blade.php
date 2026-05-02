@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @yield('seo')
 
     <title>@yield('title', config('app.name', 'Remenant Health'))</title>
     <link rel="icon" href="{{ asset('images/logo/remenant-health-favicon.jpg') }}" type="image/jpeg">
@@ -22,6 +23,16 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #F97316;
+            --primary-soft: #FFF7ED;
+            --bg-main: #FFFFFF;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+        }
+    </style>
     @stack('styles')
 </head>
 
