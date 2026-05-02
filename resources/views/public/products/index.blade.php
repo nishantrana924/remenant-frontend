@@ -8,10 +8,10 @@
         <section class="relative overflow-hidden bg-[var(--secondary)] py-16 text-white">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12 relative z-10">
                 <div class="max-w-3xl">
-                    <h1 class="text-4xl font-black italic tracking-tight sm:text-6xl leading-tight">
+                    <h1 class="text-4xl font-bold italic tracking-tight sm:text-6xl leading-tight text-white">
                         Pure Wellness <br> In Every Sip.
                     </h1>
-                    <p class="mt-6 text-lg font-bold text-white/80 leading-relaxed max-w-2xl">
+                    <p class="mt-6 text-lg font-semibold text-white/80 leading-relaxed max-w-2xl">
                         Discover our collection of clean-label, effervescent wellness formulas designed for modern life.
                     </p>
                 </div>
@@ -45,9 +45,9 @@
                         <div class="p-6 lg:p-0 space-y-10 lg:space-y-10">
                             <!-- Sort (Mobile only view as part of filters) -->
                             <div class="lg:hidden">
-                                <h3 class="text-sm font-black uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-4">Sort By</h3>
+                                <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-4">Sort By</h3>
                                 <div class="relative">
-                                    <select class="w-full appearance-none rounded-2xl bg-white px-6 py-4 pr-12 text-sm font-black uppercase tracking-widest outline-none ring-1 ring-black/5 shadow-sm">
+                                    <select class="w-full appearance-none rounded-2xl bg-white px-6 py-4 pr-12 text-sm font-semibold uppercase tracking-widest outline-none ring-1 ring-black/5 shadow-sm">
                                         <option>Best Selling</option>
                                         <option>Price: Low to High</option>
                                         <option>Price: High to Low</option>
@@ -59,16 +59,16 @@
 
                             <!-- Categories -->
                             <div>
-                                <h3 class="text-sm font-black uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Categories</h3>
+                                <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Categories</h3>
                                 <div class="space-y-3">
                                     @php
-                                        $categories = ['All Products', 'Immunity', 'Beauty & Skin', 'Metabolism', 'Daily Energy', 'Weight Care'];
+                                        $categories = ['All Products', 'Immunity', 'Beauty & Skin', 'Metabolism', 'Daily Energy', 'Weight Care', 'Combo Offers'];
                                     @endphp
                                     @foreach($categories as $cat)
                                         <label class="group flex items-center gap-3 cursor-pointer">
                                             <input type="checkbox" 
-                                                   class="h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
-                                                   {{ $loop->first ? 'checked' : '' }}>
+                                                   data-category="{{ $cat }}"
+                                                   class="category-filter-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
                                             <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">{{ $cat }}</span>
                                         </label>
                                     @endforeach
@@ -77,19 +77,19 @@
 
                             <!-- Price Range -->
                             <div>
-                                <h3 class="text-sm font-black uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Price Range</h3>
+                                <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Price Range</h3>
                                 <div class="space-y-4">
                                     <input type="range" min="0" max="5000" step="100" class="w-full accent-[var(--primary)]">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-xs font-black text-gray-400">₹0</span>
-                                        <span class="text-xs font-black text-gray-400">₹5,000+</span>
+                                        <span class="text-xs font-black text-[color:var(--text-muted)]">₹0</span>
+                                        <span class="text-xs font-black text-[color:var(--text-muted)]">₹5,000+</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Availability -->
                             <div>
-                                <h3 class="text-sm font-black uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Availability</h3>
+                                <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Availability</h3>
                                 <div class="space-y-3">
                                     <label class="group flex items-center gap-3 cursor-pointer">
                                         <input type="checkbox" 
@@ -107,7 +107,7 @@
 
                             <!-- Reset Filters -->
                             <div class="pt-6 lg:pt-0">
-                                <button type="button" class="w-full rounded-2xl bg-black/5 py-4 text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-black/10 transition">
+                                <button type="button" class="w-full rounded-2xl bg-black/5 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-black/10 transition">
                                     Reset Filters
                                 </button>
                             </div>
@@ -126,19 +126,19 @@
                                     class="lg:hidden flex items-center justify-center rounded-xl bg-white h-11 w-11 shadow-sm ring-1 ring-black/5 text-gray-900 active:scale-95 transition">
                                 <i data-lucide="sliders-horizontal" class="h-5 w-5"></i>
                             </button>
-                            <p class="text-sm font-black uppercase tracking-widest text-[color:var(--text-secondary)]">
+                            <p class="text-sm font-bold uppercase tracking-widest text-[color:var(--text-secondary)]">
                                 Showing {{ count($products) }} Products
                             </p>
                         </div>
                         
                         <div class="hidden lg:flex items-center gap-4">
-                            <span class="text-xs font-black uppercase tracking-widest text-gray-400">Sort By:</span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-[color:var(--text-muted)]">Sort By:</span>
                             <div class="relative">
-                                <select class="appearance-none rounded-2xl bg-white px-6 py-3 pr-12 text-sm font-black uppercase tracking-widest outline-none ring-1 ring-black/5 shadow-sm hover:bg-gray-50 transition">
-                                    <option>Best Selling</option>
-                                    <option>Price: Low to High</option>
-                                    <option>Price: High to Low</option>
-                                    <option>Newest First</option>
+                                <select id="sort-select" class="appearance-none rounded-2xl bg-white px-6 py-3 pr-12 text-sm font-semibold uppercase tracking-widest outline-none ring-1 ring-black/5 shadow-sm hover:bg-gray-50 transition">
+                                    <option value="best-selling">Best Selling</option>
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
+                                    <option value="newest">Newest First</option>
                                 </select>
                                 <i data-lucide="chevron-down" class="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
                             </div>
@@ -175,22 +175,24 @@
                                 </div>
 
                                 <div class="flex flex-1 flex-col p-4">
-                                    <p class="text-xs font-extrabold tracking-wide text-[color:var(--primary)]">
+                                    <p class="text-xs font-extrabold tracking-wide text-[color:var(--primary)] uppercase">
                                         {{ $product->tagline }}</p>
-                                    <p class="mt-1 text-sm font-extrabold text-[color:var(--text-primary)] leading-tight">
-                                        {{ $product->title }}</p>
+                                    <h3 class="mt-1 text-sm font-extrabold text-[color:var(--text-primary)] leading-tight truncate">
+                                        {{ $product->title }}</h3>
 
                                     <div class="mt-3 flex items-center justify-between gap-3">
                                         <div class="flex items-baseline gap-2">
-                                            <p class="text-lg font-extrabold text-[color:var(--primary)]">
+                                            <p class="text-lg font-extrabold text-[color:var(--primary)] tracking-tighter">
                                                 ₹{{ number_format($product->price) }}</p>
                                             <p class="text-xs font-semibold text-[color:var(--text-muted)] line-through">
                                                 ₹{{ number_format($product->mrp) }}</p>
                                         </div>
                                         <div
                                             class="flex items-center gap-1 rounded-full bg-black/5 px-2 py-1 text-xs font-semibold text-[color:var(--text-secondary)]">
-                                            <i data-lucide="star" class="h-3 w-3 fill-orange-400 text-orange-400"></i>
+                                            <i data-lucide="star" class="h-3 w-3 fill-[color:var(--primary)] text-[color:var(--primary)]"></i>
                                             {{ number_format($product->rating, 1) }} ({{ number_format($product->reviews ?? $product->reviews_count) }})
+                                        </div>
+                                    </div>
                                         </div>
                                     </div>
 
@@ -222,8 +224,8 @@
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
                 <div class="rounded-[4rem] bg-[var(--bg-sage)] p-8 sm:p-20 relative overflow-hidden">
                     <div class="relative z-10 text-center max-w-3xl mx-auto">
-                        <h2 class="text-4xl font-black italic tracking-tight text-[#074D3D] sm:text-5xl">Join the Wellness Revolution</h2>
-                        <p class="mt-6 text-lg font-bold text-[#074D3D]/80">
+                        <h2 class="text-4xl font-bold italic tracking-tight text-[#074D3D] sm:text-5xl">Join the Wellness Revolution</h2>
+                        <p class="mt-6 text-lg font-semibold text-[#074D3D]/80">
                             Get 10% off your first order and stay updated with our latest health tips.
                         </p>
                         
@@ -241,4 +243,38 @@
             </div>
         </section>
     </div>
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryParam = urlParams.get('category');
+            const sortParam = urlParams.get('sort');
+
+            // Handle Category Filter
+            if (categoryParam) {
+                const checkboxes = document.querySelectorAll('.category-filter-checkbox');
+                checkboxes.forEach(cb => {
+                    if (cb.dataset.category.toLowerCase() === categoryParam.toLowerCase()) {
+                        cb.checked = true;
+                        // You might want to trigger a filter function here if you have one
+                    } else {
+                        cb.checked = false;
+                    }
+                });
+            } else {
+                // If no category, check 'All Products'
+                const allCb = document.querySelector('[data-category="All Products"]');
+                if (allCb) allCb.checked = true;
+            }
+
+            // Handle Sort
+            if (sortParam) {
+                const sortSelect = document.getElementById('sort-select');
+                if (sortSelect) {
+                    sortSelect.value = sortParam;
+                }
+            }
+        });
+    </script>
+    @endpush
 @endsection

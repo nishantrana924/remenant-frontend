@@ -88,4 +88,28 @@ class ProductController extends Controller
 
         return collect($data)->map(fn($item) => (object)$item);
     }
+
+    private function getProducts()
+    {
+        $products = Product::where('status', 'published')->get();
+        if ($products->isEmpty()) {
+            return $this->getStaticProducts();
+        }
+        return $products;
+    }
+
+    public function reviews($slug)
+    {
+        $allProducts = $this->getProducts();
+        $product = collect($allProducts)->firstWhere('slug', $slug);
+
+        if (!$product) {
+            abort(404);
+        }
+
+        // Ensure product is an object for view compatibility
+        $product = (object)$product;
+
+        return view('public.products.reviews', compact('product'));
+    }
 }

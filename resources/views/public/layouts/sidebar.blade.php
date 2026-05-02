@@ -19,14 +19,22 @@
         </div>
 
         <div class="px-5 py-5">
-            <div class="rounded-2xl bg-[var(--primary-soft)] p-4">
-                <p class="text-xs font-bold uppercase tracking-wide text-[color:var(--primary)]">Deals</p>
-                <p class="mt-1 text-sm font-extrabold text-gray-900">Exclusive best sellers this week</p>
-                <a href="#shop"
-                    class="mt-3 inline-flex rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition"
-                    data-sidebar-initial-focus>
-                    Shop now
-                </a>
+            <div class="rounded-2xl bg-[var(--primary-soft)] p-5 border border-[var(--primary)]/10">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-[color:var(--primary)]">Special Offer</p>
+                    <span class="text-[10px] font-black px-2 py-0.5 rounded bg-[var(--primary)] text-white">DEAL</span>
+                </div>
+                <p class="text-sm font-bold text-gray-900 leading-snug">Get 10% OFF on your <br>first purchase</p>
+                <div class="mt-4 flex items-center gap-2">
+                    <div class="flex-1 rounded-xl border-2 border-dashed border-[var(--primary)]/30 bg-white/50 px-3 py-2 text-center">
+                        <span class="text-xs font-black tracking-widest text-[color:var(--primary)]">WELCOME10</span>
+                    </div>
+                    <a href="{{ route('products.index') }}"
+                        class="shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20 transition hover:scale-105 active:scale-95"
+                        data-sidebar-initial-focus>
+                        <i data-lucide="arrow-right" class="h-5 w-5"></i>
+                    </a>
+                </div>
             </div>
 
             <nav class="mt-6 space-y-1">
@@ -38,12 +46,7 @@
                 <a href="{{ route('products.index') }}"
                     class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
                     <i data-lucide="store" class="h-5 w-5 text-gray-600"></i>
-                    Shop
-                </a>
-                <a href="#categories"
-                    class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
-                    <i data-lucide="grid-3x3" class="h-5 w-5 text-gray-600"></i>
-                    Categories
+                    Shop All
                 </a>
                 <a href="{{ route('about') }}"
                     class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">

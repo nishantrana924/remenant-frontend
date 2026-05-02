@@ -14,16 +14,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <!-- Owl Carousel CSS -->
-    <link rel="stylesheet" href="{{ asset('plugins/owlcarousel/assets/owl.carousel.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('plugins/owlcarousel/assets/owl.theme.default.min.css') }}">
+    <!-- Owl Carousel CSS (Local) -->
+    <link rel="stylesheet" href="{{ asset('assets/owl-carousel/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/owl-carousel/owl.theme.default.min.css') }}">
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('assets/css/global-styles.css') }}">
     <style>
         :root {
             --primary: #F97316;
@@ -41,15 +42,16 @@
         @include('public.layouts.header')
         @include('public.layouts.sidebar')
 
-        <main class="flex-1 overflow-x-hidden">
+        <main class="flex-1" style="overflow-x: clip;">
             @yield('content')
         </main>
 
         @include('public.layouts.footer')
     </div>
 
-    <script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('plugins/owlcarousel/owl.carousel.min.js') }}"></script>
+    <!-- Scripts (Local) -->
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/owl-carousel/owl.carousel.min.js') }}"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="{{ asset('js/icons.js') }}"></script>
     <script src="{{ asset('js/public-sidebar.js') }}"></script>
@@ -58,7 +60,7 @@
     <!-- Lenis Smooth Scroll -->
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
     <script>
-        const lenis = new Lenis({
+        window.lenis = new Lenis({
             duration: 1.2,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             smoothWheel: true,
@@ -68,14 +70,14 @@
         })
 
         function raf(time) {
-            lenis.raf(time)
+            window.lenis.raf(time)
             requestAnimationFrame(raf)
         }
 
         requestAnimationFrame(raf)
 
         // Anchor link scroll sync
-        $(document).on('click', 'a[href^="#"]', function(e) {
+        $(document).on('click', 'a[href^="#"]', function (e) {
             const target = this.getAttribute('href');
             if (target && target !== '#') {
                 const element = document.querySelector(target);

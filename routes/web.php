@@ -22,6 +22,7 @@ Route::get('/cart', function () {
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/product/{slug}/reviews', [ProductController::class, 'reviews'])->name('products.reviews');
 
 // Admin routes (all authenticated users are admins)
 Route::get('/clear-cache', function() {
@@ -36,8 +37,8 @@ Route::get('/debug-db', [App\Http\Controllers\Admin\ArtisanController::class, 'd
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
-    Route::get('/setup', [ArtisanController::class, 'setup'])->name('admin.setup');
-    Route::get('/debug-db', [ArtisanController::class, 'debugDb'])->name('admin.debug-db');
+    Route::get('/setup', [\App\Http\Controllers\Admin\ArtisanController::class, 'setup'])->name('admin.setup');
+    Route::get('/debug-db', [\App\Http\Controllers\Admin\ArtisanController::class, 'debugDb'])->name('admin.debug-db');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

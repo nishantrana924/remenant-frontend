@@ -115,18 +115,25 @@
 
     /* Smooth mobile search hide on scroll */
     .public-mobile-search {
-        max-height: 96px;
+        max-height: 70px;
         opacity: 1;
         transform: translateY(0);
-        transition: max-height 200ms ease, opacity 200ms ease, transform 200ms ease, margin-top 200ms ease;
-        will-change: max-height, opacity, transform;
+        margin-top: 1rem; /* matches mt-4 */
+        padding-bottom: 0.5rem;
+        transition: max-height 400ms cubic-bezier(0.4, 0, 0.2, 1), 
+                    opacity 400ms ease, 
+                    transform 400ms ease, 
+                    margin-top 400ms cubic-bezier(0.4, 0, 0.2, 1),
+                    padding-bottom 400ms cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: max-height, opacity, transform, margin-top;
     }
 
     .public-mobile-search.is-hidden {
         max-height: 0;
         opacity: 0;
-        transform: translateY(-6px);
+        transform: translateY(-10px);
         margin-top: 0;
+        padding-bottom: 0;
         overflow: hidden;
         pointer-events: none;
     }
