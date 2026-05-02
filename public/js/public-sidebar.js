@@ -32,6 +32,7 @@
         const focusTarget = panel.querySelector('[data-sidebar-initial-focus]') || panel;
         focusTarget.focus?.();
         document.body.classList.add('overflow-hidden');
+        window.lenis?.stop();
     }
 
     function closeSidebar() {
@@ -51,6 +52,7 @@
         setExpanded(lastOpenBtn, false);
         lastOpenBtn?.focus?.();
         document.body.classList.remove('overflow-hidden');
+        window.lenis?.start();
     }
 
     function onKeyDown(e) {
@@ -72,6 +74,13 @@
             btn.addEventListener('click', () => openSidebar(btn));
         });
         closeBtn.addEventListener('click', closeSidebar);
+        
+        // Close sidebar when clicking any link inside it (especially for anchor links)
+        const sidebarLinks = panel.querySelectorAll('a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', closeSidebar);
+        });
+
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) closeSidebar();
         });

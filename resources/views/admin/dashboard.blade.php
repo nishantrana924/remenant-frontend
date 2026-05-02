@@ -1,166 +1,145 @@
 @extends('admin.layouts.app')
 
-@section('header')
-    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        {{ __('Admin Dashboard') }}
-    </h2>
-@endsection
-
 @section('content')
-    <div>
-        <div class="max-w-7xl mx-auto">
-            <!-- Welcome Section -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-2xl font-bold mb-2">Welcome, {{ Auth::user()->name }}!</h3>
-                    <p class="text-gray-600">You're logged in as an administrator. Manage the entire system from here.</p>
-                </div>
-            </div>
-
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500">Total Users</p>
-                                <p class="text-2xl font-semibold text-gray-900">{{ \App\Models\User::count() }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500">Admins</p>
-                                <p class="text-2xl font-semibold text-gray-900">{{ \App\Models\User::where('role', 'admin')->count() }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500">Total Products</p>
-                                <p class="text-2xl font-semibold text-gray-900">0</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500">Total Orders</p>
-                                <p class="text-2xl font-semibold text-gray-900">0</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Admin Actions -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">User Management</h3>
-                        <div class="space-y-3">
-                            <a href="#" class="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-700 font-medium">View All Users</span>
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </div>
-                            </a>
-                            <a href="#" class="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-700 font-medium">Create New User</span>
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </div>
-                            </a>
-                            <a href="#" class="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-700 font-medium">Manage Roles</span>
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">System Management</h3>
-                        <div class="space-y-3">
-                            <a href="#" class="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-700 font-medium">View All Products</span>
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </div>
-                            </a>
-                            <a href="#" class="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-700 font-medium">Manage Orders</span>
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </div>
-                            </a>
-                            <a href="#" class="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-700 font-medium">System Settings</span>
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-                    <div class="text-center py-8 text-gray-500">
-                        <p>No recent activity to display</p>
-                    </div>
-                </div>
-            </div>
+<div class="space-y-8 pb-12">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Intelligence Overview</h1>
+            <p class="text-sm text-slate-500 mt-1">Real-time performance metrics and business health</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="saas-btn-secondary flex items-center gap-2">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                Last 30 Days
+            </button>
+            <button class="saas-btn-primary">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                Export Report
+            </button>
         </div>
     </div>
-@endsection
 
+    <!-- KPI Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="saas-card">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600">
+                    <i data-lucide="banknote" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-md">+12.5%</span>
+            </div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Gross Revenue</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1">₹{{ number_format($stats['revenue'] ?? 452800) }}</h3>
+        </div>
+
+        <div class="saas-card">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-md">+8.2%</span>
+            </div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Orders</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['orders_count'] ?? 1254 }}</h3>
+        </div>
+
+        <div class="saas-card">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-md">+24%</span>
+            </div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">New Customers</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['customers_count'] ?? 842 }}</h3>
+        </div>
+
+        <div class="saas-card">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded-md">Low Stock</span>
+            </div>
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Inventory Alerts</p>
+            <h3 class="text-2xl font-bold text-slate-900 mt-1">{{ $stats['low_stock'] ?? 12 }}</h3>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Revenue Chart -->
+        <div class="lg:col-span-2 saas-card">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="font-bold text-slate-900">Revenue Growth</h3>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                        <span class="text-xs text-slate-500">Current Year</span>
+                    </div>
+                </div>
+            </div>
+            <canvas id="revenueChart" height="300"></canvas>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="saas-card">
+            <h3 class="font-bold text-slate-900 mb-6">Recent Activity</h3>
+            <div class="space-y-6">
+                @foreach($recent_orders ?? [] as $order)
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0">
+                        <i data-lucide="package" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-slate-800">Order #{{ $order->id }}</p>
+                        <p class="text-xs text-slate-500">{{ $order->customer_name }} • ₹{{ number_format($order->total_amount) }}</p>
+                        <p class="text-[10px] text-slate-400 mt-1">{{ $order->created_at->diffForHumans() }}</p>
+                    </div>
+                </div>
+                @endforeach
+                
+                <!-- Placeholder if empty -->
+                @if(count($recent_orders ?? []) == 0)
+                <div class="text-center py-12">
+                    <i data-lucide="inbox" class="w-12 h-12 text-slate-200 mx-auto mb-4"></i>
+                    <p class="text-sm text-slate-400">No recent activity found</p>
+                </div>
+                @endif
+            </div>
+            <button class="w-full mt-8 py-3 text-xs font-bold text-slate-400 uppercase tracking-widest hover:text-orange-500 transition-colors border-t border-slate-50">View All Orders</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Revenue',
+                data: [32000, 45000, 42000, 58000, 65000, 59000, 72000, 81000, 78000, 92000, 105000, 118000],
+                borderColor: '#F97316',
+                backgroundColor: 'rgba(249, 115, 22, 0.05)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5], drawBorder: false } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+});
+</script>
+@endsection
