@@ -184,7 +184,7 @@
                                         </div>
                                         <div
                                             class="flex items-center gap-1 rounded-full bg-black/5 px-2 py-1 text-xs font-semibold text-[color:var(--text-secondary)]">
-                                            <i data-lucide="star" class="h-4 w-4 fill-yellow-400 text-yellow-400"></i>
+                                            <i data-lucide="star" class="h-4 w-4 fill-[color:var(--primary)] text-[color:var(--primary)]"></i>
                                             {{ number_format($product['rating'], 1) }} ({{ number_format($product['reviews']) }})
                                         </div>
                                     </div>

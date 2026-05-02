@@ -169,6 +169,72 @@
                         </div>
                         <p class="mt-2 text-xs font-bold text-[color:var(--text-muted)] uppercase tracking-wider">Inclusive of all taxes</p>
                         
+                        <!-- Interactive Coupon Section -->
+                        <div class="mt-8">
+                            <div class="flex flex-col gap-3">
+                                <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Apply Coupon Code</label>
+                                <div class="relative flex items-center max-w-sm">
+                                    <input type="text" 
+                                           id="coupon-input"
+                                           placeholder="Enter Code"
+                                           class="w-full rounded-2xl bg-gray-50/50 border-2 border-dashed border-gray-200 px-5 py-4 text-sm font-bold text-[color:var(--text-primary)] placeholder:text-gray-300 focus:outline-none focus:border-[color:var(--primary)] transition-all uppercase tracking-widest">
+                                    <button type="button" 
+                                            onclick="applyCouponCode()"
+                                            class="absolute right-2 top-2 bottom-2 rounded-xl bg-[color:var(--primary)] px-6 text-[10px] font-black text-white uppercase tracking-widest shadow-lg shadow-[color:var(--primary)]/20 active:scale-95 transition-all hover:brightness-105">
+                                        Apply
+                                    </button>
+                                </div>
+                                
+                                <div id="coupon-message" class="hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div class="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 border border-green-100">
+                                        <i data-lucide="check-circle-2" class="h-4 w-4 text-green-600"></i>
+                                        <p class="text-[11px] font-bold text-green-700 uppercase tracking-wider">
+                                            Code <span id="applied-code-text" class="underline"></span> Applied! <span class="mx-2 text-green-300">|</span> You save <span class="text-lg">₹<span id="discount-amount">0</span></span>
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <p id="coupon-error" class="hidden text-[10px] font-bold text-red-500 uppercase tracking-widest mt-1">
+                                    Invalid coupon code. Try REMENANT10
+                                </p>
+                            </div>
+                        </div>
+
+                        <script>
+                            function applyCouponCode() {
+                                const input = document.getElementById('coupon-input');
+                                const message = document.getElementById('coupon-message');
+                                const error = document.getElementById('coupon-error');
+                                const codeText = document.getElementById('applied-code-text');
+                                const discountText = document.getElementById('discount-amount');
+                                
+                                const code = input.value.trim().toUpperCase();
+                                
+                                // Reset states
+                                message.classList.add('hidden');
+                                error.classList.add('hidden');
+                                
+                                if (code === 'REMENANT10' || code === 'WELCOME10') {
+                                    const price = {{ $product['price'] }};
+                                    const discount = Math.round(price * 0.1);
+                                    
+                                    codeText.innerText = code;
+                                    discountText.innerText = discount.toLocaleString();
+                                    message.classList.remove('hidden');
+                                    input.classList.add('border-green-200');
+                                    input.classList.remove('border-dashed');
+                                    
+                                    if (window.lucide) lucide.createIcons();
+                                } else if (code === '') {
+                                    // Do nothing
+                                } else {
+                                    error.classList.remove('hidden');
+                                    input.classList.add('border-red-200');
+                                }
+                            }
+                        </script>
+                        
+                        {{-- 
                         <!-- Professional Minimalist 'Available Offers' (No Code Badges) -->
                         <div class="mt-10 rounded-[1.5rem] bg-gray-50/50 border border-gray-100 overflow-hidden shadow-sm">
                             <button type="button" 
@@ -263,7 +329,50 @@
                                 navigator.clipboard.writeText(code);
                             }
                         </script>
+                        --}}
 
+                        <!-- Product Short Description -->
+                        <div class="mt-8 border-t border-black/5 pt-8">
+                            <div class="relative group/desc">
+                                <div id="short-description" class="text-lg leading-relaxed text-[color:var(--text-secondary)] font-medium line-clamp-3 transition-all duration-500">
+                                    {!! $product['description'] !!}
+                                </div>
+                                <button type="button" 
+                                        id="short-desc-btn"
+                                        onclick="toggleShortDescription()"
+                                        class="mt-4 text-xs font-black text-[color:var(--primary)] hover:underline underline-offset-8 uppercase tracking-[0.2em] hidden">
+                                    Read More
+                                </button>
+                            </div>
+                        </div>
+
+                        <script>
+                            function checkShortDesc() {
+                                const desc = document.getElementById('short-description');
+                                const btn = document.getElementById('short-desc-btn');
+                                if (!desc || !btn) return;
+                                
+                                if (desc.scrollHeight > desc.offsetHeight + 5) {
+                                    btn.classList.remove('hidden');
+                                }
+                            }
+
+                            function toggleShortDescription() {
+                                const desc = document.getElementById('short-description');
+                                const btn = document.getElementById('short-desc-btn');
+                                if (desc.classList.contains('line-clamp-3')) {
+                                    desc.classList.remove('line-clamp-3');
+                                    btn.innerText = 'Read Less';
+                                } else {
+                                    desc.classList.add('line-clamp-3');
+                                    btn.innerText = 'Read More';
+                                }
+                            }
+
+                            window.addEventListener('DOMContentLoaded', checkShortDesc);
+                        </script>
+
+                        {{-- 
                         <!-- Refined Minimalist Delivery Section -->
                         <div class="mt-10 border-t border-black/5 pt-10">
                             <div class="flex items-center gap-4 mb-8">
@@ -325,6 +434,37 @@
                                     alert('Please enter a valid 6-digit pincode');
                                 }
                             }
+                        </script>
+                        --}}
+
+                        <script>
+                            // Long Description Read More Logic
+                            function checkLongDescOverflow() {
+                                const desc = document.getElementById('long-description-text');
+                                const btn = document.getElementById('long-desc-read-more');
+                                if (!desc || !btn) return;
+
+                                if (desc.scrollHeight > desc.offsetHeight) {
+                                    btn.classList.remove('hidden');
+                                } else {
+                                    btn.classList.add('hidden');
+                                }
+                            }
+
+                            function toggleLongDescription() {
+                                const desc = document.getElementById('long-description-text');
+                                const btn = document.getElementById('long-desc-read-more');
+                                if (desc.classList.contains('line-clamp-6')) {
+                                    desc.classList.remove('line-clamp-6');
+                                    btn.innerText = 'Read Less';
+                                } else {
+                                    desc.classList.add('line-clamp-6');
+                                    btn.innerText = 'Read More';
+                                }
+                            }
+
+                            window.addEventListener('DOMContentLoaded', checkLongDescOverflow);
+                            window.addEventListener('resize', checkLongDescOverflow);
                         </script>
 
                         {{-- 
@@ -415,7 +555,38 @@
         </section>
 
 
+        <!-- Product Image Showcase -->
+        <section class="bg-white pt-16 sm:pt-24">
+            <div class="px-4 sm:px-6 lg:px-0 py-4 sm:py-8 lg:py-0">
+
+                <!-- Main Banner Image (1200×450 aspect ratio) -->
+                <div class="w-full overflow-hidden bg-gray-50" style="aspect-ratio: 1200/450;">
+                    <img src="{{ asset('images/products/' . ($product['gallery'][0] ?? $product['image'])) }}"
+                         alt="{{ $product['title'] }} - Main"
+                         class="w-full h-full object-cover">
+                </div>
+
+                <!-- Two Images Side by Side -->
+                @if(count($product['gallery']) >= 3)
+                <div class="mt-1 grid grid-cols-2 gap-1">
+                    <div class="overflow-hidden bg-gray-50 aspect-square">
+                        <img src="{{ asset('images/products/' . $product['gallery'][1]) }}"
+                             alt="{{ $product['title'] }} - Detail 1"
+                             class="w-full h-full object-cover">
+                    </div>
+                    <div class="overflow-hidden bg-gray-50 aspect-square">
+                        <img src="{{ asset('images/products/' . $product['gallery'][2]) }}"
+                             alt="{{ $product['title'] }} - Detail 2"
+                             class="w-full h-full object-cover">
+                    </div>
+                </div>
+                @endif
+
+            </div>
+        </section>
+
         <!-- Product Information TRUE Table Layout -->
+
         <section class="py-12 sm:py-20 bg-white">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
                 <div class="overflow-hidden border-t border-black/10">
@@ -425,19 +596,19 @@
                         <div class="p-8 border-r border-black/10">
                             <div class="flex items-center gap-3">
                                 <i data-lucide="info" class="h-5 w-5 text-orange-600"></i>
-                                <span class="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Description</span>
+                                <span class="text-sm font-bold uppercase tracking-[0.2em] text-gray-400">Description</span>
                             </div>
                         </div>
                         <div class="p-8 border-r border-black/10">
                             <div class="flex items-center gap-3">
                                 <i data-lucide="clipboard-list" class="h-5 w-5 text-blue-600"></i>
-                                <span class="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Specifications</span>
+                                <span class="text-sm font-bold uppercase tracking-[0.2em] text-gray-400">Specifications</span>
                             </div>
                         </div>
                         <div class="p-8">
                             <div class="flex items-center gap-3">
                                 <i data-lucide="building-2" class="h-5 w-5 text-emerald-600"></i>
-                                <span class="text-sm font-black uppercase tracking-[0.2em] text-gray-400">Brand Info</span>
+                                <span class="text-sm font-bold uppercase tracking-[0.2em] text-gray-400">Brand Info</span>
                             </div>
                         </div>
                     </div>
@@ -450,20 +621,28 @@
                             <!-- Mobile Header -->
                             <div class="md:hidden flex items-center gap-3 mb-6 py-2 border-b border-black/5">
                                 <i data-lucide="info" class="h-5 w-5 text-orange-600"></i>
-                                <span class="text-sm font-black uppercase tracking-widest text-gray-400">Description</span>
+                                <span class="text-sm font-bold uppercase tracking-widest text-gray-400">Description</span>
                             </div>
                             
-                            <p class="text-base sm:text-lg leading-relaxed text-gray-600 font-medium">
-                                {{ $product['long_description'] }}
-                            </p>
+                            <div class="relative">
+                                <p id="long-description-text" class="text-base sm:text-lg leading-relaxed text-gray-600 font-medium line-clamp-6 transition-all duration-500">
+                                    {{ $product['long_description'] }}
+                                </p>
+                                <button type="button" 
+                                        id="long-desc-read-more"
+                                        onclick="toggleLongDescription()"
+                                        class="mt-4 text-xs font-bold text-[color:var(--primary)] hover:underline underline-offset-4 uppercase tracking-widest hidden">
+                                    Read More
+                                </button>
+                            </div>
                             <div class="mt-8 space-y-4">
                                 <div class="flex items-center gap-3">
                                     <div class="h-2 w-2 rounded-full bg-orange-400"></div>
-                                    <span class="text-xs font-black uppercase tracking-widest text-gray-500">Clinically Formulated</span>
+                                    <span class="text-xs font-semibold uppercase tracking-widest text-gray-500">Clinically Formulated</span>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <div class="h-2 w-2 rounded-full bg-orange-400"></div>
-                                    <span class="text-xs font-black uppercase tracking-widest text-gray-500">100% Vegan & Clean</span>
+                                    <span class="text-xs font-semibold uppercase tracking-widest text-gray-500">100% Vegan & Clean</span>
                                 </div>
                             </div>
                         </div>
@@ -473,14 +652,14 @@
                             <!-- Mobile Header -->
                             <div class="md:hidden flex items-center gap-3 mb-6 py-2 border-b border-black/5">
                                 <i data-lucide="clipboard-list" class="h-5 w-5 text-blue-600"></i>
-                                <span class="text-sm font-black uppercase tracking-widest text-gray-400">Specifications</span>
+                                <span class="text-sm font-bold uppercase tracking-widest text-gray-400">Specifications</span>
                             </div>
 
                             <div class="space-y-6">
                                 @foreach($product['specs'] as $label => $value)
                                     <div class="flex items-center justify-between border-b border-black/5 pb-4 last:border-0">
-                                        <span class="text-xs font-black uppercase tracking-widest text-gray-400">{{ $label }}</span>
-                                        <span class="text-base font-black text-gray-800">{{ $value }}</span>
+                                        <span class="text-xs font-bold uppercase tracking-widest text-gray-400">{{ $label }}</span>
+                                        <span class="text-base font-semibold text-gray-800">{{ $value }}</span>
                                     </div>
                                 @endforeach
                             </div>
@@ -491,22 +670,22 @@
                             <!-- Mobile Header -->
                             <div class="md:hidden flex items-center gap-3 mb-6 py-2 border-b border-black/5">
                                 <i data-lucide="building-2" class="h-5 w-5 text-emerald-600"></i>
-                                <span class="text-sm font-black uppercase tracking-widest text-gray-400">Brand Info</span>
+                                <span class="text-sm font-bold uppercase tracking-widest text-gray-400">Brand Info</span>
                             </div>
 
                             <div class="space-y-8">
                                 <div>
-                                    <span class="text-xs font-black uppercase tracking-widest text-gray-400">Marketed By</span>
-                                    <p class="mt-2 text-lg font-black text-gray-800">Remenant Health Private Limited</p>
+                                    <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Marketed By</span>
+                                    <p class="mt-2 text-lg font-semibold text-gray-800">Remenant Health Private Limited</p>
                                     <p class="text-sm font-bold text-gray-500">BKC, Mumbai - 400051</p>
                                 </div>
                                 <div class="pt-6 border-t border-black/5">
-                                    <span class="text-xs font-black uppercase tracking-widest text-gray-400">Customer Support</span>
-                                    <p class="mt-2 text-lg font-black text-orange-600">care@remenanthealth.com</p>
+                                    <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Customer Support</span>
+                                    <p class="mt-2 text-lg font-semibold text-orange-600">care@remenanthealth.com</p>
                                 </div>
                                 <div class="inline-flex items-center gap-3 rounded-xl bg-emerald-50 px-5 py-2.5 ring-1 ring-emerald-500/10">
                                     <i data-lucide="shield-check" class="h-5 w-5 text-emerald-600"></i>
-                                    <span class="text-xs font-black uppercase tracking-widest text-emerald-700">FSSAI Certified</span>
+                                    <span class="text-xs font-semibold uppercase tracking-widest text-emerald-700">FSSAI Certified</span>
                                 </div>
                             </div>
                         </div>
@@ -516,87 +695,73 @@
             </div>
         </section>
 
-
-            {{-- product Highlights --}}
-        <!-- Polished Experience Excellence Card -->
-        <section class="pt-12 pb-6 sm:pt-28 sm:pb-12 bg-white border-t border-black/5">
+        <!-- Product-Specific Highlights Section -->
+        <section class="py-12 sm:py-20 bg-[#FAFAFA] border-t border-black/5">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-                <div class="relative rounded-[2.5rem] sm:rounded-[4rem] bg-[var(--bg-sage)] p-6 sm:p-10 lg:p-24 overflow-hidden shadow-2xl shadow-[var(--bg-sage)]/10">
-                    <!-- Premium Background Accents -->
-                    <div class="absolute top-0 right-0 h-full w-1/3 bg-white/5 -skew-x-12 translate-x-20"></div>
-                    <div class="absolute -top-32 -left-32 h-64 w-64 rounded-full bg-white/20 blur-[120px]"></div>
-                    
-                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:items-center">
-                        <!-- Column 1: Editorial Heading -->
-                        <div class="lg:col-span-5">
-                            <h2 class="text-5xl sm:text-7xl font-bold tracking-tighter text-[color:var(--text-primary)] leading-[0.9] mb-6">
-                                Experience <br> <span class="text-white">Excellence</span>
-                            </h2>
-                            <div class="h-1.5 w-16 bg-[var(--primary)] rounded-full mb-8 sm:mb-10"></div>
-                            <p class="text-xl text-[color:var(--text-primary)]/80 leading-relaxed max-w-md font-medium">Advanced effervescent technology designed to seamlessly integrate into your modern lifestyle.</p>
-                        </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-24">
 
-                        <!-- Column 2 & 3: Content Grid -->
-                        <div class="lg:col-span-7">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-16 lg:gap-20">
-                                <!-- Highlights Column -->
-                                <div class="space-y-12">
-                                    <div class="flex gap-6 group">
-                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-[color:var(--primary)] backdrop-blur-sm border border-white/20 transition-transform group-hover:scale-110">
-                                            <i data-lucide="zap" class="h-5 w-5"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-sm font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">Maximum Absorption</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 leading-relaxed font-medium">100% Bioavailable Formula for rapid action.</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-6 group">
-                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-emerald-600 backdrop-blur-sm border border-white/20 transition-transform group-hover:scale-110">
-                                            <i data-lucide="leaf" class="h-5 w-5"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-sm font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">Pure Ingredients</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 leading-relaxed font-medium">Clean Label Certified with no additives.</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-6 group">
-                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-rose-600 backdrop-blur-sm border border-white/20 transition-transform group-hover:scale-110">
-                                            <i data-lucide="ban" class="h-5 w-5"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-sm font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">Zero Compromise</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 leading-relaxed font-medium">No Sugar & No Artificial Colors used.</p>
-                                        </div>
-                                    </div>
+                    <!-- Left: Label Column -->
+                    <div class="lg:col-span-2 lg:sticky lg:top-28 lg:self-start">
+                        <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-[color:var(--primary)]">What It Does</span>
+                        <h2 class="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--text-primary)] leading-snug">
+                            Key Benefits of<br>{{ $product['title'] }}
+                        </h2>
+                        <p class="mt-4 text-sm text-gray-500 font-medium leading-relaxed max-w-xs">
+                            {{ $product['description'] }}
+                        </p>
+                    </div>
+
+                    <!-- Right: Benefits List -->
+                    <div class="lg:col-span-3 divide-y divide-black/[0.06]">
+                        @foreach($product['benefits'] as $index => $benefit)
+                            <div class="flex items-start gap-8 py-8 first:pt-0 last:pb-0">
+                                <div class="shrink-0 w-10 text-right">
+                                    <span class="text-base font-bold text-gray-300 tabular-nums">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
                                 </div>
-
-                                <!-- Ritual Column (Timeline) -->
-                                <div class="relative pl-8">
-                                    <div class="absolute left-0 top-2 bottom-2 w-px bg-white/20"></div>
-                                    <div class="space-y-12">
-                                        <div class="relative group/step">
-                                            <div class="absolute -left-10 top-0 h-4 w-4 rounded-full bg-[var(--primary)] border-4 border-[var(--bg-sage)] z-10 transition-transform group-hover/step:scale-125"></div>
-                                            <h4 class="text-xs font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">01. Drop it</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 font-medium">Dissolve one tablet in 200ml water.</p>
-                                        </div>
-                                        <div class="relative group/step">
-                                            <div class="absolute -left-10 top-0 h-4 w-4 rounded-full bg-white/40 border-4 border-[var(--bg-sage)] z-10 transition-transform group-hover/step:scale-125 group-hover/step:bg-white"></div>
-                                            <h4 class="text-xs font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">02. Fizz it</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 font-medium">Watch the pure formulation dissolve.</p>
-                                        </div>
-                                        <div class="relative group/step">
-                                            <div class="absolute -left-10 top-0 h-4 w-4 rounded-full bg-white/40 border-4 border-[var(--bg-sage)] z-10 transition-transform group-hover/step:scale-125 group-hover/step:bg-white"></div>
-                                            <h4 class="text-xs font-black uppercase tracking-widest mb-2 text-[color:var(--text-primary)]">03. Fuel Up</h4>
-                                            <p class="text-xs text-[color:var(--text-primary)]/70 font-medium">Drink and take on your day.</p>
-                                        </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <i data-lucide="{{ $benefit['icon'] }}" class="h-6 w-6 text-[color:var(--primary)] shrink-0"></i>
+                                        <h3 class="text-base font-bold text-[color:var(--text-primary)]">{{ $benefit['title'] }}</h3>
                                     </div>
+                                    <p class="text-sm text-gray-500 font-medium leading-relaxed">{{ $benefit['desc'] }}</p>
                                 </div>
                             </div>
-                        </div>
+                        @endforeach
                     </div>
+
                 </div>
             </div>
         </section>
+
+
+
+
+        <!-- Brand Text Marquee Section -->
+        <section class="bg-[#E5E9E0] py-5 overflow-hidden border-y border-black/5">
+            <div class="marquee marquee--slow select-none">
+                <div class="marquee__track gap-12 sm:gap-20">
+                    @php
+                        $brandPoints = [
+                            'MADE IN INDIA',
+                            'GMO FREE',
+                            'GLUTEN FREE',
+                            'NON-TOXIC',
+                            'LAB VERIFIED',
+                            'HIGH ABSORPTION'
+                        ];
+                    @endphp
+                    @foreach(range(1, 6) as $i)
+                        @foreach ($brandPoints as $point)
+                            <div class="flex items-center gap-12 sm:gap-20">
+                                <span class="text-sm sm:text-base font-black tracking-[0.2em] text-[#074D3D] whitespace-nowrap">{{ $point }}</span>
+                                <div class="h-2 w-2 rounded-full bg-[#FF6B00] shrink-0"></div>
+                            </div>
+                        @endforeach
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
 
         <!-- Reviews Section -->
         <section id="reviews" class="pt-6 pb-12 sm:pt-12 sm:pb-24 bg-[var(--bg-main)] scroll-mt-24">
@@ -611,7 +776,7 @@
                                 <div class="flex flex-col gap-1 pb-1">
                                     <div class="flex text-orange-400">
                                         @for($i = 0; $i < 5; $i++)
-                                            <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+                                            <i data-lucide="star" class="h-5 w-5 text-[color:var(--primary)] fill-[color:var(--primary)]"></i>
                                         @endfor
                                     </div>
                                     <span class="text-sm font-medium text-[color:var(--text-secondary)]">Based on {{ number_format($product['reviews']) }} reviews</span>
@@ -632,9 +797,9 @@
                                 @foreach($ratings as $r)
                                     <div class="flex items-center gap-4">
                                         <span class="w-4 text-xs font-semibold text-[color:var(--text-secondary)]">{{ $r['stars'] }}</span>
-                                        <i data-lucide="star" class="h-3 w-3 text-orange-400 fill-current"></i>
+                                        <i data-lucide="star" class="h-3 w-3 text-[color:var(--primary)] fill-current"></i>
                                         <div class="flex-1 h-1.5 rounded-full bg-black/5 overflow-hidden">
-                                            <div class="h-full bg-orange-400 rounded-full" style="width: {{ ($r['count'] / 982) * 100 }}%"></div>
+                                            <div class="h-full bg-[color:var(--primary)] rounded-full" style="width: {{ ($r['count'] / 982) * 100 }}%"></div>
                                         </div>
                                         <span class="w-12 text-xs font-medium text-[color:var(--text-muted)] text-right">{{ $r['count'] }}</span>
                                     </div>
@@ -766,69 +931,107 @@
             </div>
         </section>
 
-        <!-- Related Products -->
-        <section class="pt-20 pb-32 border-t border-black/5">
-            <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-                <div class="flex items-end justify-between mb-12">
+        <!-- More Products Section -->
+        <section class="py-20 bg-white border-t border-black/5">
+            <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-12">
                     <div>
-                        <h2 class="text-3xl font-bold tracking-tight text-[color:var(--text-primary)]">You may also like</h2>
-                        <p class="mt-2 text-[color:var(--text-secondary)] font-semibold">Complete your wellness routine.</p>
+                        <h2 class="section-heading !text-left">Recommended for you</h2>
+                        <p class="mt-2 text-[color:var(--text-secondary)] font-medium">Discover more premium wellness essentials.</p>
                     </div>
-                    <a href="{{ route('products.index') }}" class="hidden sm:inline-flex rounded-full bg-orange-50 text-[color:var(--primary)] px-8 py-3 text-xs font-black uppercase tracking-widest hover:bg-orange-100 transition ring-1 ring-orange-100">View All Collections</a>
+                    <a href="{{ route('products.index') }}" class="inline-flex rounded-full bg-orange-50 text-[color:var(--primary)] px-8 py-3 text-xs font-black uppercase tracking-widest hover:bg-orange-100 transition ring-1 ring-orange-100">View All</a>
                 </div>
 
-                <div class="related-carousel owl-carousel owl-theme" style="padding: 8px 0;">
+                <div class="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 sm:gap-8 pb-8 lg:pb-0 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
                     @foreach ($relatedProducts as $rp)
                         @php
                             $discount = (int) round((1 - ($rp['price'] / max(1, $rp['mrp']))) * 100);
                         @endphp
-                        <div class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
-                            <a href="{{ route('products.show', $rp['slug']) }}" class="absolute inset-0 z-[5]"></a>
-                            <button type="button"
-                                class="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 ring-1 ring-black/10 hover:bg-white transition"
-                                aria-label="Add to wishlist">
-                                <i data-lucide="heart" class="h-5 w-5 text-[color:var(--text-primary)]"></i>
-                            </button>
-
+                        <div class="group relative flex flex-col shrink-0 w-[280px] sm:w-auto bg-white rounded-[2rem] border border-black/5 overflow-hidden snap-start">
+                            {{-- Image Container --}}
                             <div class="relative aspect-square overflow-hidden bg-[var(--bg-section)]">
+                                <a href="{{ route('products.show', $rp['slug']) }}" class="absolute inset-0 z-10"></a>
                                 <img src="{{ asset('images/products/' . $rp['image']) }}" alt="{{ $rp['title'] }}"
                                     class="h-full w-full object-contain" loading="lazy">
+                                
+                                {{-- Badges --}}
                                 @if($discount > 0)
-                                <div class="absolute left-3 top-3 rounded-full bg-[var(--primary)] px-3 py-1 text-xs font-extrabold text-white">
-                                    -{{ $discount }}%
-                                </div>
+                                    <div class="absolute left-3 top-3 z-20 rounded-full bg-[var(--primary)] px-3 py-1.5 text-[10px] font-black text-white uppercase tracking-wider">
+                                        -{{ $discount }}%
+                                    </div>
                                 @endif
+                                
+                                <button type="button" class="absolute right-3 top-3 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white/90 ring-1 ring-black/5 text-gray-900 transition-transform active:scale-90 hover:scale-110">
+                                    <i data-lucide="heart" class="h-5 w-5"></i>
+                                </button>
                             </div>
 
-                            <div class="flex flex-1 flex-col p-4">
-                                <p class="text-xs font-bold tracking-wide text-[color:var(--primary)] uppercase">
+                            {{-- Content --}}
+                            <div class="flex flex-1 flex-col p-4 sm:p-5">
+                                <p class="text-[10px] sm:text-xs font-bold tracking-wider text-[color:var(--primary)] uppercase">
                                     {{ $rp['tagline'] }}
                                 </p>
-                                <h3 class="mt-1 text-[color:var(--text-primary)] line-clamp-2 min-h-[2.5rem]">{{ $rp['title'] }}</h3>
+                                <h3 class="mt-1 text-base sm:text-lg font-bold text-[color:var(--text-primary)] leading-tight line-clamp-2 min-h-[2.5rem]">
+                                    {{ $rp['title'] }}
+                                </h3>
 
-                                <div class="mt-3 flex items-center justify-between gap-3">
+                                <div class="mt-4 flex items-center justify-between gap-3">
                                     <div class="flex items-baseline gap-2">
-                                        <p class="text-lg font-bold text-[color:var(--primary)]">
-                                            ₹{{ number_format($rp['price']) }}</p>
+                                        <span class="text-xl font-bold text-[color:var(--primary)]">₹{{ number_format($rp['price']) }}</span>
                                         @if($rp['mrp'] > $rp['price'])
-                                        <p class="text-xs font-medium text-[color:var(--text-muted)] line-through">
-                                            ₹{{ number_format($rp['mrp']) }}</p>
+                                            <span class="text-xs font-medium text-[color:var(--text-muted)] line-through">₹{{ number_format($rp['mrp']) }}</span>
                                         @endif
                                     </div>
-                                    <div class="flex items-center gap-1 rounded-full bg-black/5 px-2 py-1 text-xs font-semibold text-[color:var(--text-secondary)]">
-                                        <i data-lucide="star" class="h-4 w-4 fill-yellow-400 text-yellow-400"></i>
-                                        {{ number_format($rp['rating'], 1) }} ({{ number_format($rp['reviews'] ?? 0) }})
+                                    <div class="flex items-center gap-1 rounded-full bg-black/5 px-2 py-1 text-[10px] font-semibold text-[color:var(--text-secondary)]">
+                                        <i data-lucide="star" class="h-3.5 w-3.5 fill-[color:var(--primary)] text-[color:var(--primary)]"></i>
+                                        <span>{{ number_format($rp['rating'], 1) }}</span>
+                                        <span>({{ number_format($rp['reviews'] ?? 0) }})</span>
                                     </div>
                                 </div>
 
-                                <div class="mt-auto pt-3 relative z-10">
-                                    <a href="{{ route('products.show', $rp['slug']) }}"
-                                        class="block w-full text-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
+                                <div class="mt-auto pt-4 relative z-10">
+                                    <a href="{{ route('products.show', $rp['slug']) }}" class="block w-full text-center rounded-full bg-[var(--primary)] px-4 py-2.5 text-sm font-extrabold text-white hover:opacity-95 transition">
                                         Add to cart
                                     </a>
                                 </div>
                             </div>
                         </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        <!-- Trust & Certifications Section -->
+
+        <section class="bg-[#F5F8F7] py-8 sm:py-12 border-y border-black/5 overflow-hidden">
+            <div class="marquee select-none">
+                <div class="marquee__track gap-12 sm:gap-24 px-12">
+                    @php
+                        $certs = [
+                            ['id' => 'iso', 'name' => 'ISO Certified', 'desc' => 'Quality Management'],
+                            ['id' => 'haccp', 'name' => 'HACCP', 'desc' => 'Food Safety'],
+                            ['id' => 'gmp', 'name' => 'GMP Consistent', 'desc' => 'Manufacturing Practice'],
+                            ['id' => 'fda', 'name' => 'FDA Registered', 'desc' => 'Facility Standard'],
+                            ['id' => 'kosher', 'name' => 'Kosher', 'desc' => 'Certified Quality'],
+                        ];
+                    @endphp
+
+                    {{-- Multi-duplication for ultra-smooth infinite scroll --}}
+                    @foreach(range(1, 4) as $iteration)
+                        @foreach ($certs as $cert)
+                            <div class="flex flex-col items-center shrink-0 w-[180px]">
+                                <div class="mb-4 flex h-20 w-20 items-center justify-center transition-transform hover:scale-110">
+                                    <img src="{{ asset('images/icons/' . $cert['id'] . '.png') }}" alt="{{ $cert['name'] }}"
+                                        class="h-full w-full object-contain">
+                                </div>
+                                <h3 class="text-sm font-bold uppercase tracking-widest text-[color:var(--text-primary)] text-center">
+                                    {{ $cert['name'] }}
+                                </h3>
+                                <p class="mt-1 text-[10px] font-semibold text-[color:var(--text-secondary)] uppercase text-center whitespace-normal">
+                                    {{ $cert['desc'] }}
+                                </p>
+                            </div>
+                        @endforeach
                     @endforeach
                 </div>
             </div>
@@ -926,7 +1129,7 @@
                                 <label class="text-sm font-medium text-gray-700 mb-2 block">Your Rating</label>
                                 <div class="flex items-center gap-1" id="review-star-rating">
                                     @for($i = 1; $i <= 5; $i++)
-                                        <button type="button" data-star="{{ $i }}" onclick="setReviewRating({{ $i }})" class="review-star p-0.5 text-gray-300 hover:text-orange-400 transition-colors duration-150">
+                                        <button type="button" data-star="{{ $i }}" onclick="setReviewRating({{ $i }})" class="review-star p-0.5 text-gray-300 hover:text-[color:var(--primary)] transition-colors duration-150">
                                             <i data-lucide="star" class="h-7 w-7"></i>
                                         </button>
                                     @endfor
@@ -986,10 +1189,18 @@
         #lightbox-current, #lightbox-total { display: none !important; }
         .lightbox-nav-btn { z-index: 120 !important; }
 
-        /* Allow related carousel cards to show fully */
-        .related-carousel .owl-stage-outer { overflow: visible !important; }
-        .related-carousel { overflow: hidden; }
+        /* Remove any possible blue focus ring from coupon input */
+        #coupon-input, #coupon-input:focus, #coupon-input:active {
+            outline: none !important;
+            box-shadow: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
 
+
+        
+        .marquee--slow .marquee__track {
+            animation: marquee-scroll 60s linear infinite !important;
+        }
         /* Review modal: strip all focus outlines */
         #review-modal input:focus,
         #review-modal textarea:focus {
@@ -1353,19 +1564,7 @@
                 if (e.key === "ArrowLeft") $lightbox.trigger("prev.owl.carousel");
             });
 
-            $(".related-carousel").owlCarousel({
-                items: 1,
-                margin: 16,
-                loop: false,
-                autoplay: false,
-                nav: false,
-                dots: false,
-                responsive: {
-                    0: { items: 1.2, stagePadding: 20 },
-                    640: { items: 2 },
-                    1024: { items: 4 }
-                }
-            });
+
 
             updateGalleryNavState(0);
             updateLightboxNavState(0);
@@ -1390,7 +1589,7 @@
             $('#review-content').val('');
             $('#review-image-previews').empty().addClass('hidden');
             $('#rating-label').text('Select a rating').removeClass('text-orange-500');
-            $('.review-star').removeClass('active text-orange-400').addClass('text-gray-300');
+            $('.review-star').removeClass('active text-[color:var(--primary)]').addClass('text-gray-300');
             // Lock background scroll (works on iOS Safari too)
             reviewModalScrollY = window.scrollY || window.pageYOffset || 0;
             $('body').css({
