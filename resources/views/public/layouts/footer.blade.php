@@ -37,14 +37,18 @@
                 <h3 class="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">Catalog
                 </h3>
                 <ul class="mt-6 space-y-3 text-sm font-medium">
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Best
-                            Sellers</a></li>
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Combo
-                            Offers</a></li>
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Immunity
+                    <li><a href="{{ route('products.index', ['sort' => 'best-selling']) }}"
+                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">Best Sellers</a>
+                    </li>
+                    <li><a href="{{ route('products.index', ['category' => 'Combo Offers']) }}"
+                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">Combo Offers</a>
+                    </li>
+                    <li><a href="{{ route('products.index', ['category' => 'Immunity']) }}"
+                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">Immunity
                             Boosters</a></li>
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Beauty
-                            Formulas</a></li>
+                    <li><a href="{{ route('products.index', ['category' => 'Beauty & Skin']) }}"
+                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">Beauty Formulas</a>
+                    </li>
                 </ul>
             </div>
 
@@ -54,11 +58,14 @@
                 <ul class="mt-6 space-y-3 text-sm font-medium">
                     <li><a href="{{ route('about') }}"
                             class="text-[color:var(--text-primary)]/70 hover:text-black transition">About Us</a></li>
-                    <li><a href="#"
-                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">Sustainability</a>
+                    <li><a href="{{ route('about') }}#philosophy"
+                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">Our Philosophy</a>
                     </li>
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Why
-                            Effervescent?</a></li>
+                    <li><a href="{{ route('about') }}#process"
+                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">The Process</a></li>
+                    <li><a href="{{ route('about') }}#founders"
+                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">Our Founders</a>
+                    </li>
                     <li><a href="{{ route('contact') }}"
                             class="text-[color:var(--text-primary)]/70 hover:text-black transition">Contact
                             Us</a></li>
@@ -69,15 +76,14 @@
                 <h3 class="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">
                     Assistance</h3>
                 <ul class="mt-6 space-y-3 text-sm font-medium">
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Track
-                            Order</a></li>
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Shipping
-                            Guide</a></li>
                     <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Refund
                             Policy</a></li>
-                    <li><a href="{{ route('contact') }}"
-                            class="text-[color:var(--text-primary)]/70 hover:text-black transition">Help
-                            Center</a></li>
+                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Shipping
+                            Guide</a></li>
+                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Privacy
+                            Policy</a></li>
+                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Terms &
+                            Conditions</a></li>
                 </ul>
             </div>
 
@@ -143,14 +149,9 @@
         <div
             class="mt-12 border-t border-black/5 pt-8 flex flex-col items-center gap-6 sm:flex-row sm:justify-between text-[11px] sm:text-xs font-medium !text-black">
             <div class="flex flex-col items-center gap-4 sm:flex-row sm:gap-8 text-center sm:text-left">
-                <p class="font-semibold !text-black">&copy; {{ date('Y') }} Remenant Health. All rights reserved.</p>
                 <div class="flex items-center gap-6">
-                    <a href="#"
-                        class="hover:text-black transition border-b border-transparent hover:border-black/20 pb-0.5">Privacy</a>
-                    <a href="#"
-                        class="hover:text-black transition border-b border-transparent hover:border-black/20 pb-0.5">Terms</a>
-                    <a href="#"
-                        class="hover:text-black transition border-b border-transparent hover:border-black/20 pb-0.5">Cookies</a>
+                    <p class="font-semibold !text-black">&copy; {{ date('Y') }} Remenant Health. All rights reserved.
+                    </p>
                 </div>
             </div>
             <div

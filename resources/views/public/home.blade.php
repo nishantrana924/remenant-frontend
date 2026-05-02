@@ -181,7 +181,7 @@
                             <p class="text-xs font-bold tracking-wide text-[color:var(--primary)] uppercase">
                                 {{ $product['tagline'] }}
                             </p>
-                            <h3 class="mt-1 text-[color:var(--text-primary)]">{{ $product['title'] }}</h3>
+                            <h3 class="mt-1 text-[color:var(--text-primary)] truncate">{{ $product['title'] }}</h3>
 
                             <div class="mt-3 flex items-center justify-between gap-3">
                                 <div class="flex items-baseline gap-2">
@@ -262,7 +262,7 @@
                                         </div>
                                     </div>
 
-                                    <h3 class="text-base sm:text-lg font-semibold text-[color:var(--text-primary)] leading-tight group-hover:text-[color:var(--primary)] transition-colors">
+                                    <h3 class="text-base sm:text-lg font-semibold text-[color:var(--text-primary)] leading-tight group-hover:text-[color:var(--primary)] transition-colors truncate">
                                         {{ $combo['title'] }}
                                     </h3>
                                     

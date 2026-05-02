@@ -62,13 +62,13 @@
                                 <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Categories</h3>
                                 <div class="space-y-3">
                                     @php
-                                        $categories = ['All Products', 'Immunity', 'Beauty & Skin', 'Metabolism', 'Daily Energy', 'Weight Care'];
+                                        $categories = ['All Products', 'Immunity', 'Beauty & Skin', 'Metabolism', 'Daily Energy', 'Weight Care', 'Combo Offers'];
                                     @endphp
                                     @foreach($categories as $cat)
                                         <label class="group flex items-center gap-3 cursor-pointer">
                                             <input type="checkbox" 
-                                                   class="h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
-                                                   {{ $loop->first ? 'checked' : '' }}>
+                                                   data-category="{{ $cat }}"
+                                                   class="category-filter-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
                                             <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">{{ $cat }}</span>
                                         </label>
                                     @endforeach
@@ -134,11 +134,11 @@
                         <div class="hidden lg:flex items-center gap-4">
                             <span class="text-xs font-bold uppercase tracking-widest text-[color:var(--text-muted)]">Sort By:</span>
                             <div class="relative">
-                                <select class="appearance-none rounded-2xl bg-white px-6 py-3 pr-12 text-sm font-semibold uppercase tracking-widest outline-none ring-1 ring-black/5 shadow-sm hover:bg-gray-50 transition">
-                                    <option>Best Selling</option>
-                                    <option>Price: Low to High</option>
-                                    <option>Price: High to Low</option>
-                                    <option>Newest First</option>
+                                <select id="sort-select" class="appearance-none rounded-2xl bg-white px-6 py-3 pr-12 text-sm font-semibold uppercase tracking-widest outline-none ring-1 ring-black/5 shadow-sm hover:bg-gray-50 transition">
+                                    <option value="best-selling">Best Selling</option>
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
+                                    <option value="newest">Newest First</option>
                                 </select>
                                 <i data-lucide="chevron-down" class="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
                             </div>
@@ -152,7 +152,7 @@
                                 $discount = (int) round((1 - ($product['price'] / max(1, $product['mrp']))) * 100);
                             @endphp
                             <div
-                                class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
+                                class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5">
                                 <a href="{{ route('products.show', $product['slug']) }}" class="absolute inset-0 z-[5]"></a>
                                 <button type="button"
                                     class="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 ring-1 ring-black/10 hover:bg-white transition"
@@ -172,7 +172,7 @@
                                 <div class="flex flex-1 flex-col p-4">
                                     <p class="text-xs font-bold tracking-wide text-[color:var(--primary)] uppercase">
                                         {{ $product['tagline'] }}</p>
-                                    <h3 class="mt-1 text-[color:var(--text-primary)] font-semibold">
+                                    <h3 class="mt-1 text-[color:var(--text-primary)] font-semibold truncate">
                                         {{ $product['title'] }}</h3>
 
                                     <div class="mt-3 flex items-center justify-between gap-3">
@@ -236,4 +236,38 @@
             </div>
         </section>
     </div>
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryParam = urlParams.get('category');
+            const sortParam = urlParams.get('sort');
+
+            // Handle Category Filter
+            if (categoryParam) {
+                const checkboxes = document.querySelectorAll('.category-filter-checkbox');
+                checkboxes.forEach(cb => {
+                    if (cb.dataset.category.toLowerCase() === categoryParam.toLowerCase()) {
+                        cb.checked = true;
+                        // You might want to trigger a filter function here if you have one
+                    } else {
+                        cb.checked = false;
+                    }
+                });
+            } else {
+                // If no category, check 'All Products'
+                const allCb = document.querySelector('[data-category="All Products"]');
+                if (allCb) allCb.checked = true;
+            }
+
+            // Handle Sort
+            if (sortParam) {
+                const sortSelect = document.getElementById('sort-select');
+                if (sortSelect) {
+                    sortSelect.value = sortParam;
+                }
+            }
+        });
+    </script>
+    @endpush
 @endsection

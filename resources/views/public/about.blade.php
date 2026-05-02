@@ -6,7 +6,7 @@
 
 
     <!-- about section  -->
-    <section class="relative overflow-hidden bg-[var(--bg-main)] py-6 lg:py-10">
+    <section id="philosophy" class="relative overflow-hidden bg-[var(--bg-main)] py-6 lg:py-10">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
                 <div class="relative z-10">
@@ -97,20 +97,20 @@
                         <img src="{{ asset('images/banners/remenant-mission.jpg') }}" alt="Our Mission" class="h-full w-full object-cover transition duration-1000 group-hover:scale-105">
                     </div>
                 </div>
-                <div class="w-full lg:w-[45%] lg:-mr-24 relative z-10 p-6 sm:p-10 lg:p-16 rounded-[3rem] bg-[var(--bg-sage)] text-[color:var(--text-primary)] shadow-2xl">
-                    <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-[var(--primary)] mb-6">
-                        <span class="h-px w-8 bg-[var(--primary)]"></span>
+                <div class="w-full lg:w-[45%] lg:-mr-24 relative z-10 p-6 sm:p-10 lg:p-16 rounded-[3rem] bg-[var(--primary)] text-white shadow-2xl">
+                    <span class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-white/90 mb-6">
+                        <span class="h-px w-8 bg-white"></span>
                         Our Mission
                     </span>
-                    <h2 class="section-heading text-left">Engineering <br> Daily Excellence</h2>
-                    <p class="mt-8 text-base leading-relaxed text-[color:var(--text-primary)]/80 font-medium">We are on a mission to simplify health by combining medical precision with engineering brilliance. We create supplements that are not just effective, but a joy to consume every single day.</p>
+                    <h2 class="section-heading text-left !text-white">Engineering <br> Daily Excellence</h2>
+                    <p class="mt-8 text-base leading-relaxed text-white/90 font-medium">We are on a mission to simplify health by combining medical precision with engineering brilliance. We create supplements that are not just effective, but a joy to consume every single day.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- The REMENANT Process -->
-    <section class="py-24 bg-[#F0F4F3] border-y border-black/5">
+    <section id="process" class="py-24 bg-[#F0F4F3] border-y border-black/5">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="text-center mb-20">
                 <span class="text-xs font-black uppercase tracking-[0.3em] text-[color:var(--primary)]">How It's
@@ -151,7 +151,7 @@
     </section>
 
     <!-- Meet the Founders: Clean Simple UI -->
-    <section class="bg-[var(--bg-main)] py-16 lg:py-24">
+    <section id="founders" class="bg-[var(--bg-main)] py-16 lg:py-24">
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
             <div class="text-center mb-16">
                 <span class="text-xs font-black uppercase tracking-[0.3em] text-[color:var(--primary)]">The People Behind the Standard</span>

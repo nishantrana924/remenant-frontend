@@ -971,7 +971,7 @@
                                 <p class="text-[10px] sm:text-xs font-bold tracking-wider text-[color:var(--primary)] uppercase">
                                     {{ $rp['tagline'] }}
                                 </p>
-                                <h3 class="mt-1 text-base sm:text-lg font-bold text-[color:var(--text-primary)] leading-tight line-clamp-2 min-h-[2.5rem]">
+                                <h3 class="mt-1 text-base sm:text-lg font-bold text-[color:var(--text-primary)] leading-tight truncate">
                                     {{ $rp['title'] }}
                                 </h3>
 
