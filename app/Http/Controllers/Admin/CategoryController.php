@@ -13,15 +13,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $categories = Category::latest()->get();
+        return view('admin.categories.index', compact('categories'));
     }
 
     /**
@@ -29,31 +22,36 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name'
+        ]);
+
+        Category::create([
+            'name' => $request->name,
+            'slug' => \Illuminate\Support\Str::slug($request->name)
+        ]);
+
+        return redirect()->route('admin.categories.index')->with('success', 'Category created successfully.');
     }
 
     /**
-     * Display the specified resource.
+     * Quick add a category via AJAX.
      */
-    public function show(Category $category)
+    public function quickAdd(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name'
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
-    {
-        //
-    }
+        $category = Category::create([
+            'name' => $request->name,
+            'slug' => \Illuminate\Support\Str::slug($request->name)
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $category)
-    {
-        //
+        return response()->json([
+            'success' => true,
+            'category' => $category
+        ]);
     }
 
     /**
@@ -61,6 +59,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        $category->delete();
+        return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully.');
     }
 }

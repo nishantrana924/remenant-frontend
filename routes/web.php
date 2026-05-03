@@ -50,6 +50,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
     
     // Core Modules
+    Route::post('categories/quick-add', [\App\Http\Controllers\Admin\CategoryController::class, 'quickAdd'])->name('categories.quick-add');
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
     Route::resource('sliders', \App\Http\Controllers\Admin\SliderController::class);
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);

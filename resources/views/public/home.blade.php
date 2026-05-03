@@ -158,11 +158,13 @@
                 @forelse ($featuredProducts ?? $products ?? [] as $product)
                     @php
                         $discount = (int) round((1 - ($product->price / max(1, $product->mrp))) * 100);
-                        $imagePath = $product->image ? asset('storage/' . $product->image) : asset('images/products/placeholder.jpg');
+                        $imagePath = $product->image 
+                            ? (Str::startsWith($product->image, 'products/') ? asset('storage/' . $product->image) : asset('images/products/' . $product->image))
+                            : asset('images/products/placeholder.jpg');
                     @endphp
                     <div
                         class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
-                        <a href="{{ route('products.show', $product['slug']) }}" class="absolute inset-0 z-[5]"></a>
+                        <a href="{{ route('products.show', $product->slug) }}" class="absolute inset-0 z-[5]"></a>
                         <button type="button"
                             class="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 ring-1 ring-black/10 hover:bg-white transition"
                             aria-label="Add to wishlist">
@@ -181,21 +183,21 @@
 
                         <div class="flex flex-1 flex-col p-4">
                             <p class="text-xs font-bold tracking-wide text-[color:var(--primary)] uppercase">
-                                {{ $product['tagline'] }}
+                                {{ $product->tagline }}
                             </p>
-                            <h3 class="mt-1 text-[color:var(--text-primary)] truncate">{{ $product['title'] }}</h3>
+                            <h3 class="mt-1 text-[color:var(--text-primary)] truncate">{{ $product->title }}</h3>
 
                             <div class="mt-3 flex items-center justify-between gap-3">
                                 <div class="flex items-baseline gap-2">
                                     <p class="text-lg font-bold text-[color:var(--primary)]">
-                                        ₹{{ number_format($product['price']) }}</p>
+                                        ₹{{ number_format($product->price) }}</p>
                                     <p class="text-xs font-medium text-[color:var(--text-muted)] line-through">
-                                        ₹{{ number_format($product['mrp']) }}</p>
+                                        ₹{{ number_format($product->mrp) }}</p>
                                 </div>
                                 <div
                                     class="flex items-center gap-1 rounded-full bg-black/5 px-2 py-1 text-xs font-semibold text-[color:var(--text-secondary)]">
                                     <i data-lucide="star" class="h-4 w-4 fill-[color:var(--primary)] text-[color:var(--primary)]"></i>
-                                    {{ number_format($product['rating'], 1) }} ({{ number_format($product['reviews']) }})
+                                    {{ number_format($product->rating, 1) }} ({{ number_format($product->reviews) }})
                                 </div>
                             </div>
 

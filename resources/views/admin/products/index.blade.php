@@ -79,9 +79,11 @@
                                 <a href="{{ route('admin.products.edit', $item->id) }}" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-orange-500 hover:border-orange-200 transition-all">
                                     <i data-lucide="edit-3" class="w-4 h-4"></i>
                                 </a>
-                                <form action="{{ route('admin.products.destroy', $item->id) }}" method="POST" class="inline">
+                                <form id="delete-form-{{ $item->id }}" action="{{ route('admin.products.destroy', $item->id) }}" method="POST" class="inline">
                                     @csrf @method('DELETE')
-                                    <button type="submit" onclick="return confirm('Archive this product?')" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:border-rose-200 transition-all">
+                                    <button type="button" 
+                                            @click="confirmAction('Archive Product?', 'Are you sure you want to move this product to archive?', () => { fastSubmit('#delete-form-{{ $item->id }}', { success: () => { toast('Product archived successfully!'); setTimeout(() => location.reload(), 1000); } }) })"
+                                            class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:border-rose-200 transition-all">
                                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     </button>
                                 </form>

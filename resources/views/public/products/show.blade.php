@@ -7,13 +7,29 @@
     <meta name="keywords" content="{{ $product->meta_keywords }}">
     <meta property="og:title" content="{{ $product->meta_title ?: $product->title }}">
     <meta property="og:description" content="{{ $product->meta_description }}">
-    <meta property="og:image" content="{{ asset('images/products/' . $product->image) }}">
+    <meta property="og:image" content="{{ asset('storage/' . $product->image) }}">
     <meta property="og:type" content="product">
 @endsection
 
 @section('content')
     @push('styles')
+    @php
+        $themeColor = $product->theme_color ?? 'orange';
+        $isHex = str_starts_with($themeColor, '#');
+        $themes = [
+            'orange' => ['primary' => '#FF6B00', 'secondary' => '#008A48'],
+            'emerald' => ['primary' => '#10b981', 'secondary' => '#065f46'],
+            'blue' => ['primary' => '#3b82f6', 'secondary' => '#1e3a8a'],
+            'indigo' => ['primary' => '#6366f1', 'secondary' => '#312e81'],
+            'rose' => ['primary' => '#f43f5e', 'secondary' => '#881337'],
+        ];
+        $currentTheme = $isHex ? ['primary' => $themeColor, 'secondary' => $themeColor] : ($themes[$themeColor] ?? $themes['orange']);
+    @endphp
     <style>
+        :root {
+            --primary: {{ $currentTheme['primary'] }};
+            --secondary: {{ $currentTheme['secondary'] }};
+        }
         /* Prevent flicker on reload: show first slide immediately */
         .product-gallery-carousel:not(.owl-loaded) {
             display: flex;
@@ -85,7 +101,17 @@
     @endpush
     <div class="bg-[var(--bg-main)]">
         @php
-            $galleryImages = array_values(array_unique(array_merge([$product->image], $product->gallery)));
+            $gallery = $product->gallery ?? [];
+            $galleryImages = array_values(array_unique(array_merge([$product->image], $gallery)));
+            
+            // Helper to get correct asset path
+            $getImgPath = function($img) {
+                if (!$img) return asset('images/products/placeholder.jpg');
+                if (Str::startsWith($img, 'products/') || Str::startsWith($img, 'storage/')) {
+                    return asset('storage/' . str_replace('storage/', '', $img));
+                }
+                return asset('images/products/' . $img);
+            };
         @endphp
 
         <!-- Product Hero Section -->
@@ -100,7 +126,7 @@
                                 <button type="button" 
                                         data-index="{{ $index }}"
                                         class="product-other-image-thumb relative aspect-square w-20 sm:w-24 shrink-0 overflow-hidden rounded-2xl bg-white border-2 transition-colors duration-200 shadow-sm {{ $index === 0 ? 'border-[var(--primary)]' : 'border-transparent hover:border-[var(--primary)]/70' }}">
-                                    <img src="{{ asset('images/products/' . $img) }}" alt="Product other image" class="h-full w-full object-contain">
+                                    <img src="{{ $getImgPath($img) }}" alt="Product other image" class="h-full w-full object-contain">
                                 </button>
                             @endforeach
                         </div>
@@ -118,7 +144,7 @@
                             @foreach($galleryImages as $index => $img)
                                 <div class="relative aspect-square overflow-hidden cursor-zoom-in"
                                      onclick="openLightbox({{ $index }})">
-                                    <img src="{{ asset('images/products/' . $img) }}" 
+                                    <img src="{{ $getImgPath($img) }}" 
                                          width="1200"
                                          height="1200"
                                          alt="{{ $product->title }}" 
@@ -139,14 +165,14 @@
                 <!-- Right: Product Info -->
                 <div class="flex flex-col">
                     <div class="pb-4">
-                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--primary)]">{{ $product->tagline }}</p>
+                        <p class="text-xs font-bold uppercase tracking-[0.2em]" style="color: var(--primary)">{{ $product->tagline }}</p>
                         <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-[color:var(--text-primary)] sm:text-5xl lg:text-6xl leading-tight">
                             {{ $product->title }}
                         </h1>
                         
                         <div class="mt-6 flex items-start justify-between gap-3 sm:items-center sm:gap-6">
                             <a href="#reviews" class="flex items-center gap-3 sm:gap-6 group min-w-0">
-                                <div class="flex shrink-0 items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1.5 text-orange-600 group-hover:bg-orange-100 transition">
+                                <div class="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 group-hover:brightness-110 transition" style="background-color: color-mix(in srgb, var(--primary), transparent 90%); color: var(--primary)">
                                     <i data-lucide="star" class="h-5 w-5 fill-current"></i>
                                     <span class="text-sm font-black">{{ $product->rating }}</span>
                                 </div>
@@ -189,7 +215,8 @@
                                            class="w-full rounded-2xl bg-gray-50/50 border-2 border-dashed border-gray-200 px-5 py-4 text-sm font-bold text-[color:var(--text-primary)] placeholder:text-gray-300 focus:outline-none focus:border-[color:var(--primary)] transition-all uppercase tracking-widest">
                                     <button type="button" 
                                             onclick="applyCouponCode()"
-                                            class="absolute right-2 top-2 bottom-2 rounded-xl bg-[color:var(--primary)] px-6 text-[10px] font-black text-white uppercase tracking-widest shadow-lg shadow-[color:var(--primary)]/20 active:scale-95 transition-all hover:brightness-105">
+                                            class="absolute right-2 top-2 bottom-2 rounded-xl px-6 text-[10px] font-black text-white uppercase tracking-widest shadow-lg active:scale-95 transition-all hover:brightness-105"
+                                            style="background-color: var(--primary); shadow: 0 10px 20px -5px color-mix(in srgb, var(--primary), transparent 60%)">
                                         Apply
                                     </button>
                                 </div>
@@ -569,22 +596,22 @@
 
                 <!-- Main Banner Image (1200×450 aspect ratio) -->
                 <div class="w-full overflow-hidden bg-gray-50" style="aspect-ratio: 1200/450;">
-                    <img src="{{ asset('images/products/' . ($product['gallery'][0] ?? $product['image'])) }}"
-                         alt="{{ $product['title'] }} - Main"
+                    <img src="{{ $getImgPath(($product->gallery ?? [])[0] ?? $product->image) }}"
+                         alt="{{ $product->title }} - Main"
                          class="w-full h-full object-cover">
                 </div>
 
                 <!-- Two Images Side by Side -->
-                @if(count($product['gallery']) >= 3)
+                @if(count($product->gallery ?? []) >= 3)
                 <div class="mt-1 grid grid-cols-2 gap-1">
                     <div class="overflow-hidden bg-gray-50 aspect-square">
-                        <img src="{{ asset('images/products/' . $product['gallery'][1]) }}"
-                             alt="{{ $product['title'] }} - Detail 1"
+                        <img src="{{ $getImgPath($product->gallery[1] ?? null) }}"
+                             alt="{{ $product->title }} - Detail 1"
                              class="w-full h-full object-cover">
                     </div>
                     <div class="overflow-hidden bg-gray-50 aspect-square">
-                        <img src="{{ asset('images/products/' . $product['gallery'][2]) }}"
-                             alt="{{ $product['title'] }} - Detail 2"
+                        <img src="{{ $getImgPath($product->gallery[2] ?? null) }}"
+                             alt="{{ $product->title }} - Detail 2"
                              class="w-full h-full object-cover">
                     </div>
                 </div>
@@ -664,12 +691,18 @@
                             </div>
 
                             <div class="space-y-6">
-                                @foreach($product->specs as $label => $value)
-                                    <div class="flex items-center justify-between border-b border-black/5 pb-4 last:border-0">
-                                        <span class="text-xs font-bold uppercase tracking-widest text-gray-400">{{ $label }}</span>
-                                        <span class="text-base font-semibold text-gray-800">{{ $value }}</span>
+                                @if(is_array($product->specs) || is_object($product->specs))
+                                    @foreach($product->specs ?? [] as $label => $value)
+                                        <div class="flex items-center justify-between border-b border-black/5 pb-4 last:border-0">
+                                            <span class="text-xs font-bold uppercase tracking-widest text-gray-400">{{ $label }}</span>
+                                            <span class="text-base font-semibold text-gray-800">{{ is_array($value) ? json_encode($value) : $value }}</span>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="prose prose-sm max-w-none">
+                                        {!! $product->specs !!}
                                     </div>
-                                @endforeach
+                                @endif
                             </div>
                         </div>
 
@@ -709,29 +742,37 @@
 
                     <!-- Left: Label Column -->
                     <div class="lg:col-span-2 lg:sticky lg:top-28 lg:self-start">
-                        <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-[color:var(--primary)]">What It Does</span>
+                        <span class="text-[10px] font-bold uppercase tracking-[0.4em] mb-6 block" style="color: var(--primary)">What It Does</span>
                         <h2 class="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-[color:var(--text-primary)] leading-snug">
-                            Key Benefits of<br>{{ $product->title }}
+                            {!! $product->benefits_title ?? "Key Benefits of<br>".$product->title !!}
                         </h2>
-                        <p class="mt-4 text-sm text-gray-500 font-medium leading-relaxed max-w-xs">
-                            {{ $product->description }}
+                        <p class="mt-3 text-base sm:text-lg text-slate-500 font-medium leading-relaxed max-w-sm">
+                            {{ $product->benefits_subtitle ?? $product->tagline }}
                         </p>
                     </div>
 
                     <!-- Right: Benefits List -->
                     <div class="lg:col-span-3 divide-y divide-black/[0.06]">
                         @if($product->benefits && count($product->benefits) > 0)
-                            @foreach($product->benefits as $index => $benefit)
-                                <div class="flex items-start gap-8 py-8 first:pt-0 last:pb-0">
-                                    <div class="shrink-0 w-10 text-right">
-                                        <span class="text-base font-bold text-gray-300 tabular-nums">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                            @foreach($product->benefits ?? [] as $index => $benefit)
+                                @php 
+                                    $b = (object)$benefit;
+                                    $iconName = $b->icon ?? 'star';
+                                @endphp
+                                <div class="flex items-start gap-6 py-8 first:pt-0 last:pb-0 group">
+                                    <div class="shrink-0 w-12 pt-1">
+                                        <span class="text-base font-bold text-slate-300 tabular-nums">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-3 mb-2">
-                                            <i data-lucide="{{ $benefit->icon ?? $benefit['icon'] ?? 'check' }}" class="h-6 w-6 text-[color:var(--primary)] shrink-0"></i>
-                                            <h3 class="text-base font-bold text-[color:var(--text-primary)]">{{ $benefit->title ?? $benefit['title'] ?? '' }}</h3>
+                                        <div class="flex items-center gap-4 mb-2">
+                                            <div class="shrink-0" style="color: var(--primary)">
+                                                <i data-lucide="{{ $iconName }}" class="h-6 w-6"></i>
+                                            </div>
+                                            <h3 class="text-xl font-bold text-slate-900 leading-tight">{{ $b->title ?? '' }}</h3>
                                         </div>
-                                        <p class="text-sm text-gray-500 font-medium leading-relaxed">{{ $benefit->desc ?? $benefit['desc'] ?? '' }}</p>
+                                        <div class="text-sm text-slate-500 font-medium leading-relaxed max-w-2xl">
+                                            {!! $b->desc ?? '' !!}
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
@@ -740,79 +781,117 @@
 
                 </div>
             </div>
-        </section>
-
         {{-- Product Highlights & Ritual --}}
         @if($product->highlights || ($product->ritual && count($product->ritual) > 0))
-        <section class="py-12 sm:py-24 bg-white border-t border-black/5">
+        <section class="py-12 sm:py-20 bg-white border-t border-black/5">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-                <div class="rounded-[2rem] sm:rounded-[3rem] bg-slate-900 p-6 sm:p-20 text-white overflow-hidden relative shadow-2xl">
-                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 lg:items-center">
-                        <!-- Left: Product Highlights (CKEditor) -->
-                        <div>
-                            <h2 class="text-xs font-black uppercase tracking-[0.4em] text-orange-500 mb-6">Experience Excellence</h2>
-                            <h3 class="text-3xl sm:text-5xl font-black italic tracking-tighter uppercase mb-8 sm:mb-12">Product Highlights</h3>
-                            <div class="prose prose-invert prose-orange max-w-none">
-                                {!! $product->highlights !!}
-                            </div>
-                        </div>
-
-                        <!-- Right: The Ritual (Steps) -->
-                        <div class="bg-white/10 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 border border-white/10 shadow-inner">
-                            <h2 class="text-2xl sm:text-3xl font-black tracking-tighter uppercase mb-10 sm:mb-12 flex items-center gap-4">
-                                <span class="h-px flex-1 bg-white/20"></span>
-                                The Ritual
-                                <span class="h-px flex-1 bg-white/20"></span>
-                            </h2>
-                            <div class="space-y-10">
-                                @if($product->ritual && is_array($product->ritual))
-                                    @foreach($product->ritual as $index => $step)
-                                        <div class="flex gap-8 group">
-                                            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-orange-500 font-black text-white text-2xl shadow-xl transition-transform group-hover:rotate-12">{{ $index + 1 }}</span>
-                                            <div>
-                                                <h4 class="text-xl font-bold uppercase tracking-widest">{{ $step->title ?? $step['title'] ?? '' }}</h4>
-                                                <p class="mt-2 text-base text-white/80 leading-relaxed">{{ $step->desc ?? $step['desc'] ?? '' }}</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 lg:items-start">
+                    <!-- Left: Product Highlights -->
+                    <div>
+                        <span class="text-[10px] font-black uppercase tracking-[0.4em] mb-4 block" style="color: var(--primary)">Experience Excellence</span>
+                        <h3 class="text-3xl sm:text-5xl font-black tracking-tighter uppercase text-slate-900 mb-8 leading-tight">Product<br>Highlights</h3>
+                        
+                        <div class="grid grid-cols-1 gap-4 mt-8">
+                            @if(is_array($product->highlights) || is_object($product->highlights))
+                                @foreach($product->highlights as $highlight)
+                                    @php $h = (object)$highlight; @endphp
+                                    <div class="flex items-start gap-5 p-6 rounded-[2rem] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-xl transition-all duration-500 group" :style="{ '--tw-shadow-color': 'var(--primary)' }">
+                                        <div class="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform" style="background-color: color-mix(in srgb, var(--primary), transparent 90%); color: var(--primary)">
+                                            <i data-lucide="{{ $h->icon ?? 'star' }}" class="h-5 w-5"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-base font-black text-slate-900 mb-1 uppercase tracking-tight">{{ $h->title ?? '' }}</h4>
+                                            <div class="text-sm text-slate-500 leading-relaxed font-medium prose prose-sm prose-slate">
+                                                {!! $h->desc ?? $h->description ?? '' !!}
                                             </div>
                                         </div>
-                                    @endforeach
-                                @endif
-                            </div>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Right: The Ritual -->
+                    <div class="rounded-[2.5rem] p-8 sm:p-12 border relative overflow-hidden" style="background-color: color-mix(in srgb, var(--primary), transparent 95%); border-color: color-mix(in srgb, var(--primary), transparent 80%)">
+                        <div class="absolute top-0 right-0 w-64 h-64 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" style="background-color: color-mix(in srgb, var(--primary), transparent 90%)"></div>
+                        
+                        <h2 class="text-2xl sm:text-3xl font-black tracking-tighter uppercase text-slate-900 mb-10 flex items-center gap-6">
+                            The Ritual
+                            <span class="h-px flex-1" style="background-color: color-mix(in srgb, var(--primary), transparent 80%)"></span>
+                        </h2>
+                        
+                        <div class="space-y-10">
+                            @if($product->ritual && is_array($product->ritual))
+                                @foreach($product->ritual as $step)
+                                    <div class="flex gap-8 group relative">
+                                        <div class="relative z-10">
+                                            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl font-black text-white text-2xl shadow-lg transition-transform group-hover:rotate-12 group-hover:scale-110 duration-500" style="background-color: var(--primary); shadow: 0 10px 25px -5px color-mix(in srgb, var(--primary), transparent 60%)">{{ $loop->iteration }}</span>
+                                            @if(!$loop->last)
+                                                <div class="absolute top-14 left-1/2 -translate-x-1/2 w-px h-10 bg-gradient-to-b" style="--tw-gradient-from: color-mix(in srgb, var(--primary), transparent 50%); --tw-gradient-to: transparent;"></div>
+                                            @endif
+                                        </div>
+                                        <div class="pt-1">
+                                            <h4 class="text-xl font-black uppercase tracking-widest text-slate-900 mb-2">{{ $step->title ?? $step['title'] ?? '' }}</h4>
+                                            <p class="text-base text-slate-500 font-medium leading-relaxed">{{ $step->desc ?? $step['desc'] ?? '' }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </section>
         @endif
-   </section>
 
-        {{-- Specs & Brand Heritage --}}
-        <section class="py-12 sm:py-24 bg-white">
+        {{-- Nutrition Facts Section --}}
+        @if($product->nutrition && count($product->nutrition) > 0)
+        <section class="py-12 sm:py-24 bg-[#FDFBF7]">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                    <!-- Specifications -->
-                    <div class="p-8 sm:p-12 bg-slate-50 rounded-[3rem] border border-slate-100">
-                        <h3 class="text-2xl font-black uppercase tracking-tight text-slate-900 mb-8 flex items-center gap-3">
-                            <i data-lucide="layers" class="text-orange-500"></i>
-                            Technical Specifications
-                        </h3>
-                        <div class="prose prose-sm max-w-none text-slate-600">
-                            {!! $product->specs !!}
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-orange-600">Pure & Potent</span>
+                        <h2 class="mt-4 text-3xl sm:text-5xl font-black tracking-tighter text-slate-900 uppercase">Nutrition Facts</h2>
+                        <div class="prose prose-slate max-w-none text-slate-600 leading-relaxed mt-6">
+                            {!! $product->nutrition_description ?? 'We believe in total transparency. Every ingredient is carefully sourced and lab-tested for purity and potency. No hidden fillers, just results.' !!}
+                        </div>
+                        
+                        <div class="mt-10 grid grid-cols-2 gap-6">
+                            @php
+                                $nutriHighlights = $product->nutrition_highlights ?? [
+                                    ['icon' => 'leaf', 'text' => '100% Vegan'],
+                                    ['icon' => 'zap', 'text' => 'Zero Sugar']
+                                ];
+                            @endphp
+                            @foreach(array_slice($nutriHighlights, 0, 2) as $highlight)
+                                <div class="p-6 rounded-3xl bg-white border border-slate-100 shadow-sm">
+                                    <i data-lucide="{{ $highlight['icon'] ?? 'check' }}" class="h-6 w-6 text-{{ ($highlight['icon'] ?? '') == 'leaf' ? 'green' : 'amber' }}-500 mb-3"></i>
+                                    <h4 class="font-bold text-slate-900 uppercase text-xs tracking-widest">{{ $highlight['text'] ?? '' }}</h4>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
 
-                    <!-- Brand Heritage -->
-                    <div class="p-8 sm:p-12 bg-orange-50 rounded-[3rem] border border-orange-100/50">
-                        <h3 class="text-2xl font-black uppercase tracking-tight text-slate-900 mb-8 flex items-center gap-3">
-                            <i data-lucide="award" class="text-orange-600"></i>
-                            Brand Heritage
-                        </h3>
-                        <div class="prose prose-sm max-w-none text-slate-700">
-                            {!! $product->brand_info !!}
+                    <div class="bg-white p-8 sm:p-12 rounded-[3rem] border border-slate-200 shadow-2xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-full -mr-10 -mt-10"></div>
+                        
+                        <div class="relative z-10">
+                            <h3 class="text-xl font-bold text-slate-900 mb-8 border-b border-slate-100 pb-4">Typical Values (Per Serving)</h3>
+                            <div class="space-y-4">
+                                @foreach($product->nutrition as $label => $value)
+                                    <div class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+                                        <span class="text-sm font-bold text-slate-500 uppercase tracking-wider">{{ $label }}</span>
+                                        <span class="text-base font-black text-slate-900">{{ $value }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <p class="mt-8 text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">* Daily values based on a 2,000 calorie diet.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+        @endif
 
         <!-- Brand Text Marquee Section -->
         <section class="bg-[#E5E9E0] py-5 overflow-hidden border-y border-black/5">
@@ -839,9 +918,7 @@
                 </div>
             </div>
         </section>
-                </div>
-            </div>
-        </section>
+   </section>
 
 
 
@@ -955,7 +1032,7 @@
                                     <p class="text-sm sm:text-base leading-relaxed text-[color:var(--text-secondary)]">
                                         {{ Str::limit($review['content'], 120) }}
                                         @if(strlen($review['content']) > 120)
-                                            <a href="{{ route('products.reviews', $product['slug']) }}" class="text-[color:var(--primary)] font-semibold hover:underline ml-1">Read more</a>
+                                            <a href="{{ route('products.reviews', $product->slug) }}" class="text-[color:var(--primary)] font-semibold hover:underline ml-1">Read more</a>
                                         @endif
                                     </p>
 
@@ -1026,7 +1103,7 @@
                 </div>
                 
                 <div class="space-y-4 max-w-4xl mx-auto">
-                    @foreach($product->faqs as $index => $faq)
+                    @foreach($product->faqs ?? [] as $index => $faq)
                         <div x-data="{ open: false }" class="bg-white rounded-[2rem] border border-slate-100 overflow-hidden transition-all hover:shadow-lg hover:shadow-slate-200/50">
                             <button @click="open = !open" class="w-full p-6 sm:p-8 flex items-center justify-between text-left focus:outline-none">
                                 <span class="text-lg font-black text-slate-900">{{ $faq['question'] ?? '' }}</span>
@@ -1062,7 +1139,7 @@
                             {{-- Image Container --}}
                             <div class="relative aspect-square overflow-hidden bg-[var(--bg-section)]">
                                 <a href="{{ route('products.show', $rp->slug) }}" class="absolute inset-0 z-10"></a>
-                                <img src="{{ asset('images/products/' . $rp->image) }}" alt="{{ $rp->title }}"
+                                <img src="{{ $getImgPath($rp->image) }}" alt="{{ $rp->title }}"
                                     class="h-full w-full object-contain" loading="lazy">
                                 
                                 {{-- Badges --}}
@@ -1156,7 +1233,7 @@
         <div class="mx-auto max-w-[1600px] flex items-center justify-between gap-8 px-4 sm:px-6 lg:px-12">
             <!-- Product Info (Desktop Only) -->
             <div class="hidden md:flex items-center gap-4">
-                <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->title }}" class="h-14 w-14 rounded-xl bg-gray-50 object-contain p-2">
+                <img src="{{ $getImgPath($product->image) }}" alt="{{ $product->title }}" class="h-14 w-14 rounded-xl bg-gray-50 object-contain p-2">
                 <div>
                     <h4 class="text-sm font-black text-[color:var(--text-primary)] line-clamp-1">{{ $product->title }}</h4>
                     <p class="text-xs font-bold text-[color:var(--primary)]">₹{{ number_format($product->price) }}</p>

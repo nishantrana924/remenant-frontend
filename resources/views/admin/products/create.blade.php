@@ -19,12 +19,31 @@
                 <i data-lucide="smartphone" class="w-4 h-4"></i>
                 Live Preview
             </button>
-            <button type="button" onclick="document.querySelector('#product-form').submit()" class="saas-btn-primary shadow-lg shadow-orange-100">
+            <button type="button" @click="submitForm()" class="saas-btn-primary shadow-lg shadow-orange-100">
                 <i data-lucide="check" class="w-4 h-4"></i>
                 Deploy Product
             </button>
         </div>
     </div>
+
+    <!-- Draft Notification -->
+    <template x-if="hasDraft">
+        <div x-cloak class="mb-8 p-4 bg-orange-600 rounded-[2rem] border-2 border-orange-500 shadow-2xl flex items-center justify-between">
+            <div class="flex items-center gap-4 text-white">
+                <div class="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center animate-pulse">
+                    <i data-lucide="history" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-black uppercase tracking-widest">Unsaved Progress Detected</p>
+                    <p class="text-[10px] text-orange-100 font-medium">You have a draft from a previous session. Would you like to restore it?</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button @click="discardDraft()" class="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-all">Discard</button>
+                <button @click="restoreDraft()" class="px-6 py-2 bg-white text-orange-600 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-all">Restore Content</button>
+            </div>
+        </div>
+    </template>
 
     <form id="product-form" action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -72,7 +91,7 @@
                             <i data-lucide="plus" class="w-3 h-3"></i> Add Benefit
                         </button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         <template x-for="(benefit, index) in formData.benefits" :key="index">
                             <div class="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 group relative hover:border-orange-200 transition-all">
                                 <button type="button" @click="removeBenefit(index)" class="absolute -top-2 -right-2 h-8 w-8 bg-white shadow-lg rounded-full text-rose-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
@@ -174,13 +193,49 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
-                                <label class="saas-label">Rich Specifications</label>
+                                <label class="saas-label text-slate-400">Rich Specifications (CKEditor)</label>
                                 <textarea name="specs" id="specs_editor"></textarea>
                             </div>
                             <div>
-                                <label class="saas-label">Brand Heritage (Brand Info)</label>
-                                <textarea name="brand_info" id="brand_info_editor"></textarea>
+                                <label class="saas-label text-slate-400">Nutrition Description (Rich Text)</label>
+                                <textarea name="nutrition_description" id="nutrition_description_editor"></textarea>
                             </div>
+                            <div class="mt-8">
+                                <label class="saas-label text-slate-400">Nutrition Highlights (2 Boxes)</label>
+                                <div class="grid grid-cols-2 gap-4 mb-8">
+                                    <template x-for="(item, index) in formData.nutrition_highlights" :key="index">
+                                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+                                            <button type="button" @click="openNutriIconPicker(index)" class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-orange-500 hover:scale-110 transition-all">
+                                                <i :data-lucide="item.icon || 'star'" class="w-6 h-6"></i>
+                                            </button>
+                                            <input type="hidden" :name="'nutrition_highlights['+index+'][icon]'" x-model="item.icon">
+                                            <input type="text" :name="'nutrition_highlights['+index+'][text]'" x-model="item.text" class="saas-input h-10 flex-1 text-[10px] font-black uppercase tracking-wider" placeholder="e.g. 100% VEGAN">
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <label class="saas-label text-slate-400">Nutrition Facts Builder</label>
+                                <div class="space-y-3">
+                                    <template x-for="(val, label, index) in formData.nutrition" :key="label">
+                                        <div class="flex items-center gap-2 group">
+                                            <input type="text" :value="label" disabled class="saas-input h-10 w-1/3 bg-slate-50 font-bold text-[10px] uppercase" placeholder="Label">
+                                            <input type="text" :name="'nutrition['+label+']'" x-model="formData.nutrition[label]" class="saas-input h-10 flex-1 text-xs" placeholder="Value (e.g. 1000mg)">
+                                            <button type="button" @click="delete formData.nutrition[label]" class="h-8 w-8 rounded-lg text-rose-400 hover:bg-rose-50 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                    </template>
+                                    
+                                    <div class="flex items-center gap-2 p-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200 mt-4">
+                                        <input type="text" x-model="newNutrientLabel" class="saas-input h-9 text-[10px] uppercase font-bold" placeholder="New Label (e.g. Zinc)">
+                                        <button type="button" @click="if(newNutrientLabel) { formData.nutrition[newNutrientLabel] = ''; newNutrientLabel = ''; }" class="h-9 px-4 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Add Row</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-8 mt-8 border-t border-slate-100">
+                            <label class="saas-label">Brand Heritage (Brand Info)</label>
+                            <textarea name="brand_info" id="brand_info_editor"></textarea>
                         </div>
 
                         <!-- 4. Experience Excellence (Structured Highlights) -->
@@ -279,12 +334,53 @@
                             </div>
                         </div>
                         <div class="pt-4 border-t border-slate-100">
+                            <label class="saas-label">Quick Add Category</label>
+                            <div class="flex gap-2">
+                                <input type="text" x-model="newCategoryName" class="saas-input h-10 text-xs" placeholder="New Category Name">
+                                <button type="button" @click="quickAddCategory()" class="h-10 px-4 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">Add</button>
+                            </div>
+                        </div>
+                        <div class="pt-4 border-t border-slate-100">
                             <label class="saas-label">Product Status</label>
                             <select name="status" x-model="formData.status" class="saas-input">
                                 <option value="published">Published</option>
                                 <option value="draft">Draft</option>
                                 <option value="hidden">Hidden</option>
                             </select>
+                        </div>
+                        <div class="pt-4 border-t border-slate-100">
+                            <label class="saas-label">Product Theme</label>
+                            <input type="hidden" name="theme_color" x-model="formData.theme_color">
+                            <div class="flex items-start gap-4 mt-2">
+                                <div class="grid grid-cols-3 gap-2 w-32">
+                                    <template x-for="color in ['orange', 'emerald', 'blue', 'indigo', 'rose']" :key="color">
+                                        <button type="button" 
+                                                @click="formData.theme_color = color"
+                                                :class="formData.theme_color === color ? 'ring-2 ring-offset-2 ring-slate-900 border-transparent shadow-md' : 'hover:scale-110'"
+                                                class="h-8 w-full rounded-lg transition-all border border-slate-200"
+                                                :style="{ 
+                                                    backgroundColor: color === 'orange' ? '#FF6B00' : 
+                                                                   (color === 'emerald' ? '#10b981' : 
+                                                                   (color === 'blue' ? '#3b82f6' : 
+                                                                   (color === 'indigo' ? '#6366f1' : '#f43f5e')))
+                                                }">
+                                        </button>
+                                    </template>
+                                </div>
+                                <div class="w-px h-8 bg-slate-100"></div>
+                                <div class="relative group">
+                                    <label class="block h-10 w-10 rounded-xl border-2 border-slate-200 p-0.5 cursor-pointer hover:border-slate-400 transition-all overflow-hidden"
+                                           :style="{ backgroundColor: formData.theme_color.startsWith('#') ? formData.theme_color : '#fff' }"
+                                           :class="formData.theme_color.startsWith('#') ? 'ring-2 ring-offset-2 ring-slate-900' : ''">
+                                        <input type="color" x-model="formData.theme_color" class="absolute -inset-2 w-[150%] h-[150%] opacity-0 cursor-pointer">
+                                        <div x-show="!formData.theme_color.startsWith('#')" class="w-full h-full flex items-center justify-center bg-slate-50">
+                                            <i data-lucide="pipette" class="w-4 h-4 text-slate-400"></i>
+                                        </div>
+                                    </label>
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-[8px] font-bold uppercase rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Custom RGB</div>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-2 italic font-medium">Selected: <span class="uppercase font-black text-slate-900" x-text="formData.theme_color"></span></p>
                         </div>
                     </div>
                 </div>
@@ -368,12 +464,19 @@
                                 <input type="number" name="mrp" x-model="formData.mrp" class="saas-input">
                             </div>
                         </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Available Stock</p>
+                                <p class="text-xs text-slate-400 mt-1">Current units in warehouse</p>
+                            </div>
+                            <input type="number" name="stock" x-model="formData.stock" value="100" class="w-20 h-10 saas-input border-slate-200 text-center font-bold">
+                        </div>
                         <div class="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex items-center justify-between">
                             <div>
                                 <p class="text-[10px] font-bold text-orange-600 uppercase tracking-widest">Inventory Alert</p>
                                 <p class="text-xs text-orange-400 mt-1">Notify when below</p>
                             </div>
-                            <input type="number" name="low_stock_threshold" value="10" class="w-16 h-10 saas-input border-orange-200 text-center font-bold">
+                            <input type="number" name="low_stock_threshold" x-model="formData.low_stock_threshold" value="10" class="w-16 h-10 saas-input border-orange-200 text-center font-bold">
                         </div>
                     </div>
                 </div>
@@ -499,9 +602,9 @@
                 <div class="grid grid-cols-2 gap-16 items-start">
                     <!-- Left Gallery Mock -->
                     <div class="flex gap-6 sticky top-0 h-fit">
-                        <div class="flex flex-col gap-4 w-24">
+                        <div class="flex-col gap-4 w-24 hidden lg:flex">
                             <template x-for="i in [1,2,3]" :key="i">
-                                <div class="aspect-square bg-slate-50 rounded-2xl border-2 border-slate-100 flex items-center justify-center p-4 cursor-pointer hover:border-orange-200 transition">
+                                <div class="aspect-square bg-slate-50 rounded-2xl border-2 border-slate-100 flex items-center justify-center p-4">
                                     <img x-show="imagePreview" :src="imagePreview" class="w-full h-full object-contain mix-blend-multiply opacity-50">
                                     <i x-show="!imagePreview" data-lucide="image" class="w-8 h-8 text-slate-200"></i>
                                 </div>
@@ -510,20 +613,16 @@
                         <div class="flex-1 aspect-square bg-slate-50 rounded-[3rem] border border-slate-100 flex items-center justify-center p-16 shadow-inner relative overflow-hidden">
                             <img x-show="imagePreview" :src="imagePreview" class="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl">
                             <i x-show="!imagePreview" data-lucide="image" class="w-32 h-32 text-slate-100"></i>
-                            <div class="absolute top-6 right-6 flex flex-col gap-3">
-                                <div class="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-slate-400 hover:text-orange-500 transition"><i data-lucide="heart" class="w-5 h-5"></i></div>
-                                <div class="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-slate-400 hover:text-orange-500 transition"><i data-lucide="send" class="w-5 h-5"></i></div>
-                            </div>
                         </div>
                     </div>
 
                     <!-- Right Info -->
                     <div class="space-y-8">
                         <div class="space-y-2">
-                            <p class="text-sm font-black uppercase tracking-[0.3em] text-orange-500" x-text="formData.tagline || 'Tagline'"></p>
+                            <p class="text-sm font-black uppercase tracking-[0.3em]" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }" x-text="formData.tagline || 'Tagline'"></p>
                             <h1 class="text-6xl font-black text-slate-900 tracking-tighter leading-none" x-text="formData.title || 'Product Title'"></h1>
                             <div class="flex items-center gap-6 mt-6">
-                                <div class="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-full text-orange-600 font-black">
+                                <div class="flex items-center gap-2 px-4 py-2 rounded-full font-black" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 90%)', color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">
                                     <i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                     <span>4.9</span>
                                 </div>
@@ -533,7 +632,6 @@
 
                         <div class="py-10 border-y border-slate-100 space-y-8">
                             <div class="inline-flex items-center bg-[#008A48] px-4 py-2 rounded-lg text-white text-xs font-black uppercase tracking-widest">Hot Deal</div>
-                            
                             <div class="flex items-center gap-8">
                                 <div class="flex items-center text-[#008A48]">
                                     <i data-lucide="arrow-down" class="w-10 h-10 stroke-[4px]"></i>
@@ -542,23 +640,33 @@
                                 <span class="text-3xl font-bold text-slate-200 line-through">₹<span x-text="formData.mrp"></span></span>
                                 <span class="text-6xl font-black text-slate-900 tracking-tight">₹<span x-text="formData.price"></span></span>
                             </div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest italic">Inclusive of all taxes</p>
                         </div>
 
                         <!-- CTA -->
                         <div class="flex gap-6 pt-4">
-                            <button class="flex-1 h-20 bg-slate-950 rounded-2xl text-white font-black uppercase tracking-[0.3em] text-sm shadow-2xl shadow-slate-900/20 active:scale-95 transition-all">Add to Cart</button>
-                            <button class="w-20 h-20 rounded-2xl border-2 border-slate-100 flex items-center justify-center text-slate-300 hover:border-orange-200 hover:text-orange-500 transition-all"><i data-lucide="heart" class="w-8 h-8"></i></button>
+                            <button class="flex-1 h-20 rounded-2xl text-white font-black uppercase tracking-[0.3em] text-sm shadow-2xl active:scale-95 transition-all" :style="{ backgroundColor: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">Add to Cart</button>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Trust Grid -->
-                        <div class="grid grid-cols-2 gap-6 pt-10">
-                            <template x-for="benefit in formData.benefits.slice(0,4)" :key="benefit.title">
-                                <div class="flex items-start gap-4 p-5 bg-white border border-slate-100 rounded-[2rem] shadow-sm">
-                                    <div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-500"><i :data-lucide="benefit.icon" class="w-6 h-6"></i></div>
+                <!-- Benefits Section -->
+                <div class="mt-32 border-t border-slate-100 pt-20">
+                    <div class="grid grid-cols-2 gap-24">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">What It Does</span>
+                            <h2 class="text-4xl font-black text-slate-900 tracking-tight leading-tight" x-html="formData.benefits_title || 'Key Benefits'"></h2>
+                            <p class="mt-6 text-xl text-slate-400 font-medium leading-relaxed" x-text="formData.benefits_subtitle || 'Subtitle...'"></p>
+                        </div>
+                        <div class="divide-y divide-slate-100">
+                            <template x-for="(benefit, index) in formData.benefits" :key="index">
+                                <div class="flex items-start gap-8 py-10 first:pt-0">
+                                    <span class="text-2xl font-black text-slate-200" x-text="String(index + 1).padStart(2, '0')"></span>
                                     <div>
-                                        <p class="text-base font-black text-slate-900" x-text="benefit.title"></p>
-                                        <p class="text-xs text-slate-400 mt-1" x-text="benefit.desc"></p>
+                                        <div class="flex items-center gap-4 mb-3">
+                                            <i :data-lucide="benefit.icon || 'star'" class="w-6 h-6" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }"></i>
+                                            <h4 class="text-2xl font-black text-slate-900" x-text="benefit.title"></h4>
+                                        </div>
+                                        <p class="text-lg text-slate-400 font-medium" x-html="benefit.desc"></p>
                                     </div>
                                 </div>
                             </template>
@@ -566,43 +674,40 @@
                     </div>
                 </div>
 
-                <!-- Info Table Layout (Real Site Sync) -->
-                <div class="mt-32 border-t border-slate-100 pt-20">
-                    <div class="grid grid-cols-3 border-b border-slate-100 bg-slate-50/50">
-                        <div class="p-8 border-r border-slate-100 flex items-center gap-3"><i data-lucide="info" class="w-5 h-5 text-orange-500"></i><span class="text-xs font-black uppercase tracking-widest text-slate-400">Description</span></div>
-                        <div class="p-8 border-r border-slate-100 flex items-center gap-3"><i data-lucide="layers" class="w-5 h-5 text-blue-500"></i><span class="text-xs font-black uppercase tracking-widest text-slate-400">Specifications</span></div>
-                        <div class="p-8 flex items-center gap-3"><i data-lucide="award" class="w-5 h-5 text-emerald-500"></i><span class="text-xs font-black uppercase tracking-widest text-slate-400">Brand Info</span></div>
-                    </div>
-                    <div class="grid grid-cols-3 min-h-[400px]">
-                        <div class="p-10 border-r border-slate-100 prose prose-sm text-slate-600" x-html="formData.long_description || 'Story...'"></div>
-                        <div class="p-10 border-r border-slate-100 prose prose-sm text-slate-600" x-html="formData.specs || 'Technical data...'"></div>
-                        <div class="p-10 prose prose-sm text-slate-600" x-html="formData.brand_info || 'Brand heritage...'"></div>
-                    </div>
-                </div>
-
-                <!-- Highlights Section -->
-                <div class="mt-32 p-24 bg-slate-950 rounded-[4rem] text-white relative overflow-hidden">
-                    <div class="relative z-10 grid grid-cols-2 gap-20 items-center">
-                        <div>
-                            <p class="text-xs font-black uppercase tracking-[0.4em] text-orange-500 mb-6">Experience Excellence</p>
-                            <h2 class="text-6xl font-black italic tracking-tighter uppercase mb-12">Product Highlights</h2>
-                            <div class="prose prose-invert prose-lg max-w-none" x-html="formData.highlights"></div>
-                        </div>
-                        <div class="bg-white/5 backdrop-blur-md rounded-[3rem] p-12 border border-white/10 shadow-inner">
-                            <h2 class="text-3xl font-black tracking-tighter uppercase mb-12 flex items-center gap-6">
-                                <span class="h-px flex-1 bg-white/10"></span> The Ritual <span class="h-px flex-1 bg-white/10"></span>
-                            </h2>
-                            <div class="space-y-12">
-                                <template x-for="step in [1, 2, 3]" :key="step">
-                                    <div class="flex gap-8 group">
-                                        <span class="w-14 h-14 shrink-0 rounded-2xl bg-orange-500 flex items-center justify-center font-black text-2xl text-white shadow-xl shadow-orange-500/20 group-hover:rotate-12 transition-transform" x-text="step"></span>
-                                        <div>
-                                            <h4 class="text-xl font-bold uppercase tracking-wider">Step Title</h4>
-                                            <p class="text-lg text-white/40 mt-2 leading-relaxed">Watch the pure wellness dissolve.</p>
-                                        </div>
+                <!-- Highlights & Ritual -->
+                <div class="mt-32 grid grid-cols-2 gap-24 items-start pb-32">
+                    <div>
+                        <span class="text-[10px] font-black uppercase tracking-[0.4em] mb-4 block" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">Experience Excellence</span>
+                        <h2 class="text-5xl font-black text-slate-900 tracking-tighter uppercase mb-12">Product Highlights</h2>
+                        <div class="grid grid-cols-1 gap-6">
+                            <template x-for="h in formData.highlights" :key="h.title">
+                                <div class="flex items-start gap-6 p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100">
+                                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 90%)', color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">
+                                        <i :data-lucide="h.icon || 'star'" class="w-7 h-7"></i>
                                     </div>
-                                </template>
-                            </div>
+                                    <div>
+                                        <h4 class="text-xl font-black text-slate-900 uppercase tracking-tight" x-text="h.title"></h4>
+                                        <p class="text-base text-slate-400 mt-2 font-medium" x-html="h.desc"></p>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="rounded-[3rem] p-16 border relative overflow-hidden" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 95%)', borderColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 80%)' }">
+                        <h2 class="text-3xl font-black tracking-tighter uppercase text-slate-900 mb-16 flex items-center gap-8">
+                            The Ritual <span class="h-px flex-1" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 80%)' }"></span>
+                        </h2>
+                        <div class="space-y-16">
+                            <template x-for="(step, i) in formData.ritual" :key="i">
+                                <div class="flex gap-10">
+                                    <span class="flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl font-black text-white text-3xl shadow-xl" :style="{ backgroundColor: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }" x-text="i + 1"></span>
+                                    <div>
+                                        <h4 class="text-2xl font-black uppercase tracking-widest text-slate-900 mb-2" x-text="step.title"></h4>
+                                        <p class="text-xl text-slate-400 font-medium leading-relaxed" x-text="step.desc"></p>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -679,9 +784,12 @@ function productSystem() {
         showMobilePreview: false,
         showIconPicker: false,
         iconSearch: '',
+        newNutrientLabel: '',
         currentBenefitIndex: null,
         previewMode: 'mobile',
         imagePreview: null,
+        hasDraft: false,
+        editors: {},
         get filteredIcons() {
             if (!this.iconSearch) return this.iconLibrary;
             return this.iconLibrary.filter(i => i.includes(this.iconSearch.toLowerCase()));
@@ -707,9 +815,21 @@ function productSystem() {
         ],
         formData: {
             title: '', tagline: '', badge: '', description: '', long_description: '', 
-            specs: '', brand_info: '', meta_title: '', meta_description: '', video_url: '',
+            specs: '', brand_info: '', nutrition_description: '', meta_title: '', meta_description: '', video_url: '',
             price: 0, mrp: 0,
+            stock: 100,
+            low_stock_threshold: 10,
+            theme_color: 'orange',
             faqs: [{question: 'How to use?', answer: 'Dissolve one tablet in 200ml water.'}],
+            nutrition: {
+                'Energy': '0 kcal',
+                'Protein': '0g',
+                'Carbohydrates': '0g'
+            },
+            nutrition_highlights: [
+                { icon: 'leaf', text: '100% Vegan' },
+                { icon: 'zap', text: 'Zero Sugar' }
+            ],
             benefits: [
                 {icon: 'shield-check', title: 'Immunity Boost', desc: 'Strengthens defenses.'},
                 {icon: 'sparkles', title: 'Skin Glow', desc: 'Supports collagen.'}
@@ -739,6 +859,39 @@ function productSystem() {
             
             this.$watch('showMobilePreview', value => { if(value) this.$nextTick(() => lucide.createIcons()); });
             this.$watch('showIconPicker', value => { if(value) this.$nextTick(() => lucide.createIcons()); });
+
+            // Persistence Engine Initialization
+            const persistenceKey = 'product_draft_create';
+            this.persistence = useFormPersistence(persistenceKey, this);
+            
+            if (this.persistence.load()) {
+                this.hasDraft = true;
+            }
+
+            this.$watch('formData', () => {
+                this.persistence.save();
+            }, { deep: true });
+        },
+        restoreDraft() {
+            const savedData = this.persistence.load();
+            if (savedData) {
+                this.formData = Object.assign({}, this.formData, savedData);
+                // Sync CKEditors
+                Object.keys(this.editors).forEach(id => {
+                    if (this.formData[id]) this.editors[id].setData(this.formData[id]);
+                });
+                // Sync Highlight Editors
+                this.formData.highlights_list.forEach(h => {
+                    const ed = this.editors['highlight_' + h.id];
+                    if (ed && h.desc) ed.setData(h.desc);
+                });
+                this.hasDraft = false;
+                Swal.fire({ icon: 'success', title: 'Draft Restored', timer: 1500, showConfirmButton: false });
+            }
+        },
+        discardDraft() {
+            this.persistence.clear();
+            this.hasDraft = false;
         },
         openIconPicker(index) {
             this.pickerMode = 'benefit';
@@ -754,6 +907,12 @@ function productSystem() {
         },
         openHighlightIconPicker(index) {
             this.pickerMode = 'highlight';
+            this.currentBenefitIndex = index;
+            this.showIconPicker = true;
+            this.$nextTick(() => lucide.createIcons());
+        },
+        openNutriIconPicker(index) {
+            this.pickerMode = 'nutri_highlight';
             this.currentBenefitIndex = index;
             this.showIconPicker = true;
             this.$nextTick(() => lucide.createIcons());
@@ -777,6 +936,8 @@ function productSystem() {
                 this.formData.benefits[this.currentBenefitIndex].icon = icon;
             } else if(this.pickerMode === 'trust') {
                 this.formData.trust_signals[this.currentBenefitIndex].icon = icon;
+            } else if(this.pickerMode === 'nutri_highlight') {
+                this.formData.nutrition_highlights[this.currentBenefitIndex].icon = icon;
             } else {
                 this.formData.highlights_list[this.currentBenefitIndex].icon = icon;
             }
@@ -814,16 +975,21 @@ function productSystem() {
             });
         },
         initEditors() {
-            const mainEditors = ['long_description', 'specs', 'brand_info'];
+            const mainEditors = ['long_description', 'specs', 'brand_info', 'nutrition_description'];
             mainEditors.forEach(id => {
-                ClassicEditor.create(document.querySelector('#'+id+'_editor'), {
+                const el = document.querySelector('#'+id+'_editor');
+                if (!el) return;
+                ClassicEditor.create(el, {
                     toolbar: [
                         'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 
                         'insertTable', 'blockQuote', 'undo', 'redo'
                     ],
                     table: { contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'] }
                 }).then(editor => {
-                    editor.model.document.on('change:data', () => { this.formData[id] = editor.getData(); });
+                    this.editors[id] = editor;
+                    editor.model.document.on('change:data', () => { 
+                        this.formData[id] = editor.getData(); 
+                    });
                 });
             });
 
@@ -842,6 +1008,7 @@ function productSystem() {
                 toolbar: ['bold', 'italic', 'link', 'undo', 'redo']
             }).then(editor => {
                 el.classList.add('ck-editor-initialized');
+                this.editors['highlight_' + id] = editor;
                 editor.model.document.on('change:data', () => { 
                     const item = this.formData.highlights_list.find(h => h.id === id);
                     if(item) item.desc = editor.getData(); 
@@ -853,7 +1020,52 @@ function productSystem() {
         addFaq() { this.formData.faqs.push({question: '', answer: ''}); this.$nextTick(() => lucide.createIcons()); },
         removeFaq(index) { this.formData.faqs.splice(index, 1); },
         addBenefit() { this.formData.benefits.push({icon: 'star', title: '', desc: ''}); this.$nextTick(() => lucide.createIcons()); },
-        removeBenefit(index) { this.formData.benefits.splice(index, 1); }
+        removeBenefit(index) { this.formData.benefits.splice(index, 1); },
+        async quickAddCategory() {
+            if (!this.newCategoryName) return;
+            try {
+                const response = await fetch('{{ route("admin.categories.quick-add") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ name: this.newCategoryName })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const list = document.getElementById('category-list');
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center gap-3 p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all cursor-pointer group';
+                    label.innerHTML = `
+                        <input type="checkbox" name="categories[]" value="${data.category.id}" checked class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
+                        <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">${data.category.name}</span>
+                    `;
+                    list.appendChild(label);
+                    this.newCategoryName = '';
+                } else {
+                    alert(data.message || 'Error adding category');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        submitForm() {
+            fastSubmit('#product-form', {
+                success: (data) => {
+                    this.persistence.clear();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deployed!',
+                        text: 'Product has been created and indexed.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '{{ route("admin.products.index") }}';
+                    });
+                }
+            });
+        }
     }
 }
 </script>

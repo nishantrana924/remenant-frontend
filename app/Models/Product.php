@@ -18,6 +18,8 @@ class Product extends Model
         'faqs' => 'array',
         'highlights' => 'array',
         'trust_signals' => 'array',
+        'nutrition' => 'array',
+        'nutrition_highlights' => 'array',
         'is_featured' => 'boolean',
         'status' => 'string',
     ];
