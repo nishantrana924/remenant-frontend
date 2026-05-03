@@ -239,44 +239,27 @@
                             $discount = (int) round((1 - ($combo['price'] / max(1, $combo['mrp']))) * 100);
                         @endphp
                         <div class="item h-full">
-                            <div class="combo-card group relative flex flex-col h-full overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-black/5 transition-all duration-500">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative group">
                                 <a href="{{ route('products.show', $combo['slug']) }}" class="absolute inset-0 z-10"></a>
-                                
-                                <!-- Image Container -->
-                                <div class="aspect-square w-full overflow-hidden bg-[var(--bg-section)]">
+                                <div class="aspect-square bg-gray-50">
                                     <img src="{{ asset('images/products/' . $combo['image']) }}" alt="{{ $combo['title'] }}"
-                                        class="h-full w-full object-cover transition duration-700 group-hover:scale-110"
-                                        loading="lazy">
-                                    <div class="absolute left-4 top-4 z-20">
-                                        <span class="rounded-full bg-[var(--primary)] px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg">
-                                            -{{ $discount }}%
-                                        </span>
-                                    </div>
+                                        class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
                                 </div>
-                                
-                                <!-- Content Area -->
-                                <div class="flex flex-col flex-1 p-5 sm:p-6">
-                                    <!-- Meta Row: Category & Reviews -->
-                                    <div class="flex items-center justify-between gap-2 mb-3">
-                                        <span class="text-[10px] font-black uppercase tracking-widest text-[color:var(--primary)]">
-                                            {{ $combo['category'] ?? 'Wellness' }}
-                                        </span>
-                                        
-                                        <div class="flex items-center gap-1 rounded-full bg-black/[0.03] px-2 py-1 text-[10px] font-bold text-gray-500 ring-1 ring-black/[0.05]">
-                                            <i data-lucide="star" class="h-3 w-3 fill-[color:var(--primary)] text-[color:var(--primary)]"></i>
-                                            <span>4.9 ({{ rand(500, 1500) }})</span>
-                                        </div>
-                                    </div>
-
-                                    <h3 class="text-base sm:text-lg font-semibold text-[color:var(--text-primary)] leading-tight group-hover:text-[color:var(--primary)] transition-colors truncate">
-                                        {{ $combo['title'] }}
-                                    </h3>
-                                    
-                                    <div class="mt-auto pt-4 flex flex-col gap-1">
+                                <div class="p-5 flex-1 flex flex-col">
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-[color:var(--primary)] mb-1">
+                                        {{ $combo['tagline'] }}</p>
+                                    <h4 class="text-sm font-extrabold text-[color:var(--text-primary)] mb-4 line-clamp-1">
+                                        {{ $combo['title'] }}</h4>
+                                    <div class="mt-auto flex items-center justify-between">
                                         <div class="flex items-baseline gap-2">
-                                            <span class="text-lg sm:text-xl font-bold text-[color:var(--text-primary)]">₹{{ number_format($combo['price']) }}</span>
-                                            <span class="text-xs sm:text-sm font-medium text-gray-400 line-through">₹{{ number_format($combo['mrp']) }}</span>
+                                            <span
+                                                class="text-lg font-black text-[color:var(--text-primary)]">₹{{ number_format($combo['price']) }}</span>
+                                            <span class="text-xs text-gray-400 line-through">₹{{ number_format($combo['mrp']) }}</span>
                                         </div>
+                                        <button
+                                            class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-[color:var(--primary)] hover:text-white transition relative z-20">
+                                            <i data-lucide="plus" class="w-4 h-4"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>

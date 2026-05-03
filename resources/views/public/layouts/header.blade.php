@@ -99,7 +99,7 @@
             </div>
 
             <!-- Mobile search bar -->
-            <div class="public-mobile-search {{ request()->routeIs('products.show') ? 'hidden' : '' }}" data-mobile-search>
+            <div class="public-mobile-search {{ request()->routeIs('products.show', 'cart') ? 'hidden' : '' }}" data-mobile-search>
                 <div class="relative">
                     <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/80">
                         <i data-lucide="search" class="h-5 w-5"></i>
