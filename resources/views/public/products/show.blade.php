@@ -1055,9 +1055,9 @@
                 <a href="{{ route('cart') }}" class="flex-1 h-11 sm:h-12 flex items-center justify-center rounded-xl sm:rounded-2xl bg-[var(--primary)] text-white font-bold uppercase tracking-[0.1em] text-[10px] sm:text-xs shadow-lg shadow-[var(--primary)]/20 active:scale-95 transition hover:brightness-105">
                     Add to Cart
                 </a>
-                <button type="button" class="flex-1 h-11 sm:h-12 rounded-xl sm:rounded-2xl bg-[var(--secondary)] text-white font-bold uppercase tracking-[0.1em] text-[10px] sm:text-xs shadow-lg shadow-[var(--secondary)]/20 active:scale-95 transition hover:brightness-105">
+                <a href="{{ route('checkout', ['product' => $product['slug']]) }}" class="flex-1 h-11 sm:h-12 rounded-xl sm:rounded-2xl bg-[var(--secondary)] text-white font-bold uppercase tracking-[0.1em] text-[10px] sm:text-xs shadow-lg shadow-[var(--secondary)]/20 active:scale-95 transition hover:brightness-105 flex items-center justify-center">
                     Buy It Now
-                </button>
+                </a>
             </div>
         </div>
     </div>

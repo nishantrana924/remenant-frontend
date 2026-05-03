@@ -4,9 +4,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ProductController;
+use App\Http\Controllers\Public\CheckoutController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout')->middleware('auth');
 
 Route::get('/about', function () {
     return view('public.about');

@@ -232,10 +232,9 @@
                                 <p class="text-sm font-bold">You'll save ₹3,201 on this order!</p>
                             </div>
 
-                            <button class="w-full bg-[color:var(--primary)] text-white py-4 rounded-md text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-orange-100 hover:brightness-110 active:scale-[0.98] transition-all mt-4">
+                            <a href="{{ route('checkout') }}" class="w-full bg-[color:var(--primary)] text-white py-4 rounded-md text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-orange-100 hover:brightness-110 active:scale-[0.98] transition-all mt-4 flex items-center justify-center">
                                 PROCEED TO CHECKOUT
-                            </button>
-
+                            </a>
                             <div class="mt-6 flex items-center gap-3 text-[10px] text-gray-400 font-bold uppercase tracking-widest justify-center">
                                 <i data-lucide="shield-check" class="w-4 h-4"></i> Safe and Secure Payments
                             </div>
@@ -243,7 +242,6 @@
                     </div>
                 </div>
                 </div>
-
             </div>
 
             <!-- Recommendations Section -->
@@ -263,7 +261,6 @@
                         <p class="text-sm text-gray-400 mt-1 uppercase tracking-widest font-bold">Selected for your wellness
                             journey</p>
                     </div>
-
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         @foreach($recommendations as $rec)
                             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
