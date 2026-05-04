@@ -24,11 +24,25 @@ Route::get('/contact', function () {
     return view('public.contact');
 })->name('contact');
 
-Route::get('/cart', [App\Http\Controllers\Public\CartController::class, 'index'])->name('cart');
-Route::post('/cart/add/{id}', [App\Http\Controllers\Public\CartController::class, 'add'])->name('cart.add');
-Route::patch('/cart/update', [App\Http\Controllers\Public\CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/remove', [App\Http\Controllers\Public\CartController::class, 'remove'])->name('cart.remove');
-Route::post('/checkout/verify', [CheckoutController::class, 'verifyPayment'])->name('checkout.verify')->middleware('auth');
+Route::get('/terms-and-conditions', function () {
+    return view('public.terms');
+})->name('terms');
+
+Route::get('/privacy-policy', function () {
+    return view('public.privacy');
+})->name('privacy');
+
+Route::get('/shipping-guide', function () {
+    return view('public.shipping');
+})->name('shipping');
+
+Route::get('/refund-policy', function () {
+    return view('public.refund');
+})->name('refund');
+
+Route::get('/cart', function () {
+    return view('public.cart');
+})->name('cart');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');

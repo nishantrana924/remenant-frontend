@@ -1,3 +1,7 @@
+@php
+    $isAuthPage = request()->routeIs('login', 'register', 'password.*', 'verification.*');
+@endphp
+
 @if (request()->routeIs('home'))
     <!-- Top promo bar (NOT sticky) -->
     <div class="bg-[var(--secondary)] text-white">
@@ -40,9 +44,11 @@
                     </a>
                 </div>
 
+                @if(!$isAuthPage)
                 <div class="flex items-center gap-2">
                     @php $cartCount = count(session('cart', [])); @endphp
                     <a href="{{ route('cart') }}"
+                        class="header-btn relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
                         class="header-btn relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
                         aria-label="Cart">
                         <i data-lucide="shopping-cart" class="h-6 w-6"></i>
@@ -100,10 +106,11 @@
                         </div>
                     </details>
                 </div>
+                @endif
             </div>
 
             <!-- Mobile search bar -->
-            <div class="public-mobile-search {{ request()->routeIs('products.show', 'cart') ? 'hidden' : '' }}" data-mobile-search>
+            <div class="public-mobile-search {{ $isAuthPage || request()->routeIs('products.show', 'cart') ? 'hidden' : '' }}" data-mobile-search>
                 <div class="relative">
                     <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/80">
                         <i data-lucide="search" class="h-5 w-5"></i>
@@ -129,6 +136,7 @@
                     alt="{{ config('app.name', 'Remenant Health') }} logo" class="h-12 w-auto object-contain">
             </a>
 
+            @if(!$isAuthPage)
             <!-- Search -->
             <div class="flex-1">
                 <div class="relative max-w-[520px]">
@@ -139,10 +147,15 @@
                         class="w-full rounded-full border border-white/30 bg-white/10 py-2 pl-10 pr-4 text-white placeholder:text-white/60 outline-none transition-all duration-300 focus:max-w-[580px] focus:bg-white/20 focus:ring-0 focus:border-white/50 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
                 </div>
             </div>
+            @else
+            <div class="flex-1"></div>
+            @endif
 
+            @if(!$isAuthPage)
             <!-- Actions -->
             <div class="flex items-center gap-2">
                 <a href="{{ route('cart') }}"
+                    class="header-btn relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
                     class="header-btn relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
                     aria-label="Cart">
                     <i data-lucide="shopping-cart" class="h-5 w-5"></i>
@@ -214,6 +227,7 @@
                     @endif
                 @endauth
             </div>
+            @endif
         </div>
     </div>
 </header>

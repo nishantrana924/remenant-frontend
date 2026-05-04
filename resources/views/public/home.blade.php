@@ -91,7 +91,7 @@
         <div class="w-full">
             <div
                 class="relative overflow-hidden bg-gradient-to-r from-[#FFF2E8] via-[#FFE7D5] to-[#FDE7D7] px-4 py-8 sm:px-8">
-                <div class="mx-auto max-w-[1600px]">
+                <div class="mx-auto max-w-7xl">
                     <!-- Decorative fruit background icons -->
                     <div
                         class="pointer-events-none absolute -left-4 top-6 hidden flex-col gap-3 opacity-50 sm:flex sm:left-4">
@@ -108,35 +108,35 @@
                             class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/60 text-lg shadow-sm">🍏</span>
                     </div>
 
-                    <p class="text-center text-xl font-extrabold tracking-tight text-[color:var(--secondary)] sm:text-2xl">
+                    <p class="text-center text-xl font-semibold tracking-tight text-[color:var(--secondary)] sm:text-2xl">
                         Trusted by Thousands Across India
                     </p>
 
                     <div class="relative mt-6 grid grid-cols-3 gap-2 sm:gap-4">
                         <div
-                            class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
+                            class="flex flex-col items-center justify-start gap-2 px-1 py-4 text-center sm:flex-row sm:items-center sm:justify-center sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
                             <img src="{{ asset('images/icons/clinically-tested.png') }}" alt="Clinically tested"
-                                class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16">
-                            <p class="text-[11px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
-                                Clean Label<br>Certified
+                                class="h-10 w-10 object-contain sm:h-16 sm:w-16 lg:h-20 lg:w-20">
+                            <p class="text-[10px] font-bold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                                Clean Label<br class="hidden sm:block">Certified
                             </p>
                         </div>
 
                         <div
-                            class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
+                            class="flex flex-col items-center justify-start gap-2 px-1 py-4 text-center sm:flex-row sm:items-center sm:justify-center sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
                             <img src="{{ asset('images/icons/premium-quality.png') }}" alt="Premium quality"
-                                class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16">
-                            <p class="text-[11px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
-                                Premium Quality<br>Ingredients
+                                class="h-10 w-10 object-contain sm:h-16 sm:w-16 lg:h-20 lg:w-20">
+                            <p class="text-[10px] font-bold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                                Premium Quality<br class="hidden sm:block">Ingredients
                             </p>
                         </div>
 
                         <div
-                            class="flex flex-col items-center justify-center gap-1 px-2 py-2 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
+                            class="flex flex-col items-center justify-start gap-2 px-1 py-4 text-center sm:flex-row sm:items-center sm:justify-center sm:gap-3 sm:px-4 sm:py-3 sm:text-left">
                             <img src="{{ asset('images/icons/safe-daily-use.png') }}" alt="Safe and effective"
-                                class="h-8 w-8 object-contain sm:h-14 sm:w-14 lg:h-16 lg:w-16">
-                            <p class="text-[11px] font-extrabold leading-tight text-[color:var(--secondary)] sm:text-sm">
-                                Safe &amp; Effective<br>Daily Use
+                                class="h-10 w-10 object-contain sm:h-16 sm:w-16 lg:h-20 lg:w-20">
+                            <p class="text-[10px] font-bold leading-tight text-[color:var(--secondary)] sm:text-sm">
+                                Safe &amp; Effective<br class="hidden sm:block">Daily Use
                             </p>
                         </div>
                     </div>
@@ -416,70 +416,64 @@
                 <h2 class="section-heading !text-left">Shop By Concern</h2>
             </div>
 
-            <div class="new-category-carousel owl-carousel owl-theme" style="min-height: 450px;">
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <!-- Weight Management -->
-                <div class="item">
-                    <div
-                        class="group relative block h-[450px] overflow-hidden rounded-[2.5rem] bg-[#FFF0F3] ring-1 ring-black/5 transition">
-                        <div class="relative px-8 py-12 z-20 h-full flex flex-col">
-                            <h3 class="text-3xl font-black italic tracking-tighter text-[#E91E63] uppercase leading-tight">
-                                Weight<br>Management</h3>
+                <div
+                    class="group relative block h-[450px] overflow-hidden rounded-[2.5rem] bg-[#E8F5E9] ring-1 ring-black/5 transition">
+                    <div class="relative px-8 py-12 z-20 h-full flex flex-col">
+                        <h3 class="text-3xl font-black italic tracking-tighter text-[#2E7D32] uppercase leading-tight">
+                            Weight<br>Management</h3>
 
-                            <div class="mt-auto">
-                                <a href="{{ route('products.index') }}"
-                                    class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#E91E63] shadow-xl transition hover:bg-pink-50 hover:scale-105 active:scale-95">
-                                    Explore All
-                                </a>
-                            </div>
+                        <div class="mt-auto">
+                            <a href="{{ route('products.index') }}"
+                                class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#2E7D32] shadow-xl transition hover:bg-green-50 hover:scale-105 active:scale-95">
+                                Explore All
+                            </a>
                         </div>
-                        <img src="{{ asset('images/home/remenant-bg.png') }}"
-                            class="absolute bottom-0 -right-8 h-[55%] w-auto object-contain object-bottom transition-transform duration-700 group-hover:scale-110 group-hover:-translate-x-4 select-none pointer-events-none z-10">
-                        <div class="absolute bottom-0 left-0 right-0 h-[50%] bg-[#FFD1DC] rounded-t-[3rem] z-0 opacity-40">
-                        </div>
+                    </div>
+                    <img src="{{ asset('images/home/remenant-concern1.png') }}"
+                        class="absolute bottom-0 right-0 h-[55%] w-auto object-contain object-bottom transition-transform duration-700 group-hover:scale-110 group-hover:-translate-x-4 select-none pointer-events-none z-10">
+                    <div class="absolute bottom-0 left-0 right-0 h-[50%] bg-[#A5D6A7] rounded-t-[3rem] z-0 opacity-40">
                     </div>
                 </div>
 
                 <!-- Daily Performance -->
-                <div class="item">
-                    <div
-                        class="group relative block h-[450px] overflow-hidden rounded-[2.5rem] bg-[#E8F5E9] ring-1 ring-black/5 transition">
-                        <div class="relative px-8 py-12 z-20 h-full flex flex-col">
-                            <h3 class="text-3xl font-black italic tracking-tighter text-[#2E7D32] uppercase leading-tight">
-                                Daily<br>Performance</h3>
+                <div
+                    class="group relative block h-[450px] overflow-hidden rounded-[2.5rem] bg-[#FFF0F3] ring-1 ring-black/5 transition">
+                    <div class="relative px-8 py-12 z-20 h-full flex flex-col">
+                        <h3 class="text-3xl font-black italic tracking-tighter text-[#E91E63] uppercase leading-tight">
+                            Daily<br>Performance</h3>
 
-                            <div class="mt-auto">
-                                <a href="{{ route('products.index') }}"
-                                    class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#2E7D32] shadow-xl transition hover:bg-green-50 hover:scale-105 active:scale-95">
-                                    Explore All
-                                </a>
-                            </div>
+                        <div class="mt-auto">
+                            <a href="{{ route('products.index') }}"
+                                class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#E91E63] shadow-xl transition hover:bg-pink-50 hover:scale-105 active:scale-95">
+                                Explore All
+                            </a>
                         </div>
-                        <img src="{{ asset('images/products/remenant-product13.jpg') }}"
-                            class="absolute bottom-0 -right-8 h-[55%] w-auto object-contain object-bottom transition-transform duration-700 group-hover:scale-110 select-none pointer-events-none z-10 opacity-40">
-                        <div class="absolute bottom-0 left-0 right-0 h-[50%] bg-[#A5D6A7] rounded-t-[3rem] z-0 opacity-30">
-                        </div>
+                    </div>
+                    <img src="{{ asset('images/home/remenant-concern2.png') }}"
+                        class="absolute bottom-0 right-0 h-[55%] w-auto object-contain object-bottom transition-transform duration-700 group-hover:scale-110 group-hover:-translate-x-4 select-none pointer-events-none z-10">
+                    <div class="absolute bottom-0 left-0 right-0 h-[50%] bg-[#FFD1DC] rounded-t-[3rem] z-0 opacity-30">
                     </div>
                 </div>
 
                 <!-- Hair & Skin -->
-                <div class="item">
-                    <div
-                        class="group relative block h-[450px] overflow-hidden rounded-[2.5rem] bg-[#FFF3E0] ring-1 ring-black/5 transition">
-                        <div class="relative px-8 py-12 z-20 h-full flex flex-col">
-                            <h3 class="text-3xl font-black italic tracking-tighter text-[#EF6C00] uppercase leading-tight">
-                                Hair &<br>Skin Care</h3>
+                <div
+                    class="group relative block h-[450px] overflow-hidden rounded-[2.5rem] bg-[#FFF3E0] ring-1 ring-black/5 transition">
+                    <div class="relative px-8 py-12 z-20 h-full flex flex-col">
+                        <h3 class="text-3xl font-black italic tracking-tighter text-[#EF6C00] uppercase leading-tight">
+                            Hair &<br>Skin Care</h3>
 
-                            <div class="mt-auto">
-                                <a href="{{ route('products.index') }}"
-                                    class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#EF6C00] shadow-xl transition hover:bg-orange-50 hover:scale-105 active:scale-95">
-                                    Explore All
-                                </a>
-                            </div>
+                        <div class="mt-auto">
+                            <a href="{{ route('products.index') }}"
+                                class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#EF6C00] shadow-xl transition hover:bg-orange-50 hover:scale-105 active:scale-95">
+                                Explore All
+                            </a>
                         </div>
-                        <img src="{{ asset('images/products/remenant-product12.jpg') }}"
-                            class="absolute bottom-0 -right-8 h-[55%] w-auto object-contain object-bottom transition-transform duration-700 group-hover:scale-110 select-none pointer-events-none z-10 opacity-40">
-                        <div class="absolute bottom-0 left-0 right-0 h-[50%] bg-[#FFCC80] rounded-t-[3rem] z-0 opacity-30">
-                        </div>
+                    </div>
+                    <img src="{{ asset('images/home/remenant-concern3.png') }}"
+                        class="absolute bottom-0 right-0 h-[55%] w-auto object-contain object-bottom transition-transform duration-700 group-hover:scale-110 group-hover:-translate-x-4 select-none pointer-events-none z-10">
+                    <div class="absolute bottom-0 left-0 right-0 h-[50%] bg-[#FFCC80] rounded-t-[3rem] z-0 opacity-30">
                     </div>
                 </div>
             </div>
@@ -493,7 +487,7 @@
             <!-- Mobile Image -->
             <source media="(max-width: 640px)" srcset="{{ asset('images/banners/mobile-bg/remenant-bg4.jpg') }}">
             <!-- Desktop Image -->
-            <img src="{{ asset('images/banners/remenant-bg21.jpg') }}" alt="Remenant Wellness" class="w-full h-auto"
+            <img src="{{ asset('images/home/remenant-banner.jpg') }}" alt="Remenant Wellness" class="w-full h-auto"
                 loading="eager">
         </picture>
     </section>

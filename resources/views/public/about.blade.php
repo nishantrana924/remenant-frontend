@@ -23,7 +23,7 @@
                 </div>
                 <div class="relative">
                     <div class="aspect-square overflow-hidden rounded-[3rem] bg-[var(--bg-section)]">
-                        <img src="{{ asset('images/home/remenant-bg2.jpg') }}" alt="Advanced Engineering"
+                        <img src="{{ asset('images/about/remenant-bg.jpg') }}" alt="Advanced Engineering"
                             class="h-full w-full object-cover">
                     </div>
                 </div>
@@ -163,8 +163,8 @@
                 <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
                     <div class="w-full lg:w-[35%] group">
                         <div class="relative aspect-square max-w-sm mx-auto overflow-hidden rounded-[2.5rem] bg-white border border-black/5 shadow-xl transition-all duration-500 group-hover:shadow-2xl">
-                            <img src="{{ asset('images/logo/remenant-health-logo.png') }}" alt="Dr. Jimmy Thummar"
-                                class="h-full w-full object-contain p-16 lg:p-20 opacity-40 transition duration-700 group-hover:scale-105">
+                            <img src="{{ asset('images/about/remenant-jimmy.jpg') }}" alt="Dr. Jimmy Thummar"
+                                class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
                         </div>
                     </div>
                     <div class="w-full lg:w-[65%]">
@@ -192,8 +192,8 @@
                 <div class="flex flex-col lg:flex-row-reverse items-center gap-12 lg:gap-24">
                     <div class="w-full lg:w-[35%] group">
                         <div class="relative aspect-square max-w-sm mx-auto overflow-hidden rounded-[2.5rem] bg-white border border-black/5 shadow-xl transition-all duration-500 group-hover:shadow-2xl">
-                            <img src="{{ asset('images/logo/remenant-health-logo.png') }}" alt="Het Lakhani"
-                                class="h-full w-full object-contain p-16 lg:p-20 opacity-40 transition duration-700 group-hover:scale-105">
+                            <img src="{{ asset('images/about/remenant-het.jpg') }}" alt="Het Lakhani"
+                                class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
                         </div>
                     </div>
                     <div class="w-full lg:w-[65%] lg:text-right">
@@ -304,7 +304,7 @@
                     <div class="order-2 lg:order-1 flex justify-center lg:block">
                         <div
                             class="lg:absolute relative -mt-10 lg:mt-0 bottom-0 left-0 lg:left-10 w-full lg:w-[450px] flex justify-center lg:justify-start pointer-events-none">
-                            <img src="{{ asset('images/home/remenant-bg1.png') }}" alt="Upgrade Your Health"
+                            <img src="{{ asset('images/about/remenant-cta.png') }}" alt="Upgrade Your Health"
                                 class="w-[260px] sm:w-[320px] lg:w-full h-auto block lg:scale-105 lg:origin-bottom transition-transform duration-500 hover:scale-110">
                         </div>
                     </div>
