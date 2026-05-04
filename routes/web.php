@@ -18,6 +18,22 @@ Route::get('/contact', function () {
     return view('public.contact');
 })->name('contact');
 
+Route::get('/terms-and-conditions', function () {
+    return view('public.terms');
+})->name('terms');
+
+Route::get('/privacy-policy', function () {
+    return view('public.privacy');
+})->name('privacy');
+
+Route::get('/shipping-guide', function () {
+    return view('public.shipping');
+})->name('shipping');
+
+Route::get('/refund-policy', function () {
+    return view('public.refund');
+})->name('refund');
+
 Route::get('/cart', function () {
     return view('public.cart');
 })->name('cart');

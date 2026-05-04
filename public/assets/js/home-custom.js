@@ -111,32 +111,5 @@ $(document).ready(function () {
 
     initTestimonialCarousel();
 
-    // New Category Slider
-    function initNewCategoryCarousel() {
-        console.log('New Category Slider Init Start');
-        const newCategoryCarousel = $(".new-category-carousel").owlCarousel({
-            items: 1,
-            margin: 20,
-            loop: true,
-            autoplay: false,
-            nav: false,
-            dots: false,
-            smartSpeed: 800,
-            responsive: {
-                0: { items: 1, stagePadding: 20, margin: 16 },
-                768: { items: 2, stagePadding: 0, margin: 20 },
-                1024: { items: 3, stagePadding: 0, margin: 20 }
-            },
-            onInitialized: function() {
-                $('.new-category-carousel').addClass('owl-loaded');
-                console.log('New Category Slider Initialized');
-            }
-        });
-
-        setTimeout(() => {
-            newCategoryCarousel.trigger('refresh.owl.carousel');
-        }, 50);
-    }
-
-    initNewCategoryCarousel();
+    initTestimonialCarousel();
 });

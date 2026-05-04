@@ -35,23 +35,28 @@
                     <label for="email" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email Address</label>
                     <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
                            class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300"
-                           placeholder="your@email.com">
+                           placeholder="Enter Your mail">
                     @error('email')
                         <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Password -->
-                <div class="space-y-2">
+                <div class="space-y-2" x-data="{ show: false }">
                     <div class="flex items-center justify-between px-1">
                         <label for="password" class="text-[10px] font-black uppercase tracking-widest text-gray-400">Password</label>
                         @if (Route::has('password.request'))
                             <a href="{{ route('password.request') }}" class="text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-[color:var(--primary)] transition">Forgot?</a>
                         @endif
                     </div>
-                    <input id="password" type="password" name="password" required autocomplete="current-password"
-                           class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300"
-                           placeholder="••••••••">
+                    <div class="relative group">
+                        <input id="password" :type="show ? 'text' : 'password'" name="password" required autocomplete="current-password"
+                               class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 pr-14"
+                               placeholder="••••••••">
+                        <button type="button" @click="show = !show" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[color:var(--primary)] transition-colors">
+                            <i :data-lucide="show ? 'eye-off' : 'eye'" class="h-4 w-4"></i>
+                        </button>
+                    </div>
                     @error('password')
                         <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
                     @enderror

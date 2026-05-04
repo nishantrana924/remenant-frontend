@@ -1,72 +1,71 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    @if (session('status'))
-        <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-            <div class="flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                {{ session('status') }}
-            </div>
+@extends('public.layouts.app')
+
+@section('title', 'Forgot Password - ' . config('app.name', 'Remenant Health'))
+
+@section('content')
+<div class="bg-[var(--bg-main)] flex flex-col lg:flex-row lg:h-[calc(100vh-100px)] lg:min-h-[600px]">
+    
+    <!-- Left Side: Full Bleed Image (Desktop Only) -->
+    <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center p-12 text-center">
+        <img src="{{ asset('images/products/remenant-product12.jpg') }}" alt="Recovery" class="absolute inset-0 h-full w-full object-cover">
+        <div class="absolute inset-0 bg-black/40"></div>
+        <div class="relative z-10">
+            <h2 class="text-6xl font-black italic tracking-tighter text-white uppercase leading-none mb-6">Recover<br>Your Path.</h2>
+            <div class="h-1.5 w-16 bg-[color:var(--primary)] mx-auto rounded-full"></div>
         </div>
-    @endif
+    </div>
 
-    <form method="POST" action="{{ route('password.email') }}">
-        @csrf
+    <!-- Right Side: Forgot Password Form -->
+    <div class="flex-1 flex items-start justify-center p-6 lg:pt-32 relative">
+        <div class="w-full max-w-[440px]">
+            
+            <div class="mb-10">
+                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-[color:var(--primary)] mb-3">Security</p>
+                <h1 class="text-4xl font-black italic tracking-tighter text-[color:var(--text-primary)] uppercase leading-none mb-6">Password Recovery</h1>
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
+                    Forgot your password? No problem. Just let us know your email address and we will email you a password reset link.
+                </p>
+            </div>
 
-        <!-- Header -->
-        <div class="mb-8">
-            <div class="flex justify-center mb-4">
-                <div class="bg-blue-100 rounded-full p-3">
-                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                    </svg>
+            <!-- Session Status -->
+            @if (session('status'))
+                <div class="mb-6 rounded-2xl bg-green-50 p-4 ring-1 ring-green-100 flex items-center gap-3">
+                    <i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>
+                    <p class="text-[11px] font-bold text-green-700 uppercase tracking-wider">{{ session('status') }}</p>
                 </div>
-            </div>
-            <h2 class="text-3xl font-bold text-gray-900 mb-2 text-center">Forgot Password?</h2>
-            <p class="text-gray-600 text-center">
-                No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.
-            </p>
-        </div>
+            @endif
 
-        <!-- Email Address -->
-        <div class="mb-6">
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                {{ __('Email Address') }}
-            </label>
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
-                    </svg>
+            <form method="POST" action="{{ route('password.email') }}" class="space-y-6">
+                @csrf
+
+                <!-- Email Address -->
+                <div class="space-y-2">
+                    <label for="email" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email Address</label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
+                           class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300"
+                           placeholder="Enter Your mail">
+                    @error('email')
+                        <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
+                    @enderror
                 </div>
-                <input id="email" 
-                       class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('email') border-red-500 @enderror" 
-                       type="email" 
-                       name="email" 
-                       value="{{ old('email') }}" 
-                       required 
-                       autofocus
-                       placeholder="Enter your email address">
-            </div>
-            @error('email')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
 
-        <!-- Submit Button -->
-        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-            {{ __('Email Password Reset Link') }}
-        </button>
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full rounded-2xl bg-[color:var(--text-primary)] py-5 text-xs font-black text-white uppercase tracking-[0.2em] shadow-2xl shadow-black/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 group">
+                        Send Reset Link
+                        <i data-lucide="mail" class="h-4 w-4 transition-transform group-hover:scale-110"></i>
+                    </button>
+                </div>
 
-        <!-- Back to Login -->
-        <div class="mt-6 text-center">
-            <a href="{{ route('login') }}" class="text-sm text-blue-600 hover:text-blue-700 font-medium transition inline-flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
-                {{ __('Back to Login') }}
-            </a>
+                <!-- Back to Login -->
+                <div class="pt-6 text-center">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                        Remembered? 
+                        <a href="{{ route('login') }}" class="text-[color:var(--primary)] hover:underline underline-offset-4">Back to Sign In</a>
+                    </p>
+                </div>
+            </form>
         </div>
-    </form>
-</x-guest-layout>
+    </div>
+</div>
+@endsection

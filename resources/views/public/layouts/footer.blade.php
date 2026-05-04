@@ -76,13 +76,13 @@
                 <h3 class="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">
                     Assistance</h3>
                 <ul class="mt-6 space-y-3 text-sm font-medium">
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Refund
+                    <li><a href="{{ route('refund') }}" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Refund
                             Policy</a></li>
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Shipping
+                    <li><a href="{{ route('shipping') }}" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Shipping
                             Guide</a></li>
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Privacy
+                    <li><a href="{{ route('privacy') }}" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Privacy
                             Policy</a></li>
-                    <li><a href="#" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Terms &
+                    <li><a href="{{ route('terms') }}" class="text-[color:var(--text-primary)]/70 hover:text-black transition">Terms &
                             Conditions</a></li>
                 </ul>
             </div>

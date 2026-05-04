@@ -27,7 +27,7 @@
                     <label for="name" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Full Name</label>
                     <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus
                            class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner"
-                           placeholder="John Doe">
+                           placeholder="Enter your full name">
                     @error('name')
                         <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
                     @enderror
@@ -38,7 +38,7 @@
                     <label for="email" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email Address</label>
                     <input id="email" type="email" name="email" value="{{ old('email') }}" required
                            class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner"
-                           placeholder="your@email.com">
+                           placeholder="Enter you mail">
                     @error('email')
                         <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
                     @enderror
@@ -46,22 +46,32 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <!-- Password -->
-                    <div class="space-y-2">
+                    <div class="space-y-2" x-data="{ show: false }">
                         <label for="password" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Password</label>
-                        <input id="password" type="password" name="password" required autocomplete="new-password"
-                               class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner"
-                               placeholder="••••••••">
+                        <div class="relative group">
+                            <input id="password" :type="show ? 'text' : 'password'" name="password" required autocomplete="new-password"
+                                   class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner pr-14"
+                                   placeholder="••••••••">
+                            <button type="button" @click="show = !show" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[color:var(--primary)] transition-colors">
+                                <i :data-lucide="show ? 'eye-off' : 'eye'" class="h-4 w-4"></i>
+                            </button>
+                        </div>
                         @error('password')
                             <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Confirm Password -->
-                    <div class="space-y-2">
+                    <div class="space-y-2" x-data="{ show: false }">
                         <label for="password_confirmation" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Confirm</label>
-                        <input id="password_confirmation" type="password" name="password_confirmation" required
-                               class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner"
-                               placeholder="••••••••">
+                        <div class="relative group">
+                            <input id="password_confirmation" :type="show ? 'text' : 'password'" name="password_confirmation" required
+                                   class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner pr-14"
+                                   placeholder="••••••••">
+                            <button type="button" @click="show = !show" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[color:var(--primary)] transition-colors">
+                                <i :data-lucide="show ? 'eye-off' : 'eye'" class="h-4 w-4"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
