@@ -56,4 +56,23 @@ class OrderController extends BaseController
         $this->service->delete($id);
         return redirect()->route('admin.orders.index')->with('success', 'Order deleted successfully.');
     }
+
+    /**
+     * AJAX status update for Shopify-style command center
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $data = $request->only(['status', 'delivery_status', 'tracking_id', 'courier_name', 'payment_status']);
+        
+        // If status is being updated to processing, we could trigger stock locking logic here
+        // if ($request->status === 'processing') { ... }
+
+        $this->service->update($id, $data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order updated successfully',
+            'order' => $this->service->getById($id)
+        ]);
+    }
 }

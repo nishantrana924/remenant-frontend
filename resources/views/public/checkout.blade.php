@@ -1,255 +1,270 @@
 @extends('public.layouts.app')
 
-@section('title', 'Checkout - ' . config('app.name', 'Remenant Health'))
+@section('title', 'Checkout - Remenant')
 
 @section('content')
-<div class="bg-[var(--bg-main)] min-h-screen pt-24 pb-12 sm:pt-32 sm:pb-24">
-    <div class="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
-        
-        <!-- Page Header -->
-        <div class="flex items-center justify-between mb-10 sm:mb-16">
-            <div>
-                <a href="{{ url()->previous() }}" class="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-[color:var(--primary)] transition group">
-                    <i data-lucide="arrow-left" class="h-4 w-4 transition-transform group-hover:-translate-x-1"></i>
-                    Back to shopping
+<div class="min-h-screen bg-[#FDFCFB] pt-24 pb-12 px-4">
+    <div class="max-w-[1300px] mx-auto">
+        <!-- Compact Header -->
+        <div class="flex items-center justify-between mb-8 pb-6 border-b border-black/5">
+            <div class="flex items-center gap-4">
+                <a href="{{ url()->previous() }}" class="h-10 w-10 flex items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-black/5 hover:bg-orange-50 transition-colors">
+                    <i data-lucide="chevron-left" class="h-5 w-5 text-slate-600"></i>
                 </a>
-                <h1 class="text-3xl sm:text-4xl font-black text-[color:var(--text-primary)] mt-4 tracking-tight uppercase">Checkout</h1>
+                <div>
+                    <h1 class="text-xl font-black italic tracking-tighter uppercase text-slate-900">Secure Checkout</h1>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Order Review & Shipping</p>
+                </div>
             </div>
-            <div class="hidden sm:flex items-center gap-4 text-xs font-black uppercase tracking-widest text-gray-400">
-                <span class="text-[color:var(--primary)]">1. Information</span>
-                <span class="w-8 h-px bg-gray-200"></span>
-                <span>2. Shipping</span>
-                <span class="w-8 h-px bg-gray-200"></span>
-                <span>3. Payment</span>
+            <div class="hidden sm:flex items-center gap-6 opacity-40 grayscale">
+                <img src="{{ asset('images/icons/visa.png') }}" alt="Visa" class="h-3 object-contain">
+                <img src="{{ asset('images/icons/mastercard.png') }}" alt="Mastercard" class="h-5 object-contain">
+                <img src="{{ asset('images/icons/pci.png') }}" alt="PCI" class="h-6 object-contain">
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
             
             <!-- Left Column: Checkout Form -->
-            <div class="lg:col-span-7 space-y-12">
-                
-                <!-- Contact Information -->
-                <section>
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-[color:var(--primary)] shadow-sm">
-                            <i data-lucide="user" class="h-6 w-6"></i>
-                        </div>
-                        <h2 class="text-xl font-extrabold text-[color:var(--text-primary)] tracking-tight uppercase">Contact Information</h2>
-                    </div>
+            <div class="lg:col-span-7">
+                <form id="checkout-form" method="POST" action="{{ route('checkout.store') }}" class="space-y-6">
+                    @csrf
+                    @if(isset($buyNowProduct))
+                        <input type="hidden" name="buy_now_product_id" value="{{ $buyNowProduct->id }}">
+                    @endif
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email Address</label>
-                            <input type="email" placeholder="alex@example.com" class="w-full rounded-2xl bg-white border border-gray-100 px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:outline-none focus:border-[color:var(--primary)] shadow-sm transition-all">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Phone Number</label>
-                            <input type="tel" placeholder="+91 98765 43210" class="w-full rounded-2xl bg-white border border-gray-100 px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:outline-none focus:border-[color:var(--primary)] shadow-sm transition-all">
-                        </div>
+                    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm ring-1 ring-black/[0.03] space-y-8">
+                        <!-- Contact Information -->
+                        <section>
+                            <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                                <span class="h-1.5 w-1.5 rounded-full bg-orange-500"></span>
+                                01. Contact Information
+                            </h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="space-y-1.5">
+                                    <label class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Email Address</label>
+                                    <input type="email" name="email" required class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all" value="{{ auth()->user()->email }}">
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Phone Number</label>
+                                    <input type="tel" name="phone" required pattern="[0-9]{10}" placeholder="9876543210" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Shipping Address -->
+                        <section>
+                            <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                                <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                                02. Shipping Address
+                            </h2>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <input type="text" name="first_name" required placeholder="First Name" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
+                                    <input type="text" name="last_name" required placeholder="Last Name" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
+                                </div>
+                                <input type="text" name="address" required placeholder="Street Address, House No, Area" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <input type="text" name="pincode" required pattern="[0-9]{6}" placeholder="Pincode" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
+                                    <input type="text" id="city-input" name="city" required placeholder="City" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
+                                    <div class="relative">
+                                        <select id="state-select" name="state" required class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 appearance-none transition-all">
+                                            <option value="">State</option>
+                                            <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                            <option value="Assam">Assam</option>
+                                            <option value="Bihar">Bihar</option>
+                                            <option value="Chandigarh">Chandigarh</option>
+                                            <option value="Chhattisgarh">Chhattisgarh</option>
+                                            <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
+                                            <option value="Daman and Diu">Daman and Diu</option>
+                                            <option value="Delhi">Delhi</option>
+                                            <option value="Goa">Goa</option>
+                                            <option value="Gujarat">Gujarat</option>
+                                            <option value="Haryana">Haryana</option>
+                                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                            <option value="Jharkhand">Jharkhand</option>
+                                            <option value="Karnataka">Karnataka</option>
+                                            <option value="Kerala">Kerala</option>
+                                            <option value="Ladakh">Ladakh</option>
+                                            <option value="Lakshadweep">Lakshadweep</option>
+                                            <option value="Madhya Pradesh" selected>Madhya Pradesh</option>
+                                            <option value="Maharashtra">Maharashtra</option>
+                                            <option value="Manipur">Manipur</option>
+                                            <option value="Meghalaya">Meghalaya</option>
+                                            <option value="Mizoram">Mizoram</option>
+                                            <option value="Nagaland">Nagaland</option>
+                                            <option value="Odisha">Odisha</option>
+                                            <option value="Puducherry">Puducherry</option>
+                                            <option value="Punjab">Punjab</option>
+                                            <option value="Rajasthan">Rajasthan</option>
+                                            <option value="Sikkim">Sikkim</option>
+                                            <option value="Tamil Nadu">Tamil Nadu</option>
+                                            <option value="Telangana">Telangana</option>
+                                            <option value="Tripura">Tripura</option>
+                                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                            <option value="Uttarakhand">Uttarakhand</option>
+                                            <option value="West Bengal">West Bengal</option>
+                                        </select>
+                                        <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Payment Method -->
+                        <section>
+                            <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                03. Payment Method
+                            </h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="relative flex items-center gap-3 p-4 rounded-xl border-2 border-slate-50 cursor-pointer hover:border-orange-500/20 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/30 transition-all">
+                                    <input type="radio" name="payment_method" value="prepaid" class="h-4 w-4 text-orange-500" checked>
+                                    <div class="flex-1">
+                                        <span class="block text-xs font-black text-slate-900 uppercase">Online Payment</span>
+                                        <span class="block text-[9px] font-bold text-slate-400 uppercase mt-0.5">UPI, Cards, NetBanking</span>
+                                    </div>
+                                </label>
+                                <label class="relative flex items-center gap-3 p-4 rounded-xl border-2 border-slate-50 cursor-pointer hover:border-orange-500/20 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/30 transition-all">
+                                    <input type="radio" name="payment_method" value="cod" class="h-4 w-4 text-orange-500">
+                                    <div class="flex-1">
+                                        <span class="block text-xs font-black text-slate-900 uppercase">Cash on Delivery</span>
+                                        <span class="block text-[9px] font-bold text-slate-400 uppercase mt-0.5">Pay at your doorstep</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </section>
                     </div>
-                </section>
 
-                <!-- Shipping Address -->
-                <section>
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 shadow-sm">
-                            <i data-lucide="map-pin" class="h-6 w-6"></i>
-                        </div>
-                        <h2 class="text-xl font-extrabold text-[color:var(--text-primary)] tracking-tight uppercase">Shipping Address</h2>
-                    </div>
-
-                    <div class="space-y-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">First Name</label>
-                                <input type="text" placeholder="First Name" class="w-full rounded-2xl bg-white border border-gray-100 px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:outline-none focus:border-[color:var(--primary)] shadow-sm transition-all">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Last Name</label>
-                                <input type="text" placeholder="Last Name" class="w-full rounded-2xl bg-white border border-gray-100 px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:outline-none focus:border-[color:var(--primary)] shadow-sm transition-all">
-                            </div>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Address Line 1</label>
-                            <input type="text" placeholder="Flat, House no., Building, Company, Apartment" class="w-full rounded-2xl bg-white border border-gray-100 px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:outline-none focus:border-[color:var(--primary)] shadow-sm transition-all">
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Pincode</label>
-                                <input type="text" placeholder="400051" class="w-full rounded-2xl bg-white border border-gray-100 px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:outline-none focus:border-[color:var(--primary)] shadow-sm transition-all">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">City</label>
-                                <input type="text" placeholder="Mumbai" class="w-full rounded-2xl bg-white border border-gray-100 px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:outline-none focus:border-[color:var(--primary)] shadow-sm transition-all">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">State</label>
-                                <select class="w-full rounded-2xl bg-white border border-gray-100 px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:outline-none focus:border-[color:var(--primary)] shadow-sm transition-all appearance-none">
-                                    <option value="Maharashtra">Maharashtra</option>
-                                    <option value="Delhi">Delhi</option>
-                                    <option value="Karnataka">Karnataka</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Payment Method -->
-                <section>
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-sm">
-                            <i data-lucide="credit-card" class="h-6 w-6"></i>
-                        </div>
-                        <h2 class="text-xl font-extrabold text-[color:var(--text-primary)] tracking-tight uppercase">Payment Method</h2>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <label class="relative flex items-center gap-4 p-6 rounded-2xl bg-white border-2 border-gray-100 cursor-pointer transition-all hover:border-[color:var(--primary)]/30 group has-[:checked]:border-[color:var(--primary)] has-[:checked]:bg-[var(--primary-soft)]">
-                            <input type="radio" name="payment" value="prepaid" class="peer h-5 w-5 text-[color:var(--primary)] focus:ring-[color:var(--primary)] border-gray-300" checked>
-                            <div class="flex-1">
-                                <span class="block text-sm font-black text-[color:var(--text-primary)] uppercase tracking-wider">Online Payment</span>
-                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">UPI, Cards, NetBanking</span>
-                            </div>
-                            <div class="h-10 w-10 flex items-center justify-center rounded-xl bg-gray-50 group-hover:bg-white transition-colors peer-checked:bg-white">
-                                <i data-lucide="zap" class="h-5 w-5 text-[color:var(--primary)]"></i>
-                            </div>
-                        </label>
-
-                        <label class="relative flex items-center gap-4 p-6 rounded-2xl bg-white border-2 border-gray-100 cursor-pointer transition-all hover:border-[color:var(--primary)]/30 group has-[:checked]:border-[color:var(--primary)] has-[:checked]:bg-[var(--primary-soft)]">
-                            <input type="radio" name="payment" value="cod" class="peer h-5 w-5 text-[color:var(--primary)] focus:ring-[color:var(--primary)] border-gray-300">
-                            <div class="flex-1">
-                                <span class="block text-sm font-black text-[color:var(--text-primary)] uppercase tracking-wider">Cash on Delivery</span>
-                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Pay at your doorstep</span>
-                            </div>
-                            <div class="h-10 w-10 flex items-center justify-center rounded-xl bg-gray-50 group-hover:bg-white transition-colors peer-checked:bg-white">
-                                <i data-lucide="truck" class="h-5 w-5 text-gray-400"></i>
-                            </div>
-                        </label>
-                    </div>
-                </section>
-
-                <div class="pt-4">
-                    <button class="w-full rounded-2xl bg-[color:var(--text-primary)] py-5 text-base font-black text-white uppercase tracking-[0.2em] shadow-2xl transition hover:brightness-110 active:scale-[0.98] flex items-center justify-center gap-4">
-                        Confirm Purchase
-                        <i data-lucide="arrow-right" class="h-5 w-5"></i>
+                    <button type="submit" id="checkout-btn" class="w-full rounded-2xl bg-slate-900 py-4 text-sm font-black text-white uppercase tracking-[0.2em] shadow-xl hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                        <span class="btn-text">Place Order & Pay</span>
+                        <i data-lucide="arrow-right" class="h-4 w-4 btn-icon"></i>
                     </button>
-                    <p class="text-[10px] font-bold text-gray-400 text-center uppercase tracking-widest mt-6 flex items-center justify-center gap-2">
-                        <i data-lucide="shield-check" class="h-4 w-4 text-emerald-500"></i>
-                        SSL Secure & Encrypted Checkout
-                    </p>
-                </div>
-
+                </form>
             </div>
 
             <!-- Right Column: Order Summary -->
             <div class="lg:col-span-5">
-                <div class="lg:sticky lg:top-32 space-y-8">
-                    <div class="bg-white rounded-[2.5rem] p-8 sm:p-10 shadow-sm ring-1 ring-black/[0.03]">
-                        <h2 class="text-xl font-extrabold text-[color:var(--text-primary)] tracking-tight uppercase mb-8">Order Summary</h2>
-                        
-                        <!-- Product List -->
-                        <div class="space-y-6 pb-8 border-b border-black/5 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                            @if($product)
-                                <div class="flex gap-6 items-center">
-                                    <div class="h-24 w-24 shrink-0 rounded-2xl bg-gray-50 p-2 ring-1 ring-black/5 relative">
-                                        <img src="{{ asset('images/products/' . $product['image']) }}" alt="{{ $product['title'] }}" class="h-full w-full object-contain">
-                                        <span class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-[color:var(--text-primary)] text-white text-[10px] font-black flex items-center justify-center shadow-lg">1</span>
-                                    </div>
-                                    <div class="flex-1">
-                                        <h3 class="text-sm font-black text-[color:var(--text-primary)] uppercase tracking-tight leading-snug">{{ $product['title'] }}</h3>
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{{ $product['tagline'] }}</p>
-                                        <div class="flex items-center justify-between mt-2">
-                                            <span class="text-base font-black text-[color:var(--text-primary)]">₹{{ number_format($product['price']) }}</span>
-                                        </div>
-                                    </div>
+                <div class="lg:sticky lg:top-28 bg-white rounded-3xl p-6 shadow-sm ring-1 ring-black/[0.03]">
+                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Order Summary</h2>
+                    
+                    <div class="space-y-4 mb-6">
+                        @php
+                            $getImgPath = function($img) {
+                                if (!$img) return asset('images/products/placeholder.jpg');
+                                if (Str::startsWith($img, 'products/') || Str::startsWith($img, 'storage/')) {
+                                    return asset('storage/' . str_replace('storage/', '', $img));
+                                }
+                                return asset('images/products/' . $img);
+                            };
+                        @endphp
+
+                        @foreach($items as $item)
+                            <div class="flex gap-4 items-center p-3 rounded-2xl bg-slate-50/50 ring-1 ring-black/[0.02]">
+                                <div class="h-16 w-16 shrink-0 rounded-xl bg-white p-2 shadow-sm relative">
+                                    <img src="{{ $getImgPath($item['image']) }}" alt="{{ $item['title'] }}" class="h-full w-full object-contain">
+                                    <span class="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-slate-900 text-white text-[9px] font-black flex items-center justify-center">{{ $item['quantity'] }}</span>
                                 </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-xs font-black text-slate-900 uppercase truncate">{{ $item['title'] }}</h3>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase mt-0.5 truncate">₹{{ number_format($item['price']) }} x {{ $item['quantity'] }}</p>
+                                    <p class="text-sm font-black text-slate-900 mt-1">₹{{ number_format($item['price'] * $item['quantity']) }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="space-y-3 pt-6 border-t border-slate-100">
+                        <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                            <span>Subtotal</span>
+                            <span class="text-slate-900 font-black">₹{{ number_format($subtotal) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                            <span>Shipping</span>
+                            @if($shipping == 0)
+                                <span class="text-emerald-600 font-black">Free</span>
                             @else
-                                @php
-                                    $mockCartItems = [
-                                        [
-                                            'title' => 'Ultimate Immunity Duo',
-                                            'tagline' => 'Double protection',
-                                            'price' => 3299,
-                                            'image' => 'remenant-product1.jpg',
-                                            'qty' => 1
-                                        ],
-                                        [
-                                            'title' => 'Glow & Strength Bundle',
-                                            'tagline' => 'Beauty essentials',
-                                            'price' => 3499,
-                                            'image' => 'remenant-product2.jpg',
-                                            'qty' => 2
-                                        ]
-                                    ];
-                                    $totalPrice = array_reduce($mockCartItems, fn($acc, $item) => $acc + ($item['price'] * $item['qty']), 0);
-                                @endphp
-                                @foreach($mockCartItems as $item)
-                                    <div class="flex gap-6 items-center">
-                                        <div class="h-24 w-24 shrink-0 rounded-2xl bg-gray-50 p-2 ring-1 ring-black/5 relative">
-                                            <img src="{{ asset('images/products/' . $item['image']) }}" alt="{{ $item['title'] }}" class="h-full w-full object-contain">
-                                            <span class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-[color:var(--text-primary)] text-white text-[10px] font-black flex items-center justify-center shadow-lg">{{ $item['qty'] }}</span>
-                                        </div>
-                                        <div class="flex-1">
-                                            <h3 class="text-sm font-black text-[color:var(--text-primary)] uppercase tracking-tight leading-snug">{{ $item['title'] }}</h3>
-                                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{{ $item['tagline'] }}</p>
-                                            <div class="flex items-center justify-between mt-2">
-                                                <span class="text-base font-black text-[color:var(--text-primary)]">₹{{ number_format($item['price']) }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                                <span class="text-slate-900 font-black">₹{{ number_format($shipping) }}</span>
                             @endif
                         </div>
-
-                        <!-- Calculations -->
-                        <div class="py-8 space-y-4 border-b border-black/5">
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Subtotal</span>
-                                <span class="font-black text-[color:var(--text-primary)]">₹{{ number_format($product ? $product['price'] : ($totalPrice ?? 0)) }}</span>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Shipping</span>
-                                <span class="font-bold text-emerald-600 uppercase tracking-widest text-[10px]">Free</span>
-                            </div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Tax (GST)</span>
-                                <span class="font-black text-[color:var(--text-primary)]">₹0</span>
-                            </div>
-                        </div>
-
-                        <!-- Total -->
-                        <div class="pt-8">
-                            <div class="flex justify-between items-end">
-                                <div>
-                                    <span class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Total to pay</span>
-                                    <span class="text-4xl font-black text-[color:var(--text-primary)] tracking-tighter">₹{{ number_format($product ? $product['price'] : ($totalPrice ?? 0)) }}</span>
-                                </div>
-                                <div class="bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 flex items-center gap-2">
-                                    <div class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                    <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Pricing Guaranteed</span>
-                                </div>
-                            </div>
+                        <div class="flex justify-between items-center pt-4 mt-4 border-t border-slate-100">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total</span>
+                            <span class="text-2xl font-black text-slate-900">₹{{ number_format($total) }}</span>
                         </div>
                     </div>
 
-                    <!-- Trust Strip -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-6 rounded-3xl bg-white/50 border border-gray-100 flex flex-col items-center text-center gap-3">
-                            <i data-lucide="rotate-ccw" class="h-6 w-6 text-gray-400"></i>
-                            <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-tight">15-Day Easy<br>Returns Policy</span>
-                        </div>
-                        <div class="p-6 rounded-3xl bg-white/50 border border-gray-100 flex flex-col items-center text-center gap-3">
-                            <i data-lucide="award" class="h-6 w-6 text-gray-400"></i>
-                            <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-tight">Certified Safe<br>& Effective</span>
-                        </div>
+                    <div class="mt-8 flex items-center justify-center gap-2 grayscale opacity-30">
+                        <img src="{{ asset('images/icons/visa.png') }}" class="h-2.5">
+                        <img src="{{ asset('images/icons/mastercard.png') }}" class="h-4">
+                        <img src="{{ asset('images/icons/upi.png') }}" class="h-3">
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
+
+<script>
+    // Auto-Save Persistence
+    const STORAGE_KEY = 'remenant_checkout_draft';
+
+    function saveDraft() {
+        const form = document.getElementById('checkout-form');
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            if (key !== '_token') data[key] = value;
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadDraft() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        
+        try {
+            const data = JSON.parse(saved);
+            const form = document.getElementById('checkout-form');
+            Object.keys(data).forEach(key => {
+                const input = form.querySelector(`[name="${key}"]`);
+                if (input) {
+                    if (input.type === 'radio') {
+                        if (input.value === data[key]) input.checked = true;
+                    } else {
+                        input.value = data[key];
+                    }
+                }
+            });
+            if (data.city) autoDetectState(data.city);
+        } catch (e) { console.error('Failed to load draft', e); }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadDraft();
+        const form = document.getElementById('checkout-form');
+        form.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('input', saveDraft);
+            input.addEventListener('change', saveDraft);
+        });
+    });
+
+    function autoDetectState(city) {
+        const stateSelect = document.getElementById('state-select');
+        const cityLower = city.toLowerCase().trim();
+        const mapping = {
+            'ujjain': 'Madhya Pradesh',
+            'indore': 'Madhya Pradesh',
+            'bhopal': 'Madhya Pradesh',
+            'mumbai': 'Maharashtra',
+            'pune': 'Maharashtra',
+            'delhi': 'Delhi',
+            'bangalore': 'Karnataka'
+        };
+        if (mapping[cityLower]) stateSelect.value = mapping[cityLower];
+    }
+</script>
 @endsection

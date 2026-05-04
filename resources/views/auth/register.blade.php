@@ -44,6 +44,17 @@
                     @enderror
                 </div>
 
+                <!-- Contact Number -->
+                <div class="space-y-2">
+                    <label for="phone" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Contact Number</label>
+                    <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" required pattern="[0-9]{10}"
+                           class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner"
+                           placeholder="9876543210">
+                    @error('phone')
+                        <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <!-- Password -->
                     <div class="space-y-2">

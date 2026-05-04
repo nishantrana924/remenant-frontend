@@ -118,10 +118,19 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
-                            <p class="text-sm font-bold text-slate-900">#{{ $order->id }}</p>
-                            <span class="text-[10px] font-black text-emerald-500 uppercase">PAID</span>
+                            <p class="text-sm font-bold text-slate-900">#{{ $order->order_number }}</p>
+                            @php
+                                $statusColors = [
+                                    'paid' => 'text-emerald-500',
+                                    'unpaid' => 'text-rose-500',
+                                    'pending' => 'text-orange-500',
+                                    'awaiting_payment' => 'text-blue-500'
+                                ];
+                                $color = $statusColors[$order->payment_status] ?? 'text-slate-400';
+                            @endphp
+                            <span class="text-[9px] font-black {{ $color }} uppercase">{{ str_replace('_', ' ', $order->payment_status) }}</span>
                         </div>
-                        <p class="text-xs text-slate-400 truncate mt-0.5">{{ $order->user->name ?? 'Guest Customer' }}</p>
+                        <p class="text-xs text-slate-400 truncate mt-0.5">{{ $order->customer_name ?? ($order->user->name ?? 'Guest Customer') }}</p>
                         <p class="text-[9px] text-slate-300 font-bold mt-1 tracking-wider">{{ $order->created_at->diffForHumans() }}</p>
                     </div>
                 </div>

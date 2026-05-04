@@ -22,7 +22,7 @@
                     <tr class="bg-slate-50/50">
                         <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Customer Identity</th>
                         <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Contact</th>
-                        <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Orders</th>
+                        <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Account Type</th>
                         <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">LTV</th>
                         <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Actions</th>
                     </tr>
@@ -32,12 +32,12 @@
                         <tr class="hover:bg-slate-50/30 transition-colors group">
                             <td class="px-8 py-5">
                                 <div class="flex items-center gap-4">
-                                    <div class="h-12 w-12 rounded-[1.25rem] bg-indigo-50 flex items-center justify-center text-indigo-500 font-black text-lg flex-shrink-0">
+                                    <div class="h-12 w-12 rounded-[1.25rem] {{ (int)$item->role_id === 1 ? 'bg-orange-50 text-orange-500' : 'bg-indigo-50 text-indigo-500' }} flex items-center justify-center font-black text-lg flex-shrink-0">
                                         {{ strtoupper(substr($item->name, 0, 1)) }}
                                     </div>
                                     <div>
                                         <h4 class="font-black text-slate-800 leading-tight">{{ $item->name }}</h4>
-                                        <p class="text-[10px] text-slate-400 mt-1 font-bold tracking-wide uppercase">Joined {{ $item->created_at->diffForHumans() }}</p>
+                                        <p class="text-[10px] text-slate-400 mt-1 font-bold tracking-wide uppercase">ID: #{{ $item->id }}</p>
                                     </div>
                                 </div>
                             </td>
@@ -47,15 +47,21 @@
                                     <span class="text-[10px] text-slate-400">{{ $item->phone ?? 'No phone' }}</span>
                                 </div>
                             </td>
-                            <td class="px-8 py-5 text-center">
-                                <span class="px-3 py-1 bg-slate-100 rounded-lg text-[10px] font-black text-slate-500 uppercase">{{ $item->orders->count() }} Orders</span>
+                            <td class="px-8 py-5">
+                                <form action="{{ route('admin.customers.update-role', $item->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    <select name="role" onchange="this.form.submit()" class="text-[10px] font-black uppercase tracking-widest border-0 bg-transparent focus:ring-0 cursor-pointer {{ (int)$item->role_id === 1 ? 'text-orange-600' : 'text-indigo-600' }}">
+                                        <option value="2" {{ (int)$item->role_id === 2 ? 'selected' : '' }}>Regular User</option>
+                                        <option value="1" {{ (int)$item->role_id === 1 ? 'selected' : '' }}>Administrator</option>
+                                    </select>
+                                </form>
                             </td>
                             <td class="px-8 py-5">
                                 <span class="text-sm font-black text-slate-800">₹{{ number_format($item->orders()->where('payment_status', 'paid')->sum('total_amount')) }}</span>
                             </td>
-                            <td class="px-8 py-5 text-right">
-                                <a href="{{ route('admin.customers.show', $item->id) }}" class="h-9 px-4 inline-flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all text-[9px] font-black uppercase tracking-widest gap-2">
-                                    View Intel <i data-lucide="arrow-right" class="h-3.5 w-3.5"></i>
+                            <td class="px-8 py-5 text-right flex items-center justify-end gap-3">
+                                <a href="{{ route('admin.customers.show', $item->id) }}" class="h-9 w-9 inline-flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all">
+                                    <i data-lucide="eye" class="h-4 w-4"></i>
                                 </a>
                             </td>
                         </tr>

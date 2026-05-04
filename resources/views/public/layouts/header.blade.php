@@ -41,10 +41,14 @@
                 </div>
 
                 <div class="flex items-center gap-2">
+                    @php $cartCount = count(session('cart', [])); @endphp
                     <a href="{{ route('cart') }}"
-                        class="header-btn inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
+                        class="header-btn relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
                         aria-label="Cart">
                         <i data-lucide="shopping-cart" class="h-6 w-6"></i>
+                        <span class="cart-count-badge absolute -top-1 -right-1 {{ $cartCount > 0 ? '' : 'hidden' }} flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-black text-[color:var(--primary)] shadow-sm">
+                            {{ $cartCount }}
+                        </span>
                     </a>
 
                     <details class="relative" data-account-dropdown>
@@ -139,15 +143,19 @@
             <!-- Actions -->
             <div class="flex items-center gap-2">
                 <a href="{{ route('cart') }}"
-                    class="header-btn inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
+                    class="header-btn relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
                     aria-label="Cart">
                     <i data-lucide="shopping-cart" class="h-5 w-5"></i>
+                    <span class="cart-count-badge absolute -top-1 -right-1 {{ $cartCount > 0 ? '' : 'hidden' }} flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-black text-[color:var(--primary)] shadow-sm">
+                        {{ $cartCount }}
+                    </span>
                 </a>
 
                 @auth
                     <a href="{{ route('dashboard') }}"
-                        class="hidden rounded-full bg-white px-4 py-2 text-sm font-extrabold text-[color:var(--primary)] shadow-sm ring-1 ring-white/40 hover:bg-white/90 transition lg:inline-flex">
-                        Dashboard
+                        class="hidden h-10 w-10 items-center justify-center rounded-full bg-white text-[color:var(--primary)] shadow-sm ring-1 ring-white/40 hover:bg-white/90 transition lg:inline-flex"
+                        title="Account Dashboard">
+                        <i data-lucide="settings" class="h-5 w-5"></i>
                     </a>
                 @else
                     <details class="relative" data-account-dropdown>

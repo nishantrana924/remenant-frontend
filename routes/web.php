@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout')->middleware('auth');
+Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store')->middleware('auth');
+Route::get('/checkout/payment/{order}', [CheckoutController::class, 'payment'])->name('checkout.payment')->middleware('auth');
+Route::get('/track-order/{order_number?}', [CheckoutController::class, 'track'])->name('order.track');
+Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success')->middleware('auth');
+Route::get('/order/{order}/invoice', [CheckoutController::class, 'invoice'])->name('order.invoice');
+
 
 Route::get('/about', function () {
     return view('public.about');
@@ -18,9 +24,11 @@ Route::get('/contact', function () {
     return view('public.contact');
 })->name('contact');
 
-Route::get('/cart', function () {
-    return view('public.cart');
-})->name('cart');
+Route::get('/cart', [App\Http\Controllers\Public\CartController::class, 'index'])->name('cart');
+Route::post('/cart/add/{id}', [App\Http\Controllers\Public\CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/update', [App\Http\Controllers\Public\CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/remove', [App\Http\Controllers\Public\CartController::class, 'remove'])->name('cart.remove');
+Route::post('/checkout/verify', [CheckoutController::class, 'verifyPayment'])->name('checkout.verify')->middleware('auth');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
@@ -39,6 +47,8 @@ Route::get('/debug-db', [App\Http\Controllers\Admin\ArtisanController::class, 'd
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
+    Route::get('/dashboard/user', [DashboardController::class, 'user'])
+        ->name('user.dashboard');
     Route::get('/setup', [\App\Http\Controllers\Admin\ArtisanController::class, 'setup'])->name('admin.setup');
     Route::get('/debug-db', [\App\Http\Controllers\Admin\ArtisanController::class, 'debugDb'])->name('admin.debug-db');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -47,7 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Admin routes
-Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function() { return redirect()->route('admin.dashboard'); });
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
     
@@ -57,7 +67,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
     Route::resource('sliders', \App\Http\Controllers\Admin\SliderController::class);
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
+    Route::post('orders/{id}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::resource('customers', \App\Http\Controllers\Admin\UserController::class);
+    Route::post('customers/{id}/update-role', [\App\Http\Controllers\Admin\UserController::class, 'updateRole'])->name('customers.update-role');
     Route::get('inventory', [\App\Http\Controllers\Admin\InventoryController::class, 'index'])->name('inventory.index');
     Route::post('inventory/update', [\App\Http\Controllers\Admin\InventoryController::class, 'updateStock'])->name('inventory.update');
 

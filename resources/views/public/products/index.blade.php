@@ -200,10 +200,12 @@
                                     </div>
 
                                     <div class="mt-auto pt-3 relative z-10">
-                                        <a href="{{ route('products.show', $product->slug) }}"
-                                            class="block w-full text-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
-                                            Add to cart
-                                        </a>
+                                        <form action="{{ route('cart.add', $product->id) }}" method="POST" data-ajax="true">
+                                            @csrf
+                                            <button type="submit" class="w-full text-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
+                                                Add to cart
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

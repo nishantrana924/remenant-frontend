@@ -198,7 +198,7 @@ class ProductController extends Controller
         return collect($data)->map(fn($item) => (object)$item);
     }
 
-    private function getProducts()
+    public function getProducts()
     {
         $products = Product::where('status', 'published')->get();
         if ($products->isEmpty()) {
