@@ -158,11 +158,13 @@
                 @forelse ($featuredProducts ?? $products ?? [] as $product)
                     @php
                         $discount = (int) round((1 - ($product->price / max(1, $product->mrp))) * 100);
-                        $imagePath = $product->image ? asset('storage/' . $product->image) : asset('images/products/placeholder.jpg');
+                        $imagePath = $product->image 
+                            ? (Str::startsWith($product->image, 'products/') ? asset('storage/' . $product->image) : asset('images/products/' . $product->image))
+                            : asset('images/products/placeholder.jpg');
                     @endphp
                     <div
                         class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
-                        <a href="{{ route('products.show', $product['slug']) }}" class="absolute inset-0 z-[5]"></a>
+                        <a href="{{ route('products.show', $product->slug) }}" class="absolute inset-0 z-[5]"></a>
                         <button type="button"
                             class="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 ring-1 ring-black/10 hover:bg-white transition"
                             aria-label="Add to wishlist">
@@ -181,29 +183,31 @@
 
                         <div class="flex flex-1 flex-col p-4">
                             <p class="text-xs font-bold tracking-wide text-[color:var(--primary)] uppercase">
-                                {{ $product['tagline'] }}
+                                {{ $product->tagline }}
                             </p>
-                            <h3 class="mt-1 text-[color:var(--text-primary)] truncate">{{ $product['title'] }}</h3>
+                            <h3 class="mt-1 text-[color:var(--text-primary)] truncate">{{ $product->title }}</h3>
 
                             <div class="mt-3 flex items-center justify-between gap-3">
                                 <div class="flex items-baseline gap-2">
                                     <p class="text-lg font-bold text-[color:var(--primary)]">
-                                        ₹{{ number_format($product['price']) }}</p>
+                                        ₹{{ number_format($product->price) }}</p>
                                     <p class="text-xs font-medium text-[color:var(--text-muted)] line-through">
-                                        ₹{{ number_format($product['mrp']) }}</p>
+                                        ₹{{ number_format($product->mrp) }}</p>
                                 </div>
                                 <div
                                     class="flex items-center gap-1 rounded-full bg-black/5 px-2 py-1 text-xs font-semibold text-[color:var(--text-secondary)]">
                                     <i data-lucide="star" class="h-4 w-4 fill-[color:var(--primary)] text-[color:var(--primary)]"></i>
-                                    {{ number_format($product['rating'], 1) }} ({{ number_format($product['reviews']) }})
+                                    {{ number_format($product->rating, 1) }} ({{ number_format($product->reviews) }})
                                 </div>
                             </div>
 
                             <div class="mt-auto pt-3 relative z-10">
-                                <a href="{{ route('products.show', $product->slug) }}"
-                                   class="block w-full text-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
-                                    Add to cart
-                                </a>
+                                <form action="{{ route('cart.add', $product->id) }}" method="POST" data-ajax="true">
+                                    @csrf
+                                    <button type="submit" class="w-full text-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
+                                        Add to cart
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -237,44 +241,27 @@
                             $discount = (int) round((1 - ($combo['price'] / max(1, $combo['mrp']))) * 100);
                         @endphp
                         <div class="item h-full">
-                            <div class="combo-card group relative flex flex-col h-full overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-black/5 transition-all duration-500">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative group">
                                 <a href="{{ route('products.show', $combo['slug']) }}" class="absolute inset-0 z-10"></a>
-                                
-                                <!-- Image Container -->
-                                <div class="aspect-square w-full overflow-hidden bg-[var(--bg-section)]">
+                                <div class="aspect-square bg-gray-50">
                                     <img src="{{ asset('images/products/' . $combo['image']) }}" alt="{{ $combo['title'] }}"
-                                        class="h-full w-full object-cover transition duration-700 group-hover:scale-110"
-                                        loading="lazy">
-                                    <div class="absolute left-4 top-4 z-20">
-                                        <span class="rounded-full bg-[var(--primary)] px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg">
-                                            -{{ $discount }}%
-                                        </span>
-                                    </div>
+                                        class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
                                 </div>
-                                
-                                <!-- Content Area -->
-                                <div class="flex flex-col flex-1 p-5 sm:p-6">
-                                    <!-- Meta Row: Category & Reviews -->
-                                    <div class="flex items-center justify-between gap-2 mb-3">
-                                        <span class="text-[10px] font-black uppercase tracking-widest text-[color:var(--primary)]">
-                                            {{ $combo['category'] ?? 'Wellness' }}
-                                        </span>
-                                        
-                                        <div class="flex items-center gap-1 rounded-full bg-black/[0.03] px-2 py-1 text-[10px] font-bold text-gray-500 ring-1 ring-black/[0.05]">
-                                            <i data-lucide="star" class="h-3 w-3 fill-[color:var(--primary)] text-[color:var(--primary)]"></i>
-                                            <span>4.9 ({{ rand(500, 1500) }})</span>
-                                        </div>
-                                    </div>
-
-                                    <h3 class="text-base sm:text-lg font-semibold text-[color:var(--text-primary)] leading-tight group-hover:text-[color:var(--primary)] transition-colors truncate">
-                                        {{ $combo['title'] }}
-                                    </h3>
-                                    
-                                    <div class="mt-auto pt-4 flex flex-col gap-1">
+                                <div class="p-5 flex-1 flex flex-col">
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-[color:var(--primary)] mb-1">
+                                        {{ $combo['tagline'] }}</p>
+                                    <h4 class="text-sm font-extrabold text-[color:var(--text-primary)] mb-4 line-clamp-1">
+                                        {{ $combo['title'] }}</h4>
+                                    <div class="mt-auto flex items-center justify-between">
                                         <div class="flex items-baseline gap-2">
-                                            <span class="text-lg sm:text-xl font-bold text-[color:var(--text-primary)]">₹{{ number_format($combo['price']) }}</span>
-                                            <span class="text-xs sm:text-sm font-medium text-gray-400 line-through">₹{{ number_format($combo['mrp']) }}</span>
+                                            <span
+                                                class="text-lg font-black text-[color:var(--text-primary)]">₹{{ number_format($combo['price']) }}</span>
+                                            <span class="text-xs text-gray-400 line-through">₹{{ number_format($combo['mrp']) }}</span>
                                         </div>
+                                        <button
+                                            class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-[color:var(--primary)] hover:text-white transition relative z-20">
+                                            <i data-lucide="plus" class="w-4 h-4"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>

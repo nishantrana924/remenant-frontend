@@ -200,6 +200,14 @@
             ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
             ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
+        <style>
+            [x-cloak] { display: none !important; }
+            :root { --primary: #FF6B00; --primary-soft: #FFF4ED; }
+
+            /* Premium Loader Animation */
+            @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+            .animate-spin-slow { animation: spin-slow 3s linear infinite; }
+            
             /* NProgress Custom Style */
             #nprogress .bar {
                 background: var(--primary) !important;
@@ -207,8 +215,21 @@
             }
         </style>
     </head>
-    <body class="font-sans antialiased h-screen overflow-hidden">
-        <div class="h-full bg-white flex overflow-hidden">
+    <body class="font-sans antialiased bg-white min-h-screen flex flex-col">
+        <!-- Global Page Loader -->
+        <div id="global-page-loader" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
+            <div class="relative">
+                <div class="h-20 w-20 rounded-[2.5rem] border-4 border-orange-100 animate-spin-slow"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="h-12 w-12 rounded-2xl bg-orange-500 shadow-xl shadow-orange-200 flex items-center justify-center">
+                        <i data-lucide="zap" class="w-6 h-6 text-white animate-pulse"></i>
+                    </div>
+                </div>
+            </div>
+            <p class="mt-8 text-[10px] font-black uppercase tracking-[0.5em] text-slate-400 animate-pulse">Remenant Intelligence Dashboard</p>
+        </div>
+
+        <div class="flex-1 flex overflow-hidden">
             <!-- Sidebar -->
             @include('admin.layouts.sidebar')
 
@@ -217,11 +238,12 @@
                 @include('admin.layouts.header')
 
                 <!-- Page Content -->
-                <main class="flex-1 p-6 overflow-y-auto">
-                    @yield('content')
+                <main class="flex-1 p-6 overflow-y-auto" x-data="{}" x-cloak>
+                    <div class="min-h-[70vh]">
+                        @yield('content')
+                    </div>
+                    @include('admin.layouts.footer')
                 </main>
-
-                @include('admin.layouts.footer')
             </div>
         </div>
 
@@ -259,17 +281,91 @@
                 NProgress.configure({ showSpinner: false, trickleSpeed: 200 });
             });
 
+            // 1.1 Global SweetAlert Helpers
+            window.toast = (title, icon = 'success') => {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    icon: icon,
+                    title: title
+                });
+            };
+
+            window.confirmAction = (title, text, callback) => {
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#FF6B00',
+                    cancelButtonColor: '#94a3b8',
+                    confirmButtonText: 'Yes, proceed!',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        confirmButton: 'rounded-xl px-6 py-3 font-bold',
+                        cancelButton: 'rounded-xl px-6 py-3 font-bold'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) callback();
+                });
+            };
+
             // 2. Fast Navigation Feedback
             window.onbeforeunload = () => { NProgress.start(); };
-            window.onload = () => { NProgress.done(); };
+            window.onload = () => { 
+                NProgress.done(); 
+                const loader = document.getElementById('global-page-loader');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    loader.style.pointerEvents = 'none';
+                    setTimeout(() => loader.style.display = 'none', 700);
+                }
+            };
 
-            // 3. Global AJAX Form Submission (Fast Send)
-            async function fastSubmit(formElement, options = {}) {
-                const form = typeof formElement === 'string' ? document.getElementById(formElement) : formElement;
-                if (!form) return;
+            // 3. Form Persistence Engine (Auto-Save)
+            window.useFormPersistence = (key, alpine) => {
+                let saveTimeout = null;
+                return {
+                    save() {
+                        clearTimeout(saveTimeout);
+                        saveTimeout = setTimeout(() => {
+                            localStorage.setItem(key, JSON.stringify(alpine.formData));
+                        }, 1000);
+                    },
+                    load() {
+                        const saved = localStorage.getItem(key);
+                        if (!saved) return null;
+                        try {
+                            return JSON.parse(saved);
+                        } catch(e) { return null; }
+                    },
+                    clear() {
+                        localStorage.removeItem(key);
+                    }
+                };
+            };
 
-                const formData = new FormData(form);
-                const submitBtn = form.querySelector('[type="submit"]') || form.querySelector('button:not([type="button"])');
+            // 4. Global AJAX Form Submission (Fast Send)
+            async function fastSubmit(target, options = {}) {
+                let form = null;
+                let data = options.data || null;
+                let url = '';
+                let method = options.method || 'POST';
+
+                if (typeof target === 'string' && (target.startsWith('/') || target.startsWith('http'))) {
+                    url = target;
+                } else {
+                    form = typeof target === 'string' ? document.querySelector(target) : target;
+                    if (!form) return;
+                    url = form.action;
+                    method = form.method || 'POST';
+                    data = data || new FormData(form);
+                }
+
+                const submitBtn = form ? (form.querySelector('[type="submit"]') || form.querySelector('button:not([type="button"])')) : null;
                 
                 // Visual feedback
                 if (submitBtn) {
@@ -284,10 +380,12 @@
 
                 try {
                     const response = await axios({
-                        method: form.method || 'POST',
-                        url: form.action,
-                        data: formData,
-                        headers: { 'Content-Type': 'multipart/form-data' }
+                        method: method,
+                        url: url,
+                        data: data,
+                        headers: { 
+                            'Content-Type': (data instanceof FormData) ? 'multipart/form-data' : 'application/json' 
+                        }
                     });
 
                     if (options.success) {
@@ -338,6 +436,35 @@
             });
         </script>
         <script src="{{ asset('js/app.js') }}"></script>
+
+        @if(session('success'))
+            <script>document.addEventListener('DOMContentLoaded', () => toast("{{ session('success') }}"));</script>
+        @endif
+        @if(session('error'))
+            <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({ icon: 'error', title: 'Error', text: "{{ session('error') }}", confirmButtonColor: '#FF6B00' }));</script>
+        @endif
+        @if($errors->any())
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Failed',
+                        html: `<div class="text-left bg-rose-50 p-4 rounded-2xl border border-rose-100 mt-4">
+                            <ul class="text-xs text-rose-600 space-y-1 list-disc pl-4 font-bold">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>`,
+                        confirmButtonColor: '#FF6B00',
+                        customClass: {
+                            popup: 'rounded-[2rem]',
+                            confirmButton: 'rounded-xl px-6 py-3 font-bold uppercase tracking-widest text-xs'
+                        }
+                    });
+                });
+            </script>
+        @endif
     </body>
 </html>
 

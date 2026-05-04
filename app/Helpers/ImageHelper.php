@@ -10,10 +10,17 @@ class ImageHelper
     /**
      * Upload an image to a specific directory.
      */
-    public static function upload($file, $directory = 'general'): string
+    public static function upload($file, $directory = 'products'): string
     {
-        // Use the global helper function to reduce size and convert to WebP
-        return reduceImageSize($file, $directory);
+        if (!$file) return '';
+        
+        // Generate a clean filename: timestamp-random.extension
+        $filename = time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+        
+        // Store the file in the 'public' disk under the specified directory
+        $path = $file->storeAs($directory, $filename, 'public');
+        
+        return $path;
     }
 
     /**

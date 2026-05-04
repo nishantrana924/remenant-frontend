@@ -10,8 +10,17 @@ class UserController extends Controller
 {
     public function index()
     {
-        $items = User::where('role', '!=', 'admin')->latest()->get();
+        $items = User::with('orders')->latest()->get();
         return view('admin.customers.index', compact('items'));
+    }
+
+    public function updateRole(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $user->role_id = (int)$request->role;
+        $user->save();
+
+        return redirect()->back()->with('success', 'User role updated successfully.');
     }
 
     public function show($id)

@@ -24,14 +24,14 @@
             <div class="h-8 w-px bg-gray-100 mx-2"></div>
             
             <details class="relative">
-                <summary class="list-none cursor-pointer">
-                    <div class="flex items-center gap-3 p-1 pr-3 rounded-full hover:bg-gray-100 transition">
-                        <div class="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-[#ea5f06]">
-                            <i data-lucide="user" class="w-5 h-5"></i>
+                <summary class="list-none cursor-pointer outline-none">
+                    <div class="flex items-center gap-3 p-1.5 pl-4 pr-1.5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-orange-200 hover:bg-orange-50/30 transition-all duration-300 group">
+                        <div class="hidden sm:block text-right">
+                            <p class="text-[11px] font-black text-slate-900 leading-none">{{ Auth::user()->name }}</p>
+                            <p class="text-[9px] text-slate-400 uppercase font-black tracking-widest mt-1">{{ Auth::user()->role ?? 'Administrator' }}</p>
                         </div>
-                        <div class="hidden sm:block">
-                            <p class="text-xs font-bold text-gray-800">{{ Auth::user()->name }}</p>
-                            <p class="text-[10px] text-gray-400 uppercase font-bold">{{ Auth::user()->role }}</p>
+                        <div class="w-9 h-9 rounded-xl bg-white shadow-sm border border-slate-200 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-all">
+                            <i data-lucide="user" class="w-5 h-5"></i>
                         </div>
                     </div>
                 </summary>

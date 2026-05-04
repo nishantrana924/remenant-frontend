@@ -1,187 +1,100 @@
 @extends('public.layouts.app')
 
-@section('title', 'Join Remenant Health')
+@section('title', 'Join - ' . config('app.name', 'Remenant Health'))
 
 @section('content')
-    <div class="relative py-24 sm:py-32">
-        <!-- Dynamic Background -->
-        <div class="fixed inset-0 -z-10 overflow-hidden">
-            <div class="absolute -top-[10%] -left-[10%] h-[40%] w-[40%] rounded-full bg-[color:var(--primary)]/5 blur-[120px]"></div>
-            <div class="absolute top-[20%] -right-[5%] h-[35%] w-[35%] rounded-full bg-[color:var(--secondary)]/5 blur-[100px]"></div>
-            <div class="absolute -bottom-[10%] left-[20%] h-[30%] w-[30%] rounded-full bg-[color:var(--primary)]/5 blur-[80px]"></div>
+<div class="bg-[var(--bg-main)] flex flex-col lg:flex-row lg:h-[calc(100vh-100px)] lg:min-h-[720px]">
+    
+    <!-- Left Side: Full Bleed Image (Desktop Only) -->
+    <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center p-12 text-center">
+        <img src="{{ asset('images/products/remenant-product11.jpg') }}" alt="Wellness" class="absolute inset-0 h-full w-full object-cover">
+        <div class="absolute inset-0 bg-black/30"></div>
+        <div class="relative z-10">
+            <h2 class="text-6xl font-black italic tracking-tighter text-white uppercase leading-none mb-6">Join the<br>family.</h2>
+            <div class="h-1.5 w-16 bg-[color:var(--primary)] mx-auto rounded-full"></div>
         </div>
+    </div>
 
-        <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
-            <div class="mx-auto w-full max-w-[580px]">
-                <!-- Main Card -->
-                <div class="overflow-hidden rounded-[3rem] bg-white p-8 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] ring-1 ring-black/5 sm:p-16">
-                    <div class="relative">
-                        <div class="mb-12 text-center">
-                            <h1 class="text-4xl font-black italic tracking-tight text-[color:var(--text-primary)] sm:text-5xl">Create Account</h1>
-                            <p class="mt-4 text-xs font-black text-[color:var(--text-secondary)] uppercase tracking-[0.2em]">Start your premium wellness journey</p>
-                        </div>
+    <!-- Right Side: Register Form -->
+    <div class="flex-1 flex items-start justify-center p-6 lg:pt-16 relative">
+        <div class="w-full max-w-[520px]">
 
-                        <form method="POST" action="{{ route('register') }}" class="space-y-8">
-                            @csrf
+            <form method="POST" action="{{ route('register') }}" class="space-y-6">
+                @csrf
 
-                            <div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
-                                <!-- Name -->
-                                <div class="space-y-3 sm:col-span-2">
-                                    <label for="name" class="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
-                                        Full Name
-                                    </label>
-                                    <div class="group relative">
-                                        <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none transition-colors group-focus-within:text-[color:var(--primary)] text-gray-400">
-                                            <i data-lucide="user" class="h-5 w-5"></i>
-                                        </div>
-                                        <input id="name" 
-                                               class="block w-full pl-14 pr-6 py-5 rounded-[2rem] bg-gray-50 border-none ring-1 ring-black/5 focus:ring-2 focus:ring-[color:var(--primary)] focus:bg-white transition-all font-bold text-gray-900 placeholder:text-gray-400 @error('name') ring-red-500 @enderror" 
-                                               type="text" 
-                                               name="name" 
-                                               value="{{ old('name') }}" 
-                                               required 
-                                               autofocus 
-                                               autocomplete="name"
-                                               placeholder="John Doe">
-                                    </div>
-                                    @error('name')
-                                        <p class="mt-2 text-[10px] font-black uppercase tracking-widest text-red-500 ml-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                <!-- Full Name -->
+                <div class="space-y-2">
+                    <label for="name" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Full Name</label>
+                    <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus
+                           class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner"
+                           placeholder="John Doe">
+                    @error('name')
+                        <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                                <!-- Email Address -->
-                                <div class="space-y-3 sm:col-span-2">
-                                    <label for="email" class="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
-                                        Email Address
-                                    </label>
-                                    <div class="group relative">
-                                        <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none transition-colors group-focus-within:text-[color:var(--primary)] text-gray-400">
-                                            <i data-lucide="mail" class="h-5 w-5"></i>
-                                        </div>
-                                        <input id="email" 
-                                               class="block w-full pl-14 pr-6 py-5 rounded-[2rem] bg-gray-50 border-none ring-1 ring-black/5 focus:ring-2 focus:ring-[color:var(--primary)] focus:bg-white transition-all font-bold text-gray-900 placeholder:text-gray-400 @error('email') ring-red-500 @enderror" 
-                                               type="email" 
-                                               name="email" 
-                                               value="{{ old('email') }}" 
-                                               required 
-                                               autocomplete="username"
-                                               placeholder="name@example.com">
-                                    </div>
-                                    @error('email')
-                                        <p class="mt-2 text-[10px] font-black uppercase tracking-widest text-red-500 ml-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                <!-- Email Address -->
+                <div class="space-y-2">
+                    <label for="email" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email Address</label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                           class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner"
+                           placeholder="your@email.com">
+                    @error('email')
+                        <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                                <!-- Password -->
-                                <div class="space-y-3">
-                                    <label for="password" class="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
-                                        Password
-                                    </label>
-                                    <div class="group relative" x-data="{ show: false }">
-                                        <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none transition-colors group-focus-within:text-[color:var(--primary)] text-gray-400">
-                                            <i data-lucide="lock" class="h-5 w-5"></i>
-                                        </div>
-                                        <input id="password" 
-                                               class="block w-full pl-14 pr-16 py-5 rounded-[2rem] bg-gray-50 border-none ring-1 ring-black/5 focus:ring-2 focus:ring-[color:var(--primary)] focus:bg-white transition-all font-bold text-gray-900 placeholder:text-gray-400 @error('password') ring-red-500 @enderror" 
-                                               :type="show ? 'text' : 'password'"
-                                               name="password" 
-                                               required 
-                                               autocomplete="new-password"
-                                               placeholder="••••••••">
-                                        <button type="button" 
-                                                @click="show = !show"
-                                                class="absolute inset-y-0 right-0 pr-6 flex items-center text-gray-400 hover:text-[color:var(--primary)] transition">
-                                            <i x-show="!show" data-lucide="eye" class="h-5 w-5"></i>
-                                            <i x-show="show" data-lucide="eye-off" class="h-5 w-5" style="display: none;"></i>
-                                        </button>
-                                    </div>
-                                    @error('password')
-                                        <p class="mt-2 text-[10px] font-black uppercase tracking-widest text-red-500 ml-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                <!-- Contact Number -->
+                <div class="space-y-2">
+                    <label for="phone" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Contact Number</label>
+                    <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" required pattern="[0-9]{10}"
+                           class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner"
+                           placeholder="9876543210">
+                    @error('phone')
+                        <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                                <!-- Confirm Password -->
-                                <div class="space-y-3">
-                                    <label for="password_confirmation" class="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
-                                        Confirm
-                                    </label>
-                                    <div class="group relative" x-data="{ show: false }">
-                                        <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none transition-colors group-focus-within:text-[color:var(--primary)] text-gray-400">
-                                            <i data-lucide="shield-check" class="h-5 w-5"></i>
-                                        </div>
-                                        <input id="password_confirmation" 
-                                               class="block w-full pl-14 pr-16 py-5 rounded-[2rem] bg-gray-50 border-none ring-1 ring-black/5 focus:ring-2 focus:ring-[color:var(--primary)] focus:bg-white transition-all font-bold text-gray-900 placeholder:text-gray-400" 
-                                               :type="show ? 'text' : 'password'"
-                                               name="password_confirmation" 
-                                               required 
-                                               autocomplete="new-password"
-                                               placeholder="••••••••">
-                                        <button type="button" 
-                                                @click="show = !show"
-                                                class="absolute inset-y-0 right-0 pr-6 flex items-center text-gray-400 hover:text-[color:var(--primary)] transition">
-                                            <i x-show="!show" data-lucide="eye" class="h-5 w-5"></i>
-                                            <i x-show="show" data-lucide="eye-off" class="h-5 w-5" style="display: none;"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Password -->
+                    <div class="space-y-2">
+                        <label for="password" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Password</label>
+                        <input id="password" type="password" name="password" required autocomplete="new-password"
+                               class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner"
+                               placeholder="••••••••">
+                        @error('password')
+                            <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                            <!-- Submit Button -->
-                            <button type="submit" class="w-full group relative overflow-hidden rounded-[2rem] bg-[color:var(--primary)] py-6 text-sm font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:brightness-105 active:scale-[0.98]">
-                                <span class="relative z-10 flex items-center justify-center gap-3">
-                                    Join the Family
-                                    <i data-lucide="user-plus" class="h-5 w-5 transition-transform group-hover:scale-110"></i>
-                                </span>
-                            </button>
-
-                            <!-- Social Registration -->
-                            <div class="relative py-4">
-                                <div class="absolute inset-0 flex items-center">
-                                    <div class="w-full border-t border-gray-100"></div>
-                                </div>
-                                <div class="relative flex justify-center text-[10px] font-black uppercase tracking-widest">
-                                    <span class="bg-white px-4 text-gray-400">Quick sign up with</span>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <button type="button" class="flex items-center justify-center gap-3 rounded-[1.5rem] bg-gray-50 py-5 ring-1 ring-black/5 hover:bg-gray-100 transition active:scale-95">
-                                    <i data-lucide="chrome" class="h-4 w-4"></i>
-                                    <span class="text-[10px] font-black uppercase tracking-widest">Google</span>
-                                </button>
-                                <button type="button" class="flex items-center justify-center gap-3 rounded-[1.5rem] bg-gray-50 py-5 ring-1 ring-black/5 hover:bg-gray-100 transition active:scale-95">
-                                    <i data-lucide="facebook" class="h-4 w-4"></i>
-                                    <span class="text-[10px] font-black uppercase tracking-widest">Facebook</span>
-                                </button>
-                            </div>
-
-                            <!-- Login Link -->
-                            <div class="pt-6 text-center border-t border-gray-50">
-                                <p class="text-[11px] font-black uppercase tracking-widest text-gray-400">
-                                    Already have an account?
-                                    <a href="{{ route('login') }}" class="text-[color:var(--primary)] hover:brightness-90 transition">
-                                        Sign In Instead
-                                    </a>
-                                </p>
-                            </div>
-                        </form>
+                    <!-- Confirm Password -->
+                    <div class="space-y-2">
+                        <label for="password_confirmation" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Confirm</label>
+                        <input id="password_confirmation" type="password" name="password_confirmation" required
+                               class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner"
+                               placeholder="••••••••">
                     </div>
                 </div>
 
-                <!-- Footer Links -->
-                <div class="mt-12 flex items-center justify-center gap-8">
-                    <a href="/" class="group flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 transition hover:text-[color:var(--primary)]">
-                        <i data-lucide="arrow-left" class="h-4 w-4 transition-transform group-hover:-translate-x-1"></i>
-                        Back to Home
-                    </a>
-                    <span class="h-1 w-1 rounded-full bg-gray-200"></span>
-                    <a href="{{ route('about') }}" class="text-xs font-black uppercase tracking-widest text-gray-400 transition hover:text-[color:var(--primary)]">
-                        Support Center
-                    </a>
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full rounded-2xl bg-[color:var(--text-primary)] py-5 text-xs font-black text-white uppercase tracking-[0.2em] shadow-2xl shadow-black/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 group">
+                        Create Account
+                        <i data-lucide="user-plus" class="h-4 w-4 transition-transform group-hover:scale-110"></i>
+                    </button>
                 </div>
-            </div>
+
+                <!-- Login Redirect -->
+                <div class="pt-6 text-center border-t border-gray-50">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                        Have an account? 
+                        <a href="{{ route('login') }}" class="text-[color:var(--primary)] hover:underline underline-offset-4">Sign In</a>
+                    </p>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 @endsection
 
 @push('scripts')

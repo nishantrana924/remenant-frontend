@@ -46,10 +46,16 @@ class ProductRequest extends FormRequest
             'faqs' => 'nullable|array',
             'sku' => 'nullable|string|max:255',
             'hsn_code' => 'nullable|string|max:255',
+            'stock' => 'nullable|integer',
             'low_stock_threshold' => 'nullable|integer',
             'is_featured' => 'nullable|boolean',
             'status' => 'nullable|string',
             'theme_color' => 'nullable|string',
+            'nutrition' => 'nullable|array',
+            'nutrition_highlights' => 'nullable|array',
+            'nutrition_description' => 'nullable|string',
+            'benefits_title' => 'nullable|string',
+            'benefits_subtitle' => 'nullable|string',
         ];
     }
 }

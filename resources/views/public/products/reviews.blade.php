@@ -1,6 +1,6 @@
 @extends('public.layouts.app')
 
-@section('title', $product['title'] . ' - Customer Reviews | Remenant Health')
+@section('title', $product->title . ' - Customer Reviews | Remenant Health')
 
 @section('content')
 <div class="bg-[var(--bg-main)] min-h-screen pt-24 pb-20">
@@ -12,7 +12,7 @@
                 <li><i data-lucide="chevron-right" class="h-3 w-3 text-gray-300"></i></li>
                 <li><a href="{{ route('products.index') }}" class="text-[color:var(--text-muted)] hover:text-[color:var(--primary)] transition">Products</a></li>
                 <li><i data-lucide="chevron-right" class="h-3 w-3 text-gray-300"></i></li>
-                <li><a href="{{ route('products.show', $product['slug']) }}" class="text-[color:var(--text-muted)] hover:text-[color:var(--primary)] transition">{{ $product['title'] }}</a></li>
+                <li><a href="{{ route('products.show', $product->slug) }}" class="text-[color:var(--text-muted)] hover:text-[color:var(--primary)] transition">{{ $product->title }}</a></li>
                 <li><i data-lucide="chevron-right" class="h-3 w-3 text-gray-300"></i></li>
                 <li class="text-[color:var(--text-primary)]">Customer Reviews</li>
             </ol>
@@ -27,22 +27,22 @@
             <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:items-center">
                 <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-black/[0.05] pb-12 lg:pb-0 lg:pr-12">
                     <div class="flex items-center gap-6 mb-8">
-                        <img src="{{ asset('images/products/' . $product['image']) }}" alt="{{ $product['title'] }}" class="h-24 w-24 rounded-3xl bg-gray-50 object-contain p-3 shadow-inner">
+                        <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->title }}" class="h-24 w-24 rounded-3xl bg-gray-50 object-contain p-3 shadow-inner">
                         <div>
                             <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[color:var(--primary)]">Product Feedback</span>
-                            <h1 class="text-2xl font-black text-[color:var(--text-primary)] leading-tight mt-1">{{ $product['title'] }}</h1>
+                            <h1 class="text-2xl font-black text-[color:var(--text-primary)] leading-tight mt-1">{{ $product->title }}</h1>
                         </div>
                     </div>
                     
                     <div class="flex items-end gap-6">
-                        <span class="text-7xl font-black text-[color:var(--text-primary)] tracking-tighter leading-none">{{ $product['rating'] }}</span>
+                        <span class="text-7xl font-black text-[color:var(--text-primary)] tracking-tighter leading-none">{{ $product->rating }}</span>
                         <div class="pb-2">
                             <div class="flex text-orange-400 gap-0.5 mb-2">
                                 @for($i = 0; $i < 5; $i++)
-                                    <i data-lucide="star" class="h-5 w-5 {{ $i < floor($product['rating']) ? 'fill-current' : 'text-gray-200' }}"></i>
+                                    <i data-lucide="star" class="h-5 w-5 {{ $i < floor($product->rating) ? 'fill-current' : 'text-gray-200' }}"></i>
                                 @endfor
                             </div>
-                            <p class="text-xs font-bold text-[color:var(--text-muted)] uppercase tracking-widest">Global score from {{ number_format($product['reviews']) }} buyers</p>
+                            <p class="text-xs font-bold text-[color:var(--text-muted)] uppercase tracking-widest">Global score from {{ number_format($product->reviews) }} buyers</p>
                         </div>
                     </div>
                 </div>

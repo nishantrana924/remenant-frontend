@@ -41,21 +41,17 @@ $(document).ready(function () {
             mouseDrag: true,
             responsive: {
                 0: { 
-                    items: 1.4,
+                    items: 1.3,
                     margin: 16,
                     stagePadding: 0
                 },
-                576: { 
-                    items: 1.8,
+                640: { 
+                    items: 2.4,
                     margin: 20,
                     stagePadding: 0
                 },
-                768: { 
-                    items: 2.4,
-                    margin: 24
-                },
                 1024: { 
-                    items: 3,
+                    items: 4,
                     margin: 24
                 },
                 1400: { 

@@ -97,6 +97,14 @@
     select::-ms-expand {
         display: none;
     }
+
+    input:focus,
+    textarea:focus,
+    select:focus,
+    button:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
 }
 
 @layer components {

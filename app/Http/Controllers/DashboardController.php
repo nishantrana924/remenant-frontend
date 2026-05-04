@@ -10,11 +10,24 @@ class DashboardController extends Controller
 {
     /**
      * Display the dashboard.
-     * All authenticated users are admins and redirected to admin dashboard.
+     * Redirects to admin or user dashboard based on role.
      */
     public function index(Request $request): RedirectResponse
     {
-        return redirect()->route('admin.dashboard');
+        if ($request->user()->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('user.dashboard');
+    }
+
+    /**
+     * Display the customer dashboard.
+     */
+    public function user(Request $request): View
+    {
+        $user = auth()->user();
+        $orders = \App\Models\Order::where('user_id', $user->id)->latest()->get();
+        return view('public.dashboard', compact('orders', 'user'));
     }
 
     /**
