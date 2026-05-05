@@ -37,7 +37,7 @@
                     <div class="flex items-end gap-6">
                         <span class="text-7xl font-black text-[color:var(--text-primary)] tracking-tighter leading-none">{{ $product['rating'] }}</span>
                         <div class="pb-2">
-                            <div class="flex text-orange-400 gap-0.5 mb-2">
+                            <div class="flex text-[color:var(--primary)] gap-0.5 mb-2">
                                 @for($i = 0; $i < 5; $i++)
                                     <i data-lucide="star" class="h-5 w-5 {{ $i < floor($product['rating']) ? 'fill-current' : 'text-gray-200' }}"></i>
                                 @endfor
@@ -173,19 +173,20 @@
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             @php $currentGlobalImgIdx = 0; @endphp
             @foreach($sampleReviews as $review)
-                <div class="bg-white p-6 sm:p-8 rounded-[2.5rem] shadow-sm ring-1 ring-black/[0.03] transition-all duration-500 hover:shadow-xl hover:shadow-black/[0.02] flex flex-col h-full">
+                <div class="group bg-white p-7 rounded-[2rem] border border-gray-100 flex flex-col h-full transition-all duration-500 hover:border-[var(--primary)]/20 hover:shadow-2xl hover:shadow-black/[0.02]">
                     <div class="flex flex-col gap-5 flex-1">
                         <!-- Review Top: Rating & Title -->
-                        <div class="flex items-center gap-3">
-                            <div class="flex items-center gap-1 rounded bg-green-600 px-2 py-1 text-[10px] font-black text-white">
-                                <span>{{ $review['rating'] }}</span>
-                                <i data-lucide="star" class="h-3 w-3 fill-current"></i>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-1 text-orange-600">
+                                @for($i = 0; $i < 5; $i++)
+                                    <i data-lucide="star" class="h-3 w-3 {{ $i < $review['rating'] ? 'fill-current' : 'text-gray-200' }}"></i>
+                                @endfor
                             </div>
-                            <h3 class="text-base font-black text-[color:var(--text-primary)] tracking-tight">{{ $review['title'] }}</h3>
+                            <h3 class="text-sm font-semibold text-[color:var(--text-primary)] tracking-tight">{{ $review['title'] }}</h3>
                         </div>
 
                         <!-- Review Content -->
-                        <p class="text-sm leading-relaxed text-[color:var(--text-secondary)] flex-1">
+                        <p class="text-[13px] leading-relaxed text-[color:var(--text-secondary)] font-medium flex-1">
                             {{ $review['content'] }}
                         </p>
 
@@ -210,7 +211,7 @@
                     <div class="mt-8 pt-6 border-t border-black/[0.03] flex items-center justify-between">
                         <div class="flex flex-col gap-1">
                             <div class="flex items-center gap-2">
-                                <span class="text-xs font-black text-[color:var(--text-primary)]">{{ $review['name'] }}</span>
+                                <span class="text-xs font-semibold text-[color:var(--text-primary)]">{{ $review['name'] }}</span>
                                 @if($review['verified'])
                                     <i data-lucide="check-circle-2" class="h-3.5 w-3.5 text-green-600"></i>
                                 @endif
@@ -222,11 +223,11 @@
                         <div class="flex items-center gap-4">
                             <button type="button" class="group flex items-center gap-1.5 text-gray-400 hover:text-green-600 transition-colors">
                                 <i data-lucide="thumbs-up" class="h-4 w-4 transition-transform group-active:scale-125"></i>
-                                <span class="text-[10px] font-black">12</span>
+                                <span class="text-[10px] font-semibold">12</span>
                             </button>
                             <button type="button" class="group flex items-center gap-1.5 text-gray-400 hover:text-red-500 transition-colors">
                                 <i data-lucide="thumbs-down" class="h-4 w-4 transition-transform group-active:scale-125"></i>
-                                <span class="text-[10px] font-black">2</span>
+                                <span class="text-[10px] font-semibold">2</span>
                             </button>
                         </div>
                     </div>
@@ -234,28 +235,27 @@
             @endforeach
         </div>
 
-        <!-- Modern Pagination -->
-        <div class="mt-16 flex justify-center">
-            <nav class="inline-flex items-center gap-2 p-2 rounded-full bg-white ring-1 ring-black/[0.05] shadow-sm">
-                <button class="h-12 w-12 flex items-center justify-center rounded-full text-[color:var(--text-muted)] hover:bg-gray-50 transition active:scale-90">
-                    <i data-lucide="arrow-left" class="h-5 w-5"></i>
+        <div class="mt-20 flex justify-center">
+            <nav class="inline-flex items-center gap-1">
+                <button class="h-10 w-10 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-50 transition active:scale-90">
+                    <i data-lucide="chevron-left" class="h-4 w-4"></i>
                 </button>
-                <div class="flex items-center gap-1 px-4">
+                <div class="flex items-center gap-1">
                     @foreach([1, 2, 3, '...', 24] as $page)
                         @if($page === '...')
-                            <span class="px-2 text-xs font-bold text-gray-300">...</span>
+                            <span class="w-8 text-center text-xs font-medium text-gray-300">...</span>
                         @else
-                            <button class="h-10 w-10 flex items-center justify-center rounded-full text-xs font-black transition {{ $page === 1 ? 'bg-[color:var(--text-primary)] text-white shadow-lg' : 'text-[color:var(--text-muted)] hover:bg-gray-50' }}">
+                            <button class="h-10 w-10 flex items-center justify-center rounded-full text-xs font-bold transition-all duration-300 {{ $page === 1 ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20' : 'text-gray-400 hover:text-[var(--primary)] hover:bg-[var(--primary)]/5' }}">
                                 {{ $page }}
                             </button>
                         @endif
                     @endforeach
                 </div>
-                <button class="h-12 w-12 flex items-center justify-center rounded-full text-[color:var(--text-muted)] hover:bg-gray-50 transition active:scale-90">
-                    <i data-lucide="arrow-right" class="h-5 w-5"></i>
+                <button class="h-10 w-10 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-50 transition active:scale-90">
+                    <i data-lucide="chevron-right" class="h-4 w-4"></i>
                 </button>
             </nav>
         </div>
     </div>
 </div>
-@endsectiondsection
+@endsection
