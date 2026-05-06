@@ -55,6 +55,9 @@ Route::get('/product/{slug}/reviews', [ProductController::class, 'reviews'])->na
 
 
 
+
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
@@ -90,6 +93,13 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('migrate', [\App\Http\Controllers\Admin\ArtisanController::class, 'migrate'])->name('migrate');
     Route::get('seed', [\App\Http\Controllers\Admin\ArtisanController::class, 'seed'])->name('seed');
     Route::get('setup', [\App\Http\Controllers\Admin\ArtisanController::class, 'setup'])->name('setup');
+    Route::get('debug-db', [\App\Http\Controllers\Admin\ArtisanController::class, 'debugDb'])->name('debug-db');
+    Route::get('clear-cache', function() {
+        Artisan::call('config:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        return "Cache cleared successfully!";
+    })->name('clear-cache');
     Route::get('debug-db', [\App\Http\Controllers\Admin\ArtisanController::class, 'debugDb'])->name('debug-db');
     Route::get('clear-cache', function() {
         Artisan::call('config:clear');

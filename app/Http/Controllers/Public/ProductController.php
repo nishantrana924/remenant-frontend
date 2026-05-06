@@ -140,7 +140,10 @@ class ProductController extends Controller
                     'Flavor' => 'Orange Burst',
                     'Quantity' => '20 Tablets',
                     'Form' => 'Effervescent'
-                ]
+                ],
+                'meta_title' => 'Vitamin C Effervescent - Immunity & Skin Glow',
+                'meta_description' => 'Boost your immunity and get radiant skin with Remenant Vitamin C Effervescent tablets.',
+                'meta_keywords' => 'vitamin c, effervescent, immunity, skincare'
             ],
             [
                 'id' => 2,
@@ -171,7 +174,10 @@ class ProductController extends Controller
                     'Flavor' => 'Green Apple',
                     'Quantity' => '20 Tablets',
                     'Form' => 'Effervescent'
-                ]
+                ],
+                'meta_title' => 'Biotin Effervescent - Hair & Skin Health',
+                'meta_description' => 'Strengthen your hair and nails with our high-potency Biotin effervescent formula.',
+                'meta_keywords' => 'biotin, hair growth, nail strength, skincare'
             ],
             [
                 'id' => 3,
@@ -194,7 +200,10 @@ class ProductController extends Controller
                     (object)['icon' => 'activity', 'title' => 'Daily Balance', 'desc' => 'Restores essential electrolytes for total hydration.']
                 ],
                 'ritual' => [(object)['step' => 1, 'title' => 'Morning Fizz', 'desc' => 'Dissolve in water after breakfast.']],
-                'specs' => ['Flavor' => 'Mixed Berry', 'Quantity' => '20 Tablets']
+                'specs' => ['Flavor' => 'Mixed Berry', 'Quantity' => '20 Tablets'],
+                'meta_title' => 'Daily Multivitamin - Energy & Vitality',
+                'meta_description' => '24 essential vitamins and minerals for your daily energy and wellness.',
+                'meta_keywords' => 'multivitamin, daily health, energy boost'
             ],
             [
                 'id' => 4,
@@ -217,7 +226,10 @@ class ProductController extends Controller
                     (object)['icon' => 'sparkles', 'title' => 'Skin Glow', 'desc' => 'Supports collagen production for radiant skin.']
                 ],
                 'ritual' => [(object)['step' => 1, 'title' => 'Nightly Routine', 'desc' => 'Take 30 mins before bed.']],
-                'specs' => ['Flavor' => 'Lavender Lemon', 'Quantity' => '20 Tablets']
+                'specs' => ['Flavor' => 'Lavender Lemon', 'Quantity' => '20 Tablets'],
+                'meta_title' => 'Sleep & Relax - Natural Melatonin Support',
+                'meta_description' => 'Fall asleep faster and wake up refreshed with our natural sleep support tablets.',
+                'meta_keywords' => 'sleep aid, melatonin, relaxation, valerian root'
             ],
             [
                 'id' => 5,
@@ -245,7 +257,10 @@ class ProductController extends Controller
                     (object)['step' => 3, 'title' => 'Enjoy', 'desc' => 'Drink immediately for maximum absorption.']
                 ],
                 'specs' => ['Flavor' => 'Orange Burst', 'Quantity' => '20 Tablets', 'Form' => 'Effervescent'],
-                'nutrition' => ['Vitamin C' => '1000mg', 'Zinc' => '10mg', 'Vitamin D3' => '400IU']
+                'nutrition' => ['Vitamin C' => '1000mg', 'Zinc' => '10mg', 'Vitamin D3' => '400IU'],
+                'meta_title' => 'Pricing Architecture - Advanced Wellness',
+                'meta_description' => 'Experience the next generation of wellness with our Pricing Architecture series.',
+                'meta_keywords' => 'wellness, precision health, performance'
             ]
         ];
 

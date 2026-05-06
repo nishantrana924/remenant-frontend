@@ -1,13 +1,13 @@
 @extends('public.layouts.app')
 
-@section('title', $product->meta_title ?: $product->title)
+@section('title', ($product->meta_title ?? null) ?: $product->title)
 
 @section('seo')
-    <meta name="description" content="{{ $product->meta_description }}">
-    <meta name="keywords" content="{{ $product->meta_keywords }}">
-    <meta property="og:title" content="{{ $product->meta_title ?: $product->title }}">
-    <meta property="og:description" content="{{ $product->meta_description }}">
-    <meta property="og:image" content="{{ asset('storage/' . $product->image) }}">
+    <meta name="description" content="{{ $product->meta_description ?? '' }}">
+    <meta name="keywords" content="{{ $product->meta_keywords ?? '' }}">
+    <meta property="og:title" content="{{ ($product->meta_title ?? null) ?: $product->title }}">
+    <meta property="og:description" content="{{ $product->meta_description ?? '' }}">
+    <meta property="og:image" content="{{ \App\Helpers\ImageHelper::getUrl($product->image) }}">
     <meta property="og:type" content="product">
 @endsection
 
@@ -103,15 +103,6 @@
         @php
             $gallery = $product->gallery ?? [];
             $galleryImages = array_values(array_unique(array_merge([$product->image], $gallery)));
-            
-            // Helper to get correct asset path
-            $getImgPath = function($img) {
-                if (!$img) return asset('images/products/placeholder.jpg');
-                if (Str::startsWith($img, 'products/') || Str::startsWith($img, 'storage/')) {
-                    return asset('storage/' . str_replace('storage/', '', $img));
-                }
-                return asset('images/products/' . $img);
-            };
         @endphp
 
         <!-- Product Hero Section -->
@@ -126,7 +117,7 @@
                                 <button type="button" 
                                         data-index="{{ $index }}"
                                         class="product-other-image-thumb relative aspect-square w-20 sm:w-24 shrink-0 overflow-hidden rounded-2xl bg-white border-2 transition-colors duration-200 shadow-sm {{ $index === 0 ? 'border-[var(--primary)]' : 'border-transparent hover:border-[var(--primary)]/70' }}">
-                                    <img src="{{ $getImgPath($img) }}" alt="Product other image" class="h-full w-full object-contain">
+                                    <img src="{{ \App\Helpers\ImageHelper::getUrl($img, 'images/products') }}" alt="Product other image" class="h-full w-full object-contain">
                                 </button>
                             @endforeach
                         </div>
@@ -142,7 +133,7 @@
                             @foreach($galleryImages as $index => $img)
                                 <div class="relative aspect-square overflow-hidden cursor-zoom-in"
                                      onclick="openLightbox({{ $index }})">
-                                    <img src="{{ $getImgPath($img) }}" 
+                                    <img src="{{ \App\Helpers\ImageHelper::getUrl($img, 'images/products') }}" 
                                          width="1200"
                                          height="1200"
                                          alt="{{ $product->title }}" 
@@ -278,7 +269,7 @@
                                     <h3 class="text-xl font-bold text-[#1B4B36]">Available Offers</h3>
                                     <div class="flex items-baseline gap-2">
                                         <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Buy at</span>
-                                        <span class="text-xl font-bold text-[#1B4B36]">₹{{ number_format($product['price'] - 250) }}</span>
+                                        <span class="text-xl font-bold text-[#1B4B36]">₹{{ number_format($product->price - 250) }}</span>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3">
@@ -369,7 +360,7 @@
                         <div class="mt-8 border-t border-black/5 pt-8">
                             <div class="relative group/desc">
                                 <div id="short-description" class="text-lg leading-relaxed text-[color:var(--text-secondary)] font-medium line-clamp-3 transition-all duration-500">
-                                    {!! $product['description'] !!}
+                                    {!! $product->description !!}
                                 </div>
                                 <button type="button" 
                                         id="short-desc-btn"
@@ -594,7 +585,7 @@
 
                 <!-- Main Banner Image (1200×450 aspect ratio) -->
                 <div class="w-full overflow-hidden bg-gray-50" style="aspect-ratio: 1200/450;">
-                    <img src="{{ $getImgPath(($product->gallery ?? [])[0] ?? $product->image) }}"
+                    <img src="{{ \App\Helpers\ImageHelper::getUrl(($product->gallery ?? [])[0] ?? $product->image, 'images/products') }}"
                          alt="{{ $product->title }} - Main"
                          class="w-full h-full object-cover">
                 </div>
@@ -603,12 +594,12 @@
                 @if(count($product->gallery ?? []) >= 3)
                 <div class="mt-1 grid grid-cols-2 gap-1">
                     <div class="overflow-hidden bg-gray-50 aspect-square">
-                        <img src="{{ $getImgPath($product->gallery[1] ?? null) }}"
+                        <img src="{{ \App\Helpers\ImageHelper::getUrl($product->gallery[1] ?? null, 'images/products') }}"
                              alt="{{ $product->title }} - Detail 1"
                              class="w-full h-full object-cover">
                     </div>
                     <div class="overflow-hidden bg-gray-50 aspect-square">
-                        <img src="{{ $getImgPath($product->gallery[2] ?? null) }}"
+                        <img src="{{ \App\Helpers\ImageHelper::getUrl($product->gallery[2] ?? null, 'images/products') }}"
                              alt="{{ $product->title }} - Detail 2"
                              class="w-full h-full object-cover">
                     </div>
@@ -1137,7 +1128,7 @@
                             {{-- Image Container --}}
                             <div class="relative aspect-square overflow-hidden bg-[var(--bg-section)]">
                                 <a href="{{ route('products.show', $rp->slug) }}" class="absolute inset-0 z-10"></a>
-                                <img src="{{ $getImgPath($rp->image) }}" alt="{{ $rp->title }}"
+                                <img src="{{ \App\Helpers\ImageHelper::getUrl($rp->image, 'images/products') }}" alt="{{ $rp->title }}"
                                     class="h-full w-full object-contain" loading="lazy">
                                 
                                 {{-- Badges --}}
@@ -1229,7 +1220,7 @@
         <div class="mx-auto max-w-[1600px] flex items-center justify-between gap-8 px-4 sm:px-6 lg:px-12">
             <!-- Product Info (Desktop Only) -->
             <div class="hidden md:flex items-center gap-4">
-                <img src="{{ $getImgPath($product->image) }}" alt="{{ $product->title }}" class="h-14 w-14 rounded-xl bg-gray-50 object-contain p-2">
+                <img src="{{ \App\Helpers\ImageHelper::getUrl($product->image, 'images/products') }}" alt="{{ $product->title }}" class="h-14 w-14 rounded-xl bg-gray-50 object-contain p-2">
                 <div>
                     <h4 class="text-sm font-black text-[color:var(--text-primary)] line-clamp-1">{{ $product->title }}</h4>
                     <p class="text-xs font-bold text-[color:var(--primary)]">₹{{ number_format($product->price) }}</p>
@@ -1446,7 +1437,7 @@
     <script>
         const gallery = [
             @foreach($galleryImages as $img)
-                '{{ asset("images/products/" . $img) }}',
+                '{{ \App\Helpers\ImageHelper::getUrl($img, "images/products") }}',
             @endforeach
         ];
         

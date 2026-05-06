@@ -56,24 +56,34 @@
 
     <section class="bg-[var(--bg-main)]">
         <div class="hero-carousel owl-carousel owl-theme">
-            @php
-                $slides = [
-                    ['desktop' => 'remenant-bg22.jpg', 'mobile' => 'remenant-bg1.jpg', 'alt' => 'Banner 1'],
-                    ['desktop' => 'remenant-bg20.jpg', 'mobile' => 'remenant-bg2.jpg', 'alt' => 'Banner 2'],
-                    ['desktop' => 'remenant-bg19.jpg', 'mobile' => 'remenant-bg3.jpg', 'alt' => 'Banner 3'],
-                    ['desktop' => 'remenant-bg18.jpg', 'mobile' => 'remenant-bg4.jpg', 'alt' => 'Banner 4'],
-                    ['desktop' => 'remenant-bg21.jpg', 'mobile' => 'remenant-bg5.jpg', 'alt' => 'Banner 5'],
-                ];
-            @endphp
-            @foreach($slides as $slide)
+            @forelse($sliders ?? [] as $slide)
                 <div class="item">
-                    <picture>
-                        <source media="(max-width: 640px)" srcset="{{ asset('images/banners/mobile-bg/' . $slide['mobile']) }}">
-                        <img src="{{ asset('images/banners/' . $slide['desktop']) }}" alt="{{ $slide['alt'] }}" class="hero-img"
-                            loading="{{ $loop->first ? 'eager' : 'lazy' }}">
-                    </picture>
+                    <a href="{{ $slide->link ?: '#' }}" class="block">
+                        <picture>
+                            <source media="(max-width: 640px)" srcset="{{ \App\Helpers\ImageHelper::getUrl($slide->image_mobile, 'images/banners/mobile-bg') }}">
+                            <img src="{{ \App\Helpers\ImageHelper::getUrl($slide->image_desktop, 'images/banners') }}" alt="{{ $slide->alt_text }}" class="hero-img"
+                                loading="{{ $loop->first ? 'eager' : 'lazy' }}">
+                        </picture>
+                    </a>
                 </div>
-            @endforeach
+            @empty
+                {{-- Fallback slides if DB is empty --}}
+                @php
+                    $fallbackSlides = [
+                        ['desktop' => 'remenant-bg22.jpg', 'mobile' => 'remenant-bg1.jpg', 'alt' => 'Banner 1'],
+                        ['desktop' => 'remenant-bg20.jpg', 'mobile' => 'remenant-bg2.jpg', 'alt' => 'Banner 2'],
+                    ];
+                @endphp
+                @foreach($fallbackSlides as $slide)
+                    <div class="item">
+                        <picture>
+                            <source media="(max-width: 640px)" srcset="{{ asset('images/banners/mobile-bg/' . $slide['mobile']) }}">
+                            <img src="{{ asset('images/banners/' . $slide['desktop']) }}" alt="{{ $slide['alt'] }}" class="hero-img"
+                                loading="{{ $loop->first ? 'eager' : 'lazy' }}">
+                        </picture>
+                    </div>
+                @endforeach
+            @endforelse
         </div>
     </section>
 
@@ -159,9 +169,7 @@
                 @forelse ($featuredProducts ?? $products ?? [] as $product)
                     @php
                         $discount = (int) round((1 - ($product->price / max(1, $product->mrp))) * 100);
-                        $imagePath = $product->image 
-                            ? (Str::startsWith($product->image, 'products/') ? asset('storage/' . $product->image) : asset('images/products/' . $product->image))
-                            : asset('images/products/placeholder.jpg');
+                        $imagePath = \App\Helpers\ImageHelper::getUrl($product->image, 'images/products');
                     @endphp
                     <div
                         class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
@@ -241,7 +249,7 @@
                             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative group">
                                 <a href="{{ route('products.show', $combo->slug) }}" class="absolute inset-0 z-10"></a>
                                 <div class="aspect-square bg-gray-50">
-                                    <img src="{{ Str::startsWith($combo->image, 'products/') ? asset('storage/' . $combo->image) : asset('images/products/' . $combo->image) }}" alt="{{ $combo->title }}"
+                                    <img src="{{ \App\Helpers\ImageHelper::getUrl($combo->image, 'images/products') }}" alt="{{ $combo->title }}"
                                         class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
                                 </div>
                                 <div class="p-5 flex-1 flex flex-col">
