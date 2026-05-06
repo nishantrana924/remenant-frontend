@@ -154,30 +154,48 @@
                         </div>
                     </div>
 
-                    @if(isset($combos) && $combos->isNotEmpty())
-                    <!-- Combo Offers Slider (Only on products page) -->
-                    <div class="mb-16">
-                        <div class="flex items-center justify-between mb-8">
-                            <h2 class="text-2xl font-bold italic text-[color:var(--text-primary)]">Special Combo Offers</h2>
-                            <div class="flex items-center gap-2">
-                                <button type="button" data-combo-prev class="h-10 w-10 rounded-full bg-white shadow-sm ring-1 ring-black/5 flex items-center justify-center hover:bg-gray-50 transition active:scale-95">
-                                    <i data-lucide="chevron-left" class="h-5 w-5"></i>
-                                </button>
-                                <button type="button" data-combo-next class="h-10 w-10 rounded-full bg-white shadow-sm ring-1 ring-black/5 flex items-center justify-center hover:bg-gray-50 transition active:scale-95">
-                                    <i data-lucide="chevron-right" class="h-5 w-5"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="combo-carousel owl-carousel owl-theme" data-items-count="{{ count($combos) }}">
-                            @foreach ($combos as $combo)
-                                <div class="item">
-                                    <div class="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
-                                        <a href="{{ route('products.show', $combo->slug) }}" class="absolute inset-0 z-10"></a>
-                                        <div class="aspect-square bg-gray-50 overflow-hidden">
-                                            <img src="{{ Str::startsWith($combo->image, 'products/') ? asset('storage/' . $combo->image) : asset('images/products/' . $combo->image) }}" 
-                                                 alt="{{ $combo->title }}"
-                                                 class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                    <!-- Product Grid -->
+                    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                        @foreach ($products as $product)
+                            @php
+                                $discount = (int) round((1 - ($product->price / max(1, $product->mrp))) * 100);
+                            @endphp
+                            <div
+                                class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5">
+                                <a href="{{ route('products.show', $product->slug) }}" class="absolute inset-0 z-[5]"></a>
+
+
+                                <div class="relative aspect-square overflow-hidden bg-[var(--bg-section)]">
+                                    @php
+                                        $displayImage = $product->image ?? 'placeholder.jpg';
+                                        $imageSrc = (Str::startsWith($displayImage, 'products/') || Str::startsWith($displayImage, 'storage/'))
+                                            ? asset('storage/' . str_replace('storage/', '', $displayImage))
+                                            : asset('images/products/' . $displayImage);
+                                    @endphp
+                                    <img src="{{ $imageSrc }}" 
+                                         alt="{{ $product->title ?? 'Product' }}"
+                                         class="h-full w-full object-contain" 
+                                         onerror="this.src='{{ asset('images/products/remenant-product1.jpg') }}'"
+                                         loading="lazy">
+                                     @if(isset($discount) && $discount > 0)
+                                         <div class="absolute left-3 top-3 rounded-full bg-[var(--primary)] px-3 py-1 text-xs font-extrabold text-white">
+                                             -{{ $discount }}%
+                                         </div>
+                                     @endif
+                                 </div>
+
+                                <div class="flex flex-1 flex-col p-4">
+                                    <p class="text-xs font-bold tracking-wide text-[color:var(--primary)] uppercase">
+                                        {{ $product->tagline }}</p>
+                                    <h3 class="mt-1 text-[color:var(--text-primary)] font-semibold truncate">
+                                        {{ $product->title }}</h3>
+
+                                    <div class="mt-3 flex items-center justify-between gap-3">
+                                        <div class="flex items-baseline gap-2">
+                                            <p class="text-base font-semibold text-[color:var(--primary)] tracking-tighter">
+                                                ₹{{ number_format($product->price) }}</p>
+                                            <p class="text-xs font-medium text-[color:var(--text-muted)] line-through">
+                                                ₹{{ number_format($product->mrp) }}</p>
                                         </div>
                                         <div class="p-4 flex-1 flex flex-col">
                                             <p class="text-[10px] font-black uppercase tracking-widest text-[color:var(--primary)] mb-1">{{ $combo->tagline }}</p>
@@ -189,6 +207,15 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+
+                                    <div class="mt-auto pt-3 relative z-10">
+                                        <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="w-full text-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
+                                                Add to cart
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             @endforeach

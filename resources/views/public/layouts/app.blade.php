@@ -52,6 +52,7 @@
 
 <body class="font-sans antialiased bg-[var(--bg-main)]">
     <!-- Global Page Loader -->
+    @if(!request()->routeIs('login', 'register', 'password.*', 'verification.*', 'dashboard', 'my-orders', 'profile.*'))
     <div id="global-page-loader" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
         <div class="relative">
             <div class="h-20 w-20 rounded-[2.5rem] border-4 border-orange-100 animate-spin-slow"></div>
@@ -63,6 +64,7 @@
         </div>
         <p class="mt-8 text-[10px] font-black uppercase tracking-[0.5em] text-slate-400 animate-pulse">Remenant Health</p>
     </div>
+    @endif
 
     <div class="min-h-screen flex flex-col">
         @include('public.layouts.header')
@@ -151,40 +153,162 @@
     </script>
     @stack('scripts')
 
-    @if(session('success'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 4000,
-                    timerProgressBar: true,
-                    icon: 'success',
-                    title: "{{ session('success') }}",
-                    customClass: { popup: 'rounded-2xl' }
-                });
-            });
-        </script>
-    @endif
+    <style>
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .custom-toast {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            width: 320px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: start;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            animation: toast-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            border: 1px solid transparent;
+        }
+
+        @keyframes toast-in {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .custom-toast.hide {
+            animation: toast-out 0.5s ease forwards;
+        }
+
+        @keyframes toast-out {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(120%); opacity: 0; }
+        }
+
+        /* Success Variant */
+        .custom-toast.success { background: #f0fdf4; border-color: #bbf7d0; }
+        .custom-toast.success .toast-icon path { fill: #22c55e; }
+        .custom-toast.success .toast-title { color: #166534; }
+        .custom-toast.success .toast-close path { fill: #166534; }
+
+        /* Error Variant */
+        .custom-toast.error { background: #fef2f2; border-color: #fecaca; }
+        .custom-toast.error .toast-icon path { fill: #ef4444; }
+        .custom-toast.error .toast-title { color: #991b1b; }
+        .custom-toast.error .toast-close path { fill: #991b1b; }
+
+        /* Warning Variant (Your Design) */
+        .custom-toast.warning { background: #FEF7D1; border-color: #F7C752; }
+        .custom-toast.warning .toast-icon path { fill: #F7C752; }
+        .custom-toast.warning .toast-title { color: #755118; }
+        .custom-toast.warning .toast-close path { fill: #755118; }
+
+        .toast-icon { width: 20px; height: 20px; margin-right: 12px; flex-shrink: 0; }
+        .toast-title { font-weight: 600; font-size: 13px; flex-grow: 1; }
+        .toast-close { width: 18px; height: 18px; margin-left: 12px; cursor: pointer; transition: opacity 0.2s; opacity: 0.6; }
+        .toast-close:hover { opacity: 1; }
+    </style>
+
+    <div id="toast-wrapper" class="toast-container"></div>
+
+    <script>
+        function showToast(message, type = 'success') {
+            const wrapper = document.getElementById('toast-wrapper');
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            
+            const iconPath = type === 'success' 
+                ? 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'
+                : 'm13 14h-2v-5h2zm0 4h-2v-2h2zm-12 3h22l-11-19z';
+
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="${iconPath}"></path></svg>
+                </div>
+                <div class="toast-title">${message}</div>
+                <div class="toast-close" onclick="this.parentElement.classList.add('hide'); setTimeout(() => this.parentElement.remove(), 500)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="m15.8333 5.34166-1.175-1.175-4.6583 4.65834-4.65833-4.65834-1.175 1.175 4.65833 4.65834-4.65833 4.6583 1.175 1.175 4.65833-4.6583 4.6583 4.6583 1.175-1.175-4.6583-4.6583z"></path></svg>
+                </div>
+            `;
+
+            wrapper.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.add('hide');
+                    setTimeout(() => toast.remove(), 500);
+                }
+            }, 5000);
+        }
+
+        @if(session('success'))
+            showToast("{{ session('success') }}", 'success');
+        @endif
+        @if(session('error'))
+            showToast("{{ session('error') }}", 'error');
+        @endif
+        @if(session('warning'))
+            showToast("{{ session('warning') }}", 'warning');
+        @endif
+    </script>
+
+    <style>
+        .premium-swal-popup {
+            padding: 3rem !important;
+            border-radius: 3rem !important;
+            border: none !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        }
+        .premium-swal-actions {
+            width: 100% !important;
+            margin-top: 2rem !important;
+        }
+        .premium-swal-confirm {
+            width: 100% !important;
+            background: #000000 !important;
+            color: white !important;
+            border-radius: 100px !important;
+            padding: 1.25rem 2rem !important;
+            font-size: 11px !important;
+            font-weight: 900 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.2em !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+            cursor: pointer !important;
+            display: block !important;
+        }
+        .premium-swal-confirm:hover {
+            background: #1f2937 !important;
+            transform: scale(1.02);
+        }
+        .premium-swal-confirm:active {
+            transform: scale(0.98);
+        }
+    </style>
 
     @if($errors->any())
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Validation Failed',
-                    html: `<div class="text-left bg-rose-50 p-4 rounded-2xl border border-rose-100 mt-4">
-                        <ul class="text-xs text-rose-600 space-y-1 list-disc pl-4 font-bold">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>`,
-                    confirmButtonColor: '#F97316',
+                    iconColor: '#ef4444',
+                    title: '<span class="text-2xl font-black uppercase tracking-tight text-gray-900">Oops!</span>',
+                    text: '{{ $errors->first() }}',
+                    confirmButtonText: 'Try Again',
+                    buttonsStyling: false,
                     customClass: {
-                        popup: 'rounded-[2rem]',
-                        confirmButton: 'rounded-xl px-6 py-3 font-bold uppercase tracking-widest text-xs'
+                        popup: 'premium-swal-popup',
+                        title: 'mb-2',
+                        htmlContainer: 'text-sm font-bold text-gray-500 mb-4',
+                        actions: 'premium-swal-actions',
+                        confirmButton: 'premium-swal-confirm'
                     }
                 });
             });

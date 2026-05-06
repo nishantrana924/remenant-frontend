@@ -61,28 +61,25 @@
             </nav>
 
             <div class="mt-6 border-t border-black/5 pt-5">
+                <a href="{{ route('my-orders') }}"
+                    class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
+                    <i data-lucide="package" class="h-5 w-5 text-gray-600"></i>
+                    My Orders
+                </a>
+                <a href="{{ route('profile.edit') }}"
+                    class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
+                    <i data-lucide="settings" class="h-5 w-5 text-gray-600"></i>
+                    Profile Settings
+                </a>
                 @auth
-                    <a href="{{ route('dashboard') }}"
-                        class="flex items-center justify-between rounded-2xl bg-black/5 px-4 py-3 text-sm font-extrabold text-gray-900 hover:bg-black/10 transition">
-                        <span class="flex items-center gap-3">
-                            <i data-lucide="layout-dashboard" class="h-5 w-5 text-gray-600"></i>
-                            Dashboard
-                        </span>
-                        <i data-lucide="chevron-right" class="h-5 w-5 text-gray-600"></i>
-                    </a>
-                @else
-                    <div class="grid grid-cols-2 gap-2">
-                        <a href="{{ route('login') }}"
-                            class="inline-flex items-center justify-center rounded-2xl bg-black/5 px-4 py-3 text-sm font-extrabold text-gray-900 hover:bg-black/10 transition">
-                            Login
-                        </a>
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}"
-                                class="inline-flex items-center justify-center rounded-2xl bg-[var(--primary)] px-4 py-3 text-sm font-extrabold text-white hover:opacity-95 transition">
-                                Register
-                            </a>
-                        @endif
-                    </div>
+                    <form method="POST" action="{{ route('logout') }}" class="mt-2">
+                        @csrf
+                        <button type="submit"
+                            class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 transition">
+                            <i data-lucide="log-out" class="h-5 w-5"></i>
+                            Logout
+                        </button>
+                    </form>
                 @endauth
             </div>
         </div>

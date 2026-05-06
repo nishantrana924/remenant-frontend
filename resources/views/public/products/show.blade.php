@@ -133,9 +133,7 @@
 
                     <div class="relative group/gallery product-gallery-shell overflow-hidden -mx-4 rounded-none bg-[var(--bg-section)] ring-1 ring-black/5 shadow-sm sm:mx-0 sm:rounded-[2rem]">
                         <div class="absolute right-3 top-3 sm:right-4 sm:top-4 z-30 flex flex-col gap-2">
-                            <button type="button" aria-label="Add to wishlist" class="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-[color:var(--text-primary)] shadow-lg ring-1 ring-black/10 transition hover:text-[color:var(--primary)] active:scale-95">
-                                <i data-lucide="heart" class="h-5 w-5"></i>
-                            </button>
+
                             <button type="button" aria-label="Share product" class="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-[color:var(--text-primary)] shadow-lg ring-1 ring-black/10 transition hover:text-[color:var(--primary)] active:scale-95">
                                 <i data-lucide="send" class="h-5 w-5"></i>
                             </button>
@@ -1149,9 +1147,7 @@
                                     </div>
                                 @endif
                                 
-                                <button type="button" class="absolute right-3 top-3 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white/90 ring-1 ring-black/5 text-gray-900 transition-transform active:scale-90 hover:scale-110">
-                                    <i data-lucide="heart" class="h-5 w-5"></i>
-                                </button>
+
                             </div>
 
                             {{-- Content --}}
@@ -1242,7 +1238,7 @@
 
             <!-- Buttons -->
             <div class="flex flex-1 items-center gap-2 sm:gap-3 max-w-[600px] lg:flex-none lg:w-[450px]">
-                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1" data-ajax="true">
+                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
                     @csrf
                     <button type="submit" class="w-full h-11 sm:h-12 flex items-center justify-center rounded-xl sm:rounded-2xl bg-[var(--primary)] text-white font-bold uppercase tracking-[0.1em] text-[10px] sm:text-xs shadow-lg shadow-[var(--primary)]/20 active:scale-95 transition hover:brightness-105">
                         Add to Cart
