@@ -27,13 +27,13 @@ class ProductService
     {
         // 1. Image & Gallery Processing
         if (isset($data['image'])) {
-            $data['image'] = \App\Helpers\ImageHelper::upload($data['image'], 'products');
+            $data['image'] = \App\Helpers\ImageHelper::upload($data['image'], 'uploads/products');
         }
 
         if (isset($data['gallery'])) {
             $galleryPaths = [];
             foreach ($data['gallery'] as $file) {
-                $galleryPaths[] = \App\Helpers\ImageHelper::upload($file, 'products/gallery');
+                $galleryPaths[] = \App\Helpers\ImageHelper::upload($file, 'uploads/products/gallery');
             }
             $data['gallery'] = $galleryPaths;
         }
@@ -72,7 +72,7 @@ class ProductService
         // 1. Image & Gallery Update
         if (isset($data['image'])) {
             if ($product->image) \App\Helpers\ImageHelper::delete($product->image);
-            $data['image'] = \App\Helpers\ImageHelper::upload($data['image'], 'products');
+            $data['image'] = \App\Helpers\ImageHelper::upload($data['image'], 'uploads/products');
         }
 
         if (isset($data['gallery'])) {
@@ -82,7 +82,7 @@ class ProductService
             }
             $galleryPaths = [];
             foreach ($data['gallery'] as $file) {
-                $galleryPaths[] = \App\Helpers\ImageHelper::upload($file, 'products/gallery');
+                $galleryPaths[] = \App\Helpers\ImageHelper::upload($file, 'uploads/products/gallery');
             }
             $data['gallery'] = $galleryPaths;
         }

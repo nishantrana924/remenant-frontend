@@ -13,10 +13,7 @@
 
             <div class="relative aspect-square overflow-hidden bg-[var(--bg-section)]">
                 @php
-                    $displayImage = $product->image ?? 'placeholder.jpg';
-                    $imageSrc = (Str::startsWith($displayImage, 'products/') || Str::startsWith($displayImage, 'storage/'))
-                        ? asset('storage/' . str_replace('storage/', '', $displayImage))
-                        : asset('images/products/' . $displayImage);
+                    $imageSrc = \App\Helpers\ImageHelper::getUrl($product->image, 'images/products');
                 @endphp
                 <img src="{{ $imageSrc }}" 
                      alt="{{ $product->title ?? 'Product' }}"

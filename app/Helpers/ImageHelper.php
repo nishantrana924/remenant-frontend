@@ -8,28 +8,35 @@ use Illuminate\Support\Str;
 class ImageHelper
 {
     /**
-     * Upload an image to a specific directory.
+     * Upload an image directly to the public folder.
      */
-    public static function upload($file, $directory = 'products'): string
+    public static function upload($file, $directory = 'uploads/products'): string
     {
         if (!$file) return '';
         
         // Generate a clean filename: timestamp-random.extension
-        $filename = time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+        $filename = time() . '-' . \Illuminate\Support\Str::random(10) . '.' . $file->getClientOriginalExtension();
         
-        // Store the file in the 'public' disk under the specified directory
-        $path = $file->storeAs($directory, $filename, 'public');
+        // Move the file directly to the public directory
+        $file->move(public_path($directory), $filename);
         
-        return $path;
+        // Return the relative path from the public folder
+        return $directory . '/' . $filename;
     }
 
     /**
-     * Delete an image from storage.
+     * Delete an image from the public folder.
      */
     public static function delete($path): bool
     {
-        if ($path && Storage::disk('public')->exists($path)) {
-            return Storage::disk('public')->delete($path);
+        if (!$path) return false;
+
+        // Clean path: remove 'storage/' if it exists, and trim slashes
+        $cleanPath = str_replace('storage/', '', ltrim($path, '/'));
+        $fullPath = public_path($cleanPath);
+        
+        if (file_exists($fullPath) && is_file($fullPath)) {
+            return unlink($fullPath);
         }
         return false;
     }
@@ -37,18 +44,17 @@ class ImageHelper
     /**
      * Get the full URL of an image.
      */
-    public static function getUrl($path, $fallbackDir = 'images'): string
+    public static function getUrl($path, $fallbackDir = 'uploads/products'): string
     {
         if (!$path) return asset('images/placeholder.jpg');
         
-        if (Str::startsWith($path, ['http://', 'https://'])) {
+        if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])) {
             return $path;
         }
 
-        if (!Str::contains($path, '/')) {
-            return asset($fallbackDir . '/' . $path);
-        }
-
-        return Storage::disk('public')->url($path);
+        // Clean path for URL generation
+        $cleanPath = str_replace('storage/', '', ltrim($path, '/'));
+        
+        return asset($cleanPath);
     }
 }

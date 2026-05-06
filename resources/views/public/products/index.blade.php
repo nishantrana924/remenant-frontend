@@ -175,13 +175,7 @@
                                     <div class="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
                                         <a href="{{ route('products.show', $combo->slug) }}" class="absolute inset-0 z-10"></a>
                                         <div class="aspect-square bg-gray-50 overflow-hidden">
-                                            @php
-                                                $comboImage = $combo->image ?? 'placeholder.jpg';
-                                                $comboSrc = (Str::startsWith($comboImage, 'products/') || Str::startsWith($comboImage, 'storage/'))
-                                                    ? asset('storage/' . str_replace('storage/', '', $comboImage))
-                                                    : asset('images/products/' . $comboImage);
-                                            @endphp
-                                            <img src="{{ $comboSrc }}" 
+                                            <img src="{{ \App\Helpers\ImageHelper::getUrl($combo->image, 'images/products') }}" 
                                                  alt="{{ $combo->title }}"
                                                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                                         </div>
