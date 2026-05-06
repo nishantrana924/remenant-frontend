@@ -17,7 +17,7 @@ class DashboardController extends Controller
         if ($request->user()->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
-        return redirect()->route('user.dashboard');
+        return redirect()->route('my-orders');
     }
 
     /**

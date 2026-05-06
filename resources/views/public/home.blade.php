@@ -165,11 +165,7 @@
                     <div
                         class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
                         <a href="{{ route('products.show', $product->slug) }}" class="absolute inset-0 z-[5]"></a>
-                        <button type="button"
-                            class="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 ring-1 ring-black/10 hover:bg-white transition"
-                            aria-label="Add to wishlist">
-                            <i data-lucide="heart" class="h-5 w-5 text-[color:var(--text-primary)]"></i>
-                        </button>
+
 
                         <div class="relative aspect-square overflow-hidden bg-[var(--bg-section)]">
                             <img src="{{ $imagePath }}" alt="{{ $product->title }}"
@@ -202,7 +198,7 @@
                             </div>
 
                             <div class="mt-auto pt-3 relative z-10">
-                                <form action="{{ route('cart.add', $product->id) }}" method="POST" data-ajax="true">
+                                <form action="{{ route('cart.add', $product->id) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="w-full text-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
                                         Add to cart

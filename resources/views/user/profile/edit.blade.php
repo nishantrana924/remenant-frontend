@@ -20,7 +20,7 @@
                 </div>
 
                 <div class="bg-white shadow-sm border border-slate-100 divide-y divide-slate-50">
-                    <a href="{{ route('user.dashboard') }}" class="p-4 flex items-center justify-between group hover:bg-slate-50 transition-colors">
+                    <a href="{{ route('my-orders') }}" class="p-4 flex items-center justify-between group hover:bg-slate-50 transition-colors">
                         <div class="flex items-center gap-3">
                             <i data-lucide="shopping-bag" class="h-4 w-4 text-slate-400"></i>
                             <span class="text-[11px] font-black uppercase tracking-widest text-slate-900">My Orders</span>

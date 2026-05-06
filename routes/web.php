@@ -63,8 +63,8 @@ Route::get('/debug-db', [App\Http\Controllers\Admin\ArtisanController::class, 'd
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
-    Route::get('/dashboard/user', [DashboardController::class, 'user'])
-        ->name('user.dashboard');
+    Route::get('/my-orders', [DashboardController::class, 'user'])
+        ->name('my-orders');
     Route::get('/setup', [\App\Http\Controllers\Admin\ArtisanController::class, 'setup'])->name('admin.setup');
     Route::get('/debug-db', [\App\Http\Controllers\Admin\ArtisanController::class, 'debugDb'])->name('admin.debug-db');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

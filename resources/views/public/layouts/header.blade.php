@@ -45,80 +45,79 @@
                 </div>
 
                 @if(!$isAuthPage)
-                <div class="flex items-center gap-2">
-                    @php $cartCount = count(session('cart', [])); @endphp
-                    <a href="{{ route('cart') }}"
-                        class="header-btn relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
-                        class="header-btn relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
-                        aria-label="Cart">
-                        <i data-lucide="shopping-cart" class="h-6 w-6"></i>
-                        <span class="cart-count-badge absolute -top-1 -right-1 {{ $cartCount > 0 ? '' : 'hidden' }} flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-black text-[color:var(--primary)] shadow-sm">
-                            {{ $cartCount }}
-                        </span>
-                    </a>
+                    <div class="flex items-center gap-2">
+                        @php $cartCount = count(session('cart', [])); @endphp
+                        <a href="{{ route('cart') }}"
+                            class="header-btn relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
+                            class="header-btn relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
+                            aria-label="Cart">
+                            <i data-lucide="shopping-cart" class="h-6 w-6"></i>
+                            <span
+                                class="cart-count-badge absolute -top-1 -right-1 {{ $cartCount > 0 ? '' : 'hidden' }} flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-black text-[color:var(--primary)] shadow-sm">
+                                {{ $cartCount }}
+                            </span>
+                        </a>
 
-                    <details class="relative" data-account-dropdown>
-                        <summary
-                            class="header-btn list-none inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
-                            aria-label="Account">
-                            <i data-lucide="user" class="h-6 w-6"></i>
-                        </summary>
+                        <details class="relative" data-account-dropdown>
+                            <summary
+                                class="header-btn list-none inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
+                                aria-label="Account">
+                                <i data-lucide="user" class="h-6 w-6"></i>
+                            </summary>
 
-                        <div
-                            class="absolute right-0 mt-2 w-48 overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/10">
-                            <div class="px-4 py-3">
-                                <p class="text-xs font-semibold text-gray-500">Account</p>
-                                <p class="text-sm font-extrabold text-gray-900">
-                                    {{ config('app.name', 'Remenant Health') }}
-                                </p>
-                            </div>
-                            <div class="h-px bg-gray-100"></div>
-                            <div class="p-2">
-                                @auth
-                                    <a href="#wishlist"
-                                        class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
-                                        <i data-lucide="heart" class="h-4 w-4"></i>
-                                        Wishlist
-                                    </a>
-                                    <form method="POST" action="{{ route('logout') }}" class="mt-1">
-                                        @csrf
-                                        <button type="submit"
-                                            class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold text-gray-800 hover:bg-gray-50">
-                                            <i data-lucide="log-out" class="h-4 w-4"></i>
-                                            Logout
-                                        </button>
-                                    </form>
-                                @else
-                                    <a href="{{ route('login') }}"
-                                        class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
-                                        <i data-lucide="log-in" class="h-4 w-4"></i>
-                                        Login
-                                    </a>
-                                    @if (Route::has('register'))
-                                        <a href="{{ route('register') }}"
-                                            class="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
-                                            <i data-lucide="user-plus" class="h-4 w-4"></i>
-                                            Register
+                            <div
+                                class="absolute right-0 mt-2 w-48 overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/10">
+                                <div class="px-4 py-3">
+                                    <p class="text-xs font-semibold text-gray-500">
+                                        {{ auth()->check() ? 'Profile Setting' : 'Account' }}
+                                    </p>
+                                    <p class="text-sm font-extrabold text-gray-900">
+                                        {{ auth()->check() ? auth()->user()->name : 'Guest' }}
+                                    </p>
+                                </div>
+                                <div class="h-px bg-gray-100"></div>
+                                <div class="p-2">
+                                    @auth
+                                        <a href="{{ route('my-orders') }}"
+                                            class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                            <i data-lucide="package" class="h-4 w-4"></i>
+                                            My Orders
                                         </a>
-                                    @endif
-                                @endauth
+                                        <a href="{{ route('profile.edit') }}"
+                                            class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                            <i data-lucide="settings" class="h-4 w-4"></i>
+                                            Profile Settings
+                                        </a>
+
+                                        <form method="POST" action="{{ route('logout') }}" class="mt-1">
+                                            @csrf
+                                            <button type="submit"
+                                                class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                                <i data-lucide="log-out" class="h-4 w-4"></i>
+                                                Logout
+                                            </button>
+                                        </form>
+                                    @else
+                                        <a href="{{ route('login') }}"
+                                            class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                            <i data-lucide="log-in" class="h-4 w-4"></i>
+                                            Login
+                                        </a>
+                                        @if (Route::has('register'))
+                                            <a href="{{ route('register') }}"
+                                                class="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                                <i data-lucide="user-plus" class="h-4 w-4"></i>
+                                                Register
+                                            </a>
+                                        @endif
+                                    @endauth
+                                </div>
                             </div>
-                        </div>
-                    </details>
-                </div>
+                        </details>
+                    </div>
                 @endif
             </div>
 
-            <!-- Mobile search bar -->
-            <div class="public-mobile-search {{ $isAuthPage || request()->routeIs('products.show', 'cart') ? 'hidden' : '' }}" data-mobile-search>
-                <div class="relative">
-                    <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/80">
-                        <i data-lucide="search" class="h-5 w-5"></i>
-                    </span>
-                    <input type="search" placeholder="Search for products…"
-                        class="w-full rounded-full border border-white/30 bg-white/10 py-3 pl-11 pr-4 text-white placeholder:text-white/60 outline-none transition-all duration-300 focus:bg-white/20 focus:ring-0 focus:border-white/50 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                </div>
-            </div>
         </div>
 
         <!-- Desktop header -->
@@ -137,40 +136,34 @@
             </a>
 
             @if(!$isAuthPage)
-            <!-- Search -->
-            <div class="flex-1">
-                <div class="relative max-w-[520px]">
-                    <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/80">
-                        <i data-lucide="search" class="h-5 w-5"></i>
-                    </span>
-                    <input type="search" placeholder="Search for products…"
-                        class="w-full rounded-full border border-white/30 bg-white/10 py-2 pl-10 pr-4 text-white placeholder:text-white/60 outline-none transition-all duration-300 focus:max-w-[580px] focus:bg-white/20 focus:ring-0 focus:border-white/50 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                <!-- Search -->
+                <div class="flex-1">
+                    <div class="relative max-w-[520px]">
+                        <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/80">
+                            <i data-lucide="search" class="h-5 w-5"></i>
+                        </span>
+                        <input type="search" placeholder="Search for products…"
+                            class="w-full rounded-full border border-white/30 bg-white/10 py-2 pl-10 pr-4 text-white placeholder:text-white/60 outline-none transition-all duration-300 focus:max-w-[580px] focus:bg-white/20 focus:ring-0 focus:border-white/50 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                    </div>
                 </div>
-            </div>
             @else
-            <div class="flex-1"></div>
+                <div class="flex-1"></div>
             @endif
 
             @if(!$isAuthPage)
-            <!-- Actions -->
-            <div class="flex items-center gap-2">
-                <a href="{{ route('cart') }}"
-                    class="header-btn relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
-                    class="header-btn relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
-                    aria-label="Cart">
-                    <i data-lucide="shopping-cart" class="h-5 w-5"></i>
-                    <span class="cart-count-badge absolute -top-1 -right-1 {{ $cartCount > 0 ? '' : 'hidden' }} flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-black text-[color:var(--primary)] shadow-sm">
-                        {{ $cartCount }}
-                    </span>
-                </a>
-
-                @auth
-                    <a href="{{ route('dashboard') }}"
-                        class="hidden h-10 w-10 items-center justify-center rounded-full bg-white text-[color:var(--primary)] shadow-sm ring-1 ring-white/40 hover:bg-white/90 transition lg:inline-flex"
-                        title="Account Dashboard">
-                        <i data-lucide="settings" class="h-5 w-5"></i>
+                <!-- Actions -->
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('cart') }}"
+                        class="header-btn relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
+                        class="header-btn relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
+                        aria-label="Cart">
+                        <i data-lucide="shopping-cart" class="h-5 w-5"></i>
+                        <span
+                            class="cart-count-badge absolute -top-1 -right-1 {{ $cartCount > 0 ? '' : 'hidden' }} flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-black text-[color:var(--primary)] shadow-sm">
+                            {{ $cartCount }}
+                        </span>
                     </a>
-                @else
+
                     <details class="relative" data-account-dropdown>
                         <summary
                             class="header-btn list-none inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
@@ -181,18 +174,27 @@
                         <div
                             class="absolute right-0 mt-2 w-48 overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/10">
                             <div class="px-4 py-3">
-                                <p class="text-xs font-semibold text-gray-500">Account</p>
-                                <p class="text-sm font-extrabold text-gray-900">{{ config('app.name', 'Remenant Health') }}
+                                <p class="text-xs font-semibold text-gray-500">
+                                    {{ auth()->check() ? 'Profile Setting' : 'Account' }}
+                                </p>
+                                <p class="text-sm font-extrabold text-gray-900">
+                                    {{ auth()->check() ? auth()->user()->name : 'Guest' }}
                                 </p>
                             </div>
                             <div class="h-px bg-gray-100"></div>
                             <div class="p-2">
                                 @auth
-                                    <a href="#wishlist"
+                                    <a href="{{ route('my-orders') }}"
                                         class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
-                                        <i data-lucide="heart" class="h-4 w-4"></i>
-                                        Wishlist
+                                        <i data-lucide="package" class="h-4 w-4"></i>
+                                        My Orders
                                     </a>
+                                    <a href="{{ route('profile.edit') }}"
+                                        class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                        <i data-lucide="settings" class="h-4 w-4"></i>
+                                        Profile Settings
+                                    </a>
+
                                     <form method="POST" action="{{ route('logout') }}" class="mt-1">
                                         @csrf
                                         <button type="submit"
@@ -219,18 +221,31 @@
                         </div>
                     </details>
 
-                    @if (Route::has('register'))
-                        <a href="{{ route('products.index') }}"
-                            class="hidden rounded-full bg-white px-4 py-2 text-sm font-extrabold text-[color:var(--primary)] shadow-sm ring-1 ring-white/40 hover:bg-white/90 transition lg:inline-flex">
-                            Shop All
-                        </a>
-                    @endif
-                @endauth
-            </div>
+                    <a href="{{ route('products.index') }}"
+                        class="hidden rounded-full bg-white px-4 py-2 text-sm font-extrabold text-[color:var(--primary)] shadow-sm ring-1 ring-white/40 hover:bg-white/90 transition lg:inline-flex">
+                        Shop All
+                    </a>
+                </div>
             @endif
         </div>
     </div>
 </header>
+
+<!-- Mobile search bar (Non-sticky) -->
+<div class="sm:hidden brand-gradient px-4 pb-4 -mt-1">
+    <div class="mx-auto max-w-[1600px]">
+        <div class="public-mobile-search {{ $isAuthPage || request()->routeIs('products.show', 'cart') ? 'hidden' : '' }}"
+            data-mobile-search>
+            <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/80">
+                    <i data-lucide="search" class="h-5 w-5"></i>
+                </span>
+                <input type="search" placeholder="Search for products…"
+                    class="w-full rounded-full border border-white/30 bg-white/10 py-3 pl-11 pr-4 text-white placeholder:text-white/60 outline-none transition-all duration-300 focus:bg-white/20 focus:ring-0 focus:border-white/50 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+            </div>
+        </div>
+    </div>
+</div>
 
 <style>
     /* Reinforce sticky behavior */
