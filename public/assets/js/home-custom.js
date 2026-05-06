@@ -27,10 +27,10 @@ $(document).ready(function () {
 
     // Function to initialize Combo Slider
     function initComboCarousel() {
-        console.log('Combo Slider Init Start');
+        const comboCount = parseInt($(".combo-carousel").attr('data-items-count')) || 0;
         const comboCarousel = $(".combo-carousel").owlCarousel({
             margin: 20,
-            loop: true,
+            loop: comboCount > 4,
             autoplay: true,
             autoplayTimeout: 4000,
             autoplayHoverPause: true,

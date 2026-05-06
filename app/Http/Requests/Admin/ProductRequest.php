@@ -56,6 +56,7 @@ class ProductRequest extends FormRequest
             'nutrition_description' => 'nullable|string',
             'benefits_title' => 'nullable|string',
             'benefits_subtitle' => 'nullable|string',
+            'product_type' => 'nullable|string|in:single,combo,both',
         ];
     }
 }

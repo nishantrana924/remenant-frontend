@@ -57,21 +57,29 @@
                                 </div>
                             </div>
 
-                            <!-- Categories -->
                             <div>
                                 <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Categories</h3>
                                 <div class="space-y-3">
-                                    @php
-                                        $categories = ['All Products', 'Immunity', 'Beauty & Skin', 'Metabolism', 'Daily Energy', 'Weight Care', 'Combo Offers'];
-                                    @endphp
+                                    <label class="group flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="categories[]" value="all" 
+                                               onchange="filterProducts()"
+                                               class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
+                                        <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">All Products</span>
+                                    </label>
                                     @foreach($categories as $cat)
                                         <label class="group flex items-center gap-3 cursor-pointer">
-                                            <input type="checkbox" 
-                                                   data-category="{{ $cat }}"
-                                                   class="category-filter-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
-                                            <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">{{ $cat }}</span>
+                                            <input type="checkbox" name="categories[]" value="{{ $cat->slug }}"
+                                                   onchange="filterProducts()"
+                                                   class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
+                                            <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">{{ $cat->name }}</span>
                                         </label>
                                     @endforeach
+                                    <label class="group flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="categories[]" value="Combo Offers"
+                                               onchange="filterProducts()"
+                                               class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
+                                        <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">Combo Offers</span>
+                                    </label>
                                 </div>
                             </div>
 
@@ -79,9 +87,10 @@
                             <div>
                                 <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Price Range</h3>
                                 <div class="space-y-4">
-                                    <input type="range" min="0" max="5000" step="100" class="w-full accent-[var(--primary)]">
+                                    <input type="range" id="price-range" min="0" max="5000" step="100" value="{{ request('max_price', 5000) }}" class="w-full accent-[var(--primary)]">
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs font-black text-[color:var(--text-muted)]">₹0</span>
+                                        <span class="text-xs font-black text-[color:var(--primary)]" id="price-value">₹{{ number_format(request('max_price', 5000)) }}</span>
                                         <span class="text-xs font-black text-[color:var(--text-muted)]">₹5,000+</span>
                                     </div>
                                 </div>
@@ -107,9 +116,9 @@
 
                             <!-- Reset Filters -->
                             <div class="pt-6 lg:pt-0">
-                                <button type="button" class="w-full rounded-2xl bg-black/5 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-black/10 transition">
+                                <a href="{{ route('products.index') }}" class="block w-full text-center rounded-2xl bg-black/5 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-black/10 transition">
                                     Reset Filters
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -127,14 +136,14 @@
                                 <i data-lucide="sliders-horizontal" class="h-5 w-5"></i>
                             </button>
                             <p class="text-sm font-bold uppercase tracking-widest text-[color:var(--text-secondary)]">
-                                Showing {{ count($products) }} Products
+                                Showing <span id="results-count">{{ count($products) }}</span> Products
                             </p>
                         </div>
                         
                         <div class="hidden lg:flex items-center gap-4">
                             <span class="text-xs font-bold uppercase tracking-widest text-[color:var(--text-muted)]">Sort By:</span>
                             <div class="relative">
-                                <select id="sort-select" class="appearance-none rounded-2xl bg-white px-6 py-3 pr-12 text-sm font-semibold uppercase tracking-widest outline-none ring-1 ring-black/5 shadow-sm hover:bg-gray-50 transition">
+                                <select id="sort-select" onchange="filterProducts()" class="appearance-none rounded-2xl bg-white px-6 py-3 pr-12 text-sm font-semibold uppercase tracking-widest outline-none ring-1 ring-black/5 shadow-sm hover:bg-gray-50 transition">
                                     <option value="best-selling">Best Selling</option>
                                     <option value="price-low">Price: Low to High</option>
                                     <option value="price-high">Price: High to Low</option>
@@ -145,71 +154,56 @@
                         </div>
                     </div>
 
-                    <!-- Product Grid -->
-                    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                        @foreach ($products as $product)
-                            @php
-                                $discount = (int) round((1 - ($product->price / max(1, $product->mrp))) * 100);
-                            @endphp
-                            <div
-                                class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5">
-                                <a href="{{ route('products.show', $product->slug) }}" class="absolute inset-0 z-[5]"></a>
-                                <button type="button"
-                                    class="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 ring-1 ring-black/10 hover:bg-white transition"
-                                    aria-label="Add to wishlist">
-                                    <i data-lucide="heart" class="h-5 w-5 text-[color:var(--text-primary)]"></i>
+                    @if(isset($combos) && $combos->isNotEmpty())
+                    <!-- Combo Offers Slider (Only on products page) -->
+                    <div class="mb-16">
+                        <div class="flex items-center justify-between mb-8">
+                            <h2 class="text-2xl font-bold italic text-[color:var(--text-primary)]">Special Combo Offers</h2>
+                            <div class="flex items-center gap-2">
+                                <button type="button" data-combo-prev class="h-10 w-10 rounded-full bg-white shadow-sm ring-1 ring-black/5 flex items-center justify-center hover:bg-gray-50 transition active:scale-95">
+                                    <i data-lucide="chevron-left" class="h-5 w-5"></i>
                                 </button>
-
-                                <div class="relative aspect-square overflow-hidden bg-[var(--bg-section)]">
-                                    @php
-                                        $displayImage = $product->image ?? 'placeholder.jpg';
-                                        $imageSrc = (Str::startsWith($displayImage, 'products/') || Str::startsWith($displayImage, 'storage/'))
-                                            ? asset('storage/' . str_replace('storage/', '', $displayImage))
-                                            : asset('images/products/' . $displayImage);
-                                    @endphp
-                                    <img src="{{ $imageSrc }}" 
-                                         alt="{{ $product->title ?? 'Product' }}"
-                                         class="h-full w-full object-contain" 
-                                         onerror="this.src='{{ asset('images/products/remenant-product1.jpg') }}'"
-                                         loading="lazy">
-                                     @if(isset($discount) && $discount > 0)
-                                         <div class="absolute left-3 top-3 rounded-full bg-[var(--primary)] px-3 py-1 text-xs font-extrabold text-white">
-                                             -{{ $discount }}%
-                                         </div>
-                                     @endif
-                                 </div>
-
-                                <div class="flex flex-1 flex-col p-4">
-                                    <p class="text-xs font-bold tracking-wide text-[color:var(--primary)] uppercase">
-                                        {{ $product->tagline }}</p>
-                                    <h3 class="mt-1 text-[color:var(--text-primary)] font-semibold truncate">
-                                        {{ $product->title }}</h3>
-
-                                    <div class="mt-3 flex items-center justify-between gap-3">
-                                        <div class="flex items-baseline gap-2">
-                                            <p class="text-base font-semibold text-[color:var(--primary)] tracking-tighter">
-                                                ₹{{ number_format($product->price) }}</p>
-                                            <p class="text-xs font-medium text-[color:var(--text-muted)] line-through">
-                                                ₹{{ number_format($product->mrp) }}</p>
+                                <button type="button" data-combo-next class="h-10 w-10 rounded-full bg-white shadow-sm ring-1 ring-black/5 flex items-center justify-center hover:bg-gray-50 transition active:scale-95">
+                                    <i data-lucide="chevron-right" class="h-5 w-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="combo-carousel owl-carousel owl-theme" data-items-count="{{ count($combos) }}">
+                            @foreach ($combos as $combo)
+                                <div class="item">
+                                    <div class="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
+                                        <a href="{{ route('products.show', $combo->slug) }}" class="absolute inset-0 z-10"></a>
+                                        <div class="aspect-square bg-gray-50 overflow-hidden">
+                                            <img src="{{ Str::startsWith($combo->image, 'products/') ? asset('storage/' . $combo->image) : asset('images/products/' . $combo->image) }}" 
+                                                 alt="{{ $combo->title }}"
+                                                 class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                                         </div>
-                                        <div
-                                            class="flex items-center gap-1 rounded-full bg-black/5 px-2 py-1 text-xs font-semibold text-[color:var(--text-secondary)]">
-                                            <i data-lucide="star" class="h-4 w-4 fill-[color:var(--primary)] text-[color:var(--primary)]"></i>
-                                            {{ number_format($product->rating, 1) }} ({{ number_format($product->reviews) }})
+                                        <div class="p-4 flex-1 flex flex-col">
+                                            <p class="text-[10px] font-black uppercase tracking-widest text-[color:var(--primary)] mb-1">{{ $combo->tagline }}</p>
+                                            <h4 class="text-sm font-bold text-[color:var(--text-primary)] mb-2 line-clamp-1">{{ $combo->title }}</h4>
+                                            <div class="mt-auto flex items-center justify-between">
+                                                <div class="flex items-baseline gap-2">
+                                                    <span class="text-base font-bold text-[color:var(--text-primary)]">₹{{ number_format($combo->price) }}</span>
+                                                    <span class="text-xs text-gray-400 line-through">₹{{ number_format($combo->mrp) }}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-
-                                    <div class="mt-auto pt-3 relative z-10">
-                                        <form action="{{ route('cart.add', $product->id) }}" method="POST" data-ajax="true">
-                                            @csrf
-                                            <button type="submit" class="w-full text-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
-                                                Add to cart
-                                            </button>
-                                        </form>
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Product Grid -->
+                    <div id="products-grid-container" class="relative">
+                        @include('public.products._grid')
+                        
+                        <!-- Loading Overlay -->
+                        <div id="grid-loader" class="hidden absolute inset-0 z-20 bg-white/50 backdrop-blur-[2px] flex items-center justify-center rounded-3xl">
+                            <div class="h-10 w-10 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
+                        </div>
                     </div>
 
                     <!-- Load More (Placeholder) -->
@@ -250,34 +244,72 @@
     </div>
     @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const categoryParam = urlParams.get('category');
-            const sortParam = urlParams.get('sort');
-
-            // Handle Category Filter
-            if (categoryParam) {
-                const checkboxes = document.querySelectorAll('.category-filter-checkbox');
-                checkboxes.forEach(cb => {
-                    if (cb.dataset.category.toLowerCase() === categoryParam.toLowerCase()) {
-                        cb.checked = true;
-                        // You might want to trigger a filter function here if you have one
-                    } else {
-                        cb.checked = false;
-                    }
-                });
-            } else {
-                // If no category, check 'All Products'
-                const allCb = document.querySelector('[data-category="All Products"]');
-                if (allCb) allCb.checked = true;
-            }
-
-            // Handle Sort
-            if (sortParam) {
-                const sortSelect = document.getElementById('sort-select');
-                if (sortSelect) {
-                    sortSelect.value = sortParam;
+        function filterProducts() {
+            const gridContainer = document.getElementById('products-grid-container');
+            const gridLoader = document.getElementById('grid-loader');
+            const countLabel = document.getElementById('results-count');
+            
+            // Show loader
+            gridLoader.classList.remove('hidden');
+            
+            // Gather filters
+            const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked'))
+                .map(cb => cb.value)
+                .filter(v => v !== 'all');
+            
+            const maxPrice = document.getElementById('price-range').value;
+            const sort = document.getElementById('sort-select').value;
+            
+            // Build URL
+            const url = new URL(window.location.href);
+            url.searchParams.delete('categories[]');
+            selectedCategories.forEach(cat => url.searchParams.append('categories[]', cat));
+            url.searchParams.set('max_price', maxPrice);
+            url.searchParams.set('sort', sort);
+            
+            // Push to history
+            window.history.pushState({}, '', url);
+            
+            // Fetch via AJAX
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
+            })
+            .then(response => response.json())
+            .then(data => {
+                gridContainer.innerHTML = data.html + `
+                    <!-- Loading Overlay (Restored after innerHTML replace) -->
+                    <div id="grid-loader" class="hidden absolute inset-0 z-20 bg-white/50 backdrop-blur-[2px] flex items-center justify-center rounded-3xl">
+                        <div class="h-10 w-10 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                `;
+                countLabel.textContent = data.count;
+                
+                // Re-initialize Lucide icons if any
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            })
+            .catch(error => console.error('Error filtering:', error))
+            .finally(() => {
+                // Loader is now inside gridContainer, need to find it again
+                document.getElementById('grid-loader').classList.add('hidden');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const priceRange = document.getElementById('price-range');
+            const priceValue = document.getElementById('price-value');
+
+            if (priceRange) {
+                priceRange.addEventListener('input', function() {
+                    priceValue.textContent = '₹' + parseInt(this.value).toLocaleString();
+                });
+
+                priceRange.addEventListener('change', function() {
+                    filterProducts();
+                });
             }
         });
     </script>

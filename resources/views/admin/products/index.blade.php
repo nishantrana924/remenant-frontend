@@ -60,6 +60,11 @@
                                 @foreach($item->categories as $cat)
                                 <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-bold uppercase tracking-wider">{{ $cat->name }}</span>
                                 @endforeach
+                                @if(($item->product_type ?? 'single') === 'both')
+                                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-600 rounded text-[10px] font-bold uppercase tracking-wider">Single & Combo</span>
+                                @else
+                                    <span class="px-2 py-0.5 {{ ($item->product_type ?? 'single') === 'combo' ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600' }} rounded text-[10px] font-bold uppercase tracking-wider">{{ $item->product_type ?? 'single' }}</span>
+                                @endif
                             </div>
                         </td>
                         <td>

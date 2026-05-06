@@ -325,6 +325,14 @@
                     </div>
                     <div class="space-y-4">
                         <div>
+                            <label class="saas-label">Product Type</label>
+                            <select name="product_type" x-model="formData.product_type" class="saas-input">
+                                <option value="single">Single Product</option>
+                                <option value="combo">Combo Product</option>
+                                <option value="both">Both (Single & Combo)</option>
+                            </select>
+                        </div>
+                        <div>
                             <div class="flex items-center justify-between mb-2">
                                 <label class="saas-label mb-0">Product Categories</label>
                             </div>
@@ -718,6 +726,7 @@ function productSystem() {
             nutrition_description: {!! json_encode($item->nutrition_description) !!},
             benefits_title: {!! json_encode($item->benefits_title) !!},
             benefits_subtitle: {!! json_encode($item->benefits_subtitle) !!},
+            product_type: {!! json_encode($item->product_type ?? 'single') !!},
             price: {{ $item->price ?? 0 }},
             mrp: {{ $item->mrp ?? 0 }},
             stock: {{ $item->stock ?? 0 }},

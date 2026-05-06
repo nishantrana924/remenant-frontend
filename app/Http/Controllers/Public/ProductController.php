@@ -8,22 +8,76 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request = null)
     {
-        $products = Product::where('status', 'published')->get();
+        $request = $request ?: request();
+        $query = Product::where('status', 'published');
+
+        // Multiple Category Filter
+        if ($request->has('categories') && is_array($request->categories)) {
+            $categories = $request->categories;
+            
+            $query->where(function($q) use ($categories) {
+                // Handle "Combo Offers" special case if it's in the array
+                if (in_array('Combo Offers', $categories)) {
+                    $q->whereIn('product_type', ['combo', 'both']);
+                    $otherCategories = array_diff($categories, ['Combo Offers']);
+                    if (!empty($otherCategories)) {
+                        $q->orWhereHas('categories', function($sq) use ($otherCategories) {
+                            $sq->whereIn('slug', $otherCategories)->orWhereIn('name', $otherCategories);
+                        });
+                    }
+                } else {
+                    $q->whereHas('categories', function($sq) use ($categories) {
+                        $sq->whereIn('slug', $categories)->orWhereIn('name', $categories);
+                    });
+                }
+            });
+        }
+
+        // Price Filter
+        if ($request->has('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        // Sorting (Applied to DB)
+        $sort = $request->get('sort', 'best-selling');
+        if ($sort === 'price-low') {
+            $query->orderBy('price', 'asc');
+        } elseif ($sort === 'price-high') {
+            $query->orderBy('price', 'desc');
+        } elseif ($sort === 'newest') {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $products = $query->get();
+        $combos = Product::whereIn('product_type', ['combo', 'both'])->where('status', 'published')->get();
         
-        // Fallback to static if DB is empty (for dev/transition)
-        if ($products->isEmpty()) {
-            $products = $this->getStaticProducts();
+        // Merge with static products if we don't have many real ones and no filters are applied
+        if (!$request->has('categories') && !$request->has('max_price')) {
+            $staticProducts = $this->getStaticProducts();
+            if ($products->count() < 12) {
+                $products = $products->toBase()->merge($staticProducts->slice(0, 12 - $products->count()));
+            }
+        }
+
+        // Sort the final collection if merged
+        if ($sort === 'price-low') {
+            $products = $products->sortBy('price')->values();
+        } elseif ($sort === 'price-high') {
+            $products = $products->sortByDesc('price')->values();
         }
         
-        $categories = [
-            (object)['name' => 'Immunity', 'slug' => 'immunity', 'products_count' => 12],
-            (object)['name' => 'Beauty', 'slug' => 'beauty', 'products_count' => 8],
-            (object)['name' => 'Digestion', 'slug' => 'digestion', 'products_count' => 5],
-        ];
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('public.products._grid', compact('products'))->render(),
+                'count' => $products->count()
+            ]);
+        }
+
+        $categories = \App\Models\Category::all();
         
-        return view('public.products.index', compact('products', 'categories'));
+        return view('public.products.index', compact('products', 'categories', 'combos'));
     }
 
     public function show($slug)

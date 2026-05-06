@@ -4,53 +4,54 @@
 
 @section('content')
     @php
-
-        $combos = [
-            [
-                'title' => 'Ultimate Immunity Duo',
-                'slug' => 'ultimate-immunity-duo',
-                'category' => 'Immunity',
-                'tagline' => 'Double the Protection',
-                'description' => 'Vitamin C (1000mg) + Vitamin D3 & Zinc combo for peak immunity.',
-                'price' => 3299,
-                'mrp' => 4999,
-                'image' => 'remenant-product1.jpg',
-                'badge' => 'Value Pack',
-            ],
-            [
-                'title' => 'Glow & Strength Bundle',
-                'slug' => 'glow-strength-bundle',
-                'category' => 'Beauty',
-                'tagline' => 'Complete Beauty Care',
-                'description' => 'Glutathione + Biotin combination for hair, skin and nail health.',
-                'price' => 3499,
-                'mrp' => 5499,
-                'image' => 'remenant-product2.jpg',
-                'badge' => 'Best Seller',
-            ],
-            [
-                'title' => 'Daily Wellness Pack',
-                'slug' => 'daily-wellness-pack',
-                'category' => 'Wellness',
-                'tagline' => 'Pure Energy',
-                'description' => 'ACV + Vitamin C mix for digestion and long-lasting energy.',
-                'price' => 2899,
-                'mrp' => 3999,
-                'image' => 'remenant-product3.jpg',
-                'badge' => 'Popular',
-            ],
-            [
-                'title' => 'Skin Transformation Kit',
-                'slug' => 'skin-transformation-kit',
-                'category' => 'Skin Care',
-                'tagline' => 'Radiant Results',
-                'description' => 'Premium Collagen + Glutathione for age-defying skin.',
-                'price' => 4599,
-                'mrp' => 6999,
-                'image' => 'remenant-product4.jpg',
-                'badge' => 'Expert Choice',
-            ],
-        ];
+        if (!isset($combos) || $combos->isEmpty()) {
+            $combos = collect([
+                [
+                    'title' => 'Ultimate Immunity Duo',
+                    'slug' => 'ultimate-immunity-duo',
+                    'category' => 'Immunity',
+                    'tagline' => 'Double the Protection',
+                    'description' => 'Vitamin C (1000mg) + Vitamin D3 & Zinc combo for peak immunity.',
+                    'price' => 3299,
+                    'mrp' => 4999,
+                    'image' => 'remenant-product1.jpg',
+                    'badge' => 'Value Pack',
+                ],
+                [
+                    'title' => 'Glow & Strength Bundle',
+                    'slug' => 'glow-strength-bundle',
+                    'category' => 'Beauty',
+                    'tagline' => 'Complete Beauty Care',
+                    'description' => 'Glutathione + Biotin combination for hair, skin and nail health.',
+                    'price' => 3499,
+                    'mrp' => 5499,
+                    'image' => 'remenant-product2.jpg',
+                    'badge' => 'Best Seller',
+                ],
+                [
+                    'title' => 'Daily Wellness Pack',
+                    'slug' => 'daily-wellness-pack',
+                    'category' => 'Wellness',
+                    'tagline' => 'Pure Energy',
+                    'description' => 'ACV + Vitamin C mix for digestion and long-lasting energy.',
+                    'price' => 2899,
+                    'mrp' => 3999,
+                    'image' => 'remenant-product3.jpg',
+                    'badge' => 'Popular',
+                ],
+                [
+                    'title' => 'Skin Transformation Kit',
+                    'slug' => 'skin-transformation-kit',
+                    'category' => 'Skin Care',
+                    'tagline' => 'Radiant Results',
+                    'description' => 'Premium Collagen + Glutathione for age-defying skin.',
+                    'price' => 4599,
+                    'mrp' => 6999,
+                    'image' => 'remenant-product4.jpg',
+                    'badge' => 'Expert Choice',
+                ],
+            ])->map(fn($c) => (object)$c);
+        }
     @endphp
 
     <section class="bg-[var(--bg-main)]">
@@ -235,28 +236,28 @@
                 </div>
 
 
-                <div class="combo-carousel owl-carousel owl-theme">
+                <div class="combo-carousel owl-carousel owl-theme" data-items-count="{{ count($combos) }}">
                     @foreach ($combos as $combo)
                         @php
-                            $discount = (int) round((1 - ($combo['price'] / max(1, $combo['mrp']))) * 100);
+                            $discount = (int) round((1 - ($combo->price / max(1, $combo->mrp))) * 100);
                         @endphp
                         <div class="item h-full">
                             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative group">
-                                <a href="{{ route('products.show', $combo['slug']) }}" class="absolute inset-0 z-10"></a>
+                                <a href="{{ route('products.show', $combo->slug) }}" class="absolute inset-0 z-10"></a>
                                 <div class="aspect-square bg-gray-50">
-                                    <img src="{{ asset('images/products/' . $combo['image']) }}" alt="{{ $combo['title'] }}"
+                                    <img src="{{ Str::startsWith($combo->image, 'products/') ? asset('storage/' . $combo->image) : asset('images/products/' . $combo->image) }}" alt="{{ $combo->title }}"
                                         class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
                                 </div>
                                 <div class="p-5 flex-1 flex flex-col">
                                     <p class="text-[10px] font-black uppercase tracking-widest text-[color:var(--primary)] mb-1">
-                                        {{ $combo['tagline'] }}</p>
+                                        {{ $combo->tagline }}</p>
                                     <h4 class="text-sm font-extrabold text-[color:var(--text-primary)] mb-4 line-clamp-1">
-                                        {{ $combo['title'] }}</h4>
+                                        {{ $combo->title }}</h4>
                                     <div class="mt-auto flex items-center justify-between">
                                         <div class="flex items-baseline gap-2">
                                             <span
-                                                class="text-lg font-black text-[color:var(--text-primary)]">₹{{ number_format($combo['price']) }}</span>
-                                            <span class="text-xs text-gray-400 line-through">₹{{ number_format($combo['mrp']) }}</span>
+                                                class="text-lg font-black text-[color:var(--text-primary)]">₹{{ number_format($combo->price) }}</span>
+                                            <span class="text-xs text-gray-400 line-through">₹{{ number_format($combo->mrp) }}</span>
                                         </div>
                                         <button
                                             class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-[color:var(--primary)] hover:text-white transition relative z-20">

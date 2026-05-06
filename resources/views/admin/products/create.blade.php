@@ -321,6 +321,14 @@
                     </div>
                     <div class="space-y-4">
                         <div>
+                            <label class="saas-label">Product Type</label>
+                            <select name="product_type" x-model="formData.product_type" class="saas-input">
+                                <option value="single">Single Product</option>
+                                <option value="combo">Combo Product</option>
+                                <option value="both">Both (Single & Combo)</option>
+                            </select>
+                        </div>
+                        <div>
                             <div class="flex items-center justify-between mb-2">
                                 <label class="saas-label mb-0">Product Categories</label>
                             </div>
@@ -815,6 +823,7 @@ function productSystem() {
         ],
         formData: {
             title: '', tagline: '', badge: '', description: '', long_description: '', 
+            product_type: 'single',
             specs: '', brand_info: '', nutrition_description: '', meta_title: '', meta_description: '', video_url: '',
             price: 0, mrp: 0,
             stock: 100,
