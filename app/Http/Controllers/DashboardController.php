@@ -27,7 +27,8 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         $orders = \App\Models\Order::where('user_id', $user->id)->latest()->get();
-        return view('public.dashboard', compact('orders', 'user'));
+        $activeTab = $request->get('tab', 'orders');
+        return view('public.dashboard', compact('orders', 'user', 'activeTab'));
     }
 
     /**

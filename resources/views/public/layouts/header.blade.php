@@ -83,7 +83,7 @@
                                             <i data-lucide="package" class="h-4 w-4"></i>
                                             My Orders
                                         </a>
-                                        <a href="{{ route('profile.edit') }}"
+                                        <a href="{{ route('my-orders', ['tab' => 'profile']) }}"
                                             class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
                                             <i data-lucide="settings" class="h-4 w-4"></i>
                                             Profile Settings
@@ -189,7 +189,7 @@
                                         <i data-lucide="package" class="h-4 w-4"></i>
                                         My Orders
                                     </a>
-                                    <a href="{{ route('profile.edit') }}"
+                                    <a href="{{ route('my-orders', ['tab' => 'profile']) }}"
                                         class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
                                         <i data-lucide="settings" class="h-4 w-4"></i>
                                         Profile Settings

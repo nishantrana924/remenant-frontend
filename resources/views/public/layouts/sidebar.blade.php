@@ -66,7 +66,7 @@
                     <i data-lucide="package" class="h-5 w-5 text-gray-600"></i>
                     My Orders
                 </a>
-                <a href="{{ route('profile.edit') }}"
+                <a href="{{ route('my-orders', ['tab' => 'profile']) }}"
                     class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
                     <i data-lucide="settings" class="h-5 w-5 text-gray-600"></i>
                     Profile Settings
