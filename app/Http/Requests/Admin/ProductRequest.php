@@ -57,6 +57,8 @@ class ProductRequest extends FormRequest
             'benefits_title' => 'nullable|string',
             'benefits_subtitle' => 'nullable|string',
             'product_type' => 'nullable|string|in:single,combo,both',
+            'removed_gallery_images' => 'nullable|array',
+            'removed_gallery_images.*' => 'string',
         ];
     }
 }

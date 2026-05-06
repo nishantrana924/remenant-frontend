@@ -75,17 +75,28 @@ class ProductService
             $data['image'] = \App\Helpers\ImageHelper::upload($data['image'], 'uploads/products');
         }
 
-        if (isset($data['gallery'])) {
-            // Option: merge or replace. We'll replace for simplicity here.
-            if ($product->gallery) {
-                foreach($product->gallery as $old) \App\Helpers\ImageHelper::delete($old);
+        // Handle Gallery
+        $currentGallery = $product->gallery ?? [];
+        
+        // Remove specific images
+        if (isset($data['removed_gallery_images']) && is_array($data['removed_gallery_images'])) {
+            foreach ($data['removed_gallery_images'] as $path) {
+                \App\Helpers\ImageHelper::delete($path);
+                $currentGallery = array_filter($currentGallery, fn($g) => $g !== $path);
             }
-            $galleryPaths = [];
-            foreach ($data['gallery'] as $file) {
-                $galleryPaths[] = \App\Helpers\ImageHelper::upload($file, 'uploads/products/gallery');
-            }
-            $data['gallery'] = $galleryPaths;
+            unset($data['removed_gallery_images']);
         }
+
+        // Add new images
+        if (isset($data['gallery']) && is_array($data['gallery'])) {
+            $newPaths = [];
+            foreach ($data['gallery'] as $file) {
+                $newPaths[] = \App\Helpers\ImageHelper::upload($file, 'uploads/products/gallery');
+            }
+            $currentGallery = array_merge($currentGallery, $newPaths);
+        }
+
+        $data['gallery'] = array_values($currentGallery);
 
         // 2. Transformations
         $data['is_featured'] = isset($data['is_featured']) ? (bool)$data['is_featured'] : false;
