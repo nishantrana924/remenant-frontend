@@ -17,9 +17,8 @@ Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])-
 Route::get('/order/{order}/invoice', [CheckoutController::class, 'invoice'])->name('order.invoice');
 
 
-Route::get('/about', function () {
-    return view('public.about');
-})->name('about');
+Route::get('/about', [\App\Http\Controllers\Public\AboutController::class, 'index'])->name('about');
+
  
 Route::get('/contact', function () {
     return view('public.contact');

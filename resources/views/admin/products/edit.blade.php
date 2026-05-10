@@ -422,12 +422,21 @@
                             </div>
                             @if($item->gallery && count($item->gallery) > 0)
                                 <div class="grid grid-cols-4 gap-2 mb-4">
-                                    @foreach($item->gallery as $g)
-                                        <div class="aspect-square rounded-lg bg-slate-50 border border-slate-100 p-1 overflow-hidden">
+                                    @foreach($item->gallery as $index => $g)
+                                        <div x-show="!formData.removed_gallery_images.includes('{{ $g }}')" 
+                                             class="group relative aspect-square rounded-lg bg-slate-50 border border-slate-100 p-1 overflow-hidden">
                                             <img src="{{ \App\Helpers\ImageHelper::getUrl($g) }}" class="w-full h-full object-cover rounded">
+                                            <button type="button" 
+                                                    @click="removeExistingGalleryImage('{{ $g }}')"
+                                                    class="absolute top-1 right-1 h-6 w-6 bg-rose-500 text-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110">
+                                                <i data-lucide="x" class="w-3 h-3"></i>
+                                            </button>
                                         </div>
                                     @endforeach
                                 </div>
+                                <template x-for="path in formData.removed_gallery_images" :key="path">
+                                    <input type="hidden" name="removed_gallery_images[]" :value="path">
+                                </template>
                             @endif
                             <div class="gallery-upload-area relative">
                                 <input type="file" name="gallery[]" multiple class="filepond-gallery">
@@ -746,7 +755,8 @@ function productSystem() {
                 2: { title: {!! json_encode($item->ritual[2]['title'] ?? '') !!}, desc: {!! json_encode($item->ritual[2]['desc'] ?? '') !!} },
                 3: { title: {!! json_encode($item->ritual[3]['title'] ?? '') !!}, desc: {!! json_encode($item->ritual[3]['desc'] ?? '') !!} }
             },
-            highlights_list: {!! json_encode($item->highlights ?? []) !!}
+            highlights_list: {!! json_encode($item->highlights ?? []) !!},
+            removed_gallery_images: []
         },
         init() {
             this.initEditors();
@@ -838,6 +848,10 @@ function productSystem() {
         },
         removeHighlight(index) {
             this.formData.highlights_list.splice(index, 1);
+        },
+        removeExistingGalleryImage(path) {
+            this.formData.removed_gallery_images.push(path);
+            this.$nextTick(() => lucide.createIcons());
         },
         openIconPicker(index) { this.pickerMode = 'benefit'; this.currentBenefitIndex = index; this.showIconPicker = true; },
         openTrustIconPicker(index) { this.pickerMode = 'trust'; this.currentBenefitIndex = index; this.showIconPicker = true; },
