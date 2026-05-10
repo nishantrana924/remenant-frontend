@@ -189,7 +189,7 @@
                                 <span class="text-2xl sm:text-4xl font-semibold">{{ $discount }}%</span>
                             </div>
                             <span class="text-xl sm:text-3xl font-black text-gray-400/50 line-through decoration-gray-400/30">₹{{ number_format($product->mrp) }}</span>
-                            <span class="text-4xl sm:text-6xl font-black text-[color:var(--text-primary)] tracking-tight">₹{{ number_format($product->price) }}</span>
+                            <span class="text-4xl sm:text-6xl font-black text-[color:var(--text-primary)] tracking-tight current-price-text">₹{{ number_format($product->price) }}</span>
                         </div>
                         <p class="mt-2 text-xs font-bold text-[color:var(--text-muted)] uppercase tracking-wider">Inclusive of all taxes</p>
                         
@@ -203,7 +203,8 @@
                                            placeholder="Enter Code"
                                            class="w-full rounded-2xl bg-gray-50/50 border-2 border-dashed border-gray-200 px-5 py-4 text-sm font-bold text-[color:var(--text-primary)] placeholder:text-gray-300 focus:outline-none focus:border-[color:var(--primary)] transition-all uppercase tracking-widest">
                                     <button type="button" 
-                                            onclick="applyCouponCode()"
+                                            id="apply-coupon-btn"
+                                            onclick="applyCoupon()"
                                             class="absolute right-2 top-2 bottom-2 rounded-xl px-6 text-[10px] font-black text-white uppercase tracking-widest shadow-lg active:scale-95 transition-all hover:brightness-105"
                                             style="background-color: var(--primary); shadow: 0 10px 20px -5px color-mix(in srgb, var(--primary), transparent 60%)">
                                         Apply
@@ -211,52 +212,24 @@
                                 </div>
                                 
                                 <div id="coupon-message" class="hidden animate-in fade-in slide-in-from-top-2 duration-300">
-                                    <div class="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 border border-green-100">
-                                        <i data-lucide="check-circle-2" class="h-4 w-4 text-green-600"></i>
-                                        <p class="text-[11px] font-bold text-green-700 uppercase tracking-wider">
-                                            Code <span id="applied-code-text" class="underline"></span> Applied! <span class="mx-2 text-green-300">|</span> You save <span class="text-lg">₹<span id="discount-amount">0</span></span>
-                                        </p>
+                                    <div class="flex items-center justify-between gap-2 rounded-xl bg-green-50 px-4 py-3 border border-green-100">
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="check-circle-2" class="h-4 w-4 text-green-600"></i>
+                                            <p class="text-[11px] font-bold text-green-700 uppercase tracking-wider">
+                                                Code <span id="applied-code-text" class="underline"></span> Applied! <span class="mx-2 text-green-300">|</span> You save <span class="text-lg">₹<span id="discount-amount">0</span></span>
+                                            </p>
+                                        </div>
+                                        <button onclick="removeCoupon()" class="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline">Remove</button>
                                     </div>
                                 </div>
                                 
                                 <p id="coupon-error" class="hidden text-[10px] font-bold text-red-500 uppercase tracking-widest mt-1">
-                                    Invalid coupon code. Try REMENANT10
                                 </p>
                             </div>
                         </div>
 
                         <script>
-                            function applyCouponCode() {
-                                const input = document.getElementById('coupon-input');
-                                const message = document.getElementById('coupon-message');
-                                const error = document.getElementById('coupon-error');
-                                const codeText = document.getElementById('applied-code-text');
-                                const discountText = document.getElementById('discount-amount');
-                                
-                                const code = input.value.trim().toUpperCase();
-                                
-                                // Reset states
-                                message.classList.add('hidden');
-                                error.classList.add('hidden');
-                                
-                                if (code === 'REMENANT10' || code === 'WELCOME10') {
-                                    const price = {{ $product->price }};
-                                    const discount = Math.round(price * 0.1);
-                                    
-                                    codeText.innerText = code;
-                                    discountText.innerText = discount.toLocaleString();
-                                    message.classList.remove('hidden');
-                                    input.classList.add('border-green-200');
-                                    input.classList.remove('border-dashed');
-                                    
-                                    if (window.lucide) lucide.createIcons();
-                                } else if (code === '') {
-                                    // Do nothing
-                                } else {
-                                    error.classList.remove('hidden');
-                                    input.classList.add('border-red-200');
-                                }
-                            }
+                            // Real coupon logic in bottom script stack
                         </script>
                         
                         {{-- 
@@ -436,16 +409,6 @@
                                     </div>
                                 </div>
 
-                                <div id="delivery-info" class="hidden">
-                                    <div class="flex items-center gap-4 py-4 px-6 rounded-2xl bg-green-50/50 border border-green-100/50">
-                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
-                                            <i data-lucide="calendar-days" class="h-5 w-5"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-bold text-gray-900">Delivery by {{ date('j M, l', strtotime('+3 days')) }}</p>
-                                            <p class="text-[10px] font-semibold text-green-600 uppercase tracking-widest">Free Shipping Available</p>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -771,7 +734,7 @@
                 </div>
             </div>
         {{-- Product Highlights & Ritual --}}
-        @if($product->highlights || ($product->ritual && count($product->ritual) > 0))
+        @if(($product->highlights ?? null) || ($product->ritual && count((array)$product->ritual) > 0))
         <section class="py-12 sm:py-20 bg-white border-t border-black/5">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 lg:items-start">
@@ -810,8 +773,9 @@
                         </h2>
                         
                         <div class="space-y-10">
-                            @if($product->ritual && is_array($product->ritual))
-                                @foreach($product->ritual as $step)
+                            @if($product->ritual && (is_array($product->ritual) || is_object($product->ritual)))
+                                @foreach((array)$product->ritual as $step)
+                                    @php $s = (object)$step; @endphp
                                     <div class="flex gap-8 group relative">
                                         <div class="relative z-10">
                                             <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl font-black text-white text-2xl shadow-lg transition-transform group-hover:rotate-12 group-hover:scale-110 duration-500" style="background-color: var(--primary); shadow: 0 10px 25px -5px color-mix(in srgb, var(--primary), transparent 60%)">{{ $loop->iteration }}</span>
@@ -820,8 +784,8 @@
                                             @endif
                                         </div>
                                         <div class="pt-1">
-                                            <h4 class="text-xl font-black uppercase tracking-widest text-slate-900 mb-2">{{ $step->title ?? $step['title'] ?? '' }}</h4>
-                                            <p class="text-base text-slate-500 font-medium leading-relaxed">{{ $step->desc ?? $step['desc'] ?? '' }}</p>
+                                            <h4 class="text-xl font-black uppercase tracking-widest text-slate-900 mb-2">{{ $s->title ?? '' }}</h4>
+                                            <p class="text-base text-slate-500 font-medium leading-relaxed">{{ $s->desc ?? '' }}</p>
                                         </div>
                                     </div>
                                 @endforeach
@@ -834,7 +798,7 @@
         @endif
 
         {{-- Nutrition Facts Section --}}
-        @if($product->nutrition && count($product->nutrition) > 0)
+        @if($product->nutrition && count((array)$product->nutrition) > 0)
         <section class="py-12 sm:py-24 bg-[#FDFBF7]">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
@@ -853,9 +817,10 @@
                                 ];
                             @endphp
                             @foreach(array_slice($nutriHighlights, 0, 2) as $highlight)
+                                @php $nh = (object)$highlight; @endphp
                                 <div class="p-6 rounded-3xl bg-white border border-slate-100 shadow-sm">
-                                    <i data-lucide="{{ $highlight['icon'] ?? 'check' }}" class="h-6 w-6 text-{{ ($highlight['icon'] ?? '') == 'leaf' ? 'green' : 'amber' }}-500 mb-3"></i>
-                                    <h4 class="font-bold text-slate-900 uppercase text-xs tracking-widest">{{ $highlight['text'] ?? '' }}</h4>
+                                    <i data-lucide="{{ $nh->icon ?? 'check' }}" class="h-6 w-6 text-{{ ($nh->icon ?? '') == 'leaf' ? 'green' : 'amber' }}-500 mb-3"></i>
+                                    <h4 class="font-bold text-slate-900 uppercase text-xs tracking-widest">{{ $nh->text ?? '' }}</h4>
                                 </div>
                             @endforeach
                         </div>
@@ -922,36 +887,31 @@
                         <div class="p-8 sm:p-10 rounded-[2.5rem] bg-white shadow-sm ring-1 ring-black/5">
                             <h2 class="text-xl sm:text-2xl font-semibold tracking-tight text-[color:var(--text-primary)]">Verified Reviews</h2>
                             <div class="mt-8 flex items-end gap-5">
-                                <span class="text-7xl font-black leading-none text-[color:var(--text-primary)]">{{ $product->rating }}</span>
+                                <span class="text-7xl font-black leading-none text-[color:var(--text-primary)]">{{ number_format($avgRating, 1) }}</span>
                                 <div class="flex flex-col gap-1 pb-1">
                                     <div class="flex text-orange-400">
-                                        @for($i = 0; $i < 5; $i++)
-                                            <i data-lucide="star" class="h-5 w-5 text-[color:var(--primary)] fill-[color:var(--primary)]"></i>
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i data-lucide="star" class="h-5 w-5 {{ $i <= floor($avgRating) ? 'text-[color:var(--primary)] fill-[color:var(--primary)]' : 'text-slate-200' }}"></i>
                                         @endfor
                                     </div>
-                                    <span class="text-sm font-bold text-[color:var(--text-secondary)]">Based on {{ number_format($product->reviews) }} reviews</span>
+                                    <span class="text-sm font-bold text-[color:var(--text-secondary)]">Based on {{ number_format($totalApproved) }} reviews</span>
                                 </div>
                             </div>
 
                             <!-- Rating Bars -->
                             <div class="mt-10 space-y-4">
-                                @php
-                                    $ratings = [
-                                        ['stars' => 5, 'count' => 850],
-                                        ['stars' => 4, 'count' => 100],
-                                        ['stars' => 3, 'count' => 20],
-                                        ['stars' => 2, 'count' => 8],
-                                        ['stars' => 1, 'count' => 4],
-                                    ];
-                                @endphp
-                                @foreach($ratings as $r)
+                                @foreach([5, 4, 3, 2, 1] as $star)
+                                    @php
+                                        $count = $product instanceof \App\Models\Product ? $product->reviews()->where('status', 'approved')->where('rating', $star)->count() : 0;
+                                        $percentage = $totalApproved > 0 ? ($count / $totalApproved) * 100 : 0;
+                                    @endphp
                                     <div class="flex items-center gap-4">
-                                        <span class="w-4 text-xs font-semibold text-[color:var(--text-secondary)]">{{ $r['stars'] }}</span>
+                                        <span class="w-4 text-xs font-semibold text-[color:var(--text-secondary)]">{{ $star }}</span>
                                         <i data-lucide="star" class="h-3 w-3 text-[color:var(--primary)] fill-current"></i>
                                         <div class="flex-1 h-1.5 rounded-full bg-black/5 overflow-hidden">
-                                            <div class="h-full bg-[color:var(--primary)] rounded-full" style="width: {{ ($r['count'] / 982) * 100 }}%"></div>
+                                            <div class="h-full bg-[color:var(--primary)] rounded-full" style="width: {{ $percentage }}%"></div>
                                         </div>
-                                        <span class="w-12 text-xs font-medium text-[color:var(--text-muted)] text-right">{{ $r['count'] }}</span>
+                                        <span class="w-12 text-xs font-medium text-[color:var(--text-muted)] text-right">{{ $count }}</span>
                                     </div>
                                 @endforeach
                             </div>
@@ -970,68 +930,35 @@
                             <h3 class="text-base font-semibold text-[color:var(--text-secondary)]">Most Relevant</h3>
                         </div>
                         @php
-                            $sampleReviews = [
-                                [
-                                    'name' => 'Aditi Sharma',
-                                    'date' => '2 days ago',
-                                    'rating' => 5,
-                                    'title' => 'Truly Refreshing!',
-                                    'content' => 'I’ve been taking these for a month now and I can definitely feel the difference. It’s so much easier than swallowing big pills and the taste is amazing!',
-                                    'verified' => true,
-                                    'images' => ['remenant-product1.jpg', 'remenant-product13.jpg']
-                                ],
-                                [
-                                    'name' => 'Rohan Gupta',
-                                    'date' => '1 week ago',
-                                    'rating' => 5,
-                                    'title' => 'Best Wellness Product',
-                                    'content' => 'Highly recommend for anyone with a busy lifestyle. Quick, easy, and effective. The Apple Cider Vinegar flavor is my personal favorite.',
-                                    'verified' => true,
-                                    'images' => ['remenant-product10.jpg']
-                                ],
-                                [
-                                    'name' => 'Karan Patel',
-                                    'date' => '2 weeks ago',
-                                    'rating' => 4,
-                                    'title' => 'Great but slightly sweet',
-                                    'content' => 'The quality is top-notch and it fizzes perfectly. Just wish it was a tiny bit less sweet, but overall a great product that I will buy again.',
-                                    'verified' => true,
-                                    'images' => ['remenant-product5.jpg', 'remenant-product7.jpg']
-                                ]
-                            ];
-
+                            // Dynamic ratings breakdown (simple version for product page)
                         @endphp
 
-                        @foreach($sampleReviews as $review)
+                        @forelse($topReviews as $review)
                             @php 
-                                $reviewImages = array_map(fn($img) => asset('images/products/' . $img), $review['images'] ?? []);
+                                $reviewImages = array_map(fn($img) => \App\Helpers\ImageHelper::getUrl($img, 'reviews'), $review->images ?? []);
                             @endphp
                             <div class="bg-white p-5 sm:p-8 rounded-3xl shadow-sm ring-1 ring-black/[0.03] transition-all duration-300">
                                 <div class="flex flex-col gap-4">
-                                    <!-- Review Top: Rating & Title -->
                                     <div class="flex items-center gap-3">
                                         <div class="flex items-center gap-1 rounded bg-[var(--primary)] px-1.5 py-0.5 text-xs font-bold text-white">
-                                            <span class="text-white">{{ $review['rating'] }}</span>
+                                            <span class="text-white">{{ $review->rating }}</span>
                                             <i data-lucide="star" class="h-3 w-3 fill-current"></i>
                                         </div>
-                                        <h5 class="text-base font-semibold text-[color:var(--text-primary)] tracking-tight">{{ $review['title'] }}</h5>
                                     </div>
 
-                                    <!-- Review Content -->
                                     <p class="text-sm sm:text-base leading-relaxed text-[color:var(--text-secondary)]">
-                                        {{ Str::limit($review['content'], 120) }}
-                                        @if(strlen($review['content']) > 120)
+                                        {{ Str::limit($review->comment, 120) }}
+                                        @if(strlen($review->comment) > 120)
                                             <a href="{{ route('products.reviews', $product->slug) }}" class="text-[color:var(--primary)] font-semibold hover:underline ml-1">Read more</a>
                                         @endif
                                     </p>
 
-                                    <!-- Review Images -->
-                                    @if(!empty($review['images']))
+                                    @if($review->images && count($review->images) > 0)
                                         <div class="flex flex-wrap gap-2 pt-1">
-                                            @foreach($review['images'] as $imgIndex => $img)
+                                            @foreach($review->images as $imgIndex => $img)
                                                 <div class="group/img relative h-16 w-16 sm:h-20 sm:w-20 overflow-hidden rounded-xl bg-gray-50 ring-1 ring-black/5 cursor-zoom-in"
                                                      onclick="openReviewLightbox({{ json_encode($reviewImages) }}, {{ $imgIndex }})">
-                                                    <img src="{{ asset('images/products/' . $img) }}" 
+                                                    <img src="{{ \App\Helpers\ImageHelper::getUrl($img, 'reviews') }}" 
                                                          alt="User review image" 
                                                          class="h-full w-full object-cover">
                                                 </div>
@@ -1039,43 +966,34 @@
                                         </div>
                                     @endif
 
-                                    <!-- Reviewer Info & Interactions -->
                                     <div class="flex items-center justify-between pt-4 border-t border-black/[0.03]">
                                         <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
                                             <div class="flex items-center gap-2">
-                                                <span class="text-xs font-bold text-[color:var(--text-primary)]">{{ $review['name'] }}</span>
-                                                @if($review['verified'])
-                                                    <div class="flex items-center gap-1 text-[10px] font-bold text-gray-400">
-                                                        <i data-lucide="check-circle-2" class="h-3.5 w-3.5 text-[color:var(--primary)]"></i>
-                                                        Certified Buyer
-                                                    </div>
-                                                @endif
+                                                <span class="text-xs font-bold text-[color:var(--text-primary)]">{{ $review->user->name ?? 'Verified Buyer' }}</span>
+                                                <div class="flex items-center gap-1 text-[10px] font-bold text-gray-400">
+                                                    <i data-lucide="check-circle-2" class="h-3.5 w-3.5 text-[color:var(--primary)]"></i>
+                                                    Certified Buyer
+                                                </div>
                                             </div>
-                                            <span class="text-[10px] font-medium text-gray-400">{{ $review['date'] }}</span>
-                                        </div>
-
-                                        <!-- Like/Dislike Icons Only -->
-                                        <div class="flex items-center gap-4">
-                                            <button type="button" class="group flex items-center gap-1.5 text-gray-400 hover:text-[color:var(--primary)] transition-colors">
-                                                <i data-lucide="thumbs-up" class="h-4 w-4 transition-transform group-active:scale-125"></i>
-                                                <span class="text-[10px] font-bold">12</span>
-                                            </button>
-                                            <button type="button" class="group flex items-center gap-1.5 text-gray-400 hover:text-red-500 transition-colors">
-                                                <i data-lucide="thumbs-down" class="h-4 w-4 transition-transform group-active:scale-125"></i>
-                                                <span class="text-[10px] font-bold">2</span>
-                                            </button>
+                                            <span class="text-[10px] font-medium text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="text-center py-10 bg-white rounded-3xl border border-dashed border-slate-200">
+                                <p class="text-slate-400 font-medium italic">No reviews yet for this product.</p>
+                                <button onclick="openWriteReviewModal()" class="mt-4 text-[color:var(--primary)] font-bold text-xs uppercase tracking-widest hover:underline">Be the first to review</button>
+                            </div>
+                        @endforelse
 
-                        <!-- Clean Simple Button -->
-                        <div class="mt-12 flex justify-center">
-                            <a href="{{ route('products.reviews', $product->slug) }}" class="inline-flex items-center justify-center px-10 py-3.5 rounded-full border border-orange-200 text-sm font-semibold text-[color:var(--primary)] transition-all duration-300 hover:bg-orange-50 hover:border-orange-300 active:scale-95">
-                                Read All {{ number_format($product->reviews) }} Reviews
-                            </a>
-                        </div>
+                        @if($totalApproved > 0)
+                            <div class="mt-12 flex justify-center">
+                                <a href="{{ route('products.reviews', $product->slug) }}" class="inline-flex items-center justify-center px-10 py-3.5 rounded-full border border-orange-200 text-sm font-semibold text-[color:var(--primary)] transition-all duration-300 hover:bg-orange-50 hover:border-orange-300 active:scale-95">
+                                    Read All {{ number_format($totalApproved) }} Reviews
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -1093,15 +1011,16 @@
                 
                 <div class="space-y-4 max-w-4xl mx-auto">
                     @foreach($product->faqs ?? [] as $index => $faq)
+                        @php $f = (object)$faq; @endphp
                         <div x-data="{ open: false }" class="bg-white rounded-[2rem] border border-slate-100 overflow-hidden transition-all hover:shadow-lg hover:shadow-slate-200/50">
                             <button @click="open = !open" class="w-full p-6 sm:p-8 flex items-center justify-between text-left focus:outline-none">
-                                <span class="text-lg font-black text-slate-900">{{ $faq['question'] ?? '' }}</span>
+                                <span class="text-lg font-black text-slate-900">{{ $f->question ?? '' }}</span>
                                 <div class="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 transition-transform duration-300" :class="open ? 'rotate-180 bg-orange-500 text-white' : ''">
                                     <i data-lucide="chevron-down" class="w-5 h-5"></i>
                                 </div>
                             </button>
                             <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="px-6 pb-6 sm:px-8 sm:pb-8 text-slate-500 leading-relaxed font-medium">
-                                {{ $faq['answer'] ?? '' }}
+                                {{ $f->answer ?? '' }}
                             </div>
                         </div>
                     @endforeach
@@ -1266,7 +1185,7 @@
                         <div class="absolute inset-0 flex items-center justify-center" data-image-loader>
                             <x-dot-spinner class="[--uib-size:2.6rem] [--uib-color:#ffffff]" />
                         </div>
-                        <img src="{{ asset('images/products/' . $img) }}" alt="{{ $product->title }}" data-lightbox-image class="h-full w-full object-contain select-none">
+                        <img src="{{ \App\Helpers\ImageHelper::getUrl($img, 'products') }}" alt="{{ $product->title }}" data-lightbox-image class="h-full w-full object-contain select-none">
                     </div>
                 @endforeach
                 </div>
@@ -1900,29 +1819,147 @@
                 $('#rating-label').text('Please select a rating').css('color', '#ef4444');
                 return;
             }
-            const title = $('#review-title').val().trim();
             const content = $('#review-content').val().trim();
-            if (!title || !content) {
-                alert('Please fill in the title and review.');
+            if (!content || content.length < 10) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Review too short',
+                    text: 'Please write at least 10 characters for your review.',
+                    confirmButtonText: 'Understood',
+                    buttonsStyling: false,
+                    customClass: {
+                        popup: 'premium-swal-popup',
+                        confirmButton: 'premium-swal-confirm'
+                    }
+                });
                 return;
             }
 
-            // Simulate submission
             const $btn = $reviewModal.find('button:contains("Submit Review")');
             const originalText = $btn.html();
             $btn.html('<span class="inline-block h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span> Submitting...');
             $btn.prop('disabled', true);
 
-            setTimeout(() => {
-                $btn.html('<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Review Submitted!');
-                $btn.removeClass('bg-[var(--primary)]').addClass('bg-green-500');
-                setTimeout(() => {
-                    closeWriteReviewModal();
+            // Prepare FormData for real submission
+            let formData = new FormData();
+            formData.append('rating', selectedRating);
+            formData.append('comment', content);
+            formData.append('_token', '{{ csrf_token() }}');
+            
+            reviewUploadedFiles.forEach((file, i) => {
+                formData.append('images[]', file);
+            });
+
+            $.ajax({
+                url: '{{ route("products.reviews.store", $product->id) }}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thank You!',
+                        text: res.message,
+                        showConfirmButton: false,
+                        timer: 2000,
+                        customClass: {
+                            popup: 'premium-swal-popup'
+                        }
+                    });
+                    $btn.html('<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Review Submitted!');
+                    $btn.removeClass('bg-[var(--primary)]').addClass('bg-green-500');
+                    setTimeout(() => {
+                        closeWriteReviewModal();
+                        window.location.reload();
+                    }, 1500);
+                },
+                error: function(err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Submission Failed',
+                        text: err.responseJSON?.message || 'Something went wrong. Please try again.',
+                        confirmButtonText: 'Try Again',
+                        buttonsStyling: false,
+                        customClass: {
+                            popup: 'premium-swal-popup',
+                            confirmButton: 'premium-swal-confirm'
+                        }
+                    });
                     $btn.html(originalText);
-                    $btn.removeClass('bg-green-500').addClass('bg-[var(--primary)]');
                     $btn.prop('disabled', false);
-                }, 1500);
-            }, 1200);
+                }
+            });
+        };
+
+        // --- Coupon Logic ---
+        let appliedCoupon = null;
+        const originalPrice = {{ $product->price }};
+
+        window.applyCoupon = function() {
+            const code = $('#coupon-input').val().trim();
+            if (!code) {
+                $('#coupon-error').text('Please enter a coupon code').removeClass('hidden');
+                return;
+            }
+
+            const $btn = $('#apply-coupon-btn');
+            const originalBtnText = $btn.text();
+            $btn.prop('disabled', true).text('...');
+
+            $.ajax({
+                url: '{{ route("coupons.apply") }}',
+                method: 'POST',
+                data: {
+                    code: code,
+                    product_id: '{{ $product->id }}',
+                    amount: originalPrice,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(res) {
+                    appliedCoupon = res;
+                    
+                    // Show success info
+                    $('#applied-code-text').text(res.code);
+                    $('#discount-amount').text(res.discount);
+                    $('#coupon-message').removeClass('hidden');
+                    $('#coupon-error').addClass('hidden');
+                    $('#coupon-input').parent().addClass('hidden');
+                    
+                    // Update prices on page
+                    $('.current-price-text').text('₹' + res.new_total.toLocaleString());
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Coupon Applied!',
+                        text: res.message,
+                        timer: 2000,
+                        showConfirmButton: false,
+                        customClass: { popup: 'premium-swal-popup' }
+                    });
+                },
+                error: function(err) {
+                    $('#coupon-error').text(err.responseJSON?.message || 'Invalid coupon').removeClass('hidden');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Code',
+                        text: err.responseJSON?.message || 'This coupon cannot be applied.',
+                        customClass: { popup: 'premium-swal-popup', confirmButton: 'premium-swal-confirm' },
+                        buttonsStyling: false
+                    });
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).text(originalBtnText);
+                }
+            });
+        };
+
+        window.removeCoupon = function() {
+            appliedCoupon = null;
+            $('#coupon-message').addClass('hidden');
+            $('#coupon-input').val('').parent().removeClass('hidden');
+            $('.current-price-text').text('₹' + originalPrice.toLocaleString());
+            Swal.fire({ icon: 'info', title: 'Coupon Removed', text: 'The discount has been removed.', timer: 1500, showConfirmButton: false, customClass: { popup: 'premium-swal-popup' } });
         };
     </script>
     @endpush

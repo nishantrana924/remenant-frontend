@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <button @click="showMobilePreview = true" class="saas-btn-secondary">
+            <button @click="window.dispatchEvent(new CustomEvent('open-preview', { detail: formData }))" class="saas-btn-secondary">
                 <i data-lucide="smartphone" class="w-4 h-4"></i>
                 Live Preview
             </button>
@@ -126,23 +126,30 @@
 
                 <!-- 3. Trust Signals (Fast Delivery, Secure, etc.) -->
                 <div class="saas-card bg-slate-50/50 border-dashed">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
-                        <div>
-                            <h3 class="text-base font-bold text-slate-900">Trust Signals</h3>
-                            <p class="text-[10px] text-slate-400 font-medium">Core service highlights shown below the price</p>
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-900">Trust Signals</h3>
+                                <p class="text-[10px] text-slate-400 font-medium">Core service highlights shown below the price</p>
+                            </div>
                         </div>
+                        <button type="button" @click="addTrustSignal()" class="text-xs font-bold text-orange-500 flex items-center gap-1 hover:bg-orange-50 px-3 py-1 rounded-full transition-all">
+                            <i data-lucide="plus" class="w-3 h-3"></i> Add Signal
+                        </button>
                     </div>
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         <template x-for="(signal, index) in formData.trust_signals" :key="index">
-                            <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-3">
+                            <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-2 group relative">
+                                <button type="button" @click="removeTrustSignal(index)" class="absolute -top-2 -right-2 h-6 w-6 bg-white shadow-md rounded-full text-rose-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"><i data-lucide="x" class="w-3 h-3"></i></button>
                                 <div class="flex items-center justify-between">
                                     <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
                                         <i :data-lucide="signal.icon || 'star'" class="w-4 h-4"></i>
                                     </div>
                                     <button type="button" @click="openTrustIconPicker(index)" class="text-[9px] font-black text-orange-500 uppercase tracking-widest hover:underline">Change</button>
                                 </div>
-                                <input type="text" x-model="signal.text" class="saas-input h-9 text-[10px] font-black uppercase tracking-wider text-center" placeholder="e.g. FAST DELIVERY">
+                                <input type="text" :name="'trust_signals['+index+'][text]'" x-model="signal.text" class="saas-input h-9 text-[10px] font-black uppercase tracking-wider text-center" placeholder="e.g. FAST DELIVERY">
+                                <input type="hidden" :name="'trust_signals['+index+'][icon]'" x-model="signal.icon">
                             </div>
                         </template>
                     </div>
@@ -492,241 +499,7 @@
         </div>
     </form>
 
-    <!-- Multi-Device Preview Drawer (Sync with show.blade.php) -->
-    <div x-show="showMobilePreview" 
-         x-cloak         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 scale-95"
-         x-transition:enter-end="opacity-100 scale-100"
-         class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-3xl flex flex-col items-center justify-center p-4 sm:p-8" 
-         @click.self="showMobilePreview = false">
-        
-        <!-- Preview Controls -->
-        <div class="mb-6 flex items-center gap-4 p-1.5 bg-slate-900 rounded-2xl border border-white/10 shadow-2xl z-[110]">
-            <button @click="previewMode = 'mobile'" 
-                    :class="previewMode === 'mobile' ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'"
-                    class="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all">
-                <i data-lucide="smartphone" class="w-4 h-4"></i>
-                Mobile View
-            </button>
-            <button @click="previewMode = 'desktop'" 
-                    :class="previewMode === 'desktop' ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'"
-                    class="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all">
-                <i data-lucide="monitor" class="w-4 h-4"></i>
-                Desktop View
-            </button>
-        </div>
-
-        <!-- 1. Mobile Preview (Phone Mockup) -->
-        <div x-show="previewMode === 'mobile'" x-transition class="relative w-full max-w-[375px] h-[760px] bg-slate-900 rounded-[3.5rem] border-[10px] border-slate-900 shadow-2xl overflow-hidden flex flex-col ring-1 ring-white/10">
-            <!-- Mock Status Bar -->
-            <div class="absolute top-0 inset-x-0 h-7 flex items-center justify-center z-[110] pointer-events-none">
-                <div class="w-28 h-5 bg-slate-900 rounded-b-xl"></div>
-            </div>
-            
-            <div class="flex-1 bg-white overflow-y-auto scrollbar-hide pt-10">
-                <!-- Mobile Hero Image -->
-                <div class="aspect-square bg-slate-50 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
-                    <img x-show="imagePreview" :src="imagePreview" class="w-full h-full object-contain p-4">
-                    <i x-show="!imagePreview" data-lucide="image" class="w-16 h-16 text-slate-200"></i>
-                </div>
-
-                <!-- Mobile Info -->
-                <div class="p-6">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500" x-text="formData.tagline || 'Tagline'"></p>
-                    <h1 class="mt-2 text-2xl font-black text-slate-900 leading-tight" x-text="formData.title || 'Product Title'"></h1>
-                    
-                    <div class="mt-4 flex items-center gap-3">
-                        <div class="flex items-center gap-1 bg-orange-50 px-2 py-1 rounded-full text-orange-600 text-[10px] font-black">
-                            <i data-lucide="star" class="w-3 h-3 fill-current"></i>
-                            <span>4.9</span>
-                        </div>
-                        <span class="text-[10px] text-slate-400 font-bold underline decoration-dotted">1,240 Reviews</span>
-                    </div>
-
-                    <div class="mt-6 flex items-center gap-3">
-                        <div class="bg-emerald-600 px-2.5 py-1 rounded text-white text-[10px] font-black uppercase tracking-widest">Hot Deal</div>
-                    </div>
-
-                    <div class="mt-4 flex items-center gap-3">
-                        <div class="flex items-center text-emerald-600">
-                            <i data-lucide="arrow-down" class="w-6 h-6 stroke-[3px]"></i>
-                            <span class="text-3xl font-black"><span x-text="Math.round((formData.mrp - formData.price)/formData.mrp * 100) || 0"></span>%</span>
-                        </div>
-                        <span class="text-xl font-bold text-slate-300 line-through">₹<span x-text="formData.mrp"></span></span>
-                        <span class="text-3xl font-black text-slate-900">₹<span x-text="formData.price"></span></span>
-                    </div>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase mt-1">Inclusive of all taxes</p>
-
-                    <!-- Benefits 2x2 -->
-                    <div class="mt-8 grid grid-cols-2 gap-3">
-                        <template x-for="benefit in formData.benefits.slice(0,4)" :key="benefit.title">
-                            <div class="p-3 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-start gap-3">
-                                <div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-500"><i :data-lucide="benefit.icon" class="w-4 h-4"></i></div>
-                                <div>
-                                    <p class="text-[10px] font-black text-slate-900" x-text="benefit.title"></p>
-                                    <p class="text-[8px] text-slate-400 leading-tight" x-text="benefit.desc"></p>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
-                <!-- Ritual Section -->
-                <div class="mt-8 p-8 bg-slate-900 text-white rounded-[3rem] mx-2">
-                    <h2 class="text-lg font-black uppercase tracking-tighter mb-8 flex items-center gap-3">
-                        <span class="w-8 h-px bg-orange-500"></span> The Ritual
-                    </h2>
-                    <div class="space-y-8">
-                        <template x-for="step in [1, 2, 3]" :key="step">
-                            <div class="flex gap-4">
-                                <span class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center font-black text-xs text-orange-500" x-text="step"></span>
-                                <div>
-                                    <h5 class="text-xs font-bold uppercase tracking-wider">Step Title</h5>
-                                    <p class="text-[10px] text-white/50 mt-1 leading-relaxed">Watch the pure wellness dissolve.</p>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-            <!-- Sticky CTA -->
-            <div class="p-4 bg-white/80 backdrop-blur-md border-t border-slate-100">
-                <button class="w-full h-14 bg-slate-950 rounded-2xl text-white font-black uppercase text-xs tracking-widest shadow-2xl">Add to Cart</button>
-            </div>
-        </div>
-
-        <!-- 2. Desktop Preview (Real UI Port) -->
-        <div x-show="previewMode === 'desktop'" x-transition class="w-full max-w-[1280px] h-[800px] bg-white rounded-3xl shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] border-t-[40px] border-slate-900 relative overflow-hidden flex flex-col">
-            <!-- Browser Controls -->
-            <div class="absolute -top-[28px] left-6 flex gap-2">
-                <div class="w-3.5 h-3.5 rounded-full bg-rose-500 shadow-inner"></div>
-                <div class="w-3.5 h-3.5 rounded-full bg-amber-500 shadow-inner"></div>
-                <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-inner"></div>
-            </div>
-
-            <!-- Scrollable Content mimicking show.blade.php -->
-            <div class="flex-1 overflow-y-auto px-16 py-12 scroll-smooth">
-                <!-- Hero Section -->
-                <div class="grid grid-cols-2 gap-16 items-start">
-                    <!-- Left Gallery Mock -->
-                    <div class="flex gap-6 sticky top-0 h-fit">
-                        <div class="flex-col gap-4 w-24 hidden lg:flex">
-                            <template x-for="i in [1,2,3]" :key="i">
-                                <div class="aspect-square bg-slate-50 rounded-2xl border-2 border-slate-100 flex items-center justify-center p-4">
-                                    <img x-show="imagePreview" :src="imagePreview" class="w-full h-full object-contain mix-blend-multiply opacity-50">
-                                    <i x-show="!imagePreview" data-lucide="image" class="w-8 h-8 text-slate-200"></i>
-                                </div>
-                            </template>
-                        </div>
-                        <div class="flex-1 aspect-square bg-slate-50 rounded-[3rem] border border-slate-100 flex items-center justify-center p-16 shadow-inner relative overflow-hidden">
-                            <img x-show="imagePreview" :src="imagePreview" class="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl">
-                            <i x-show="!imagePreview" data-lucide="image" class="w-32 h-32 text-slate-100"></i>
-                        </div>
-                    </div>
-
-                    <!-- Right Info -->
-                    <div class="space-y-8">
-                        <div class="space-y-2">
-                            <p class="text-sm font-black uppercase tracking-[0.3em]" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }" x-text="formData.tagline || 'Tagline'"></p>
-                            <h1 class="text-6xl font-black text-slate-900 tracking-tighter leading-none" x-text="formData.title || 'Product Title'"></h1>
-                            <div class="flex items-center gap-6 mt-6">
-                                <div class="flex items-center gap-2 px-4 py-2 rounded-full font-black" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 90%)', color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">
-                                    <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                    <span>4.9</span>
-                                </div>
-                                <span class="text-sm font-bold text-slate-400 underline decoration-dotted decoration-2 underline-offset-4">1,240 Verified Reviews</span>
-                            </div>
-                        </div>
-
-                        <div class="py-10 border-y border-slate-100 space-y-8">
-                            <div class="inline-flex items-center bg-[#008A48] px-4 py-2 rounded-lg text-white text-xs font-black uppercase tracking-widest">Hot Deal</div>
-                            <div class="flex items-center gap-8">
-                                <div class="flex items-center text-[#008A48]">
-                                    <i data-lucide="arrow-down" class="w-10 h-10 stroke-[4px]"></i>
-                                    <span class="text-5xl font-black"><span x-text="Math.round((formData.mrp - formData.price)/formData.mrp * 100) || 0"></span>%</span>
-                                </div>
-                                <span class="text-3xl font-bold text-slate-200 line-through">₹<span x-text="formData.mrp"></span></span>
-                                <span class="text-6xl font-black text-slate-900 tracking-tight">₹<span x-text="formData.price"></span></span>
-                            </div>
-                        </div>
-
-                        <!-- CTA -->
-                        <div class="flex gap-6 pt-4">
-                            <button class="flex-1 h-20 rounded-2xl text-white font-black uppercase tracking-[0.3em] text-sm shadow-2xl active:scale-95 transition-all" :style="{ backgroundColor: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">Add to Cart</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Benefits Section -->
-                <div class="mt-32 border-t border-slate-100 pt-20">
-                    <div class="grid grid-cols-2 gap-24">
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">What It Does</span>
-                            <h2 class="text-4xl font-black text-slate-900 tracking-tight leading-tight" x-html="formData.benefits_title || 'Key Benefits'"></h2>
-                            <p class="mt-6 text-xl text-slate-400 font-medium leading-relaxed" x-text="formData.benefits_subtitle || 'Subtitle...'"></p>
-                        </div>
-                        <div class="divide-y divide-slate-100">
-                            <template x-for="(benefit, index) in formData.benefits" :key="index">
-                                <div class="flex items-start gap-8 py-10 first:pt-0">
-                                    <span class="text-2xl font-black text-slate-200" x-text="String(index + 1).padStart(2, '0')"></span>
-                                    <div>
-                                        <div class="flex items-center gap-4 mb-3">
-                                            <i :data-lucide="benefit.icon || 'star'" class="w-6 h-6" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }"></i>
-                                            <h4 class="text-2xl font-black text-slate-900" x-text="benefit.title"></h4>
-                                        </div>
-                                        <p class="text-lg text-slate-400 font-medium" x-html="benefit.desc"></p>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Highlights & Ritual -->
-                <div class="mt-32 grid grid-cols-2 gap-24 items-start pb-32">
-                    <div>
-                        <span class="text-[10px] font-black uppercase tracking-[0.4em] mb-4 block" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">Experience Excellence</span>
-                        <h2 class="text-5xl font-black text-slate-900 tracking-tighter uppercase mb-12">Product Highlights</h2>
-                        <div class="grid grid-cols-1 gap-6">
-                            <template x-for="h in formData.highlights" :key="h.title">
-                                <div class="flex items-start gap-6 p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100">
-                                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 90%)', color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">
-                                        <i :data-lucide="h.icon || 'star'" class="w-7 h-7"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-xl font-black text-slate-900 uppercase tracking-tight" x-text="h.title"></h4>
-                                        <p class="text-base text-slate-400 mt-2 font-medium" x-html="h.desc"></p>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-
-                    <div class="rounded-[3rem] p-16 border relative overflow-hidden" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 95%)', borderColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 80%)' }">
-                        <h2 class="text-3xl font-black tracking-tighter uppercase text-slate-900 mb-16 flex items-center gap-8">
-                            The Ritual <span class="h-px flex-1" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 80%)' }"></span>
-                        </h2>
-                        <div class="space-y-16">
-                            <template x-for="(step, i) in formData.ritual" :key="i">
-                                <div class="flex gap-10">
-                                    <span class="flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl font-black text-white text-3xl shadow-xl" :style="{ backgroundColor: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }" x-text="i + 1"></span>
-                                    <div>
-                                        <h4 class="text-2xl font-black uppercase tracking-widest text-slate-900 mb-2" x-text="step.title"></h4>
-                                        <p class="text-xl text-slate-400 font-medium leading-relaxed" x-text="step.desc"></p>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Close -->
-        <button @click="showMobilePreview = false" class="absolute top-8 right-8 h-14 w-14 bg-white/10 hover:bg-rose-500 text-white rounded-full flex items-center justify-center transition-all group shadow-2xl">
-            <i data-lucide="x" class="w-7 h-7 group-hover:rotate-90 transition-transform"></i>
-        </button>
-    </div>
+    <x-admin.preview-modal :route="route('admin.products.preview')" preview-url="remenant.com/product/preview" />
 
     <!-- Icon Picker Modal -->
     <div x-show="showIconPicker" 
@@ -789,12 +562,10 @@
 <script>
 function productSystem() {
     return {
-        showMobilePreview: false,
         showIconPicker: false,
         iconSearch: '',
         newNutrientLabel: '',
         currentBenefitIndex: null,
-        previewMode: 'mobile',
         imagePreview: null,
         hasDraft: false,
         editors: {},
@@ -839,15 +610,11 @@ function productSystem() {
                 { icon: 'leaf', text: '100% Vegan' },
                 { icon: 'zap', text: 'Zero Sugar' }
             ],
-            benefits: [
-                {icon: 'shield-check', title: 'Immunity Boost', desc: 'Strengthens defenses.'},
-                {icon: 'sparkles', title: 'Skin Glow', desc: 'Supports collagen.'}
-            ],
+            benefits: [],
             trust_signals: [
-                {icon: 'truck', text: 'Fast Delivery'},
-                {icon: 'shield-check', text: '100% Secure'},
-                {icon: 'refresh-cw', text: 'Easy Returns'},
-                {icon: 'leaf', text: 'Vegan & Pure'}
+                {icon: 'truck', text: 'FAST DELIVERY'},
+                {icon: 'shield-check', text: 'SECURE PAYMENT'},
+                {icon: 'refresh-cw', text: 'EASY RETURNS'}
             ],
             highlights_list: [
                 {id: 1, icon: 'zap', title: 'Advanced Formulation', desc: '100% Bioavailable Effervescent Formula.'},
@@ -1026,8 +793,10 @@ function productSystem() {
                 console.error('Highlight Editor Error:', error);
             });
         },
-        addFaq() { this.formData.faqs.push({question: '', answer: ''}); this.$nextTick(() => lucide.createIcons()); },
+        addFaq() { this.formData.faqs.push({question: '', answer: ''}); },
         removeFaq(index) { this.formData.faqs.splice(index, 1); },
+        addTrustSignal() { this.formData.trust_signals.push({icon: 'truck', text: ''}); this.$nextTick(() => refreshIcons()); },
+        removeTrustSignal(index) { this.formData.trust_signals.splice(index, 1); },
         addBenefit() { this.formData.benefits.push({icon: 'star', title: '', desc: ''}); this.$nextTick(() => lucide.createIcons()); },
         removeBenefit(index) { this.formData.benefits.splice(index, 1); },
         async quickAddCategory() {

@@ -1,14 +1,17 @@
-<header class="sticky top-0 z-50 glass-header border-b border-gray-100">
+<header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
     <div class="flex items-center justify-between py-3 px-6">
         <div class="flex-1 flex items-center">
             <button onclick="toggleAdminSidebar()" class="lg:hidden p-2 mr-4 rounded-xl hover:bg-gray-100 transition text-gray-600">
                 <i data-lucide="menu" class="w-6 h-6"></i>
             </button>
+            <button onclick="toggleAdminSidebarCollapse()" class="hidden lg:flex p-2 mr-4 rounded-xl hover:bg-slate-50 transition text-slate-400 border border-transparent hover:border-slate-100">
+                <i id="admin-header-toggle-icon" data-lucide="chevron-left" class="w-5 h-5"></i>
+            </button>
             <div class="flex-1">
                 @hasSection('header')
                     @yield('header')
                 @else
-                    <h2 class="font-black text-xl text-slate-800 leading-tight">
+                    <h2 class="font-black text-lg sm:text-xl text-slate-800 leading-tight">
                         Admin Portal
                     </h2>
                 @endif

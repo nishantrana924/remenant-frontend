@@ -75,7 +75,7 @@
                 </div>
                 <div class="divide-y divide-slate-50 bg-white">
                     @forelse($orders as $order)
-                    <div class="px-6 py-6 md:px-10 hover:bg-slate-50 transition-all group">
+                    <div class="px-4 sm:px-6 py-6 md:px-10 hover:bg-slate-50 transition-all group">
                         <div class="flex flex-col md:flex-row items-center gap-6 md:gap-10">
                             <div class="h-14 w-14 bg-white p-2 flex items-center justify-center border border-slate-100 rounded-lg shrink-0">
                                 <i data-lucide="package" class="h-7 w-7 text-slate-200"></i>

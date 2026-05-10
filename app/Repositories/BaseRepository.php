@@ -39,4 +39,9 @@ abstract class BaseRepository implements RepositoryInterface
     {
         return $this->find($id)->delete();
     }
+
+    public function deleteMany(array $ids)
+    {
+        return $this->model->whereIn('id', $ids)->delete();
+    }
 }

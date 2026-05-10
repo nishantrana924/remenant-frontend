@@ -12,9 +12,6 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         
-        <!-- Performance & UI Progress -->
-        <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css">
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -25,31 +22,12 @@
         <!-- Select2 -->
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            orange: {
-                                50: '#FFF7ED',
-                                100: '#FFEDD5',
-                                500: '#F97316',
-                                600: '#EA580C',
-                            }
-                        }
-                    }
-                }
-            }
-        </script>
-
         <!-- CSS Styles -->
         <style>
             :root {
-                --primary: #F97316;
+                --primary: #FF6B00;
                 --primary-hover: #EA580C;
-                --primary-soft: #FFF7ED;
+                --primary-soft: #FFF4ED;
                 --bg-main: #FFFFFF;
                 --bg-sidebar: #FFFFFF;
                 --text-main: #111827;
@@ -200,34 +178,14 @@
             ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
             ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        <style>
             [x-cloak] { display: none !important; }
-            :root { --primary: #FF6B00; --primary-soft: #FFF4ED; }
-
-            /* Premium Loader Animation */
-            @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-            .animate-spin-slow { animation: spin-slow 3s linear infinite; }
-            
-            /* NProgress Custom Style */
-            #nprogress .bar {
-                background: var(--primary) !important;
-                height: 3px !important;
-            }
         </style>
+
+        <!-- Assets -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @stack('styles')
     </head>
-    <body class="font-sans antialiased bg-white min-h-screen flex flex-col">
-        <!-- Global Page Loader -->
-        <div id="global-page-loader" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
-            <div class="relative">
-                <div class="h-20 w-20 rounded-[2.5rem] border-4 border-orange-100 animate-spin-slow"></div>
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="h-12 w-12 rounded-2xl bg-orange-500 shadow-xl shadow-orange-200 flex items-center justify-center">
-                        <i data-lucide="zap" class="w-6 h-6 text-white animate-pulse"></i>
-                    </div>
-                </div>
-            </div>
-            <p class="mt-8 text-[10px] font-black uppercase tracking-[0.5em] text-slate-400 animate-pulse">Remenant Intelligence Dashboard</p>
-        </div>
+    <body class="font-sans antialiased bg-white h-screen overflow-hidden flex flex-col">
 
         <div class="flex-1 flex overflow-hidden">
             <!-- Sidebar -->
@@ -238,7 +196,7 @@
                 @include('admin.layouts.header')
 
                 <!-- Page Content -->
-                <main class="flex-1 p-6 overflow-y-auto" x-data="{}" x-cloak>
+                <main class="flex-1 p-4 sm:p-6 overflow-y-auto" up-main>
                     <div class="min-h-[70vh]">
                         @yield('content')
                     </div>
@@ -247,39 +205,27 @@
             </div>
         </div>
 
-        <!-- JavaScript -->
+        <!-- External JavaScript (Deferred) -->
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
-        
-        <!-- FilePond -->
         <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
         <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
         <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
-        
-        <!-- SortableJS -->
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-        
-        <!-- Chart.js -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        
-        <!-- Select2 -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-        <!-- CKEditor 5 -->
         <script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
+
         <script>
             // Configure axios for Laravel
             axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
             window.axios = axios;
 
-            // --- GLOBAL FUNCTIONS FOR SPEED ---
-
-            // 1. Initialize Icons & Progress
-            document.addEventListener('DOMContentLoaded', () => {
-                lucide.createIcons();
-                NProgress.configure({ showSpinner: false, trickleSpeed: 200 });
-            });
+            // 1. Initialize Icons Globally & for SPA transitions
+            window.refreshIcons = () => { if (window.lucide) lucide.createIcons(); };
+            document.addEventListener('DOMContentLoaded', refreshIcons);
+            document.addEventListener('up:fragment:inserted', refreshIcons);
 
             // 1.1 Global SweetAlert Helpers
             window.toast = (title, icon = 'success') => {
@@ -313,18 +259,6 @@
                 });
             };
 
-            // 2. Fast Navigation Feedback
-            window.onbeforeunload = () => { NProgress.start(); };
-            window.onload = () => { 
-                NProgress.done(); 
-                const loader = document.getElementById('global-page-loader');
-                if (loader) {
-                    loader.style.opacity = '0';
-                    loader.style.pointerEvents = 'none';
-                    setTimeout(() => loader.style.display = 'none', 700);
-                }
-            };
-
             // 3. Form Persistence Engine (Auto-Save)
             window.useFormPersistence = (key, alpine) => {
                 let saveTimeout = null;
@@ -338,18 +272,14 @@
                     load() {
                         const saved = localStorage.getItem(key);
                         if (!saved) return null;
-                        try {
-                            return JSON.parse(saved);
-                        } catch(e) { return null; }
+                        try { return JSON.parse(saved); } catch(e) { return null; }
                     },
-                    clear() {
-                        localStorage.removeItem(key);
-                    }
+                    clear() { localStorage.removeItem(key); }
                 };
             };
 
             // 4. Global AJAX Form Submission (Fast Send)
-            async function fastSubmit(target, options = {}) {
+            window.fastSubmit = async function(target, options = {}) {
                 let form = null;
                 let data = options.data || null;
                 let url = '';
@@ -367,16 +297,13 @@
 
                 const submitBtn = form ? (form.querySelector('[type="submit"]') || form.querySelector('button:not([type="button"])')) : null;
                 
-                // Visual feedback
                 if (submitBtn) {
                     submitBtn.disabled = true;
                     submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
                     var originalContent = submitBtn.innerHTML;
                     submitBtn.innerHTML = '<i data-lucide="loader-2" class="h-4 w-4 animate-spin"></i> Processing...';
-                    lucide.createIcons();
+                    refreshIcons();
                 }
-
-                NProgress.start();
 
                 try {
                     const response = await axios({
@@ -405,24 +332,18 @@
                     console.error('Submission error:', error);
                     let message = 'Something went wrong. Please try again.';
                     if (error.response && error.response.data.message) message = error.response.data.message;
-                    
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: message
-                    });
+                    Swal.fire({ icon: 'error', title: 'Error', text: message });
                 } finally {
-                    NProgress.done();
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                         submitBtn.innerHTML = originalContent;
-                        lucide.createIcons();
+                        refreshIcons();
                     }
                 }
             }
 
-            // 4. Link Prefetching (Experimental for speed)
+            // 5. Link Prefetching
             const prefetched = new Set();
             document.addEventListener('mouseover', (e) => {
                 const link = e.target.closest('a');
@@ -435,36 +356,28 @@
                 }
             });
         </script>
-        <script src="{{ asset('js/app.js') }}"></script>
 
         @if(session('success'))
-            <script>document.addEventListener('DOMContentLoaded', () => toast("{{ session('success') }}"));</script>
+            <script>toast("{{ session('success') }}");</script>
         @endif
         @if(session('error'))
-            <script>document.addEventListener('DOMContentLoaded', () => Swal.fire({ icon: 'error', title: 'Error', text: "{{ session('error') }}", confirmButtonColor: '#FF6B00' }));</script>
+            <script>Swal.fire({ icon: 'error', title: 'Error', text: "{{ session('error') }}", confirmButtonColor: '#FF6B00' });</script>
         @endif
         @if($errors->any())
             <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Validation Failed',
-                        html: `<div class="text-left bg-rose-50 p-4 rounded-2xl border border-rose-100 mt-4">
-                            <ul class="text-xs text-rose-600 space-y-1 list-disc pl-4 font-bold">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>`,
-                        confirmButtonColor: '#FF6B00',
-                        customClass: {
-                            popup: 'rounded-[2rem]',
-                            confirmButton: 'rounded-xl px-6 py-3 font-bold uppercase tracking-widest text-xs'
-                        }
-                    });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Failed',
+                    html: `<div class="text-left bg-rose-50 p-4 rounded-2xl border border-rose-100 mt-4">
+                        <ul class="text-xs text-rose-600 space-y-1 list-disc pl-4 font-bold">
+                            @foreach($errors->all() as $error) <li>{{ $error }}</li> @endforeach
+                        </ul>
+                    </div>`,
+                    confirmButtonColor: '#FF6B00'
                 });
             </script>
         @endif
+        @stack('scripts')
     </body>
 </html>
 

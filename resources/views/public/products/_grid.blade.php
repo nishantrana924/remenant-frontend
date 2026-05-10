@@ -18,7 +18,7 @@
                 <img src="{{ $imageSrc }}" 
                      alt="{{ $product->title ?? 'Product' }}"
                      class="h-full w-full object-contain" 
-                     onerror="this.src='{{ asset('images/products/remenant-product1.jpg') }}'"
+                     onerror="this.src='{{ \App\Helpers\ImageHelper::getUrl('products/remenant-product1.jpg', 'images') }}'"
                      loading="lazy">
                  @if(isset($discount) && $discount > 0)
                      <div class="absolute left-3 top-3 rounded-full bg-[var(--primary)] px-3 py-1 text-xs font-extrabold text-white">
