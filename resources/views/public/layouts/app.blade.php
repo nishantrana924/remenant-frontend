@@ -126,9 +126,7 @@
             }
         };
 
-        // 2. Loader: starts hidden (display:none in HTML)
-        // Show it only during a real full-page navigation away
-        // Immediately hide it on any page restore or Unpoly swap
+        // 2. Loader Logic
         window.showLoader = function() {
             var loader = document.getElementById('global-page-loader');
             if (loader) loader.style.display = 'flex';
@@ -140,32 +138,57 @@
             if (window.NProgress) NProgress.done();
         };
 
+        // 3. Unpoly & Global Lifecycle
+        if (window.up) {
+            // Configure Unpoly to scroll to top by default on major fragment swaps
+            up.fragment.config.navigateOptions.scroll = 'top';
+
+            // Global re-initialization on every fragment insertion
+            up.on('up:fragment:inserted', function(event) {
+                window.hideLoader();
+                window.refreshIcons();
+                
+                // Reset scroll position for smooth scroll (Lenis)
+                if (window.lenis) {
+                    window.lenis.scrollTo(0, { immediate: true });
+                } else {
+                    window.scrollTo(0, 0);
+                }
+            });
+
+            // Handle loader on navigation start
+            up.on('up:link:follow', function() {
+                window.showLoader();
+            });
+
+            // Ensure loader hides if request fails or is aborted
+            up.on('up:request:finished', function() {
+                setTimeout(window.hideLoader, 100); 
+            });
+
+            // Auto-refresh Lucide icons on any new fragment
+            up.compiler('*', function(element) {
+                if (window.lucide && typeof lucide.createIcons === 'function') {
+                    lucide.createIcons({ node: element });
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             window.refreshIcons();
             if (window.NProgress) NProgress.configure({ showSpinner: false, trickleSpeed: 200 });
-            // Ensure loader is always hidden when page becomes ready
             window.hideLoader();
         });
 
-        // bfcache restore (browser back/forward button)
         window.addEventListener('pageshow', function() {
             window.hideLoader();
         });
 
-        // Unpoly SPA navigation — hide immediately after swap
-        document.addEventListener('up:location:changed', function() {
-            window.hideLoader();
-            window.refreshIcons();
-        });
-
-        // Only show loader on a real full-page navigation away from site
-        // (Unpoly intercepts same-origin links, so beforeunload only fires
-        //  when leaving to external sites or closing tab)
         window.addEventListener('beforeunload', function() {
             window.showLoader();
         });
 
-        // 3. Link Prefetching for Speed
+        // 4. Link Prefetching
         window.prefetched = window.prefetched || new Set();
         document.addEventListener('mouseover', function(e) {
             var link = e.target.closest('a');

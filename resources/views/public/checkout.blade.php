@@ -161,17 +161,19 @@
 
                         @foreach($items as $item)
                             <div class="flex gap-4 items-center p-3 rounded-2xl bg-slate-50/50 ring-1 ring-black/[0.02]">
-                                <div class="h-16 w-16 shrink-0 rounded-xl bg-white p-2 shadow-sm relative overflow-hidden bg-gray-100">
+                                <a href="{{ route('products.show', $item['slug'] ?? '#') }}" class="h-16 w-16 shrink-0 rounded-xl bg-white p-2 shadow-sm relative overflow-hidden bg-gray-100 group/img">
                                     <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay"></div>
                                     <img src="{{ \App\Helpers\ImageHelper::getUrl($item['image'], 'products') }}" 
                                          alt="{{ $item['title'] }}" 
-                                         class="h-full w-full object-contain opacity-0 transition-opacity duration-300"
+                                         class="h-full w-full object-cover opacity-0 transition-opacity duration-300"
                                          onload="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
                                          onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($item['title']) }}&color=ea5f06&background=fff1e8'; this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
                                     <span class="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-slate-900 text-white text-[9px] font-black flex items-center justify-center z-10">{{ $item['quantity'] }}</span>
-                                </div>
+                                </a>
                                 <div class="flex-1 min-w-0">
-                                    <h3 class="text-xs font-black text-slate-900 uppercase truncate">{{ $item['title'] }}</h3>
+                                    <a href="{{ route('products.show', $item['slug'] ?? '#') }}" class="block group/title">
+                                        <h3 class="text-xs font-black text-slate-900 uppercase truncate group-hover/title:text-orange-500 transition-colors">{{ $item['title'] }}</h3>
+                                    </a>
                                     <p class="text-[9px] font-bold text-slate-400 uppercase mt-0.5 truncate">₹{{ number_format($item['price']) }} x {{ $item['quantity'] }}</p>
                                     <p class="text-sm font-black text-slate-900 mt-1">₹{{ number_format($item['price'] * $item['quantity']) }}</p>
                                 </div>

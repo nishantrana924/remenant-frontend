@@ -23,7 +23,8 @@ class CheckoutController extends Controller
                         "title" => $buyNowProduct->title,
                         "quantity" => 1,
                         "price" => $buyNowProduct->price,
-                        "image" => $buyNowProduct->image
+                        "image" => $buyNowProduct->image,
+                        "slug" => $buyNowProduct->slug
                     ]
                 ];
             } else {
@@ -70,7 +71,8 @@ class CheckoutController extends Controller
                     "title" => $product->title,
                     "quantity" => 1,
                     "price" => $product->price,
-                    "image" => $product->image
+                    "image" => $product->image,
+                    "slug" => $product->slug
                 ]
             ];
         }

@@ -29,27 +29,29 @@
                                         @endphp
                                         
                                         <!-- Desktop Image -->
-                                        <div class="hidden sm:block w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 relative group/img">
+                                        <a href="{{ route('products.show', $details['slug']) }}" class="hidden sm:block w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 relative group/img">
                                             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay"></div>
                                             <img src="{{ $imagePath }}" 
                                                  alt="{{ $details['title'] }}" 
-                                                 class="h-full w-full object-contain p-2 opacity-0 transition-opacity duration-300"
+                                                 class="h-full w-full object-cover opacity-0 transition-opacity duration-300"
                                                  onload="this.classList.remove('opacity-0'); this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
                                                  onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($details['title']) }}&color=ea5f06&background=fff1e8'; this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
-                                        </div>
+                                        </a>
 
                                         <!-- Mobile Header -->
                                         <div class="flex sm:hidden gap-4 items-start">
-                                            <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 relative">
+                                            <a href="{{ route('products.show', $details['slug']) }}" class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 relative">
                                                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay"></div>
                                                 <img src="{{ $imagePath }}" 
                                                      alt="{{ $details['title'] }}" 
-                                                     class="h-full w-full object-contain p-2 opacity-0 transition-opacity duration-300"
+                                                     class="h-full w-full object-cover opacity-0 transition-opacity duration-300"
                                                      onload="this.classList.remove('opacity-0'); this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
                                                      onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($details['title']) }}&color=ea5f06&background=fff1e8'; this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
-                                            </div>
+                                            </a>
                                             <div class="flex-1">
-                                                <h3 class="text-sm font-extrabold text-slate-900 leading-tight">{{ $details['title'] }}</h3>
+                                                <a href="{{ route('products.show', $details['slug']) }}" class="block">
+                                                    <h3 class="text-sm font-extrabold text-slate-900 leading-tight hover:text-[var(--primary)] transition-colors">{{ $details['title'] }}</h3>
+                                                </a>
                                                 <p class="text-[11px] text-gray-400 mt-1 font-medium">{{ $details['subtitle'] ?? 'Remenant Health' }}</p>
                                                 <div class="mt-3 flex items-center gap-2">
                                                     <span class="text-sm text-gray-400 line-through">₹{{ number_format($details['mrp']) }}</span>
@@ -62,7 +64,9 @@
                                         <div class="hidden sm:flex flex-1 flex flex-col justify-between">
                                             <div class="flex justify-between items-start gap-4">
                                                 <div class="flex-1">
-                                                    <h3 class="text-base font-semibold text-slate-900 leading-tight">{{ $details['title'] }}</h3>
+                                                    <a href="{{ route('products.show', $details['slug']) }}" class="block group/title">
+                                                        <h3 class="text-base font-semibold text-slate-900 leading-tight group-hover/title:text-[var(--primary)] transition-colors">{{ $details['title'] }}</h3>
+                                                    </a>
                                                     <p class="text-xs text-gray-400 mt-2 font-medium">{{ $details['subtitle'] ?? 'Remenant Health' }} • {{ $details['details'] ?? 'Standard' }}</p>
                                                     <div class="mt-3 flex items-center gap-2 text-[11px] text-gray-500 font-bold bg-gray-50/50 w-fit px-2 py-1 rounded border border-gray-100">
                                                         <i data-lucide="truck" class="w-3.5 h-3.5 text-gray-400"></i>
