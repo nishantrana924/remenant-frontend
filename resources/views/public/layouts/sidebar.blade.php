@@ -7,7 +7,7 @@
         data-sidebar-panel role="dialog" aria-modal="true" aria-label="Sidebar" tabindex="-1">
         <div class="flex items-center justify-between border-b border-black/5 px-5 py-4">
             <div class="flex items-center gap-3">
-                <img src="{{ asset('images/logo/remenant-health-logo2.png') }}"
+                <img src="{{ \App\Helpers\ImageHelper::getUrl('logo/remenant-health-logo2.png', 'images') }}"
                     alt="{{ config('app.name', 'Remenant Health') }} logo" class="h-9 w-auto object-contain">
             </div>
 

@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <button @click="showMobilePreview = true" class="saas-btn-secondary">
+            <button @click="window.dispatchEvent(new CustomEvent('open-preview', { detail: formData }))" class="saas-btn-secondary">
                 <i data-lucide="smartphone" class="w-4 h-4"></i>
                 Live Preview
             </button>
@@ -129,16 +129,22 @@
 
                 <!-- 3. Trust Signals (Fast Delivery, Secure, etc.) -->
                 <div class="saas-card bg-slate-50/50 border-dashed">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
-                        <div>
-                            <h3 class="text-base font-bold text-slate-900">Trust Signals</h3>
-                            <p class="text-[10px] text-slate-400 font-medium">Core service highlights shown below the price</p>
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-900">Trust Signals</h3>
+                                <p class="text-[10px] text-slate-400 font-medium">Core service highlights shown below the price</p>
+                            </div>
                         </div>
+                        <button type="button" @click="addTrustSignal()" class="text-xs font-bold text-orange-500 flex items-center gap-1 hover:bg-orange-50 px-3 py-1 rounded-full transition-all">
+                            <i data-lucide="plus" class="w-3 h-3"></i> Add Signal
+                        </button>
                     </div>
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                         <template x-for="(signal, index) in formData.trust_signals" :key="index">
-                            <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-2">
+                            <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-2 group relative">
+                                <button type="button" @click="removeTrustSignal(index)" class="absolute -top-2 -right-2 h-6 w-6 bg-white shadow-md rounded-full text-rose-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"><i data-lucide="x" class="w-3 h-3"></i></button>
                                 <div class="flex items-center justify-between">
                                     <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
                                         <i :data-lucide="signal.icon || 'star'" class="w-4 h-4"></i>
@@ -418,17 +424,29 @@
                         <div class="pt-4 border-t border-slate-100">
                             <div class="flex items-center justify-between mb-3">
                                 <label class="saas-label font-bold mb-0">Gallery Collection</label>
-                                <span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold" id="gallery-count">{{ $item->gallery ? count($item->gallery) : 0 }} Selected</span>
+                                <span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold" id="gallery-count" x-text="formData.existing_gallery.length + ' Active'"></span>
                             </div>
-                            @if($item->gallery && count($item->gallery) > 0)
-                                <div class="grid grid-cols-4 gap-2 mb-4">
-                                    @foreach($item->gallery as $g)
-                                        <div class="aspect-square rounded-lg bg-slate-50 border border-slate-100 p-1 overflow-hidden">
-                                            <img src="{{ \App\Helpers\ImageHelper::getUrl($g) }}" class="w-full h-full object-cover rounded">
+                            
+                            <!-- Existing Gallery -->
+                            <div class="grid grid-cols-4 gap-4 mb-6">
+                                <template x-for="(path, index) in formData.existing_gallery" :key="path">
+                                    <div class="group relative aspect-square rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden hover:border-orange-200 transition-all">
+                                        <img :src="getImageUrl(path)" class="w-full h-full object-cover">
+                                        <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <button type="button" @click="removeExistingGalleryImage(path, index)" class="h-10 w-10 rounded-full bg-white text-rose-500 shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
+                                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                            </button>
                                         </div>
-                                    @endforeach
-                                </div>
-                            @endif
+                                        <input type="hidden" name="existing_gallery[]" :value="path">
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- Hidden inputs for deleted images -->
+                            <template x-for="path in deleted_gallery" :key="'del_'+path">
+                                <input type="hidden" name="deleted_gallery[]" :value="path">
+                            </template>
+
                             <div class="gallery-upload-area relative">
                                 <input type="file" name="gallery[]" multiple class="filepond-gallery">
                                 <div class="absolute bottom-4 right-4 z-10">
@@ -437,7 +455,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <p class="mt-2 text-[10px] text-slate-400 text-center italic">Drag and drop multiple images to create a story</p>
+                            <p class="mt-2 text-[10px] text-slate-400 text-center italic">Upload new images to expand the collection</p>
                         </div>
                     </div>
                 </div>
@@ -495,7 +513,12 @@
                                 <p class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Available Stock</p>
                                 <p class="text-xs text-slate-400 mt-1">Current units in warehouse</p>
                             </div>
-                            <input type="number" name="stock" x-model="formData.stock" class="w-20 h-10 saas-input border-slate-200 text-center font-bold">
+                            <div class="flex items-center gap-2">
+                                <button type="button" @click="showInventoryHistory = true" class="h-10 w-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-orange-500 hover:border-orange-200 transition-all">
+                                    <i data-lucide="history" class="w-5 h-5"></i>
+                                </button>
+                                <input type="number" name="stock" x-model="formData.stock" class="w-20 h-10 saas-input border-slate-200 text-center font-bold">
+                            </div>
                         </div>
                         <div class="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex items-center justify-between">
                             <div>
@@ -510,168 +533,72 @@
         </div>
     </form>
 
-    <!-- Multi-Device Preview Drawer (Sync with show.blade.php) -->
-    <div x-show="showMobilePreview" 
-         x-cloak         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 scale-95"
-         x-transition:enter-end="opacity-100 scale-100"
-         class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-3xl flex flex-col items-center justify-center p-4 sm:p-8" 
-         @click.self="showMobilePreview = false">
-        
-        <!-- Preview Controls -->
-        <div class="mb-6 flex items-center gap-4 p-1.5 bg-slate-900 rounded-2xl border border-white/10 shadow-2xl z-[110]">
-            <button @click="previewMode = 'mobile'" 
-                    :class="previewMode === 'mobile' ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'"
-                    class="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all">
-                <i data-lucide="smartphone" class="w-4 h-4"></i>
-                Mobile View
-            </button>
-            <button @click="previewMode = 'desktop'" 
-                    :class="previewMode === 'desktop' ? 'bg-orange-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'"
-                    class="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all">
-                <i data-lucide="monitor" class="w-4 h-4"></i>
-                Desktop View
-            </button>
-        </div>
+    <x-admin.preview-modal :route="route('admin.products.preview')" preview-url="remenant.com/product/preview" />
 
-        <!-- 1. Mobile Preview -->
-        <div x-show="previewMode === 'mobile'" x-transition class="relative w-full max-w-[375px] h-[760px] bg-slate-900 rounded-[3.5rem] border-[10px] border-slate-900 shadow-2xl overflow-hidden flex flex-col ring-1 ring-white/10">
-            <div class="absolute top-0 inset-x-0 h-7 flex items-center justify-center z-[110] pointer-events-none">
-                <div class="w-28 h-5 bg-slate-900 rounded-b-xl"></div>
-            </div>
-            <div class="flex-1 bg-white overflow-y-auto scrollbar-hide pt-10">
-                <div class="aspect-square bg-slate-50 relative overflow-hidden flex items-center justify-center border-b border-slate-100">
-                    <img x-show="imagePreview" :src="imagePreview" class="w-full h-full object-contain p-4">
-                    <i x-show="!imagePreview" data-lucide="image" class="w-16 h-16 text-slate-200"></i>
-                </div>
-                <div class="p-6">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500" x-text="formData.tagline || 'Tagline'"></p>
-                    <h1 class="mt-2 text-2xl font-black text-slate-900 leading-tight" x-text="formData.title || 'Product Title'"></h1>
-                    <div class="mt-4 flex items-center gap-3">
-                        <span class="text-3xl font-black text-slate-900">₹<span x-text="formData.price"></span></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. Desktop Preview -->
-        <div x-show="previewMode === 'desktop'" x-transition class="w-full max-w-[1280px] h-[800px] bg-white rounded-3xl shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] border-t-[40px] border-slate-900 relative overflow-hidden flex flex-col">
-            <div class="absolute -top-[28px] left-6 flex gap-2">
-                <div class="w-3.5 h-3.5 rounded-full bg-rose-500 shadow-inner"></div>
-                <div class="w-3.5 h-3.5 rounded-full bg-amber-500 shadow-inner"></div>
-                <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-inner"></div>
-            </div>
-            <!-- Scrollable Content mimicking show.blade.php -->
-            <div class="flex-1 overflow-y-auto px-16 py-12 scroll-smooth">
-                <!-- Hero Section -->
-                <div class="grid grid-cols-2 gap-16 items-start">
-                    <!-- Left Gallery Mock -->
-                    <div class="flex gap-6 sticky top-0 h-fit">
-                        <div class="flex-1 aspect-square bg-slate-50 rounded-[3rem] border border-slate-100 flex items-center justify-center p-16 shadow-inner relative overflow-hidden">
-                            <img x-show="imagePreview" :src="imagePreview" class="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl">
-                            <i x-show="!imagePreview" data-lucide="image" class="w-32 h-32 text-slate-100"></i>
-                        </div>
-                    </div>
-
-                    <!-- Right Info -->
-                    <div class="space-y-8">
-                        <div class="space-y-2">
-                            <p class="text-sm font-black uppercase tracking-[0.3em]" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }" x-text="formData.tagline || 'Tagline'"></p>
-                            <h1 class="text-6xl font-black text-slate-900 tracking-tighter leading-none" x-text="formData.title || 'Product Title'"></h1>
-                            <div class="flex items-center gap-6 mt-6">
-                                <div class="flex items-center gap-2 px-4 py-2 rounded-full font-black" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 90%)', color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">
-                                    <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                    <span>4.9</span>
-                                </div>
-                                <span class="text-sm font-bold text-slate-400 underline decoration-dotted decoration-2 underline-offset-4">1,240 Verified Reviews</span>
-                            </div>
-                        </div>
-
-                        <div class="py-10 border-y border-slate-100 space-y-8">
-                            <div class="inline-flex items-center bg-[#008A48] px-4 py-2 rounded-lg text-white text-xs font-black uppercase tracking-widest">Hot Deal</div>
-                            <div class="flex items-center gap-8">
-                                <div class="flex items-center text-[#008A48]">
-                                    <i data-lucide="arrow-down" class="w-10 h-10 stroke-[4px]"></i>
-                                    <span class="text-5xl font-black"><span x-text="Math.round((formData.mrp - formData.price)/formData.mrp * 100) || 0"></span>%</span>
-                                </div>
-                                <span class="text-3xl font-bold text-slate-200 line-through">₹<span x-text="formData.mrp"></span></span>
-                                <span class="text-6xl font-black text-slate-900 tracking-tight">₹<span x-text="formData.price"></span></span>
-                            </div>
-                        </div>
-
-                        <!-- CTA -->
-                        <div class="flex gap-6 pt-4">
-                            <button class="flex-1 h-20 rounded-2xl text-white font-black uppercase tracking-[0.3em] text-sm shadow-2xl active:scale-95 transition-all" :style="{ backgroundColor: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">Add to Cart</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Benefits Section -->
-                <div class="mt-32 border-t border-slate-100 pt-20">
-                    <div class="grid grid-cols-2 gap-24">
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">What It Does</span>
-                            <h2 class="text-4xl font-black text-slate-900 tracking-tight leading-tight" x-html="formData.benefits_title || 'Key Benefits'"></h2>
-                            <p class="mt-6 text-xl text-slate-400 font-medium leading-relaxed" x-text="formData.benefits_subtitle || 'Subtitle...'"></p>
-                        </div>
-                        <div class="divide-y divide-slate-100">
-                            <template x-for="(benefit, index) in formData.benefits" :key="index">
-                                <div class="flex items-start gap-8 py-10 first:pt-0">
-                                    <span class="text-2xl font-black text-slate-200" x-text="String(index + 1).padStart(2, '0')"></span>
-                                    <div>
-                                        <div class="flex items-center gap-4 mb-3">
-                                            <i :data-lucide="benefit.icon || 'star'" class="w-6 h-6" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }"></i>
-                                            <h4 class="text-2xl font-black text-slate-900" x-text="benefit.title"></h4>
-                                        </div>
-                                        <p class="text-lg text-slate-400 font-medium" x-html="benefit.desc"></p>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Highlights & Ritual -->
-                <div class="mt-32 grid grid-cols-2 gap-24 items-start pb-32">
+    <!-- Inventory History Modal -->
+    <div x-show="showInventoryHistory" x-cloak class="fixed inset-0 z-[130] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" @click.self="showInventoryHistory = false">
+        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50 text-slate-900">
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-orange-500"><i data-lucide="history" class="w-5 h-5"></i></div>
                     <div>
-                        <span class="text-[10px] font-black uppercase tracking-[0.4em] mb-4 block" :style="{ color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">Experience Excellence</span>
-                        <h2 class="text-5xl font-black text-slate-900 tracking-tighter uppercase mb-12">Product Highlights</h2>
-                        <div class="grid grid-cols-1 gap-6">
-                            <template x-for="h in formData.highlights_list" :key="h.id">
-                                <div class="flex items-start gap-6 p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100">
-                                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 90%)', color: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }">
-                                        <i :data-lucide="h.icon || 'star'" class="w-7 h-7"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-xl font-black text-slate-900 uppercase tracking-tight" x-text="h.title"></h4>
-                                        <p class="text-base text-slate-400 mt-2 font-medium" x-html="h.desc"></p>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-
-                    <div class="rounded-[3rem] p-16 border relative overflow-hidden" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 95%)', borderColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 80%)' }">
-                        <h2 class="text-3xl font-black tracking-tighter uppercase text-slate-900 mb-16 flex items-center gap-8">
-                            The Ritual <span class="h-px flex-1" :style="{ backgroundColor: 'color-mix(in srgb, ' + (formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)') + ', transparent 80%)' }"></span>
-                        </h2>
-                        <div class="space-y-16">
-                            <template x-for="(step, i) in [1, 2, 3]" :key="i">
-                                <div class="flex gap-10">
-                                    <span class="flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl font-black text-white text-3xl shadow-xl" :style="{ backgroundColor: formData.theme_color.startsWith('#') ? formData.theme_color : 'var(--primary)' }" x-text="i + 1"></span>
-                                    <div>
-                                        <h4 class="text-2xl font-black uppercase tracking-widest text-slate-900 mb-2" x-text="formData.ritual[step]?.title || 'Step Title'"></h4>
-                                        <p class="text-xl text-slate-400 font-medium leading-relaxed" x-text="formData.ritual[step]?.desc || 'Description...'"></p>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
+                        <h3 class="text-xl font-black">Inventory Log</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Audit Trail for {{ $item->title }}</p>
                     </div>
                 </div>
+                <button @click="showInventoryHistory = false" class="h-10 w-10 rounded-full hover:bg-slate-200 flex items-center justify-center transition-all"><i data-lucide="x" class="w-5 h-5 text-slate-400"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-8">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100">
+                            <th class="pb-4">Date & Time</th>
+                            <th class="pb-4">Admin</th>
+                            <th class="pb-4">Movement</th>
+                            <th class="pb-4">Balance</th>
+                            <th class="pb-4">Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        @forelse($item->inventoryLogs as $log)
+                            <tr class="group hover:bg-slate-50 transition-all">
+                                <td class="py-4">
+                                    <p class="text-xs font-bold text-slate-900">{{ $log->created_at->format('M d, Y') }}</p>
+                                    <p class="text-[9px] text-slate-400 font-medium">{{ $log->created_at->format('h:i A') }}</p>
+                                </td>
+                                <td class="py-4">
+                                    <div class="flex items-center gap-2">
+                                        <div class="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center text-[8px] font-black text-orange-600">{{ substr($log->user->name ?? 'A', 0, 1) }}</div>
+                                        <span class="text-[10px] font-bold text-slate-600">{{ $log->user->name ?? 'System' }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-4">
+                                    <span class="px-2 py-1 rounded-md text-[10px] font-black {{ $log->change_amount >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }}">
+                                        {{ $log->change_amount >= 0 ? '+' : '' }}{{ $log->change_amount }}
+                                    </span>
+                                </td>
+                                <td class="py-4 font-black text-slate-900 text-xs">{{ $log->new_stock }}</td>
+                                <td class="py-4">
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ str_replace('_', ' ', $log->reason) }}</span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-12 text-center">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <div class="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-300"><i data-lucide="info" class="w-6 h-6"></i></div>
+                                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">No inventory movements recorded yet</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="p-6 bg-slate-50 border-t border-slate-100 text-center">
+                <p class="text-[10px] text-slate-400 font-medium italic">All stock movements are automatically tracked for compliance.</p>
             </div>
         </div>
-        </div>
-        <button @click="showMobilePreview = false" class="absolute top-8 right-8 text-white"><i data-lucide="x" class="w-8 h-8"></i></button>
     </div>
 
     <!-- Icon Picker Modal -->
@@ -679,7 +606,7 @@
         <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50 text-slate-900">
                 <h3 class="text-xl font-black">Choose Icon</h3>
-                <button @click="showIconPicker = false"><i data-lucide="x" class="w-5 h-5 text-slate-400"></i></button>
+                <button @click="showIconPicker = false" type="button"><i data-lucide="x" class="w-5 h-5 text-slate-400"></i></button>
             </div>
             <div class="flex-1 overflow-y-auto p-8 scrollbar-hide">
                 <div class="mb-8 relative">
@@ -703,12 +630,11 @@
 <script>
 function productSystem() {
     return {
-        showMobilePreview: false,
         showIconPicker: false,
+        showInventoryHistory: false,
         iconSearch: '',
         newNutrientLabel: '',
         currentBenefitIndex: null,
-        previewMode: 'mobile',
         newCategoryName: '',
         imagePreview: {!! $item->image ? json_encode(\App\Helpers\ImageHelper::getUrl($item->image)) : 'null' !!},
         hasDraft: false,
@@ -746,7 +672,14 @@ function productSystem() {
                 2: { title: {!! json_encode($item->ritual[2]['title'] ?? '') !!}, desc: {!! json_encode($item->ritual[2]['desc'] ?? '') !!} },
                 3: { title: {!! json_encode($item->ritual[3]['title'] ?? '') !!}, desc: {!! json_encode($item->ritual[3]['desc'] ?? '') !!} }
             },
-            highlights_list: {!! json_encode($item->highlights ?? []) !!}
+            highlights_list: {!! json_encode($item->highlights ?? []) !!},
+            existing_gallery: {!! json_encode($item->gallery ?? []) !!}
+        },
+        deleted_gallery: [],
+        getImageUrl(path) {
+            if (!path) return '';
+            if (path.startsWith('http')) return path;
+            return '/' + path.replace(/^\/+/, '');
         },
         init() {
             this.initEditors();
@@ -815,6 +748,8 @@ function productSystem() {
         removeBenefit(index) { this.formData.benefits.splice(index, 1); },
         addFaq() { this.formData.faqs.push({question: '', answer: ''}); },
         removeFaq(index) { this.formData.faqs.splice(index, 1); },
+        addTrustSignal() { this.formData.trust_signals.push({icon: 'truck', text: ''}); this.$nextTick(() => refreshIcons()); },
+        removeTrustSignal(index) { this.formData.trust_signals.splice(index, 1); },
         openHighlightIconPicker(index) {
             this.pickerMode = 'highlight';
             this.currentBenefitIndex = index;
@@ -852,7 +787,14 @@ function productSystem() {
                 this.formData.highlights_list[this.currentBenefitIndex].icon = icon;
             }
             this.showIconPicker = false;
-            this.$nextTick(() => lucide.createIcons());
+            this.$nextTick(() => refreshIcons());
+        },
+        removeExistingGalleryImage(path, index) {
+            confirmAction('Remove Image?', 'This image will be permanently deleted from the product gallery.', () => {
+                this.deleted_gallery.push(path);
+                this.formData.existing_gallery.splice(index, 1);
+                toast('Image marked for deletion');
+            });
         },
         initFilePond() {
             FilePond.registerPlugin(FilePondPluginImagePreview);

@@ -7,6 +7,33 @@
     showDrawer: false,
     showShippingModal: false,
     shippingData: { id: null, tracking_id: '', courier_name: 'BlueDart' },
+    selectedItems: [],
+    allItems: @js($items->pluck('id')),
+
+    toggleAll() {
+        if (this.selectedItems.length === this.allItems.length) {
+            this.selectedItems = [];
+        } else {
+            this.selectedItems = [...this.allItems];
+        }
+    },
+
+    async bulkAction(action, data = {}) {
+        const title = action === 'delete' ? 'Delete Selected?' : 'Update Selected?';
+        const msg = `Are you sure you want to ${action} ${this.selectedItems.length} orders?`;
+        const url = action === 'delete' ? '{{ route("admin.orders.bulk-delete") }}' : '{{ route("admin.orders.bulk-update-status") }}';
+
+        window.confirmAction(title, msg, async () => {
+            window.fastSubmit(url, {
+                data: { ids: this.selectedItems, ...data },
+                success: (res) => {
+                    window.toast(res.message);
+                    this.selectedItems = [];
+                    setTimeout(() => { if(window.up) up.reload(); else location.reload(); }, 500);
+                }
+            });
+        });
+    },
     
     statusColors: {
         'pending': 'bg-orange-50 text-orange-600 border-orange-100',
@@ -49,6 +76,16 @@
             <p class="text-sm text-slate-500 mt-1 font-medium">Manage fulfillment, logistics, and customer success</p>
         </div>
         <div class="flex items-center gap-3">
+            <template x-if="selectedItems.length > 0">
+                <div class="flex items-center gap-2">
+                    <button @click="bulkAction('approve', { status: 'processing', delivery_status: 'packed' })" class="saas-btn-secondary !text-orange-600 !border-orange-100 hover:!bg-orange-50 py-2 px-4 text-xs font-black">
+                        Approve Selected
+                    </button>
+                    <button @click="bulkAction('delete')" class="saas-btn-secondary !text-rose-500 !border-rose-100 hover:!bg-rose-50 py-2 px-4 text-xs font-black">
+                        Delete
+                    </button>
+                </div>
+            </template>
             <div class="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
                 <span class="h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
                 <span class="text-[10px] font-black uppercase tracking-widest text-slate-600">{{ $items->where('status', 'pending')->count() }} Awaiting Approval</span>
@@ -109,7 +146,9 @@
             <table class="saas-table">
                 <thead>
                     <tr>
-                        <th class="w-10"></th>
+                        <th class="w-10">
+                            <input type="checkbox" @change="toggleAll()" :checked="selectedItems.length === allItems.length && allItems.length > 0" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
+                        </th>
                         <th>Order</th>
                         <th>Customer</th>
                         <th>Amount</th>
@@ -120,11 +159,12 @@
                 </thead>
                 <tbody>
                     @foreach($items as $item)
-                    <tr class="hover:bg-orange-50/30 transition-all cursor-pointer group" 
+                    <tr class="transition-all cursor-pointer group" 
+                        :class="selectedItems.includes({{ $item->id }}) ? 'bg-orange-50/70' : 'hover:bg-orange-50/30'"
                         x-show="!search || '{{ strtolower($item->order_number ?? $item->id) }}'.includes(search.toLowerCase()) || '{{ strtolower($item->customer_name ?? $item->user->name ?? 'Guest') }}'.includes(search.toLowerCase())"
                         @click.self="selectedOrder = {{ $item->toJson() }}; showDrawer = true">
-                        <td class="text-center">
-                            <input type="checkbox" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
+                        <td class="text-center" @click.stop>
+                            <input type="checkbox" x-model="selectedItems" value="{{ $item->id }}" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
                         </td>
                         <td @click="selectedOrder = {{ $item->toJson() }}; showDrawer = true">
                             <div class="flex flex-col">

@@ -39,7 +39,7 @@
                     </button>
 
                     <a href="/" class="flex items-center px-1 py-1 text-white">
-                        <img src="{{ asset('images/logo/remenant-health-logo.png') }}"
+                        <img src="{{ \App\Helpers\ImageHelper::getUrl('logo/remenant-health-logo.png', 'images') }}"
                             alt="{{ config('app.name', 'Remenant Health') }} logo" class="h-10 w-auto object-contain">
                     </a>
                 </div>
@@ -131,7 +131,7 @@
 
             <!-- Logo -->
             <a href="/" class="flex items-center px-1 py-1 text-white">
-                <img src="{{ asset('images/logo/remenant-health-logo.png') }}"
+                <img src="{{ \App\Helpers\ImageHelper::getUrl('logo/remenant-health-logo.png', 'images') }}"
                     alt="{{ config('app.name', 'Remenant Health') }} logo" class="h-12 w-auto object-contain">
             </a>
 

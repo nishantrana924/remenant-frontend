@@ -66,7 +66,7 @@
             
             <!-- SECTION: ORDERS -->
             <div id="section-orders" class="tab-section transition-all duration-300">
-                <div class="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row items-center gap-6 justify-between bg-white sticky top-0 z-10">
+                <div class="px-4 sm:px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row items-center gap-6 justify-between bg-white sticky top-0 z-10">
                     <h3 class="text-lg font-black uppercase tracking-tighter text-slate-900">Order Intelligence</h3>
                     <div class="relative w-full md:w-72">
                         <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300"></i>
@@ -75,7 +75,7 @@
                 </div>
                 <div class="divide-y divide-slate-50 bg-white">
                     @forelse($orders as $order)
-                    <div class="px-6 py-6 md:px-10 hover:bg-slate-50 transition-all group">
+                    <div class="px-4 sm:px-6 py-6 md:px-10 hover:bg-slate-50 transition-all group">
                         <div class="flex flex-col md:flex-row items-center gap-6 md:gap-10">
                             <div class="h-14 w-14 bg-white p-2 flex items-center justify-center border border-slate-100 rounded-lg shrink-0">
                                 <i data-lucide="package" class="h-7 w-7 text-slate-200"></i>
@@ -114,7 +114,7 @@
             </div>
 
             <!-- SECTION: PROFILE -->
-            <div id="section-profile" class="tab-section hidden p-10 transition-all duration-300">
+            <div id="section-profile" class="tab-section hidden p-4 sm:p-10 transition-all duration-300">
                 <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900 mb-8">Profile Intelligence</h3>
                 <form method="post" action="{{ route('profile.update') }}" class="max-w-xl space-y-6">
                     @csrf @method('patch')
@@ -131,7 +131,7 @@
             </div>
 
             <!-- SECTION: ADDRESSES -->
-            <div id="section-addresses" class="tab-section hidden p-10 transition-all duration-300">
+            <div id="section-addresses" class="tab-section hidden p-4 sm:p-10 transition-all duration-300">
                 <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900 mb-8">Manage Addresses</h3>
                 <div class="bg-slate-50 border border-dashed border-slate-200 p-12 text-center rounded-sm">
                     <i data-lucide="map-pin" class="h-10 w-10 text-slate-200 mx-auto mb-4"></i>
@@ -140,7 +140,7 @@
             </div>
 
             <!-- SECTION: GIFTCARDS -->
-            <div id="section-giftcards" class="tab-section hidden p-10 transition-all duration-300">
+            <div id="section-giftcards" class="tab-section hidden p-4 sm:p-10 transition-all duration-300">
                 <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900 mb-8">Gift Cards</h3>
                 <div class="bg-orange-500 p-8 rounded-2xl text-white shadow-xl shadow-orange-100 flex items-center justify-between">
                     <div>

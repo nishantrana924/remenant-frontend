@@ -6,7 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Shipping Product') }}</title>
-        <link rel="icon" href="{{ asset('images/logo/remenant-health-favicon.jpg') }}" type="image/jpeg">
+        <link rel="icon" href="{{ \App\Helpers\ImageHelper::getUrl('logo/remenant-health-favicon.jpg', 'images') }}" type="image/jpeg">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,7 +30,7 @@
                 <div class="mb-12 text-center">
                     <a href="/" class="group inline-block transition-transform hover:scale-105">
                         <img
-                            src="{{ asset('images/logo/remenant-health-logo.png') }}"
+                            src="{{ \App\Helpers\ImageHelper::getUrl('logo/remenant-health-logo.png', 'images') }}"
                             alt="{{ config('app.name', 'Remenant Health') }} logo"
                             class="mx-auto h-20 w-auto object-contain drop-shadow-2xl"
                         >

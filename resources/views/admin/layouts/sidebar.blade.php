@@ -2,7 +2,7 @@
 <div id="admin-sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden hidden" onclick="toggleAdminSidebar()"></div>
 
 <!-- Sidebar -->
-<aside id="admin-sidebar" class="fixed top-0 left-0 z-50 h-screen bg-white text-slate-600 transform -translate-x-full transition-all duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:z-30 border-r border-slate-100" data-collapsed="false">
+<aside id="admin-sidebar" class="fixed top-0 left-0 z-[60] h-screen bg-white text-slate-600 transform -translate-x-full transition-all duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:z-[60] border-r border-slate-100" data-collapsed="false">
     <div class="flex flex-col h-full bg-white">
         <!-- Sidebar Header -->
         <div class="flex items-center h-16 px-6 border-b border-slate-100">
@@ -10,12 +10,12 @@
                 <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
                     <i data-lucide="zap" class="w-5 h-5 text-white"></i>
                 </div>
-                <h1 class="font-bold text-slate-900 text-sm tracking-tight sidebar-text">REMENANT</h1>
+                <h1 class="font-bold text-slate-900 text-sm tracking-tight sidebar-text uppercase">REMENANT</h1>
             </div>
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
             <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active-nav-item' : '' }}">
                 <i data-lucide="layout-grid" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Intelligence</span>
@@ -23,7 +23,7 @@
 
             <a href="{{ route('admin.products.index') }}" class="nav-item {{ request()->routeIs('admin.products.*') ? 'active-nav-item' : '' }}">
                 <i data-lucide="package" class="w-4 h-4 mr-3"></i>
-                <span class="sidebar-text">Product Hub</span>
+                <span class="sidebar-text">Product</span>
             </a>
 
             <a href="{{ route('admin.inventory.index') }}" class="nav-item {{ request()->routeIs('admin.inventory.*') ? 'active-nav-item' : '' }}">
@@ -36,9 +36,23 @@
                 <span class="sidebar-text">Order Flow</span>
             </a>
 
+            <a href="{{ route('admin.reviews.index') }}" class="nav-item {{ request()->routeIs('admin.reviews.*') ? 'active-nav-item' : '' }}">
+                <i data-lucide="message-square" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Customer Voices</span>
+            </a>
+
             <a href="{{ route('admin.customers.index') }}" class="nav-item {{ request()->routeIs('admin.customers.*') ? 'active-nav-item' : '' }}">
                 <i data-lucide="users" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Customers</span>
+            </a>
+
+            <div class="pt-4 pb-2">
+                <p class="sidebar-text px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Growth</p>
+            </div>
+
+            <a href="{{ route('admin.coupons.index') }}" class="nav-item {{ request()->routeIs('admin.coupons.*') ? 'active-nav-item' : '' }}">
+                <i data-lucide="ticket" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Campaigns</span>
             </a>
 
             <div class="pt-4 pb-2">
@@ -48,6 +62,20 @@
             <a href="{{ route('admin.sliders.index') }}" class="nav-item {{ request()->routeIs('admin.sliders.*') ? 'active-nav-item' : '' }}">
                 <i data-lucide="image" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Web Banners</span>
+            </a>
+
+            <a href="{{ route('admin.about.edit') }}" class="nav-item {{ request()->routeIs('admin.about.*') ? 'active-nav-item' : '' }}">
+                <i data-lucide="info" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">About Page</span>
+            </a>
+
+            <div class="pt-4 pb-2">
+                <p class="sidebar-text px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Compliance</p>
+            </div>
+
+            <a href="{{ route('admin.legal.index') }}" class="nav-item {{ request()->routeIs('admin.legal.*') ? 'active-nav-item' : '' }}">
+                <i data-lucide="shield" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Legal Pages</span>
             </a>
         </nav>
 
@@ -96,7 +124,7 @@
         localStorage.setItem('admin-sidebar-collapsed', newState);
         
         if (window.innerWidth >= 1024) {
-            main.style.marginLeft = newState ? '5.5rem' : '17rem';
+            main.style.marginLeft = newState ? '4.5rem' : '15rem';
         }
         
         if (newState) {
@@ -104,7 +132,7 @@
         } else {
             icon.setAttribute('data-lucide', 'chevron-left');
         }
-        lucide.createIcons();
+        refreshIcons();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -114,11 +142,11 @@
         
         if (savedState === 'true' && window.innerWidth >= 1024) {
             sidebar.setAttribute('data-collapsed', 'true');
-            main.style.marginLeft = '5.5rem';
+            main.style.marginLeft = '4.5rem';
             const icon = document.getElementById('admin-header-toggle-icon');
             if(icon) {
                 icon.setAttribute('data-lucide', 'chevron-right');
-                lucide.createIcons();
+                refreshIcons();
             }
         }
     });

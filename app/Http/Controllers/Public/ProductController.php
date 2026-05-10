@@ -102,7 +102,77 @@ class ProductController extends Controller
                 ->get();
         }
 
-        return view('public.products.show', compact('product', 'relatedProducts'));
+        // Fetch top 3 approved/featured reviews
+        $topReviews = collect();
+        $totalApproved = 0;
+        $avgRating = $product->rating ?? 0;
+
+        if ($product instanceof \App\Models\Product) {
+            $topReviews = $product->reviews()->where('status', 'approved')
+                ->orderBy('is_featured', 'desc')
+                ->latest()
+                ->take(3)
+                ->get();
+            
+            $totalApproved = $product->reviews()->where('status', 'approved')->count();
+            $avgRating = $product->reviews()->where('status', 'approved')->avg('rating') ?: $product->rating;
+        }
+
+        return view('public.products.show', compact('product', 'relatedProducts', 'topReviews', 'totalApproved', 'avgRating'));
+    }
+
+    /**
+     * Preview unsaved product content
+     */
+    public function preview(Request $request)
+    {
+        $data = $request->input('content');
+        if (is_string($data)) {
+            $data = json_decode($data, true);
+        }
+        
+        // Ensure all properties used in show.blade.php exist as at least null
+        $defaults = [
+            'id' => 0,
+            'slug' => 'product-preview',
+            'title' => 'Product Preview',
+            'tagline' => '',
+            'description' => '',
+            'long_description' => '',
+            'price' => 0,
+            'mrp' => 0,
+            'image' => null,
+            'gallery' => [],
+            'rating' => 4.8,
+            'reviews' => 1240,
+            'theme_color' => 'orange',
+            'benefits' => [],
+            'highlights' => [],
+            'ritual' => [],
+            'specs' => [],
+            'meta_title' => '',
+            'meta_description' => '',
+            'meta_keywords' => '',
+            'benefits_title' => 'Key Benefits',
+            'benefits_subtitle' => 'Expertly engineered for you'
+        ];
+
+        $data = array_merge($defaults, (array)$data);
+        
+        // Cast only top-level to object, keep nested as arrays for Blade compatibility
+        $product = (object)$data;
+        
+        // Mock related products
+        $relatedProducts = Product::where('status', 'published')->take(4)->get();
+        if ($relatedProducts->isEmpty()) {
+            $relatedProducts = $this->getStaticProducts()->take(4);
+        }
+        
+        return view('public.products.show', [
+            'product' => $product,
+            'relatedProducts' => $relatedProducts,
+            'isPreview' => true
+        ]);
     }
 
     /**
@@ -285,9 +355,57 @@ class ProductController extends Controller
             abort(404);
         }
 
-        // Ensure product is an object for view compatibility
-        $product = (object)$product;
+        // If it's an Eloquent model, we can use relationships
+        if ($product instanceof \App\Models\Product) {
+            $reviews = $product->reviews()->where('status', 'approved')->paginate(10);
+            $totalCount = $product->reviews()->where('status', 'approved')->count();
+            $avgRating = $product->reviews()->where('status', 'approved')->avg('rating') ?: 4.8; // Fallback
+            
+            // Calculate Breakdown
+            $breakdown = [];
+            for($i=5; $i>=1; $i--) {
+                $count = $product->reviews()->where('status', 'approved')->where('rating', $i)->count();
+                $breakdown[$i] = $totalCount > 0 ? round(($count / $totalCount) * 100) : 0;
+            }
+        } else {
+            // Fallback for static products
+            $reviews = collect();
+            $totalCount = $product->reviews_count ?? 1240;
+            $avgRating = $product->rating ?? 4.8;
+            $breakdown = [5 => 85, 4 => 10, 3 => 3, 2 => 1, 1 => 1];
+        }
 
-        return view('public.products.reviews', compact('product'));
+        return view('public.products.reviews', compact('product', 'reviews', 'totalCount', 'avgRating', 'breakdown'));
+    }
+
+    public function storeReview(Request $request, $id)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'required|string|min:10',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:5120'
+        ]);
+
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = \App\Helpers\ImageHelper::upload($image, 'reviews');
+                $imagePaths[] = $path;
+            }
+        }
+
+        \App\Models\Review::create([
+            'product_id' => $id,
+            'user_id' => auth()->id(),
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+            'images' => $imagePaths,
+            'status' => 'pending'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Thank you! Your review has been submitted for moderation.'
+        ]);
     }
 }

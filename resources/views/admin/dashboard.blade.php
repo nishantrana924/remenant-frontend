@@ -1,5 +1,9 @@
 @extends('admin.layouts.app')
 
+@section('header')
+    <h2 class="font-black text-xl text-slate-900 leading-tight">Intelligence Hub</h2>
+@endsection
+
 @section('content')
 <div class="space-y-8 pb-12">
     <!-- Header -->
@@ -23,13 +27,13 @@
     <!-- KPI Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Revenue -->
-        <div class="saas-card group hover:border-orange-200 transition-all">
+        <div class="saas-card group hover:border-orange-200 transition-all hover:shadow-2xl hover:shadow-orange-100/50">
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform">
+                <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600 group-hover:bg-orange-500 group-hover:text-white transition-all duration-500 shadow-sm">
                     <i data-lucide="banknote" class="w-6 h-6"></i>
                 </div>
                 <div class="text-right">
-                    <span class="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-lg">+12.5%</span>
+                    <span class="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">+12.5%</span>
                 </div>
             </div>
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Gross Revenue</p>
@@ -37,13 +41,13 @@
         </div>
 
         <!-- Orders -->
-        <div class="saas-card group hover:border-blue-200 transition-all">
+        <div class="saas-card group hover:border-blue-200 transition-all hover:shadow-2xl hover:shadow-blue-100/50">
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500 shadow-sm">
                     <i data-lucide="shopping-cart" class="w-6 h-6"></i>
                 </div>
                 <div class="text-right">
-                    <span class="text-[10px] font-black text-blue-500 bg-blue-50 px-2.5 py-1 rounded-lg">Orders</span>
+                    <span class="text-[10px] font-black text-blue-500 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">Orders</span>
                 </div>
             </div>
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Transactions</p>
@@ -51,13 +55,13 @@
         </div>
 
         <!-- Products -->
-        <div class="saas-card group hover:border-indigo-200 transition-all">
+        <div class="saas-card group hover:border-indigo-200 transition-all hover:shadow-2xl hover:shadow-indigo-100/50">
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-500 shadow-sm">
                     <i data-lucide="package" class="w-6 h-6"></i>
                 </div>
                 <div class="text-right">
-                    <span class="text-[10px] font-black text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-lg">Active</span>
+                    <span class="text-[10px] font-black text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">Active</span>
                 </div>
             </div>
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Products</p>
@@ -65,13 +69,13 @@
         </div>
 
         <!-- Inventory Alerts -->
-        <div class="saas-card group hover:border-rose-200 transition-all">
+        <div class="saas-card group hover:border-rose-200 transition-all hover:shadow-2xl hover:shadow-rose-100/50">
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600 group-hover:scale-110 transition-transform">
+                <div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-all duration-500 shadow-sm">
                     <i data-lucide="shield-alert" class="w-6 h-6"></i>
                 </div>
                 <div class="text-right">
-                    <span class="text-[10px] font-black text-rose-500 bg-rose-50 px-2.5 py-1 rounded-lg">Low Stock</span>
+                    <span class="text-[10px] font-black text-rose-500 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-100">Low Stock</span>
                 </div>
             </div>
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Warehouse Alerts</p>
@@ -99,7 +103,7 @@
                     </div>
                 </div>
             </div>
-            <div class="h-[350px] relative">
+            <div class="h-[250px] sm:h-[350px] relative">
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
@@ -191,10 +195,9 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('revenueChart').getContext('2d');
+up.compiler('#revenueChart', function(canvas) {
+    const ctx = canvas.getContext('2d');
     
     // Create Gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
@@ -207,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             datasets: [{
                 label: 'Revenue',
-                data: [32000, 48000, 42000, 65000, 59000, 82000, 78000, 95000, 88000, 112000, 105000, 128000],
+                data: @json($chartData),
                 borderColor: '#FF6B00',
                 backgroundColor: gradient,
                 borderWidth: 4,
