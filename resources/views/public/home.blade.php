@@ -3,56 +3,6 @@
 @section('title', config('app.name', 'Remenant Health') . ' - Home')
 
 @section('content')
-    @php
-        if (!isset($combos) || $combos->isEmpty()) {
-            $combos = collect([
-                [
-                    'title' => 'Ultimate Immunity Duo',
-                    'slug' => 'ultimate-immunity-duo',
-                    'category' => 'Immunity',
-                    'tagline' => 'Double the Protection',
-                    'description' => 'Vitamin C (1000mg) + Vitamin D3 & Zinc combo for peak immunity.',
-                    'price' => 3299,
-                    'mrp' => 4999,
-                    'image' => 'remenant-product1.jpg',
-                    'badge' => 'Value Pack',
-                ],
-                [
-                    'title' => 'Glow & Strength Bundle',
-                    'slug' => 'glow-strength-bundle',
-                    'category' => 'Beauty',
-                    'tagline' => 'Complete Beauty Care',
-                    'description' => 'Glutathione + Biotin combination for hair, skin and nail health.',
-                    'price' => 3499,
-                    'mrp' => 5499,
-                    'image' => 'remenant-product2.jpg',
-                    'badge' => 'Best Seller',
-                ],
-                [
-                    'title' => 'Daily Wellness Pack',
-                    'slug' => 'daily-wellness-pack',
-                    'category' => 'Wellness',
-                    'tagline' => 'Pure Energy',
-                    'description' => 'ACV + Vitamin C mix for digestion and long-lasting energy.',
-                    'price' => 2899,
-                    'mrp' => 3999,
-                    'image' => 'remenant-product3.jpg',
-                    'badge' => 'Popular',
-                ],
-                [
-                    'title' => 'Skin Transformation Kit',
-                    'slug' => 'skin-transformation-kit',
-                    'category' => 'Skin Care',
-                    'tagline' => 'Radiant Results',
-                    'description' => 'Premium Collagen + Glutathione for age-defying skin.',
-                    'price' => 4599,
-                    'mrp' => 6999,
-                    'image' => 'remenant-product4.jpg',
-                    'badge' => 'Expert Choice',
-                ],
-            ])->map(fn($c) => (object)$c);
-        }
-    @endphp
 
     <section class="bg-[var(--bg-main)]">
         <div class="hero-carousel owl-carousel owl-theme">
@@ -67,22 +17,7 @@
                     </a>
                 </div>
             @empty
-                {{-- Fallback slides if DB is empty --}}
-                @php
-                    $fallbackSlides = [
-                        ['desktop' => 'remenant-bg22.jpg', 'mobile' => 'remenant-bg1.jpg', 'alt' => 'Banner 1'],
-                        ['desktop' => 'remenant-bg20.jpg', 'mobile' => 'remenant-bg2.jpg', 'alt' => 'Banner 2'],
-                    ];
-                @endphp
-                @foreach($fallbackSlides as $slide)
-                    <div class="item">
-                        <picture>
-                            <source media="(max-width: 640px)" srcset="{{ asset('images/banners/mobile-bg/' . $slide['mobile']) }}">
-                            <img src="{{ asset('images/banners/' . $slide['desktop']) }}" alt="{{ $slide['alt'] }}" class="hero-img"
-                                loading="{{ $loop->first ? 'eager' : 'lazy' }}">
-                        </picture>
-                    </div>
-                @endforeach
+                {{-- No sliders available --}}
             @endforelse
         </div>
     </section>
@@ -221,6 +156,7 @@
                 @endforelse
             </div>
 
+            @if($combos->isNotEmpty())
             <!-- Combo Offers Section -->
             <div class="mt-12 relative">
                 <div class="flex items-center justify-between mb-6">
@@ -274,6 +210,7 @@
                     @endforeach
                 </div>
             </div>
+            @endif
         </div>
     </section>
 

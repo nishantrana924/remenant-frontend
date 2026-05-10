@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice - {{ $order->order_number }}</title>
+    <link rel="icon" href="{{ asset('images/logo/remenant-health-favicon.jpg') }}" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
