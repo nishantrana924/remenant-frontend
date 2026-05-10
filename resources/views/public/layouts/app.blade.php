@@ -227,28 +227,22 @@
 
         .custom-toast {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            width: 320px;
-            padding: 12px 16px;
+            width: 340px;
+            padding: 16px;
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: start;
             border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
             animation: toast-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
             border: 1px solid transparent;
+            backdrop-filter: blur(8px);
         }
 
         @keyframes toast-in {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .custom-toast.hide {
@@ -256,96 +250,66 @@
         }
 
         @keyframes toast-out {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-
-            to {
-                transform: translateX(120%);
-                opacity: 0;
-            }
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(120%); opacity: 0; }
         }
+
+        /* Error Variant (As per user request) */
+        .custom-toast.error {
+            background: #FCE8DB;
+            border-color: rgba(239, 102, 91, 0.2);
+        }
+        .custom-toast.error .toast-icon path { fill: #EF665B; }
+        .custom-toast.error .toast-title { color: #71192F; }
+        .custom-toast.error .toast-close path { fill: #71192F; }
 
         /* Success Variant */
         .custom-toast.success {
-            background: #f0fdf4;
-            border-color: #bbf7d0;
+            background: #F0FDF4;
+            border-color: rgba(34, 197, 94, 0.2);
         }
+        .custom-toast.success .toast-icon path { fill: #22C55E; }
+        .custom-toast.success .toast-title { color: #166534; }
+        .custom-toast.success .toast-close path { fill: #166534; }
 
-        .custom-toast.success .toast-icon path {
-            fill: #22c55e;
-        }
-
-        .custom-toast.success .toast-title {
-            color: #166534;
-        }
-
-        .custom-toast.success .toast-close path {
-            fill: #166534;
-        }
-
-        /* Error Variant */
-        .custom-toast.error {
-            background: #fef2f2;
-            border-color: #fecaca;
-        }
-
-        .custom-toast.error .toast-icon path {
-            fill: #ef4444;
-        }
-
-        .custom-toast.error .toast-title {
-            color: #991b1b;
-        }
-
-        .custom-toast.error .toast-close path {
-            fill: #991b1b;
-        }
-
-        /* Warning Variant (Your Design) */
+        /* Warning/Info Variant */
         .custom-toast.warning {
-            background: #FEF7D1;
-            border-color: #F7C752;
+            background: #FFFBEB;
+            border-color: rgba(245, 158, 11, 0.2);
         }
-
-        .custom-toast.warning .toast-icon path {
-            fill: #F7C752;
-        }
-
-        .custom-toast.warning .toast-title {
-            color: #755118;
-        }
-
-        .custom-toast.warning .toast-close path {
-            fill: #755118;
-        }
+        .custom-toast.warning .toast-icon path { fill: #F59E0B; }
+        .custom-toast.warning .toast-title { color: #92400E; }
+        .custom-toast.warning .toast-close path { fill: #92400E; }
 
         .toast-icon {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             margin-right: 12px;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .toast-title {
             font-weight: 600;
             font-size: 13px;
             flex-grow: 1;
+            line-height: 1.4;
         }
 
         .toast-close {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             margin-left: 12px;
             cursor: pointer;
-            transition: opacity 0.2s;
-            opacity: 0.6;
+            transition: all 0.2s;
+            opacity: 0.5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
-        .toast-close:hover {
-            opacity: 1;
-        }
+        .toast-close:hover { opacity: 1; transform: rotate(90deg); }
     </style>
 
     <div id="toast-wrapper" class="toast-container"></div>
@@ -353,24 +317,34 @@
     <script>
         function showToast(message, type = 'success') {
             const wrapper = document.getElementById('toast-wrapper');
+            if (!wrapper) return;
+
             const toast = document.createElement('div');
             toast.className = `custom-toast ${type}`;
 
-            const iconPath = type === 'success'
-                ? 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'
-                : 'm13 14h-2v-5h2zm0 4h-2v-2h2zm-12 3h22l-11-19z';
+            // Define icons based on type
+            let iconSvg = '';
+            if (type === 'success') {
+                iconSvg = '<svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"></path></svg>';
+            } else if (type === 'error') {
+                iconSvg = '<svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m13 13h-2v-6h2zm0 4h-2v-2h2zm-1-15c-1.3132 0-2.61358.25866-3.82683.7612-1.21326.50255-2.31565 1.23915-3.24424 2.16773-1.87536 1.87537-2.92893 4.41891-2.92893 7.07107 0 2.6522 1.05357 5.1957 2.92893 7.0711.92859.9286 2.03098 1.6651 3.24424 2.1677 1.21325.5025 2.51363.7612 3.82683.7612 2.6522 0 5.1957-1.0536 7.0711-2.9289 1.8753-1.8754 2.9289-4.4189 2.9289-7.0711 0-1.3132-.2587-2.61358-.7612-3.82683-.5026-1.21326-1.2391-2.31565-2.1677-3.24424-.9286-.92858-2.031-1.66518-3.2443-2.16773-1.2132-.50254-2.5136-.7612-3.8268-.7612z" fill="currentColor"></path></svg>';
+            } else {
+                iconSvg = '<svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"></path></svg>';
+            }
 
             toast.innerHTML = `
                 <div class="toast-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="${iconPath}"></path></svg>
+                    ${iconSvg}
                 </div>
                 <div class="toast-title">${message}</div>
                 <div class="toast-close" onclick="this.parentElement.classList.add('hide'); setTimeout(() => this.parentElement.remove(), 500)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="m15.8333 5.34166-1.175-1.175-4.6583 4.65834-4.65833-4.65834-1.175 1.175 4.65833 4.65834-4.65833 4.6583 1.175 1.175 4.65833-4.6583 4.6583 4.6583 1.175-1.175-4.6583-4.6583z"></path></svg>
+                    <svg height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="m15.8333 5.34166-1.175-1.175-4.6583 4.65834-4.65833-4.65834-1.175 1.175 4.65833 4.65834-4.65833 4.6583 1.175 1.175 4.65833-4.6583 4.6583 4.6583 1.175-1.175-4.6583-4.6583z" fill="currentColor"></path></svg>
                 </div>
             `;
 
             wrapper.appendChild(toast);
+
+            // Auto-remove after 5 seconds
             setTimeout(() => {
                 if (toast.parentElement) {
                     toast.classList.add('hide');
