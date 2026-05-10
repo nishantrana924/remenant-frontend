@@ -12,7 +12,7 @@
                     <i data-lucide="chevron-left" class="w-5 h-5"></i>
                 </a>
                 <div>
-                    <h1 class="text-xl font-black text-slate-900 tracking-tight">Incentive Architect</h1>
+                    <h1 class="text-xl font-black text-slate-900 tracking-tight">Create Campaign</h1>
                     <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5">Remenant Engine • Compact Classic</p>
                 </div>
             </div>

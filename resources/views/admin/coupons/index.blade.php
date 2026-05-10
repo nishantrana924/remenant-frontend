@@ -9,7 +9,7 @@
                 <i data-lucide="ticket" class="w-6 h-6"></i>
             </div>
             <div>
-                <h1 class="text-xl font-black text-slate-900 tracking-tight">Campaign Intelligence</h1>
+                <h1 class="text-xl font-black text-slate-900 tracking-tight">Campaigns</h1>
                 <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5">Remenant Engine • Compact Classic</p>
             </div>
         </div>
@@ -111,7 +111,7 @@
                                     <a href="{{ route('admin.coupons.edit', $item->id) }}" class="h-8 w-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-orange-500 hover:border-orange-200 transition-all shadow-sm">
                                         <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                                     </a>
-                                    <form action="{{ route('admin.coupons.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Archive incentive?');" class="inline">
+                                    <form action="{{ route('admin.coupons.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Archive campaign?');" class="inline">
                                         @csrf @method('DELETE')
                                         <button class="h-8 w-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:border-rose-200 transition-all shadow-sm">
                                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
