@@ -169,6 +169,19 @@ function initProductGallery(element) {
     updateLightboxNavState(0);
     updateMobileImageProgress(0);
 
+    // Lightbox Nav Bindings
+    $lightboxPrev.off('click').on('click', function() {
+        $lightbox.trigger('prev.owl.carousel');
+    });
+    $lightboxNext.off('click').on('click', function() {
+        $lightbox.trigger('next.owl.carousel');
+    });
+    
+    // Lightbox Close Binding
+    $("[data-lightbox-close]").off('click').on('click', function() {
+        window.closeLightbox();
+    });
+
     // Lucide support
     if (window.lucide) lucide.createIcons();
 }

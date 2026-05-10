@@ -151,9 +151,15 @@
         document.querySelectorAll(CONTAINER_SELECTOR).forEach(initCategorySlider);
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+    if (window.up) {
+        up.compiler(CONTAINER_SELECTOR, function(element) {
+            initCategorySlider(element);
+        });
     } else {
-        init();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     }
 })();

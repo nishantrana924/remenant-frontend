@@ -36,7 +36,7 @@ Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.rem
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/product/{slug}/reviews', [ProductController::class, 'reviews'])->name('products.reviews');
-Route::post('/product/{id}/reviews', [ProductController::class, 'storeReview'])->name('products.reviews.store')->middleware('auth');
+Route::post('/product/{id}/reviews', [ProductController::class, 'storeReview'])->name('products.reviews.store');
 Route::post('/coupons/apply', [\App\Http\Controllers\Public\CouponController::class, 'apply'])->name('coupons.apply');
 
 // Admin routes (all authenticated users are admins)

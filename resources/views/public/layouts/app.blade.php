@@ -111,12 +111,12 @@
     <!-- Scripts (Local) -->
     <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/owl-carousel/owl.carousel.min.js') }}"></script>
-    <script src="{{ asset('js/icons.js') }}"></script>
-    <script src="{{ asset('js/public-sidebar.js') }}"></script>
-    <script src="{{ asset('js/public-header.js') }}"></script>
-    <script src="{{ asset('js/public-account.js') }}"></script>
-    <script src="{{ asset('js/global-ajax.js') }}"></script>
-    <script src="{{ asset('js/product-page.js') }}"></script>
+    <script src="{{ asset('js/icons.js') }}?v={{ filemtime(public_path('js/icons.js')) }}"></script>
+    <script src="{{ asset('js/public-sidebar.js') }}?v={{ filemtime(public_path('js/public-sidebar.js')) }}"></script>
+    <script src="{{ asset('js/public-header.js') }}?v={{ filemtime(public_path('js/public-header.js')) }}"></script>
+    <script src="{{ asset('js/public-account.js') }}?v={{ filemtime(public_path('js/public-account.js')) }}"></script>
+    <script src="{{ asset('js/global-ajax.js') }}?v={{ filemtime(public_path('js/global-ajax.js')) }}"></script>
+    <script src="{{ asset('js/product-page.js') }}?v={{ filemtime(public_path('js/product-page.js')) }}"></script>
 
     <script>
         // 1. Initialize Icons
@@ -143,13 +143,25 @@
             // Configure Unpoly to scroll to top by default on major fragment swaps
             up.fragment.config.navigateOptions.scroll = 'top';
 
+            // Include header and sidebar in fragment swaps so authentication state (cart, account) stays synced
+            up.fragment.config.mainTargets.push('[data-public-header]');
+            up.fragment.config.mainTargets.push('[data-sidebar-panel]');
+
             // Global re-initialization on every fragment insertion
             up.on('up:fragment:inserted', function(event) {
                 window.hideLoader();
                 window.refreshIcons();
                 
+                // Cleanup body locks from modals/sidebars (Fixes stuck scroll on Back button)
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                document.body.classList.remove('overflow-hidden');
+                
                 // Reset scroll position for smooth scroll (Lenis)
                 if (window.lenis) {
+                    window.lenis.start(); // Ensure scrolling is resumed
                     window.lenis.scrollTo(0, { immediate: true });
                 } else {
                     window.scrollTo(0, 0);
@@ -166,10 +178,13 @@
                 setTimeout(window.hideLoader, 100); 
             });
 
-            // Auto-refresh Lucide icons on any new fragment
-            up.compiler('*', function(element) {
+            // Optimized Lucide icon refresh: only run on elements with data-lucide attribute
+            up.compiler('[data-lucide]', function(element) {
                 if (window.lucide && typeof lucide.createIcons === 'function') {
-                    lucide.createIcons({ node: element });
+                    lucide.createIcons({
+                        icons: { [element.getAttribute('data-lucide')]: true },
+                        node: element.parentElement
+                    });
                 }
             });
         }

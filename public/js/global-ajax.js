@@ -67,10 +67,12 @@ window.RemenantApp = {
     },
 
     async apiRequest(url, method, data = null) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
         const options = {
             method: method,
             headers: {
-                'X-CSRF-TOKEN': this.csrfToken,
+                'X-CSRF-TOKEN': csrfToken,
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
             }

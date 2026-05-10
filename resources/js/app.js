@@ -13,9 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Faster navigation — follow all standard links & forms via Unpoly
-    up.link.config.followSelectors.push('a[href]');
-    up.form.config.submitSelectors.push('form');
+    // Faster navigation — follow all standard internal links & forms via Unpoly
+    // Exclude mailto, tel, and explicitly disabled links
+    up.link.config.followSelectors.push('a[href^="/"]:not([up-follow="false"])');
+    up.link.config.followSelectors.push('a[href^="' + window.location.origin + '"]:not([up-follow="false"])');
+    up.form.config.submitSelectors.push('form:not([up-follow="false"])');
 
     // Disable Unpoly's built-in progress bar (we use NProgress instead)
     up.network.config.progressBar = false;

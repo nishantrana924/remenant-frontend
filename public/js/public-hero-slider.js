@@ -134,10 +134,16 @@
         document.querySelectorAll(ROOT_SELECTOR).forEach(initSlider);
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+    if (window.up) {
+        up.compiler(ROOT_SELECTOR, function(element) {
+            initSlider(element);
+        });
     } else {
-        init();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     }
 })();
 

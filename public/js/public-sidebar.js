@@ -81,6 +81,11 @@
         });
 
         document.addEventListener('keydown', onKeyDown);
+
+        // Close sidebar when Unpoly swaps a fragment (navigation)
+        if (window.up) {
+            up.on('up:fragment:inserted', closeSidebar);
+        }
         
         // Initial accessibility setup
         const overlay = document.querySelector(SELECTORS.overlay);

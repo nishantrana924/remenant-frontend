@@ -97,7 +97,7 @@
                                             </a>
                                         @endif
 
-                                        <form method="POST" action="{{ route('logout') }}" class="mt-1">
+                                        <form method="POST" action="{{ route('logout') }}" class="mt-1" up-follow="false">
                                             @csrf
                                             <button type="submit"
                                                 class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold text-gray-800 hover:bg-gray-50">
@@ -107,12 +107,14 @@
                                         </form>
                                     @else
                                         <a href="{{ route('login') }}"
+                                            up-follow="false"
                                             class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
                                             <i data-lucide="log-in" class="h-4 w-4"></i>
                                             Login
                                         </a>
                                         @if (Route::has('register'))
                                             <a href="{{ route('register') }}"
+                                                up-follow="false"
                                                 class="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
                                                 <i data-lucide="user-plus" class="h-4 w-4"></i>
                                                 Register
@@ -211,7 +213,7 @@
                                         </a>
                                     @endif
 
-                                    <form method="POST" action="{{ route('logout') }}" class="mt-1">
+                                    <form method="POST" action="{{ route('logout') }}" class="mt-1" up-follow="false">
                                         @csrf
                                         <button type="submit"
                                             class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold text-gray-800 hover:bg-gray-50">
@@ -221,12 +223,14 @@
                                     </form>
                                 @else
                                     <a href="{{ route('login') }}"
+                                        up-follow="false"
                                         class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
                                         <i data-lucide="log-in" class="h-4 w-4"></i>
                                         Login
                                     </a>
                                     @if (Route::has('register'))
                                         <a href="{{ route('register') }}"
+                                            up-follow="false"
                                             class="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
                                             <i data-lucide="user-plus" class="h-4 w-4"></i>
                                             Register

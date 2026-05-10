@@ -5,11 +5,6 @@
         @endphp
         <div class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5">
             <a href="{{ route('products.show', $product->slug) }}" class="absolute inset-0 z-[5]"></a>
-            <button type="button"
-                class="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 ring-1 ring-black/10 hover:bg-white transition"
-                aria-label="Add to wishlist">
-                <i data-lucide="heart" class="h-5 w-5 text-[color:var(--text-primary)]"></i>
-            </button>
 
             <div class="relative aspect-square overflow-hidden bg-[var(--bg-section)]">
                 @php

@@ -61,8 +61,10 @@ class ProductController extends Controller
         }
 
         $categories = \App\Models\Category::all();
+        $minPrice = Product::where('status', 'published')->min('price') ?? 0;
+        $maxPrice = Product::where('status', 'published')->max('price') ?? 5000;
         
-        return view('public.products.index', compact('products', 'categories', 'combos'));
+        return view('public.products.index', compact('products', 'categories', 'combos', 'minPrice', 'maxPrice'));
     }
 
     public function show($slug)
@@ -170,26 +172,56 @@ class ProductController extends Controller
             'images.*' => 'image|mimes:jpeg,png,jpg|max:5120'
         ]);
 
+        if (!auth()->check()) {
+            // Process images even for guests so they are saved
+            $imagePaths = [];
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $imagePaths[] = \App\Helpers\ImageHelper::upload($image, 'reviews');
+                }
+            }
+
+            session([
+                'pending_review' => [
+                    'product_id' => $id,
+                    'rating' => $request->rating,
+                    'comment' => $request->comment,
+                    'images' => $imagePaths
+                ]
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'requires_login' => true,
+                'redirect' => route('login'),
+                'message' => 'Please login to submit your review. Your progress has been saved.'
+            ]);
+        }
+
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $path = \App\Helpers\ImageHelper::upload($image, 'reviews');
-                $imagePaths[] = $path;
+                $imagePaths[] = \App\Helpers\ImageHelper::upload($image, 'reviews');
             }
         }
 
-        \App\Models\Review::create([
-            'product_id' => $id,
-            'user_id' => auth()->id(),
-            'rating' => $request->rating,
-            'comment' => $request->comment,
-            'images' => $imagePaths,
-            'status' => 'pending'
-        ]);
+        $this->executeReviewCreation($id, auth()->id(), $request->rating, $request->comment, $imagePaths);
 
         return response()->json([
             'success' => true,
             'message' => 'Thank you! Your review has been submitted for moderation.'
+        ]);
+    }
+
+    public function executeReviewCreation($productId, $userId, $rating, $comment, $imagePaths = [])
+    {
+        return \App\Models\Review::create([
+            'product_id' => $productId,
+            'user_id' => $userId,
+            'rating' => $rating,
+            'comment' => $comment,
+            'images' => $imagePaths,
+            'status' => 'pending'
         ]);
     }
 }

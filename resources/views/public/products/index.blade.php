@@ -61,23 +61,26 @@
                                 <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Categories</h3>
                                 <div class="space-y-3">
                                     <label class="group flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" name="categories[]" value="all" 
-                                               onchange="filterProducts()"
-                                               class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
+                                        <input type="checkbox" id="all-products-checkbox"
+                                               onchange="resetCategories(this)"
+                                               class="h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
+                                               {{ !request('categories') ? 'checked' : '' }}>
                                         <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">All Products</span>
                                     </label>
                                     @foreach($categories as $cat)
                                         <label class="group flex items-center gap-3 cursor-pointer">
                                             <input type="checkbox" name="categories[]" value="{{ $cat->slug }}"
                                                    onchange="filterProducts()"
-                                                   class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
+                                                   class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
+                                                   {{ (is_array(request('categories')) && in_array($cat->slug, request('categories'))) ? 'checked' : '' }}>
                                             <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">{{ $cat->name }}</span>
                                         </label>
                                     @endforeach
                                     <label class="group flex items-center gap-3 cursor-pointer">
                                         <input type="checkbox" name="categories[]" value="Combo Offers"
                                                onchange="filterProducts()"
-                                               class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
+                                               class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
+                                               {{ (is_array(request('categories')) && in_array('Combo Offers', request('categories'))) ? 'checked' : '' }}>
                                         <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">Combo Offers</span>
                                     </label>
                                 </div>
@@ -87,32 +90,15 @@
                             <div>
                                 <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Price Range</h3>
                                 <div class="space-y-4">
-                                    <input type="range" id="price-range" min="0" max="5000" step="100" value="{{ request('max_price', 5000) }}" class="w-full accent-[var(--primary)]">
+                                    <input type="range" id="price-range" min="{{ $minPrice }}" max="{{ $maxPrice }}" step="10" value="{{ request('max_price', $maxPrice) }}" class="w-full accent-[var(--primary)]">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-xs font-black text-[color:var(--text-muted)]">₹0</span>
-                                        <span class="text-xs font-black text-[color:var(--primary)]" id="price-value">₹{{ number_format(request('max_price', 5000)) }}</span>
-                                        <span class="text-xs font-black text-[color:var(--text-muted)]">₹5,000+</span>
+                                        <span class="text-xs font-black text-[color:var(--text-muted)]">₹{{ number_format($minPrice) }}</span>
+                                        <span class="text-xs font-black text-[color:var(--primary)]" id="price-value">₹{{ number_format(request('max_price', $maxPrice)) }}</span>
+                                        <span class="text-xs font-black text-[color:var(--text-muted)]">₹{{ number_format($maxPrice) }}+</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Availability -->
-                            <div>
-                                <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Availability</h3>
-                                <div class="space-y-3">
-                                    <label class="group flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" 
-                                               class="h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
-                                               checked>
-                                        <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">In Stock</span>
-                                    </label>
-                                    <label class="group flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" 
-                                               class="h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
-                                        <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">Out of Stock</span>
-                                    </label>
-                                </div>
-                            </div>
 
                             <!-- Reset Filters -->
                             <div class="pt-6 lg:pt-0">
@@ -248,19 +234,33 @@
     </div>
     @push('scripts')
     <script>
+        function resetCategories(el) {
+            if (el.checked) {
+                document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = false);
+                filterProducts();
+            }
+        }
+
         function filterProducts() {
             const gridContainer = document.getElementById('products-grid-container');
             const gridLoader = document.getElementById('grid-loader');
             const countLabel = document.getElementById('results-count');
+            const allCheckbox = document.getElementById('all-products-checkbox');
             
             // Show loader
             gridLoader.classList.remove('hidden');
             
             // Gather filters
             const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked'))
-                .map(cb => cb.value)
-                .filter(v => v !== 'all');
+                .map(cb => cb.value);
             
+            // Uncheck "All" if any category is selected
+            if (selectedCategories.length > 0) {
+                allCheckbox.checked = false;
+            } else {
+                allCheckbox.checked = true;
+            }
+
             const maxPrice = document.getElementById('price-range').value;
             const sort = document.getElementById('sort-select').value;
             
