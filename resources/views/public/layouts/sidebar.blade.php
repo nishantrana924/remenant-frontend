@@ -61,16 +61,37 @@
             </nav>
 
             <div class="mt-6 border-t border-black/5 pt-5">
-                <a href="{{ route('my-orders') }}"
-                    class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
-                    <i data-lucide="package" class="h-5 w-5 text-gray-600"></i>
-                    My Orders
-                </a>
-                <a href="{{ route('profile.edit') }}"
-                    class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
-                    <i data-lucide="settings" class="h-5 w-5 text-gray-600"></i>
-                    Profile Settings
-                </a>
+                @auth
+                    @if(auth()->user()->isAdmin())
+                        <a href="{{ route('admin.dashboard') }}"
+                            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
+                            <i data-lucide="layout-dashboard" class="h-5 w-5 text-gray-600"></i>
+                            Admin Dashboard
+                        </a>
+                    @else
+                        <a href="{{ route('my-orders') }}"
+                            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
+                            <i data-lucide="package" class="h-5 w-5 text-gray-600"></i>
+                            My Orders
+                        </a>
+                        <a href="{{ route('my-orders', ['tab' => 'profile']) }}"
+                            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
+                            <i data-lucide="settings" class="h-5 w-5 text-gray-600"></i>
+                            Profile Settings
+                        </a>
+                    @endif
+                @else
+                    <a href="{{ route('my-orders') }}"
+                        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
+                        <i data-lucide="package" class="h-5 w-5 text-gray-600"></i>
+                        My Orders
+                    </a>
+                    <a href="{{ route('my-orders', ['tab' => 'profile']) }}"
+                        class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-gray-900 hover:bg-black/5 transition">
+                        <i data-lucide="settings" class="h-5 w-5 text-gray-600"></i>
+                        Profile Settings
+                    </a>
+                @endauth
                 @auth
                     <form method="POST" action="{{ route('logout') }}" class="mt-2">
                         @csrf

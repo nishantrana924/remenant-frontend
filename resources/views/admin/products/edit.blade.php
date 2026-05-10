@@ -426,27 +426,24 @@
                                 <label class="saas-label font-bold mb-0">Gallery Collection</label>
                                 <span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold" id="gallery-count" x-text="formData.existing_gallery.length + ' Active'"></span>
                             </div>
-                            
-                            <!-- Existing Gallery -->
-                            <div class="grid grid-cols-4 gap-4 mb-6">
-                                <template x-for="(path, index) in formData.existing_gallery" :key="path">
-                                    <div class="group relative aspect-square rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden hover:border-orange-200 transition-all">
-                                        <img :src="getImageUrl(path)" class="w-full h-full object-cover">
-                                        <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <button type="button" @click="removeExistingGalleryImage(path, index)" class="h-10 w-10 rounded-full bg-white text-rose-500 shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
-                                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            @if($item->gallery && count($item->gallery) > 0)
+                                <div class="grid grid-cols-4 gap-2 mb-4">
+                                    @foreach($item->gallery as $index => $g)
+                                        <div x-show="!formData.removed_gallery_images.includes('{{ $g }}')" 
+                                             class="group relative aspect-square rounded-lg bg-slate-50 border border-slate-100 p-1 overflow-hidden">
+                                            <img src="{{ \App\Helpers\ImageHelper::getUrl($g) }}" class="w-full h-full object-cover rounded">
+                                            <button type="button" 
+                                                    @click="removeExistingGalleryImage('{{ $g }}')"
+                                                    class="absolute top-1 right-1 h-6 w-6 bg-rose-500 text-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110">
+                                                <i data-lucide="x" class="w-3 h-3"></i>
                                             </button>
                                         </div>
-                                        <input type="hidden" name="existing_gallery[]" :value="path">
-                                    </div>
+                                    @endforeach
+                                </div>
+                                <template x-for="path in formData.removed_gallery_images" :key="path">
+                                    <input type="hidden" name="removed_gallery_images[]" :value="path">
                                 </template>
-                            </div>
-
-                            <!-- Hidden inputs for deleted images -->
-                            <template x-for="path in deleted_gallery" :key="'del_'+path">
-                                <input type="hidden" name="deleted_gallery[]" :value="path">
-                            </template>
-
+                            @endif
                             <div class="gallery-upload-area relative">
                                 <input type="file" name="gallery[]" multiple class="filepond-gallery">
                                 <div class="absolute bottom-4 right-4 z-10">
@@ -673,13 +670,7 @@ function productSystem() {
                 3: { title: {!! json_encode($item->ritual[3]['title'] ?? '') !!}, desc: {!! json_encode($item->ritual[3]['desc'] ?? '') !!} }
             },
             highlights_list: {!! json_encode($item->highlights ?? []) !!},
-            existing_gallery: {!! json_encode($item->gallery ?? []) !!}
-        },
-        deleted_gallery: [],
-        getImageUrl(path) {
-            if (!path) return '';
-            if (path.startsWith('http')) return path;
-            return '/' + path.replace(/^\/+/, '');
+            removed_gallery_images: []
         },
         init() {
             this.initEditors();
@@ -773,6 +764,10 @@ function productSystem() {
         },
         removeHighlight(index) {
             this.formData.highlights_list.splice(index, 1);
+        },
+        removeExistingGalleryImage(path) {
+            this.formData.removed_gallery_images.push(path);
+            this.$nextTick(() => lucide.createIcons());
         },
         openIconPicker(index) { this.pickerMode = 'benefit'; this.currentBenefitIndex = index; this.showIconPicker = true; },
         openTrustIconPicker(index) { this.pickerMode = 'trust'; this.currentBenefitIndex = index; this.showIconPicker = true; },

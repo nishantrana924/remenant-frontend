@@ -46,7 +46,7 @@
                     <div class="flex items-center justify-between px-1">
                         <label for="password" class="text-[10px] font-black uppercase tracking-widest text-gray-400">Password</label>
                         @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" class="text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-[color:var(--primary)] transition">Forgot?</a>
+                            <a href="javascript:void(0)" onclick="openForgotPasswordFlow()" class="text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-[color:var(--primary)] transition">Forgot?</a>
                         @endif
                     </div>
                     <div class="relative group">

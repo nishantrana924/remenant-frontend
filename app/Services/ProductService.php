@@ -88,26 +88,31 @@ class ProductService
             $data['image'] = \App\Helpers\ImageHelper::upload($data['image'], 'uploads/products');
         }
 
-        // Handle deleted gallery images
+        // Handle Gallery
         $currentGallery = $product->gallery ?? [];
-        if (isset($data['deleted_gallery'])) {
-            foreach ($data['deleted_gallery'] as $path) {
+        
+        // Remove specific images
+        if (isset($data['removed_gallery_images']) && is_array($data['removed_gallery_images'])) {
+            foreach ($data['removed_gallery_images'] as $path) {
                 \App\Helpers\ImageHelper::delete($path);
-                $currentGallery = array_filter($currentGallery, fn($p) => $p !== $path);
+                $currentGallery = array_filter($currentGallery, fn($g) => $g !== $path);
             }
+            unset($data['removed_gallery_images']);
         }
 
-        // Handle new gallery uploads
-        if (isset($data['gallery'])) {
-            $newGalleryPaths = [];
+        // Add new images
+        if (isset($data['gallery']) && is_array($data['gallery'])) {
+            $newPaths = [];
             foreach ($data['gallery'] as $file) {
-                $newGalleryPaths[] = \App\Helpers\ImageHelper::upload($file, 'uploads/products/gallery');
+                $newPaths[] = \App\Helpers\ImageHelper::upload($file, 'uploads/products/gallery');
             }
-            $currentGallery = array_merge($currentGallery, $newGalleryPaths);
+            $currentGallery = array_merge($currentGallery, $newPaths);
         }
         
         $data['gallery'] = array_values($currentGallery);
         unset($data['deleted_gallery']);
+
+        $data['gallery'] = array_values($currentGallery);
 
         // 2. Transformations
         $data['is_featured'] = isset($data['is_featured']) ? (bool)$data['is_featured'] : false;

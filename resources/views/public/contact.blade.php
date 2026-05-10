@@ -21,6 +21,7 @@
             </div>
         </div>
 
+        
         <!-- Decorative Floating Elements (Branded) -->
         <div class="pointer-events-none absolute -left-12 top-20 text-7xl opacity-20 animate-float"
             style="animation-delay: 0s;">🌿</div>

@@ -39,13 +39,34 @@
     <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        [x-cloak] { display: none !important; }
-        #nprogress .bar { background: #FF6B00 !important; height: 3px !important; }
-        #nprogress .spinner-icon { border-top-color: #FF6B00 !important; border-left-color: #FF6B00 !important; }
-        
+        [x-cloak] {
+            display: none !important;
+        }
+
+        #nprogress .bar {
+            background: #FF6B00 !important;
+            height: 3px !important;
+        }
+
+        #nprogress .spinner-icon {
+            border-top-color: #FF6B00 !important;
+            border-left-color: #FF6B00 !important;
+        }
+
         /* Premium Loader Animation */
-        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .animate-spin-slow { animation: spin-slow 3s linear infinite; }
+        @keyframes spin-slow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin-slow {
+            animation: spin-slow 3s linear infinite;
+        }
     </style>
     @stack('styles')
 </head>
@@ -53,17 +74,24 @@
 <body class="font-sans antialiased bg-[var(--bg-main)]">
     <!-- Global Page Loader -->
     @if(!request()->routeIs('login', 'register', 'password.*', 'verification.*', 'dashboard', 'my-orders', 'profile.*'))
-    <div id="global-page-loader" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
-        <div class="relative">
-            <div class="h-20 w-20 rounded-[2.5rem] border-4 border-orange-100 animate-spin-slow"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <div class="h-12 w-12 rounded-2xl bg-orange-500 shadow-xl shadow-orange-200 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-white animate-pulse"><path d="m13 2-2 10h3L11 22l2-10h-3l2-10z"/></svg>
+        <div id="global-page-loader"
+            class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
+            <div class="relative">
+                <div class="h-20 w-20 rounded-[2.5rem] border-4 border-orange-100 animate-spin-slow"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div
+                        class="h-12 w-12 rounded-2xl bg-orange-500 shadow-xl shadow-orange-200 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="w-6 h-6 text-white animate-pulse">
+                            <path d="m13 2-2 10h3L11 22l2-10h-3l2-10z" />
+                        </svg>
+                    </div>
                 </div>
             </div>
+            <p class="mt-8 text-[10px] font-black uppercase tracking-[0.5em] text-slate-400 animate-pulse">Remenant Health
+            </p>
         </div>
-        <p class="mt-8 text-[10px] font-black uppercase tracking-[0.5em] text-slate-400 animate-pulse">Remenant Health</p>
-    </div>
     @endif
 
     <div class="min-h-screen flex flex-col">
@@ -86,18 +114,18 @@
     <script src="{{ asset('js/public-header.js') }}"></script>
     <script src="{{ asset('js/public-account.js') }}"></script>
     <script src="{{ asset('js/global-ajax.js') }}"></script>
-    
+
     <script>
         // 1. Initialize Icons & Progress
         document.addEventListener('DOMContentLoaded', () => {
-            if(window.lucide) lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
             NProgress.configure({ showSpinner: false, trickleSpeed: 200 });
         });
 
         // 2. Fast Navigation Feedback
         window.onbeforeunload = () => { NProgress.start(); };
-        window.onload = () => { 
-            NProgress.done(); 
+        window.onload = () => {
+            NProgress.done();
             const loader = document.getElementById('global-page-loader');
             if (loader) {
                 loader.style.opacity = '0';
@@ -179,8 +207,15 @@
         }
 
         @keyframes toast-in {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         .custom-toast.hide {
@@ -188,32 +223,96 @@
         }
 
         @keyframes toast-out {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(120%); opacity: 0; }
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
         }
 
         /* Success Variant */
-        .custom-toast.success { background: #f0fdf4; border-color: #bbf7d0; }
-        .custom-toast.success .toast-icon path { fill: #22c55e; }
-        .custom-toast.success .toast-title { color: #166534; }
-        .custom-toast.success .toast-close path { fill: #166534; }
+        .custom-toast.success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .custom-toast.success .toast-icon path {
+            fill: #22c55e;
+        }
+
+        .custom-toast.success .toast-title {
+            color: #166534;
+        }
+
+        .custom-toast.success .toast-close path {
+            fill: #166534;
+        }
 
         /* Error Variant */
-        .custom-toast.error { background: #fef2f2; border-color: #fecaca; }
-        .custom-toast.error .toast-icon path { fill: #ef4444; }
-        .custom-toast.error .toast-title { color: #991b1b; }
-        .custom-toast.error .toast-close path { fill: #991b1b; }
+        .custom-toast.error {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .custom-toast.error .toast-icon path {
+            fill: #ef4444;
+        }
+
+        .custom-toast.error .toast-title {
+            color: #991b1b;
+        }
+
+        .custom-toast.error .toast-close path {
+            fill: #991b1b;
+        }
 
         /* Warning Variant (Your Design) */
-        .custom-toast.warning { background: #FEF7D1; border-color: #F7C752; }
-        .custom-toast.warning .toast-icon path { fill: #F7C752; }
-        .custom-toast.warning .toast-title { color: #755118; }
-        .custom-toast.warning .toast-close path { fill: #755118; }
+        .custom-toast.warning {
+            background: #FEF7D1;
+            border-color: #F7C752;
+        }
 
-        .toast-icon { width: 20px; height: 20px; margin-right: 12px; flex-shrink: 0; }
-        .toast-title { font-weight: 600; font-size: 13px; flex-grow: 1; }
-        .toast-close { width: 18px; height: 18px; margin-left: 12px; cursor: pointer; transition: opacity 0.2s; opacity: 0.6; }
-        .toast-close:hover { opacity: 1; }
+        .custom-toast.warning .toast-icon path {
+            fill: #F7C752;
+        }
+
+        .custom-toast.warning .toast-title {
+            color: #755118;
+        }
+
+        .custom-toast.warning .toast-close path {
+            fill: #755118;
+        }
+
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 13px;
+            flex-grow: 1;
+        }
+
+        .toast-close {
+            width: 18px;
+            height: 18px;
+            margin-left: 12px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            opacity: 0.6;
+        }
+
+        .toast-close:hover {
+            opacity: 1;
+        }
     </style>
 
     <div id="toast-wrapper" class="toast-container"></div>
@@ -223,8 +322,8 @@
             const wrapper = document.getElementById('toast-wrapper');
             const toast = document.createElement('div');
             toast.className = `custom-toast ${type}`;
-            
-            const iconPath = type === 'success' 
+
+            const iconPath = type === 'success'
                 ? 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'
                 : 'm13 14h-2v-5h2zm0 4h-2v-2h2zm-12 3h22l-11-19z';
 
@@ -260,15 +359,17 @@
 
     <style>
         .premium-swal-popup {
-            padding: 3rem !important;
-            border-radius: 3rem !important;
+            padding: 1.5rem 2rem !important;
+            border-radius: 1.5rem !important;
             border: none !important;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
         }
+
         .premium-swal-actions {
             width: 100% !important;
-            margin-top: 2rem !important;
+            margin-top: 1.25rem !important;
         }
+
         .premium-swal-confirm {
             width: 100% !important;
             background: #000000 !important;
@@ -284,10 +385,12 @@
             cursor: pointer !important;
             display: block !important;
         }
+
         .premium-swal-confirm:hover {
             background: #1f2937 !important;
             transform: scale(1.02);
         }
+
         .premium-swal-confirm:active {
             transform: scale(0.98);
         }
@@ -314,6 +417,120 @@
             });
         </script>
     @endif
+    <!-- Forgot Password Global Flow Components -->
+    <div id="forgot-password-spinner"
+        class="fixed inset-0 z-[10001] bg-white/90 backdrop-blur-sm hidden flex flex-col items-center justify-center transition-all duration-300 opacity-0">
+        <div class="relative">
+            <div class="h-20 w-20 rounded-[2.5rem] border-4 border-orange-100 animate-spin-slow"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div
+                    class="h-12 w-12 rounded-2xl bg-orange-500 shadow-xl shadow-orange-200 flex items-center justify-center">
+                    <i data-lucide="mail" class="h-6 w-6 text-white animate-pulse"></i>
+                </div>
+            </div>
+        </div>
+        <p class="mt-8 text-[10px] font-black uppercase tracking-[0.5em] text-slate-400">Sending Recovery Email...</p>
+    </div>
+
+    <script>
+        async function openForgotPasswordFlow(email = null) {
+            // 1. Get email if not provided
+            if (!email) {
+                const emailInput = document.getElementById('email');
+                email = emailInput ? emailInput.value : null;
+            }
+
+            if (!email) {
+                showToast('Please enter your email address first', 'error');
+                return;
+            }
+
+            // 2. Show Spinner
+            const spinner = document.getElementById('forgot-password-spinner');
+            spinner.classList.remove('hidden');
+            setTimeout(() => {
+                spinner.classList.add('opacity-100');
+            }, 10);
+
+            try {
+                // 3. Send AJAX Request
+                const response = await fetch("{{ route('password.email') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+
+                let data;
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    data = await response.json();
+                } else {
+                    // Handle non-JSON response (likely an HTML error page)
+                    throw new Error("Unable to send mail. Please check your internet or mail settings.");
+                }
+
+                // 4. Hide Spinner
+                spinner.classList.remove('opacity-100');
+                setTimeout(() => {
+                    spinner.classList.add('hidden');
+                }, 300);
+
+                if (response.ok) {
+                    // 5. Show Success Modal (Looks like OTP/Success)
+                    Swal.fire({
+                        icon: 'success',
+                        iconColor: '#22c55e',
+                        title: '<span class="text-2xl font-black uppercase tracking-tight text-gray-900">Link Sent!</span>',
+                        html: `
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest leading-relaxed mb-6">
+                                We have emailed your password reset link to <br> <span class="text-orange-500">${email}</span>
+                            </p>
+                            <div class="flex gap-2 justify-center mb-4">
+                                ${[1, 2, 3, 4].map(() => '<div class="h-12 w-10 rounded-xl bg-slate-50 border-2 border-slate-100 flex items-center justify-center text-lg font-black text-slate-300">?</div>').join('')}
+                            </div>
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Please check your inbox or spam folder</p>
+                        `,
+                        confirmButtonText: 'Got It',
+                        buttonsStyling: false,
+                        customClass: {
+                            popup: 'premium-swal-popup',
+                            title: 'mb-2',
+                            htmlContainer: 'mb-4',
+                            actions: 'premium-swal-actions',
+                            confirmButton: 'premium-swal-confirm'
+                        }
+                    });
+                } else {
+                    throw new Error(data.message || 'Something went wrong');
+                }
+            } catch (error) {
+                // Hide Spinner on error too
+                spinner.classList.remove('opacity-100');
+                setTimeout(() => {
+                    spinner.classList.add('hidden');
+                }, 300);
+
+                Swal.fire({
+                    icon: 'error',
+                    iconColor: '#ef4444',
+                    title: '<span class="text-2xl font-black uppercase tracking-tight text-gray-900">Error</span>',
+                    text: error.message,
+                    confirmButtonText: 'Try Again',
+                    buttonsStyling: false,
+                    customClass: {
+                        popup: 'premium-swal-popup',
+                        title: 'mb-2',
+                        actions: 'premium-swal-actions',
+                        confirmButton: 'premium-swal-confirm'
+                    }
+                });
+            }
+        }
+    </script>
 </body>
 
 </html>

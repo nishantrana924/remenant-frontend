@@ -23,11 +23,17 @@ class DashboardController extends Controller
     /**
      * Display the customer dashboard.
      */
-    public function user(Request $request): View
+    public function user(Request $request): mixed
     {
         $user = auth()->user();
+        
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
         $orders = \App\Models\Order::where('user_id', $user->id)->latest()->get();
-        return view('public.dashboard', compact('orders', 'user'));
+        $activeTab = $request->get('tab', 'orders');
+        return view('public.dashboard', compact('orders', 'user', 'activeTab'));
     }
 
     /**

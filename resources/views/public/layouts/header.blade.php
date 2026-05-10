@@ -78,16 +78,24 @@
                                 <div class="h-px bg-gray-100"></div>
                                 <div class="p-2">
                                     @auth
-                                        <a href="{{ route('my-orders') }}"
-                                            class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
-                                            <i data-lucide="package" class="h-4 w-4"></i>
-                                            My Orders
-                                        </a>
-                                        <a href="{{ route('profile.edit') }}"
-                                            class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
-                                            <i data-lucide="settings" class="h-4 w-4"></i>
-                                            Profile Settings
-                                        </a>
+                                        @if(auth()->user()->isAdmin())
+                                            <a href="{{ route('admin.dashboard') }}"
+                                                class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                                <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
+                                                Admin Dashboard
+                                            </a>
+                                        @else
+                                            <a href="{{ route('my-orders') }}"
+                                                class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                                <i data-lucide="package" class="h-4 w-4"></i>
+                                                My Orders
+                                            </a>
+                                            <a href="{{ route('my-orders', ['tab' => 'profile']) }}"
+                                                class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                                <i data-lucide="settings" class="h-4 w-4"></i>
+                                                Profile Settings
+                                            </a>
+                                        @endif
 
                                         <form method="POST" action="{{ route('logout') }}" class="mt-1">
                                             @csrf
@@ -184,16 +192,24 @@
                             <div class="h-px bg-gray-100"></div>
                             <div class="p-2">
                                 @auth
-                                    <a href="{{ route('my-orders') }}"
-                                        class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
-                                        <i data-lucide="package" class="h-4 w-4"></i>
-                                        My Orders
-                                    </a>
-                                    <a href="{{ route('profile.edit') }}"
-                                        class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
-                                        <i data-lucide="settings" class="h-4 w-4"></i>
-                                        Profile Settings
-                                    </a>
+                                    @if(auth()->user()->isAdmin())
+                                        <a href="{{ route('admin.dashboard') }}"
+                                            class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                            <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
+                                            Admin Dashboard
+                                        </a>
+                                    @else
+                                        <a href="{{ route('my-orders') }}"
+                                            class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                            <i data-lucide="package" class="h-4 w-4"></i>
+                                            My Orders
+                                        </a>
+                                        <a href="{{ route('my-orders', ['tab' => 'profile']) }}"
+                                            class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                                            <i data-lucide="settings" class="h-4 w-4"></i>
+                                            Profile Settings
+                                        </a>
+                                    @endif
 
                                     <form method="POST" action="{{ route('logout') }}" class="mt-1">
                                         @csrf

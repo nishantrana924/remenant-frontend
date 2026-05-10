@@ -154,9 +154,20 @@
                         </div>
                     </div>
 
+
+                    <!-- Product Grid -->
+                    <div id="products-grid-container" class="relative">
+                        @include('public.products._grid')
+                        
+                        <!-- Loading Overlay -->
+                        <div id="grid-loader" class="hidden absolute inset-0 z-20 bg-white/50 backdrop-blur-[2px] flex items-center justify-center rounded-3xl">
+                            <div class="h-10 w-10 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    </div>
+
                     @if(isset($combos) && $combos->isNotEmpty())
                     <!-- Combo Offers Slider (Only on products page) -->
-                    <div class="mb-16">
+                    <div class="mt-24 mb-16">
                         <div class="flex items-center justify-between mb-8">
                             <h2 class="text-2xl font-bold italic text-[color:var(--text-primary)]">Special Combo Offers</h2>
                             <div class="flex items-center gap-2">
@@ -198,16 +209,6 @@
                         </div>
                     </div>
                     @endif
-
-                    <!-- Product Grid -->
-                    <div id="products-grid-container" class="relative">
-                        @include('public.products._grid')
-                        
-                        <!-- Loading Overlay -->
-                        <div id="grid-loader" class="hidden absolute inset-0 z-20 bg-white/50 backdrop-blur-[2px] flex items-center justify-center rounded-3xl">
-                            <div class="h-10 w-10 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                    </div>
 
                     <!-- Load More (Placeholder) -->
                     @if(count($products) > 9)
