@@ -4,7 +4,7 @@
             <!-- Brand Column -->
             <div class="lg:col-span-3">
                 <a href="/" class="inline-flex">
-                    <img src="{{ asset('images/logo/remenant-health-logo.png') }}" alt="Remenant Health"
+                    <img src="{{ \App\Helpers\ImageHelper::getUrl('logo/remenant-health-logo.png', 'images') }}" alt="Remenant Health"
                         class="h-10 w-auto object-contain">
                 </a>
                 <p class="mt-6 text-sm leading-relaxed text-black/70 max-w-xs">

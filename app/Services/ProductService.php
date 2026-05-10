@@ -62,12 +62,25 @@ class ProductService
             $product->categories()->sync($categories);
         }
 
+        // 7. Log initial stock
+        if ($product->stock > 0) {
+            \App\Models\InventoryLog::create([
+                'product_id' => $product->id,
+                'old_stock' => 0,
+                'new_stock' => $product->stock,
+                'change_amount' => $product->stock,
+                'reason' => 'initial_creation',
+                'user_id' => auth()->id()
+            ]);
+        }
+
         return $product;
     }
 
     public function update($id, array $data)
     {
         $product = $this->repository->find($id);
+        $oldStock = $product->stock;
 
         // 1. Image & Gallery Update
         if (isset($data['image'])) {
@@ -95,6 +108,9 @@ class ProductService
             }
             $currentGallery = array_merge($currentGallery, $newPaths);
         }
+        
+        $data['gallery'] = array_values($currentGallery);
+        unset($data['deleted_gallery']);
 
         $data['gallery'] = array_values($currentGallery);
 
@@ -122,11 +138,47 @@ class ProductService
             $product->categories()->sync($categories);
         }
 
+        // 7. Log stock change if updated
+        if (isset($data['stock']) && (int)$data['stock'] !== $oldStock) {
+            \App\Models\InventoryLog::create([
+                'product_id' => $product->id,
+                'old_stock' => $oldStock,
+                'new_stock' => $product->stock,
+                'change_amount' => $product->stock - $oldStock,
+                'reason' => 'manual_update',
+                'user_id' => auth()->id()
+            ]);
+        }
+
         return $product;
     }
 
     public function delete($id)
     {
-        return $this->repository->delete($id);
+        $product = $this->repository->find($id);
+        if ($product) {
+            // Delete Main Image
+            if ($product->image) {
+                \App\Helpers\ImageHelper::delete($product->image);
+            }
+
+            // Delete Gallery Images
+            if ($product->gallery && is_array($product->gallery)) {
+                foreach ($product->gallery as $image) {
+                    \App\Helpers\ImageHelper::delete($image);
+                }
+            }
+
+            return $this->repository->delete($id);
+        }
+        return false;
+    }
+
+    public function bulkDelete(array $ids)
+    {
+        foreach ($ids as $id) {
+            $this->delete($id);
+        }
+        return true;
     }
 }

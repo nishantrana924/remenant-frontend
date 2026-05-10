@@ -27,7 +27,7 @@
             <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:items-center">
                 <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-black/[0.05] pb-12 lg:pb-0 lg:pr-12">
                     <div class="flex items-center gap-6 mb-8">
-                        <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->title }}" class="h-24 w-24 rounded-3xl bg-gray-50 object-contain p-3 shadow-inner">
+                        <img src="{{ \App\Helpers\ImageHelper::getUrl($product->image, 'products') }}" alt="{{ $product->title }}" class="h-24 w-24 rounded-3xl bg-gray-50 object-contain p-3 shadow-inner">
                         <div>
                             <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[color:var(--primary)]">Product Feedback</span>
                             <h1 class="text-2xl font-black text-[color:var(--text-primary)] leading-tight mt-1">{{ $product->title }}</h1>
@@ -35,14 +35,14 @@
                     </div>
                     
                     <div class="flex items-end gap-6">
-                        <span class="text-7xl font-black text-[color:var(--text-primary)] tracking-tighter leading-none">{{ $product->rating }}</span>
+                        <span class="text-7xl font-black text-[color:var(--text-primary)] tracking-tighter leading-none">{{ number_format($avgRating, 1) }}</span>
                         <div class="pb-2">
                             <div class="flex text-[color:var(--primary)] gap-0.5 mb-2">
                                 @for($i = 0; $i < 5; $i++)
-                                    <i data-lucide="star" class="h-5 w-5 {{ $i < floor($product->rating) ? 'fill-current' : 'text-gray-200' }}"></i>
+                                    <i data-lucide="star" class="h-5 w-5 {{ $i < floor($avgRating) ? 'fill-current' : 'text-gray-200' }}"></i>
                                 @endfor
                             </div>
-                            <p class="text-xs font-bold text-[color:var(--text-muted)] uppercase tracking-widest">Global score from {{ number_format($product->reviews) }} buyers</p>
+                            <p class="text-xs font-bold text-[color:var(--text-muted)] uppercase tracking-widest">Global score from {{ number_format($totalCount) }} buyers</p>
                         </div>
                     </div>
                 </div>
@@ -50,7 +50,8 @@
                 <div class="lg:col-span-5 border-b lg:border-b-0 lg:border-r border-black/[0.05] pb-12 lg:pb-0 lg:px-12">
                     <h3 class="text-sm font-black uppercase tracking-widest mb-6 text-[color:var(--text-primary)]">Rating Breakdown</h3>
                     <div class="space-y-4">
-                        @foreach([5 => 85, 4 => 10, 3 => 3, 2 => 1, 1 => 1] as $star => $percentage)
+                        @foreach([5, 4, 3, 2, 1] as $star)
+                        @php $percentage = $breakdown[$star] ?? 0; @endphp
                         <div class="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.15em]">
                             <span class="w-4">{{ $star }} ★</span>
                             <div class="flex-1 h-2 bg-gray-50 rounded-full overflow-hidden ring-1 ring-black/[0.03]">
@@ -85,86 +86,13 @@
         </div>
 
         @php
-            $sampleReviews = [
-                [
-                    'name' => 'Aditi Sharma',
-                    'date' => '2 days ago',
-                    'rating' => 5,
-                    'title' => 'Truly Refreshing!',
-                    'content' => 'I’ve been taking these for a month now and I can definitely feel the difference. It’s so much easier than swallowing big pills and the taste is amazing!',
-                    'verified' => true,
-                    'images' => ['remenant-product1.jpg', 'remenant-product13.jpg']
-                ],
-                [
-                    'name' => 'Rohan Gupta',
-                    'date' => '1 week ago',
-                    'rating' => 5,
-                    'title' => 'Best Wellness Product',
-                    'content' => 'Highly recommend for anyone with a busy lifestyle. Quick, easy, and effective. The Apple Cider Vinegar flavor is my personal favorite.',
-                    'verified' => true,
-                    'images' => ['remenant-product10.jpg']
-                ],
-                [
-                    'name' => 'Karan Patel',
-                    'date' => '2 weeks ago',
-                    'rating' => 4,
-                    'title' => 'Great but slightly sweet',
-                    'content' => 'The quality is top-notch and it fizzes perfectly. Just wish it was a tiny bit less sweet, but overall a great product that I will buy again.',
-                    'verified' => true,
-                    'images' => ['remenant-product5.jpg', 'remenant-product7.jpg']
-                ],
-                [
-                    'name' => 'Priya Singh',
-                    'date' => '3 weeks ago',
-                    'rating' => 5,
-                    'title' => 'Love the results',
-                    'content' => 'The packaging is so premium. I’ve noticed my skin looking much clearer after using the Vitamin C tablets. Highly satisfied!',
-                    'verified' => true,
-                    'images' => ['remenant-product11.jpg']
-                ],
-                [
-                    'name' => 'Amit Verma',
-                    'date' => '1 month ago',
-                    'rating' => 5,
-                    'title' => 'Perfect for travelers',
-                    'content' => 'I travel a lot for work and these are so easy to carry. No spillages like liquid vitamins. The fizz is very satisfying.',
-                    'verified' => true,
-                    'images' => []
-                ],
-                [
-                    'name' => 'Sneha Reddy',
-                    'date' => '1 month ago',
-                    'rating' => 4,
-                    'title' => 'Effective and yummy',
-                    'content' => 'Tastes great and I feel more energetic throughout the day. Best way to start my morning routine.',
-                    'verified' => true,
-                    'images' => ['remenant-product12.jpg']
-                ],
-                [
-                    'name' => 'Vikram Singh',
-                    'date' => '2 months ago',
-                    'rating' => 5,
-                    'title' => 'Excellent Quality',
-                    'content' => 'One of the best ACV tablets in the market. Doesn\'t feel artificial at all. The energy boost is real!',
-                    'verified' => true,
-                    'images' => ['remenant-product13.jpg']
-                ],
-                [
-                    'name' => 'Ananya Das',
-                    'date' => '2 months ago',
-                    'rating' => 5,
-                    'title' => 'Superb Packaging',
-                    'content' => 'The attention to detail in packaging is amazing. The product itself is very effective and easy to use.',
-                    'verified' => true,
-                    'images' => ['remenant-product11.jpg']
-                ]
-            ];
-
             // Global review images for lightbox
             $allReviewImages = [];
-            foreach($sampleReviews as $rev) {
-                foreach($rev['images'] as $img) {
-                    $allReviewImages[] = asset('images/products/' . $img);
+            foreach($reviews as $rev) {
+                if($rev->images) {
+                    foreach($rev->images as $img) {
+                        $allReviewImages[] = \App\Helpers\ImageHelper::getUrl($img, 'reviews');
+                    }
                 }
             }
         @endphp
@@ -172,38 +100,35 @@
         <!-- Reviews Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             @php $currentGlobalImgIdx = 0; @endphp
-            @foreach($sampleReviews as $review)
+            @forelse($reviews as $review)
                 <div class="group bg-white p-7 rounded-[2rem] border border-gray-100 flex flex-col h-full transition-all duration-500 hover:border-[var(--primary)]/20 hover:shadow-2xl hover:shadow-black/[0.02]">
                     <div class="flex flex-col gap-5 flex-1">
                         <!-- Review Top: Rating & Title -->
                         <div class="flex items-center gap-4">
                             <div class="flex items-center gap-1 text-orange-600">
-                                @for($i = 0; $i < 5; $i++)
-                                    <i data-lucide="star" class="h-3 w-3 {{ $i < $review['rating'] ? 'fill-current' : 'text-gray-200' }}"></i>
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i data-lucide="star" class="h-3 w-3 {{ $i <= $review->rating ? 'fill-current' : 'text-gray-200' }}"></i>
                                 @endfor
                             </div>
-                            <h3 class="text-sm font-semibold text-[color:var(--text-primary)] tracking-tight">{{ $review['title'] }}</h3>
                         </div>
 
                         <!-- Review Content -->
                         <p class="text-[13px] leading-relaxed text-[color:var(--text-secondary)] font-medium flex-1">
-                            {{ $review['content'] }}
+                            {{ $review->comment }}
                         </p>
 
                         <!-- Review Images -->
-                        @if(!empty($review['images']))
+                        @if($review->images && count($review->images) > 0)
                             <div class="flex flex-wrap gap-2 pt-2">
-                                @foreach($review['images'] as $imgIndex => $img)
+                                @foreach($review->images as $img)
                                     <div class="group/img relative h-16 w-16 overflow-hidden rounded-xl bg-gray-50 ring-1 ring-black/5 cursor-zoom-in"
                                          onclick="openDynamicLightbox({{ json_encode($allReviewImages) }}, {{ $currentGlobalImgIdx++ }})">
-                                        <img src="{{ asset('images/products/' . $img) }}" 
+                                        <img src="{{ \App\Helpers\ImageHelper::getUrl($img, 'reviews') }}" 
                                              alt="User review image" 
                                              class="h-full w-full object-cover transition duration-500 group-hover/img:scale-110">
                                     </div>
                                 @endforeach
                             </div>
-                        @else
-                            @php $currentGlobalImgIdx += 0; @endphp
                         @endif
                     </div>
 
@@ -211,50 +136,24 @@
                     <div class="mt-8 pt-6 border-t border-black/[0.03] flex items-center justify-between">
                         <div class="flex flex-col gap-1">
                             <div class="flex items-center gap-2">
-                                <span class="text-xs font-semibold text-[color:var(--text-primary)]">{{ $review['name'] }}</span>
-                                @if($review['verified'])
-                                    <i data-lucide="check-circle-2" class="h-3.5 w-3.5 text-green-600"></i>
-                                @endif
+                                <span class="text-xs font-semibold text-[color:var(--text-primary)]">{{ $review->user->name ?? 'Customer' }}</span>
+                                <i data-lucide="check-circle-2" class="h-3.5 w-3.5 text-green-600"></i>
                             </div>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ $review['date'] }}</span>
-                        </div>
-
-                        <!-- Like/Dislike Icons Only -->
-                        <div class="flex items-center gap-4">
-                            <button type="button" class="group flex items-center gap-1.5 text-gray-400 hover:text-green-600 transition-colors">
-                                <i data-lucide="thumbs-up" class="h-4 w-4 transition-transform group-active:scale-125"></i>
-                                <span class="text-[10px] font-semibold">12</span>
-                            </button>
-                            <button type="button" class="group flex items-center gap-1.5 text-gray-400 hover:text-red-500 transition-colors">
-                                <i data-lucide="thumbs-down" class="h-4 w-4 transition-transform group-active:scale-125"></i>
-                                <span class="text-[10px] font-semibold">2</span>
-                            </button>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ $review->created_at->diffForHumans() }}</span>
                         </div>
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <div class="col-span-full py-20 text-center">
+                    <div class="h-20 w-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-6 text-slate-200"><i data-lucide="message-square" class="w-10 h-10"></i></div>
+                    <h3 class="text-xl font-black text-slate-900">No reviews yet</h3>
+                    <p class="text-slate-500 mt-2">Be the first to share your experience!</p>
+                </div>
+            @endforelse
         </div>
 
         <div class="mt-20 flex justify-center">
-            <nav class="inline-flex items-center gap-1">
-                <button class="h-10 w-10 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-50 transition active:scale-90">
-                    <i data-lucide="chevron-left" class="h-4 w-4"></i>
-                </button>
-                <div class="flex items-center gap-1">
-                    @foreach([1, 2, 3, '...', 24] as $page)
-                        @if($page === '...')
-                            <span class="w-8 text-center text-xs font-medium text-gray-300">...</span>
-                        @else
-                            <button class="h-10 w-10 flex items-center justify-center rounded-full text-xs font-bold transition-all duration-300 {{ $page === 1 ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20' : 'text-gray-400 hover:text-[var(--primary)] hover:bg-[var(--primary)]/5' }}">
-                                {{ $page }}
-                            </button>
-                        @endif
-                    @endforeach
-                </div>
-                <button class="h-10 w-10 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-50 transition active:scale-90">
-                    <i data-lucide="chevron-right" class="h-4 w-4"></i>
-                </button>
-            </nav>
+            {{ $reviews->links() }}
         </div>
     </div>
 
@@ -698,10 +597,19 @@
             $('#rating-label').text('Please select a rating').css('color', '#ef4444');
             return;
         }
-        const title = $('#review-title').val().trim();
         const content = $('#review-content').val().trim();
-        if (!title || !content) {
-            alert('Please fill in the title and review.');
+        if (!content || content.length < 10) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Review too short',
+                text: 'Please write at least 10 characters for your review.',
+                confirmButtonText: 'Understood',
+                buttonsStyling: false,
+                customClass: {
+                    popup: 'premium-swal-popup',
+                    confirmButton: 'premium-swal-confirm'
+                }
+            });
             return;
         }
 
@@ -710,16 +618,56 @@
         $btn.html('<span class="inline-block h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span> Submitting...');
         $btn.prop('disabled', true);
 
-        setTimeout(() => {
-            $btn.html('<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Review Submitted!');
-            $btn.removeClass('bg-[var(--primary)]').addClass('bg-green-500');
-            setTimeout(() => {
-                closeWriteReviewModal();
+        // Prepare FormData for image upload
+        let formData = new FormData();
+        formData.append('rating', selectedRating);
+        formData.append('comment', content);
+        formData.append('_token', '{{ csrf_token() }}');
+        
+        reviewUploadedFiles.forEach((file, i) => {
+            formData.append('images[]', file);
+        });
+
+        $.ajax({
+            url: '{{ route("products.reviews.store", $product->id) }}',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(res) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thank You!',
+                    text: res.message,
+                    showConfirmButton: false,
+                    timer: 2000,
+                    customClass: {
+                        popup: 'premium-swal-popup'
+                    }
+                });
+                $btn.html('<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Review Submitted!');
+                $btn.removeClass('bg-[var(--primary)]').addClass('bg-green-500');
+                setTimeout(() => {
+                    closeWriteReviewModal();
+                    window.location.reload();
+                }, 1500);
+            },
+            error: function(err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Submission Failed',
+                    text: err.responseJSON?.message || 'Something went wrong. Please try again.',
+                    confirmButtonText: 'Try Again',
+                    buttonsStyling: false,
+                    customClass: {
+                        popup: 'premium-swal-popup',
+                        confirmButton: 'premium-swal-confirm'
+                    }
+                });
                 $btn.html(originalText);
-                $btn.removeClass('bg-green-500').addClass('bg-[var(--primary)]');
                 $btn.prop('disabled', false);
-            }, 1500);
-        }, 1200);
+            }
+        });
     };
 </script>
 @endpush

@@ -48,6 +48,29 @@ class ProductController extends BaseController
     public function destroy($id)
     {
         $this->service->delete($id);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Product archived successfully.'
+            ]);
+        }
+
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'No products selected.'], 400);
+        }
+
+        $this->service->bulkDelete($ids);
+
+        return response()->json([
+            'success' => true,
+            'message' => count($ids) . ' products archived successfully.'
+        ]);
     }
 }

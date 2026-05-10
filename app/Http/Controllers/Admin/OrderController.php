@@ -63,16 +63,44 @@ class OrderController extends BaseController
     public function updateStatus(Request $request, $id)
     {
         $data = $request->only(['status', 'delivery_status', 'tracking_id', 'courier_name', 'payment_status']);
-        
-        // If status is being updated to processing, we could trigger stock locking logic here
-        // if ($request->status === 'processing') { ... }
-
         $this->service->update($id, $data);
 
         return response()->json([
             'success' => true,
             'message' => 'Order updated successfully',
             'order' => $this->service->getById($id)
+        ]);
+    }
+
+    public function bulkUpdateStatus(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        $data = $request->only(['status', 'delivery_status', 'payment_status']);
+        
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'No orders selected.'], 400);
+        }
+
+        \App\Models\Order::whereIn('id', $ids)->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => count($ids) . ' orders updated successfully.'
+        ]);
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'No orders selected.'], 400);
+        }
+
+        \App\Models\Order::whereIn('id', $ids)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => count($ids) . ' orders deleted successfully.'
         ]);
     }
 }
