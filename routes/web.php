@@ -75,6 +75,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('orders/{id}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::resource('customers', \App\Http\Controllers\Admin\UserController::class);
     Route::post('customers/{id}/update-role', [\App\Http\Controllers\Admin\UserController::class, 'updateRole'])->name('customers.update-role');
+    Route::post('customers/{id}/restore', [\App\Http\Controllers\Admin\UserController::class, 'restore'])->name('customers.restore');
     
     // Reviews Management
     Route::post('reviews/bulk-action', [\App\Http\Controllers\Admin\ReviewController::class, 'bulkAction'])->name('reviews.bulk-action');

@@ -3,6 +3,12 @@
 @section('title', 'Shopping Cart - Remenant Health')
 
 @section('content')
+    <style>
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
     <div class="bg-[#FDF9F6] py-12 sm:py-16 min-h-screen pt-24">
         <div class="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
@@ -19,20 +25,28 @@
                                 @foreach($cart as $id => $details)
                                     <div class="py-6 sm:py-8 flex flex-col sm:flex-row gap-4 sm:gap-6 cart-item border-b border-gray-200 last:border-0" data-item-id="{{ $id }}" data-price="{{ $details['price'] }}" data-mrp="{{ $details['mrp'] }}">
                                         @php
-                                            $imagePath = $details['image'] 
-                                                ? (Str::startsWith($details['image'], 'products/') ? asset('storage/' . $details['image']) : asset('images/products/' . $details['image']))
-                                                : asset('images/products/placeholder.jpg');
+                                            $imagePath = \App\Helpers\ImageHelper::getUrl($details['image'] ?? null, 'products');
                                         @endphp
                                         
                                         <!-- Desktop Image -->
-                                        <div class="hidden sm:block w-32 h-32 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                                            <img src="{{ $imagePath }}" alt="{{ $details['title'] }}" class="h-full w-full object-contain p-2" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($details['title']) }}&color=ea5f06&background=fff1e8'">
+                                        <div class="hidden sm:block w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 relative group/img">
+                                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay"></div>
+                                            <img src="{{ $imagePath }}" 
+                                                 alt="{{ $details['title'] }}" 
+                                                 class="h-full w-full object-contain p-2 opacity-0 transition-opacity duration-300"
+                                                 onload="this.classList.remove('opacity-0'); this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
+                                                 onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($details['title']) }}&color=ea5f06&background=fff1e8'; this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
                                         </div>
 
                                         <!-- Mobile Header -->
                                         <div class="flex sm:hidden gap-4 items-start">
-                                            <div class="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                                                <img src="{{ $imagePath }}" alt="{{ $details['title'] }}" class="h-full w-full object-contain p-2" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($details['title']) }}&color=ea5f06&background=fff1e8'">
+                                            <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 relative">
+                                                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay"></div>
+                                                <img src="{{ $imagePath }}" 
+                                                     alt="{{ $details['title'] }}" 
+                                                     class="h-full w-full object-contain p-2 opacity-0 transition-opacity duration-300"
+                                                     onload="this.classList.remove('opacity-0'); this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
+                                                     onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($details['title']) }}&color=ea5f06&background=fff1e8'; this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
                                             </div>
                                             <div class="flex-1">
                                                 <h3 class="text-sm font-extrabold text-slate-900 leading-tight">{{ $details['title'] }}</h3>

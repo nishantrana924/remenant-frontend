@@ -48,7 +48,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Delete the user's account.
+     * Deactivate the user's account (soft delete — data is retained for admin).
      */
     public function destroy(Request $request): RedirectResponse
     {
@@ -60,11 +60,12 @@ class ProfileController extends Controller
 
         Auth::logout();
 
+        // Soft delete: sets deleted_at, data retained for admin records
         $user->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+        return Redirect::to('/login')->with('status', 'account-deleted');
     }
 }

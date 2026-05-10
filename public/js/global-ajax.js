@@ -3,7 +3,7 @@
  * Handles all interactive actions without page reloads.
  */
 
-const RemenantApp = {
+window.RemenantApp = {
     csrfToken: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
 
     init() {
@@ -210,4 +210,4 @@ const RemenantApp = {
 };
 
 // Auto-init on DOM load
-document.addEventListener('DOMContentLoaded', () => RemenantApp.init());
+document.addEventListener('DOMContentLoaded', () => window.RemenantApp.init());

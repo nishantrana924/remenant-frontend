@@ -20,6 +20,7 @@ class Product extends Model
         'trust_signals' => 'array',
         'nutrition' => 'array',
         'nutrition_highlights' => 'array',
+        'specs' => 'array',
         'is_featured' => 'boolean',
         'status' => 'string',
     ];

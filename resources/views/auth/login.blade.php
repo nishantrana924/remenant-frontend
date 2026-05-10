@@ -19,8 +19,17 @@
     <div class="flex-1 flex items-start justify-center p-6 lg:pt-32 relative">
         <div class="w-full max-w-[440px]">
             
-            <!-- Session Status -->
-            @if (session('status'))
+            <!-- Account Deleted Banner -->
+            @if (session('status') === 'account-deleted')
+                <div class="mb-6 rounded-2xl bg-red-50 p-4 ring-1 ring-red-100 flex items-center gap-3">
+                    <i data-lucide="user-x" class="h-5 w-5 text-red-500 shrink-0"></i>
+                    <div>
+                        <p class="text-[11px] font-black text-red-700 uppercase tracking-wider">Account Deactivated</p>
+                        <p class="text-xs text-red-500 mt-0.5">Your account has been successfully deleted. We're sorry to see you go.</p>
+                    </div>
+                </div>
+            @elseif (session('status'))
+                <!-- Session Status -->
                 <div class="mb-6 rounded-2xl bg-green-50 p-4 ring-1 ring-green-100 flex items-center gap-3">
                     <i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>
                     <p class="text-[11px] font-bold text-green-700 uppercase tracking-wider">{{ session('status') }}</p>

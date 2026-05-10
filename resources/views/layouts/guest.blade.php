@@ -13,8 +13,8 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        <!-- Tailwind CSS -->
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        <!-- Assets -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-[color:var(--bg-primary)] text-[color:var(--text-primary)]">
         <!-- Dynamic Background -->

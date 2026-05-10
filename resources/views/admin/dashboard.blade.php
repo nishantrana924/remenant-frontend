@@ -196,76 +196,102 @@
 </div>
 
 <script>
-up.compiler('#revenueChart', function(canvas) {
-    const ctx = canvas.getContext('2d');
-    
-    // Create Gradient
-    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(255, 107, 0, 0.2)');
-    gradient.addColorStop(1, 'rgba(255, 107, 0, 0.0)');
+(function() {
+    var chartData = @json($chartData);
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            datasets: [{
-                label: 'Revenue',
-                data: @json($chartData),
-                borderColor: '#FF6B00',
-                backgroundColor: gradient,
-                borderWidth: 4,
-                fill: true,
-                tension: 0.45,
-                pointRadius: 4,
-                pointBackgroundColor: '#fff',
-                pointBorderColor: '#FF6B00',
-                pointBorderWidth: 2,
-                pointHoverRadius: 6,
-                pointHoverBackgroundColor: '#FF6B00',
-                pointHoverBorderColor: '#fff',
-                pointHoverBorderWidth: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { intersect: false, mode: 'index' },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#0f172a',
-                    titleFont: { size: 12, weight: 'bold', family: 'Inter' },
-                    bodyFont: { size: 14, weight: 'black', family: 'Inter' },
-                    padding: 16,
-                    cornerRadius: 12,
-                    displayColors: false,
-                    callbacks: {
-                        label: function(context) {
-                            return '₹ ' + context.parsed.y.toLocaleString();
+    function initRevenueChart() {
+        var canvas = document.getElementById('revenueChart');
+        if (!canvas) return;
+        if (typeof Chart === 'undefined') return;
+
+        // Destroy existing chart instance to prevent re-init errors
+        var existing = Chart.getChart(canvas);
+        if (existing) existing.destroy();
+
+        var ctx = canvas.getContext('2d');
+        var gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(255, 107, 0, 0.2)');
+        gradient.addColorStop(1, 'rgba(255, 107, 0, 0.0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: chartData,
+                    borderColor: '#FF6B00',
+                    backgroundColor: gradient,
+                    borderWidth: 4,
+                    fill: true,
+                    tension: 0.45,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#FF6B00',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#FF6B00',
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleFont: { size: 12, weight: 'bold', family: 'Inter' },
+                        bodyFont: { size: 14, weight: 'black', family: 'Inter' },
+                        padding: 16,
+                        cornerRadius: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return '₹ ' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(241, 245, 249, 1)', drawBorder: false },
+                        ticks: {
+                            font: { size: 10, weight: 'bold', family: 'Inter' },
+                            color: '#94a3b8',
+                            callback: function(value) { return '₹' + (value/1000) + 'k'; }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 10, weight: 'bold', family: 'Inter' },
+                            color: '#94a3b8'
                         }
                     }
                 }
-            },
-            scales: {
-                y: { 
-                    beginAtZero: true, 
-                    grid: { color: 'rgba(241, 245, 249, 1)', drawBorder: false },
-                    ticks: {
-                        font: { size: 10, weight: 'bold', family: 'Inter' },
-                        color: '#94a3b8',
-                        callback: function(value) { return '₹' + (value/1000) + 'k'; }
-                    }
-                },
-                x: { 
-                    grid: { display: false },
-                    ticks: {
-                        font: { size: 10, weight: 'bold', family: 'Inter' },
-                        color: '#94a3b8'
-                    }
-                }
             }
-        }
-    });
-});
+        });
+    }
+
+    // Init on DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initRevenueChart);
+    } else {
+        initRevenueChart();
+    }
+
+    // Re-init when Unpoly swaps in this fragment
+    if (window.up) {
+        up.on('up:fragment:inserted', function(event) {
+            if (event.fragment && event.fragment.querySelector('#revenueChart')) {
+                initRevenueChart();
+            }
+        });
+    }
+})();
 </script>
 @endsection

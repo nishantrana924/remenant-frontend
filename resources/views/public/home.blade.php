@@ -3,6 +3,9 @@
 @section('title', config('app.name', 'Remenant Health') . ' - Home')
 
 @section('content')
+    {{-- Page-specific assets (Inside content for Unpoly swap) --}}
+    <link rel="stylesheet" href="{{ asset('assets/css/home-custom.css') }}">
+    <script src="{{ asset('assets/js/home-custom.js') }}"></script>
 
     <section class="bg-[var(--bg-main)]">
         <div class="hero-carousel owl-carousel owl-theme">
@@ -22,13 +25,6 @@
         </div>
     </section>
 
-    @push('styles')
-        <link rel="stylesheet" href="{{ asset('assets/css/home-custom.css') }}">
-    @endpush
-
-    @push('scripts')
-        <script src="{{ asset('assets/js/home-custom.js') }}"></script>
-    @endpush
 
 
 

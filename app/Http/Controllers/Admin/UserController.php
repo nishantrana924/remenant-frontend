@@ -10,13 +10,14 @@ class UserController extends Controller
 {
     public function index()
     {
-        $items = User::with('orders')->latest()->get();
+        // withTrashed() ensures soft-deleted users still appear in the admin list
+        $items = User::withTrashed()->with('orders')->latest()->get();
         return view('admin.customers.index', compact('items'));
     }
 
     public function updateRole(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::withTrashed()->findOrFail($id);
         $user->role_id = (int)$request->role;
         $user->save();
 
@@ -25,7 +26,7 @@ class UserController extends Controller
 
     public function show($id)
     {
-        $item = User::with(['orders.orderItems.product'])->findOrFail($id);
+        $item = User::withTrashed()->with(['orders.orderItems.product'])->findOrFail($id);
         
         $stats = [
             'total_spent' => $item->orders()->where('payment_status', 'paid')->sum('total_amount'),
@@ -34,5 +35,16 @@ class UserController extends Controller
         ];
 
         return view('admin.customers.show', compact('item', 'stats'));
+    }
+
+    /**
+     * Restore a soft-deleted (deactivated) user account.
+     */
+    public function restore($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        $user->restore();
+
+        return redirect()->back()->with('success', "Account for {$user->name} has been restored.");
     }
 }

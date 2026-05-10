@@ -12,7 +12,6 @@
 @endsection
 
 @section('content')
-    @push('styles')
     @php
         $themeColor = $product->theme_color ?? 'orange';
         $isHex = str_starts_with($themeColor, '#');
@@ -98,7 +97,6 @@
             }
         }
     </style>
-    @endpush
     <div class="bg-[var(--bg-main)]">
         @php
             $gallery = $product->gallery ?? [];
@@ -122,7 +120,8 @@
                             @endforeach
                         </div>
 
-                    <div class="relative group/gallery product-gallery-shell overflow-hidden -mx-4 rounded-none bg-[var(--bg-section)] ring-1 ring-black/5 shadow-sm sm:mx-0 sm:rounded-[2rem]">
+                    <div class="relative group/gallery product-gallery-shell overflow-hidden -mx-4 rounded-none bg-[var(--bg-section)] ring-1 ring-black/5 shadow-sm sm:mx-0 sm:rounded-[2rem]"
+                         data-gallery-images='@json(array_map(fn($img) => \App\Helpers\ImageHelper::getUrl($img, "images/products"), $galleryImages))'>
                         <div class="absolute right-3 top-3 sm:right-4 sm:top-4 z-30 flex flex-col gap-2">
 
                             <button type="button" aria-label="Share product" class="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-[color:var(--text-primary)] shadow-lg ring-1 ring-black/10 transition hover:text-[color:var(--primary)] active:scale-95">
@@ -131,13 +130,16 @@
                         </div>
                         <div class="product-gallery-carousel owl-carousel owl-theme">
                             @foreach($galleryImages as $index => $img)
-                                <div class="relative aspect-square overflow-hidden cursor-zoom-in"
+                                <div class="relative aspect-square overflow-hidden cursor-zoom-in bg-gray-100"
                                      onclick="openLightbox({{ $index }})">
+                                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay z-[5]"></div>
                                     <img src="{{ \App\Helpers\ImageHelper::getUrl($img, 'images/products') }}" 
                                          width="1200"
                                          height="1200"
                                          alt="{{ $product->title }}" 
-                                         class="h-full w-full object-contain select-none">
+                                         class="h-full w-full object-contain select-none opacity-0 transition-opacity duration-500 relative z-10"
+                                         onload="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
+                                         onerror="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
                                 </div>
                             @endforeach
                         </div>
@@ -547,24 +549,33 @@
             <div class="px-4 sm:px-6 lg:px-0 py-4 sm:py-8 lg:py-0">
 
                 <!-- Main Banner Image (1200×450 aspect ratio) -->
-                <div class="w-full overflow-hidden bg-gray-50" style="aspect-ratio: 1200/450;">
+                <div class="w-full overflow-hidden bg-gray-100 relative" style="aspect-ratio: 1200/450;">
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay"></div>
                     <img src="{{ \App\Helpers\ImageHelper::getUrl(($product->gallery ?? [])[0] ?? $product->image, 'images/products') }}"
                          alt="{{ $product->title }} - Main"
-                         class="w-full h-full object-cover">
+                         class="w-full h-full object-cover opacity-0 transition-opacity duration-500"
+                         onload="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
+                         onerror="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
                 </div>
 
                 <!-- Two Images Side by Side -->
                 @if(count($product->gallery ?? []) >= 3)
                 <div class="mt-1 grid grid-cols-2 gap-1">
-                    <div class="overflow-hidden bg-gray-50 aspect-square">
+                    <div class="overflow-hidden bg-gray-100 aspect-square relative">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay"></div>
                         <img src="{{ \App\Helpers\ImageHelper::getUrl($product->gallery[1] ?? null, 'images/products') }}"
                              alt="{{ $product->title }} - Detail 1"
-                             class="w-full h-full object-cover">
+                             class="w-full h-full object-cover opacity-0 transition-opacity duration-500"
+                             onload="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
+                             onerror="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
                     </div>
-                    <div class="overflow-hidden bg-gray-50 aspect-square">
+                    <div class="overflow-hidden bg-gray-100 aspect-square relative">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay"></div>
                         <img src="{{ \App\Helpers\ImageHelper::getUrl($product->gallery[2] ?? null, 'images/products') }}"
                              alt="{{ $product->title }} - Detail 2"
-                             class="w-full h-full object-cover">
+                             class="w-full h-full object-cover opacity-0 transition-opacity duration-500"
+                             onload="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
+                             onerror="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
                     </div>
                 </div>
                 @endif
@@ -1038,7 +1049,8 @@
                         <p class="mt-2 text-[color:var(--text-secondary)] font-medium">Discover more premium wellness essentials.</p>
                     </div>
                     <a href="{{ route('products.index') }}" class="inline-flex rounded-full bg-orange-50 text-[color:var(--primary)] px-8 py-3 text-xs font-black uppercase tracking-widest hover:bg-orange-100 transition ring-1 ring-orange-100">View All</a>
-                         <div class="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 sm:gap-8 pb-8 lg:pb-0 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+                </div>
+                <div class="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 sm:gap-8 pb-8 lg:pb-0 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
                     @foreach ($relatedProducts as $rp)
                         @php
                             $discount = (int) round((1 - ($rp->price / max(1, $rp->mrp))) * 100);
@@ -1091,9 +1103,7 @@
                             </div>
                         </div>
                     @endforeach
-                </div>
-            </div>
-        </section>
+                 </div>
             </div>
         </section>
 
@@ -1135,7 +1145,7 @@
     </div>
 
     <!-- Sticky Bottom Bar (Always Visible) -->
-    <div class="fixed bottom-0 left-0 right-0 z-[60] bg-white/90 backdrop-blur-xl border-t border-black/5 p-3 sm:p-4 sm:px-6 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+    <div class="fixed bottom-0 left-0 right-0 z-[100] bg-white/95 backdrop-blur-xl border-t border-black/5 p-3 sm:p-4 sm:px-6 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
         <div class="mx-auto max-w-[1600px] flex items-center justify-between gap-8 px-4 sm:px-6 lg:px-12">
             <!-- Product Info (Desktop Only) -->
             <div class="hidden md:flex items-center gap-4">
@@ -1282,7 +1292,8 @@
         </div>
     </div>
 
-    @push('styles')
+
+
     <style>
         /* Hide counter specifically */
         #lightbox-current, #lightbox-total { display: none !important; }
@@ -1349,618 +1360,56 @@
         #review-image-previews .preview-thumb .remove-btn:hover {
             background: rgba(220,38,38,0.85);
         }
-    </style>
-    @endpush
 
-    @push('scripts')
-    <script>
-        const gallery = [
-            @foreach($galleryImages as $img)
-                '{{ \App\Helpers\ImageHelper::getUrl($img, "images/products") }}',
-            @endforeach
-        ];
-        
-        $(document).ready(function(){
-            if(window.lucide) window.lucide.createIcons();
-            const $gallery = $(".product-gallery-carousel");
-            const $lightbox = $(".lightbox-carousel");
-            const $modal = $("#lightbox-modal");
-            const $currentCounter = $("#lightbox-current");
-            const $totalCounter = $("#lightbox-total");
-            const $galleryPrev = $("[data-gallery-prev]");
-            const $galleryNext = $("[data-gallery-next]");
-            const $lightboxPrev = $("[data-lightbox-prev]");
-            const $lightboxNext = $("[data-lightbox-next]");
-            const $mobileImageTrack = $("[data-mobile-image-track]");
-            const $mobileImageProgress = $("[data-mobile-image-progress]");
-            const $lightboxImages = $("[data-lightbox-image]");
-            let currentImageIndex = 0;
-            let lockedScrollY = 0;
-            $totalCounter.text(gallery.length);
-
-            function setNavDisabled($btn, isDisabled) {
-                $btn.toggleClass("!opacity-0 !pointer-events-none invisible", isDisabled);
-            }
-
-            function updateGalleryNavState(index) {
-                setNavDisabled($galleryPrev, index <= 0);
-                setNavDisabled($galleryNext, index >= gallery.length - 1);
-            }
-
-            function updateLightboxNavState(index) {
-                const total = $lightbox.find('.owl-item:not(.cloned)').length;
-                setNavDisabled($lightboxPrev, index <= 0);
-                setNavDisabled($lightboxNext, index >= total - 1);
-            }
-
-            function updateMobileImageProgress(index) {
-                if (!$mobileImageProgress.length || !$mobileImageTrack.length || gallery.length <= 0) return;
-                const trackWidth = $mobileImageTrack.width() || 0;
-                if (trackWidth <= 0) return;
-
-                const segmentWidth = trackWidth / gallery.length;
-                const indicatorWidth = Math.max(segmentWidth, 24);
-                const maxOffset = Math.max(trackWidth - indicatorWidth, 0);
-                const targetOffset = Math.min(segmentWidth * index, maxOffset);
-
-                $mobileImageProgress.css({
-                    width: `${indicatorWidth}px`,
-                    transform: `translateX(${targetOffset}px)`
-                });
-            }
-
-            function hideImageLoader(imgEl) {
-                const $slide = $(imgEl).closest("[data-lightbox-slide]");
-                $slide.find("[data-image-loader]").addClass("hidden");
-            }
-
-            function initLightboxImageLoaders() {
-                $lightboxImages.each(function() {
-                    const img = this;
-                    if (img.complete && img.naturalWidth > 0) {
-                        hideImageLoader(img);
-                        return;
-                    }
-
-                    $(img).one("load error", function() {
-                        hideImageLoader(img);
-                    });
-                });
-            }
-
-            function lockBackgroundScroll() {
-                lockedScrollY = window.scrollY || window.pageYOffset || 0;
-                $("body").css({
-                    position: "fixed",
-                    top: `-${lockedScrollY}px`,
-                    left: "0",
-                    right: "0",
-                    width: "100%",
-                    overflow: "hidden"
-                });
-            }
-
-            function unlockBackgroundScroll() {
-                $("body").css({
-                    position: "",
-                    top: "",
-                    left: "",
-                    right: "",
-                    width: "",
-                    overflow: ""
-                });
-                window.scrollTo(0, lockedScrollY);
-            }
-            
-            $gallery.owlCarousel({
-                items: 1,
-                loop: false,
-                dots: false,
-                nav: false,
-                smartSpeed: 800,
-                onChanged: function(event) {
-                    const index = event.item.index;
-                    currentImageIndex = index;
-                    $currentCounter.text(index + 1);
-                    $(".product-other-image-thumb")
-                        .removeClass("border-[var(--primary)]")
-                        .addClass("border-transparent");
-                    $(`.product-other-image-thumb[data-index="${index}"]`)
-                        .removeClass("border-transparent hover:border-[var(--primary)]/70")
-                        .addClass("border-[var(--primary)]");
-                    updateGalleryNavState(index);
-                    updateMobileImageProgress(index);
-                }
-            });
-
-            $lightbox.owlCarousel({
-                items: 1,
-                loop: false,
-                dots: false,
-                nav: false,
-                smartSpeed: 500,
-                mouseDrag: true,
-                touchDrag: true,
-                pullDrag: true,
-                onChanged: function(event) {
-                    if (event.item) {
-                        const index = event.item.index;
-                        currentImageIndex = index;
-                        $currentCounter.text(index + 1);
-                        if ($lightbox.attr('data-gallery-type') === 'product') {
-                            $gallery.trigger("to.owl.carousel", [index, 200, true]);
-                        }
-                        updateLightboxNavState(index);
-                    }
-                }
-            });
-
-            initLightboxImageLoaders();
-
-            $(".product-other-image-thumb").on("click", function() {
-                const index = $(this).data("index");
-                $gallery.trigger("to.owl.carousel", [index, 300]);
-            });
-
-            $galleryPrev.on("click", function() {
-                $gallery.trigger("prev.owl.carousel");
-            });
-
-            $galleryNext.on("click", function() {
-                $gallery.trigger("next.owl.carousel");
-            });
-
-            $lightboxPrev.on("click", function() {
-                $lightbox.trigger("prev.owl.carousel");
-            });
-
-            $lightboxNext.on("click", function() {
-                $lightbox.trigger("next.owl.carousel");
-            });
-
-            $("[data-lightbox-close]").on("click", function() {
-                $modal.addClass("hidden").removeClass("flex");
-                unlockBackgroundScroll();
-            });
-
-            window.openLightbox = function(index) {
-                openDynamicLightbox(gallery, index, true);
-            };
-
-            window.openDynamicLightbox = function(images, index, isProductGallery = false) {
-                const galleryType = isProductGallery ? 'product' : 'reviews';
-                const currentType = $lightbox.attr('data-gallery-type');
-                
-                currentImageIndex = index;
-                
-                // Show modal first
-                $modal.removeClass("hidden").addClass("flex");
-                lockBackgroundScroll();
-
-                setTimeout(() => {
-                    // Only rebuild if the gallery type has changed
-                    if (currentType !== galleryType) {
-                        if (currentType) {
-                            $lightbox.trigger('destroy.owl.carousel');
-                            $lightbox.empty();
-                            $lightbox.removeClass('owl-loaded owl-drag owl-hidden');
-                        }
-                        
-                        // Batch append for performance
-                        let html = '';
-                        images.forEach(src => {
-                            html += `
-                                <div class="relative flex h-full w-full items-center justify-center" data-lightbox-slide>
-                                    <img src="${src}" class="h-full w-full object-contain select-none" loading="lazy">
-                                </div>
-                            `;
-                        });
-                        $lightbox.append(html);
-                        $lightbox.attr('data-gallery-type', galleryType);
-                        
-                        $totalCounter.text(images.length);
-                        
-                        $lightbox.owlCarousel({
-                            items: 1,
-                            loop: false,
-                            dots: false,
-                            nav: false,
-                            smartSpeed: 400,
-                            mouseDrag: true,
-                            touchDrag: true,
-                            pullDrag: true,
-                            onChanged: function(event) {
-                                if (event.item) {
-                                    const idx = event.item.index;
-                                    currentImageIndex = idx;
-                                    $currentCounter.text(idx + 1);
-                                    if ($lightbox.attr('data-gallery-type') === 'product') {
-                                        $gallery.trigger("to.owl.carousel", [idx, 200, true]);
-                                    }
-                                    updateLightboxNavState(idx);
-                                }
-                            }
-                        });
-                    } else {
-                        // Crucial fix: refresh carousel to correct dimensions after changing to flex
-                        $lightbox.trigger('refresh.owl.carousel');
-                    }
-                    
-                    // Go to the specific image
-                    $lightbox.trigger('to.owl.carousel', [index, 0]);
-                    $currentCounter.text(index + 1);
-                    updateLightboxNavState(index);
-                    
-                    if (window.lucide) lucide.createIcons();
-                }, 10);
-            };
-
-            // Review-specific lightbox: always rebuild since each card has different images
-            window.openReviewLightbox = function(images, index) {
-                currentImageIndex = index;
-                
-                $modal.removeClass("hidden").addClass("flex");
-                lockBackgroundScroll();
-
-                setTimeout(() => {
-                    // Always destroy and rebuild for review images
-                    const currentType = $lightbox.attr('data-gallery-type');
-                    if (currentType) {
-                        $lightbox.trigger('destroy.owl.carousel');
-                        $lightbox.empty();
-                        $lightbox.removeClass('owl-loaded owl-drag owl-hidden');
-                    }
-                    
-                    let html = '';
-                    images.forEach(src => {
-                        html += `
-                            <div class="relative flex h-full w-full items-center justify-center" data-lightbox-slide>
-                                <img src="${src}" class="h-full w-full object-contain select-none" loading="lazy">
-                            </div>
-                        `;
-                    });
-                    $lightbox.append(html);
-                    $lightbox.attr('data-gallery-type', 'reviews');
-                    
-                    $totalCounter.text(images.length);
-                    
-                    $lightbox.owlCarousel({
-                        items: 1,
-                        loop: false,
-                        dots: false,
-                        nav: false,
-                        smartSpeed: 400,
-                        mouseDrag: true,
-                        touchDrag: true,
-                        pullDrag: true,
-                        onChanged: function(event) {
-                            if (event.item) {
-                                const idx = event.item.index;
-                                currentImageIndex = idx;
-                                $currentCounter.text(idx + 1);
-                                updateLightboxNavState(idx);
-                            }
-                        }
-                    });
-                    
-                    $lightbox.trigger('to.owl.carousel', [index, 0]);
-                    $currentCounter.text(index + 1);
-                    updateLightboxNavState(index);
-                    
-                    if (window.lucide) lucide.createIcons();
-                }, 10);
-            };
-
-            window.closeLightbox = function() {
-                $modal.addClass("hidden").removeClass("flex");
-                unlockBackgroundScroll();
-            };
-
-            $(document).on("keydown", function(e) {
-                if ($modal.hasClass("hidden")) return;
-                if (e.key === "Escape") window.closeLightbox();
-                if (e.key === "ArrowRight") $lightbox.trigger("next.owl.carousel");
-                if (e.key === "ArrowLeft") $lightbox.trigger("prev.owl.carousel");
-            });
-
-
-            $(".related-carousel").owlCarousel({
-                items: 1,
-                margin: 24,
-                loop: false,
-                autoplay: false,
-                nav: false,
-                dots: false,
-                responsive: {
-                    0: { items: 1.2, stagePadding: 20 },
-                    640: { items: 2 },
-                    1024: { items: 3 },
-                    1280: { items: 4 }
-                }
-            });
-
-
-
-
-            updateGalleryNavState(0);
-            updateLightboxNavState(0);
-            updateMobileImageProgress(0);
-            $(window).on("resize", function() {
-                updateMobileImageProgress(currentImageIndex);
-            });
-        });
-
-        // === Write a Review Modal ===
-        let selectedRating = 0;
-        let reviewUploadedFiles = [];
-        const ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
-        const $reviewModal = $('#review-modal');
-
-        let reviewModalScrollY = 0;
-
-        window.openWriteReviewModal = function() {
-            selectedRating = 0;
-            reviewUploadedFiles = [];
-            $('#review-title').val('');
-            $('#review-content').val('');
-            $('#review-image-previews').empty().addClass('hidden');
-            $('#rating-label').text('Select a rating').removeClass('text-orange-500');
-            $('.review-star').removeClass('active text-[color:var(--primary)]').addClass('text-gray-300');
-            // Lock background scroll (works on iOS Safari too)
-            reviewModalScrollY = window.scrollY || window.pageYOffset || 0;
-            $('body').css({
-                position: 'fixed',
-                top: `-${reviewModalScrollY}px`,
-                left: '0',
-                right: '0',
-                width: '100%',
-                overflow: 'hidden'
-            });
-            $reviewModal.removeClass('hidden');
-            if (window.lucide) lucide.createIcons();
-        };
-
-        window.closeWriteReviewModal = function() {
-            $reviewModal.addClass('hidden');
-            // Unlock background scroll
-            $('body').css({
-                position: '',
-                top: '',
-                left: '',
-                right: '',
-                width: '',
-                overflow: ''
-            });
-            window.scrollTo(0, reviewModalScrollY);
-        };
-
-
-
-
-        // Close on Escape
-        $(document).on('keydown', function(e) {
-            if (e.key === 'Escape' && !$reviewModal.hasClass('hidden')) {
-                closeWriteReviewModal();
-            }
-        });
-
-        window.setReviewRating = function(rating) {
-            selectedRating = rating;
-            $('.review-star').each(function() {
-                const starVal = parseInt($(this).data('star'));
-                if (starVal <= rating) {
-                    $(this).addClass('active text-orange-400').removeClass('text-gray-300');
-                } else {
-                    $(this).removeClass('active text-orange-400').addClass('text-gray-300');
-                }
-            });
-            $('#rating-label').text(ratingLabels[rating]).addClass('text-orange-500').removeClass('text-gray-400');
-        };
-
-        window.handleReviewImageUpload = function(input) {
-            const files = Array.from(input.files);
-            const maxFiles = 4;
-            const maxSize = 5 * 1024 * 1024; // 5MB
-
-            files.forEach(file => {
-                if (reviewUploadedFiles.length >= maxFiles) return;
-                if (file.size > maxSize) return;
-                if (!file.type.startsWith('image/')) return;
-                
-                reviewUploadedFiles.push(file);
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const idx = reviewUploadedFiles.length - 1;
-                    const thumb = `
-                        <div class="preview-thumb" data-file-index="${idx}">
-                            <img src="${e.target.result}" alt="Preview">
-                            <div class="remove-btn" onclick="removeReviewImage(${idx})">✕</div>
-                        </div>
-                    `;
-                    const $previews = $('#review-image-previews');
-                    $previews.append(thumb).removeClass('hidden');
-                };
-                reader.readAsDataURL(file);
-            });
-
-            // Reset input so same file can be re-selected
-            input.value = '';
-        };
-
-        window.removeReviewImage = function(index) {
-            reviewUploadedFiles.splice(index, 1);
-            renderReviewPreviews();
-        };
-
-        function renderReviewPreviews() {
-            const $previews = $('#review-image-previews');
-            $previews.empty();
-            if (reviewUploadedFiles.length === 0) {
-                $previews.addClass('hidden');
-                return;
-            }
-            reviewUploadedFiles.forEach((file, idx) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    $previews.append(`
-                        <div class="preview-thumb" data-file-index="${idx}">
-                            <img src="${e.target.result}" alt="Preview">
-                            <div class="remove-btn" onclick="removeReviewImage(${idx})">✕</div>
-                        </div>
-                    `);
-                };
-                reader.readAsDataURL(file);
-            });
-            $previews.removeClass('hidden');
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
+    </style>
 
-        window.submitReview = function() {
-            if (selectedRating === 0) {
-                $('#rating-label').text('Please select a rating').css('color', '#ef4444');
-                return;
-            }
-            const content = $('#review-content').val().trim();
-            if (!content || content.length < 10) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Review too short',
-                    text: 'Please write at least 10 characters for your review.',
-                    confirmButtonText: 'Understood',
-                    buttonsStyling: false,
-                    customClass: {
-                        popup: 'premium-swal-popup',
-                        confirmButton: 'premium-swal-confirm'
-                    }
-                });
-                return;
-            }
-
-            const $btn = $reviewModal.find('button:contains("Submit Review")');
-            const originalText = $btn.html();
-            $btn.html('<span class="inline-block h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span> Submitting...');
-            $btn.prop('disabled', true);
-
-            // Prepare FormData for real submission
-            let formData = new FormData();
-            formData.append('rating', selectedRating);
-            formData.append('comment', content);
-            formData.append('_token', '{{ csrf_token() }}');
-            
-            reviewUploadedFiles.forEach((file, i) => {
-                formData.append('images[]', file);
-            });
-
-            $.ajax({
-                url: '{{ route("products.reviews.store", $product->id) }}',
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(res) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Thank You!',
-                        text: res.message,
-                        showConfirmButton: false,
-                        timer: 2000,
-                        customClass: {
-                            popup: 'premium-swal-popup'
-                        }
-                    });
-                    $btn.html('<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Review Submitted!');
-                    $btn.removeClass('bg-[var(--primary)]').addClass('bg-green-500');
-                    setTimeout(() => {
-                        closeWriteReviewModal();
-                        window.location.reload();
-                    }, 1500);
-                },
-                error: function(err) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Submission Failed',
-                        text: err.responseJSON?.message || 'Something went wrong. Please try again.',
-                        confirmButtonText: 'Try Again',
-                        buttonsStyling: false,
-                        customClass: {
-                            popup: 'premium-swal-popup',
-                            confirmButton: 'premium-swal-confirm'
-                        }
-                    });
-                    $btn.html(originalText);
-                    $btn.prop('disabled', false);
-                }
-            });
-        };
-
-        // --- Coupon Logic ---
-        let appliedCoupon = null;
-        const originalPrice = {{ $product->price }};
+    <script>
+        // Coupon & Review logic (Inline as they depend on Blade variables)
+        var appliedCoupon = null;
+        var originalPrice = {{ $product->price }};
 
         window.applyCoupon = function() {
             const code = $('#coupon-input').val().trim();
-            if (!code) {
-                $('#coupon-error').text('Please enter a coupon code').removeClass('hidden');
-                return;
-            }
-
-            const $btn = $('#apply-coupon-btn');
-            const originalBtnText = $btn.text();
-            $btn.prop('disabled', true).text('...');
-
+            if (!code) return;
             $.ajax({
                 url: '{{ route("coupons.apply") }}',
                 method: 'POST',
-                data: {
-                    code: code,
-                    product_id: '{{ $product->id }}',
-                    amount: originalPrice,
-                    _token: '{{ csrf_token() }}'
-                },
+                data: { code: code, product_id: '{{ $product->id }}', amount: originalPrice, _token: '{{ csrf_token() }}' },
                 success: function(res) {
-                    appliedCoupon = res;
-                    
-                    // Show success info
                     $('#applied-code-text').text(res.code);
                     $('#discount-amount').text(res.discount);
                     $('#coupon-message').removeClass('hidden');
-                    $('#coupon-error').addClass('hidden');
                     $('#coupon-input').parent().addClass('hidden');
-                    
-                    // Update prices on page
                     $('.current-price-text').text('₹' + res.new_total.toLocaleString());
-                    
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Coupon Applied!',
-                        text: res.message,
-                        timer: 2000,
-                        showConfirmButton: false,
-                        customClass: { popup: 'premium-swal-popup' }
-                    });
-                },
-                error: function(err) {
-                    $('#coupon-error').text(err.responseJSON?.message || 'Invalid coupon').removeClass('hidden');
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Invalid Code',
-                        text: err.responseJSON?.message || 'This coupon cannot be applied.',
-                        customClass: { popup: 'premium-swal-popup', confirmButton: 'premium-swal-confirm' },
-                        buttonsStyling: false
-                    });
-                },
-                complete: function() {
-                    $btn.prop('disabled', false).text(originalBtnText);
                 }
             });
         };
 
         window.removeCoupon = function() {
-            appliedCoupon = null;
             $('#coupon-message').addClass('hidden');
             $('#coupon-input').val('').parent().removeClass('hidden');
             $('.current-price-text').text('₹' + originalPrice.toLocaleString());
-            Swal.fire({ icon: 'info', title: 'Coupon Removed', text: 'The discount has been removed.', timer: 1500, showConfirmButton: false, customClass: { popup: 'premium-swal-popup' } });
+        };
+
+        // Review Modal Logic
+        var selectedRating = 0;
+        window.setReviewRating = function(rating) {
+            selectedRating = rating;
+            $('.review-star').each(function() {
+                const starVal = parseInt($(this).data('star'));
+                $(this).toggleClass('active text-orange-400', starVal <= rating);
+                $(this).toggleClass('text-gray-300', starVal > rating);
+            });
+        };
+        window.openWriteReviewModal = function() {
+            $('#review-modal').removeClass('hidden');
+        };
+        window.closeWriteReviewModal = function() {
+            $('#review-modal').addClass('hidden');
         };
     </script>
-    @endpush
 @endsection

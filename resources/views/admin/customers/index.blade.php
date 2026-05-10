@@ -29,15 +29,22 @@
                 </thead>
                 <tbody class="divide-y divide-slate-50">
                     @forelse($items as $item)
-                        <tr class="hover:bg-slate-50/30 transition-colors group">
+                        <tr class="hover:bg-slate-50/30 transition-colors group {{ $item->deleted_at ? 'bg-red-50/40' : '' }}">
                             <td class="px-8 py-5">
                                 <div class="flex items-center gap-4">
-                                    <div class="h-12 w-12 rounded-[1.25rem] {{ (int)$item->role_id === 1 ? 'bg-orange-50 text-orange-500' : 'bg-indigo-50 text-indigo-500' }} flex items-center justify-center font-black text-lg flex-shrink-0">
+                                    <div class="h-12 w-12 rounded-[1.25rem] {{ $item->deleted_at ? 'bg-slate-100 text-slate-400' : ((int)$item->role_id === 1 ? 'bg-orange-50 text-orange-500' : 'bg-indigo-50 text-indigo-500') }} flex items-center justify-center font-black text-lg flex-shrink-0">
                                         {{ strtoupper(substr($item->name, 0, 1)) }}
                                     </div>
                                     <div>
-                                        <h4 class="font-black text-slate-800 leading-tight">{{ $item->name }}</h4>
-                                        <p class="text-[10px] text-slate-400 mt-1 font-bold tracking-wide uppercase">ID: #{{ $item->id }}</p>
+                                        <div class="flex items-center gap-2">
+                                            <h4 class="font-black {{ $item->deleted_at ? 'text-slate-400 line-through' : 'text-slate-800' }} leading-tight">{{ $item->name }}</h4>
+                                            @if($item->deleted_at)
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 text-red-600 text-[9px] font-black uppercase tracking-widest">
+                                                    <i data-lucide="user-x" class="w-2.5 h-2.5"></i> Deactivated
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <p class="text-[10px] text-slate-400 mt-1 font-bold tracking-wide uppercase">ID: #{{ $item->id }} {{ $item->deleted_at ? '• Deleted ' . $item->deleted_at->diffForHumans() : '' }}</p>
                                     </div>
                                 </div>
                             </td>

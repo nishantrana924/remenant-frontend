@@ -21,9 +21,13 @@
     <link rel="stylesheet" href="{{ asset('assets/owl-carousel/owl.carousel.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/owl-carousel/owl.theme.default.min.css') }}">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Assets -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://unpkg.com/unpoly@3.14.3/unpoly.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/unpoly@3.14.3/unpoly.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/global-styles.css') }}">
     <style>
         :root {
@@ -35,9 +39,7 @@
         }
     </style>
     <!-- Performance & UI Progress -->
-    <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         [x-cloak] {
             display: none !important;
@@ -75,7 +77,8 @@
     <!-- Global Page Loader -->
     @if(!request()->routeIs('login', 'register', 'password.*', 'verification.*', 'dashboard', 'my-orders', 'profile.*'))
         <div id="global-page-loader"
-            class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
+            style="display:none;"
+            class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-opacity duration-500 ease-in-out">
             <div class="relative">
                 <div class="h-20 w-20 rounded-[2.5rem] border-4 border-orange-100 animate-spin-slow"></div>
                 <div class="absolute inset-0 flex items-center justify-center">
@@ -98,7 +101,7 @@
         @include('public.layouts.header')
         @include('public.layouts.sidebar')
 
-        <main class="flex-1" style="overflow-x: clip;">
+        <main class="flex-1" style="overflow-x: clip;" up-main>
             @yield('content')
         </main>
 
@@ -108,42 +111,70 @@
     <!-- Scripts (Local) -->
     <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/owl-carousel/owl.carousel.min.js') }}"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="{{ asset('js/icons.js') }}"></script>
     <script src="{{ asset('js/public-sidebar.js') }}"></script>
     <script src="{{ asset('js/public-header.js') }}"></script>
     <script src="{{ asset('js/public-account.js') }}"></script>
     <script src="{{ asset('js/global-ajax.js') }}"></script>
+    <script src="{{ asset('js/product-page.js') }}"></script>
 
     <script>
-        // 1. Initialize Icons & Progress
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.lucide) lucide.createIcons();
-            NProgress.configure({ showSpinner: false, trickleSpeed: 200 });
-        });
-
-        // 2. Fast Navigation Feedback
-        window.onbeforeunload = () => { NProgress.start(); };
-        window.onload = () => {
-            NProgress.done();
-            const loader = document.getElementById('global-page-loader');
-            if (loader) {
-                loader.style.opacity = '0';
-                loader.style.pointerEvents = 'none';
-                setTimeout(() => loader.style.display = 'none', 700);
+        // 1. Initialize Icons
+        window.refreshIcons = function() {
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                try { lucide.createIcons(); } catch (e) {}
             }
         };
 
+        // 2. Loader: starts hidden (display:none in HTML)
+        // Show it only during a real full-page navigation away
+        // Immediately hide it on any page restore or Unpoly swap
+        window.showLoader = function() {
+            var loader = document.getElementById('global-page-loader');
+            if (loader) loader.style.display = 'flex';
+            if (window.NProgress) NProgress.start();
+        };
+        window.hideLoader = function() {
+            var loader = document.getElementById('global-page-loader');
+            if (loader) loader.style.display = 'none';
+            if (window.NProgress) NProgress.done();
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            window.refreshIcons();
+            if (window.NProgress) NProgress.configure({ showSpinner: false, trickleSpeed: 200 });
+            // Ensure loader is always hidden when page becomes ready
+            window.hideLoader();
+        });
+
+        // bfcache restore (browser back/forward button)
+        window.addEventListener('pageshow', function() {
+            window.hideLoader();
+        });
+
+        // Unpoly SPA navigation — hide immediately after swap
+        document.addEventListener('up:location:changed', function() {
+            window.hideLoader();
+            window.refreshIcons();
+        });
+
+        // Only show loader on a real full-page navigation away from site
+        // (Unpoly intercepts same-origin links, so beforeunload only fires
+        //  when leaving to external sites or closing tab)
+        window.addEventListener('beforeunload', function() {
+            window.showLoader();
+        });
+
         // 3. Link Prefetching for Speed
-        const prefetched = new Set();
-        document.addEventListener('mouseover', (e) => {
-            const link = e.target.closest('a');
-            if (link && link.href && link.origin === window.location.origin && !prefetched.has(link.href)) {
-                const prefetchLink = document.createElement('link');
+        window.prefetched = window.prefetched || new Set();
+        document.addEventListener('mouseover', function(e) {
+            var link = e.target.closest('a');
+            if (link && link.href && link.origin === window.location.origin && !window.prefetched.has(link.href)) {
+                var prefetchLink = document.createElement('link');
                 prefetchLink.rel = 'prefetch';
                 prefetchLink.href = link.href;
                 document.head.appendChild(prefetchLink);
-                prefetched.add(link.href);
+                window.prefetched.add(link.href);
             }
         });
     </script>
@@ -160,12 +191,14 @@
             infinite: false,
         })
 
-        function raf(time) {
-            window.lenis.raf(time)
-            requestAnimationFrame(raf)
+        if (!window._lenisRafRunning) {
+            window._lenisRafRunning = true;
+            window._lenisRaf = function(time) {
+                window.lenis.raf(time);
+                requestAnimationFrame(window._lenisRaf);
+            };
+            requestAnimationFrame(window._lenisRaf);
         }
-
-        requestAnimationFrame(raf)
 
         // Anchor link scroll sync
         $(document).on('click', 'a[href^="#"]', function (e) {

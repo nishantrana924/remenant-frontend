@@ -1,38 +1,22 @@
 import './bootstrap';
-import 'unpoly';
-import 'unpoly/unpoly.css';
 
-// Unpoly configuration for icons
-// This runs whenever a new fragment is inserted into the DOM
-up.compiler('[data-lucide]', (element) => {
-    if (window.lucide) {
-        lucide.createIcons({
-            root: element.parentElement,
-            searchAround: element
-        });
-    }
-});
-
-// Global fallback for any missed icons on fragment insert
-up.on('up:fragment:inserted', () => {
-    if (window.lucide) lucide.createIcons();
-});
-
-// Faster navigation
-up.link.config.followSelectors.push('a[href]');
-up.form.config.submitSelectors.push('form');
-
-// Disable default loading bar
-up.network.config.progressBar = false;
-
-// Ensure Alpine.js re-initializes on fragment updates
-up.on('up:fragment:inserted', () => {
-    if (window.Alpine) {
-        // Alpine 3.x handles most mutations, but we can force a discovery if needed
-    }
-});
-
+// Defer all Unpoly configuration until DOMContentLoaded,
+// because `up` is loaded via CDN in the <head> — not bundled here.
+// This prevents "up is not defined" errors from the compiled bundle.
 document.addEventListener('DOMContentLoaded', () => {
-    // Initial icon creation
-    if (window.lucide) lucide.createIcons();
+    if (typeof window.up === 'undefined') return;
+
+    // Reinitialize Lucide icons whenever Unpoly swaps a fragment
+    up.on('up:fragment:inserted', () => {
+        if (window.lucide && typeof lucide.createIcons === 'function') {
+            lucide.createIcons();
+        }
+    });
+
+    // Faster navigation — follow all standard links & forms via Unpoly
+    up.link.config.followSelectors.push('a[href]');
+    up.form.config.submitSelectors.push('form');
+
+    // Disable Unpoly's built-in progress bar (we use NProgress instead)
+    up.network.config.progressBar = false;
 });

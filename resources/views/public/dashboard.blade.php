@@ -179,42 +179,191 @@
                     </div>
                 </form>
 
-                <div class="h-px bg-slate-50 my-12"></div>
-
-                <!-- SUBSECTION: DELETE ACCOUNT -->
-                <div class="bg-rose-50/50 border border-rose-100 p-8 rounded-sm">
-                    <h3 class="text-lg font-black uppercase tracking-tighter text-rose-600 mb-2">Delete Account</h3>
-                    <p class="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-6 leading-relaxed">Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.</p>
-                    
-                    <form method="post" action="{{ route('profile.destroy') }}" class="space-y-4">
-                        @csrf @method('delete')
-                        <div class="max-w-md space-y-2">
-                            <input type="password" name="password" placeholder="Enter password to confirm" class="password-input w-full bg-white border border-rose-100 px-6 py-3 text-xs font-bold outline-none rounded-sm focus:ring-1 focus:ring-rose-500/20">
-                        </div>
-                        <button type="submit" class="bg-rose-600 text-white px-10 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all">Delete Account Permanently</button>
-                    </form>
+                <div class="h-px bg-slate-50 my-12"></div>                <!-- SUBSECTION: DEACTIVATE ACCOUNT -->
+                <div class="mt-12 bg-rose-50/30 border border-rose-100 p-8 rounded-2xl relative overflow-hidden group">
+                    <div class="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:scale-110 transition-transform duration-700">
+                        <i data-lucide="user-x" class="h-48 w-48 text-rose-900"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-lg font-black uppercase tracking-tight text-rose-600 mb-2">Deactivate Account</h3>
+                        <p class="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-8 leading-relaxed max-w-md">Your account will be hidden and you will be logged out. All your data and order history is preserved. You can reactivate instantly by logging back in.</p>
+                        
+                        <form method="post" action="{{ route('profile.destroy') }}" class="flex flex-col md:flex-row items-end gap-4">
+                            @csrf @method('delete')
+                            <div class="w-full md:w-80 space-y-2">
+                                <label class="text-[9px] font-black text-rose-300 uppercase tracking-widest ml-1">Confirm with Password</label>
+                                <input type="password" name="password" placeholder="••••••••" class="password-input w-full bg-white border border-rose-100 px-6 py-3 text-xs font-bold outline-none rounded-xl focus:ring-2 focus:ring-rose-500/10">
+                            </div>
+                            <button type="submit" class="w-full md:w-auto bg-rose-600 text-white px-8 py-3.5 text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all rounded-xl shadow-lg shadow-rose-100">Deactivate Now</button>
+                        </form>
+                    </div>
                 </div>
-            </div>
             </div>
 
             <!-- SECTION: ADDRESSES -->
-            <div id="section-addresses" class="tab-section {{ $activeTab !== 'addresses' ? 'hidden' : '' }} p-10 transition-all duration-300">
-                <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900 mb-8">Manage Addresses</h3>
-                <div class="bg-slate-50 border border-dashed border-slate-200 p-12 text-center rounded-sm">
-                    <i data-lucide="map-pin" class="h-10 w-10 text-slate-200 mx-auto mb-4"></i>
-                    <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">No addresses saved yet.</p>
+            <div id="section-addresses" class="tab-section {{ $activeTab !== 'addresses' ? 'hidden' : '' }} p-6 md:p-10 transition-all duration-300">
+                <div class="flex items-center justify-between mb-10">
+                    <div>
+                        <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900">Manage Addresses</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Primary delivery locations</p>
+                    </div>
+                    <button class="bg-slate-900 text-white px-6 py-3 text-[9px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all rounded-xl flex items-center gap-2">
+                        <i data-lucide="plus" class="h-3 w-3"></i> Add New Address
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Default Address Card -->
+                    <div class="border-2 border-orange-500 bg-white p-8 rounded-[2rem] relative group shadow-xl shadow-orange-50">
+                        <div class="absolute top-6 right-6">
+                            <span class="bg-orange-500 text-white text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Default</span>
+                        </div>
+                        <div class="h-10 w-10 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="home" class="h-5 w-5"></i>
+                        </div>
+                        <h4 class="font-black text-slate-900 uppercase text-xs mb-2">Home Address</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed font-medium mb-6">
+                            {{ auth()->user()->name }}<br>
+                            Plot No. 12, Sector 44, Gurgaon<br>
+                            Haryana, 122003<br>
+                            Phone: {{ auth()->user()->phone ?? '+91 98765 43210' }}
+                        </p>
+                        <div class="flex items-center gap-4 pt-6 border-t border-slate-50">
+                            <button class="text-[9px] font-black text-slate-400 hover:text-orange-500 uppercase tracking-widest">Edit Address</button>
+                            <span class="h-3 w-px bg-slate-100"></span>
+                            <button class="text-[9px] font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest">Remove</button>
+                        </div>
+                    </div>
+
+                    <!-- Work Address Card -->
+                    <div class="border border-slate-100 bg-white p-8 rounded-[2rem] hover:border-slate-200 transition-all group">
+                        <div class="h-10 w-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all">
+                            <i data-lucide="briefcase" class="h-5 w-5"></i>
+                        </div>
+                        <h4 class="font-black text-slate-900 uppercase text-xs mb-2">Work Office</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed font-medium mb-6">
+                            Remenant Health HQ<br>
+                            Cyber Hub, DLF Phase 3<br>
+                            Gurgaon, Haryana, 122002
+                        </p>
+                        <div class="flex items-center gap-4 pt-6 border-t border-slate-50">
+                            <button class="text-[9px] font-black text-slate-400 hover:text-indigo-500 uppercase tracking-widest">Edit Address</button>
+                            <span class="h-3 w-px bg-slate-100"></span>
+                            <button class="text-[9px] font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest">Remove</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- SECTION: GIFTCARDS -->
-            <div id="section-giftcards" class="tab-section {{ $activeTab !== 'giftcards' ? 'hidden' : '' }} p-10 transition-all duration-300">
-                <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900 mb-8">Gift Cards</h3>
-                <div class="bg-orange-500 p-8 rounded-2xl text-white shadow-xl shadow-orange-100 flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Current Balance</p>
-                        <h4 class="text-4xl font-black mt-2">₹0.00</h4>
+            <div id="section-giftcards" class="tab-section {{ $activeTab !== 'giftcards' ? 'hidden' : '' }} p-6 md:p-10 transition-all duration-300">
+                <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900 mb-8">Gift Card Portfolio</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                    <!-- Balance Card -->
+                    <div class="lg:col-span-2 bg-slate-900 p-10 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-orange-500/20 to-transparent"></div>
+                        <div class="relative z-10 flex flex-col h-full justify-between">
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-2">Available Balance</p>
+                                <h4 class="text-5xl font-black tracking-tight">₹0.00</h4>
+                            </div>
+                            <div class="flex items-center gap-6 mt-12">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-2 w-2 rounded-full bg-emerald-500"></div>
+                                    <span class="text-[9px] font-black uppercase tracking-widest text-white/60">Active Wallet</span>
+                                </div>
+                                <button class="text-[9px] font-black uppercase tracking-widest text-orange-400 hover:text-orange-300 transition-all">Add Credits</button>
+                            </div>
+                        </div>
+                        <i data-lucide="gift" class="absolute -right-8 -bottom-8 h-48 w-48 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-700"></i>
                     </div>
-                    <i data-lucide="gift" class="h-16 w-16 opacity-20"></i>
+
+                    <!-- Redemption Form -->
+                    <div class="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100">
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <i data-lucide="ticket" class="h-4 w-4 text-orange-500"></i>
+                            Redeem Code
+                        </h4>
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <input type="text" placeholder="XXXX-XXXX-XXXX" class="w-full bg-white border border-slate-200 px-6 py-4 text-xs font-black outline-none rounded-xl focus:ring-2 focus:ring-orange-500/10 text-center tracking-[0.2em] uppercase">
+                            </div>
+                            <button class="w-full bg-slate-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all rounded-xl shadow-lg shadow-slate-100">Apply to Balance</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transaction Table -->
+                <div class="border border-slate-50 rounded-2xl overflow-hidden">
+                    <div class="bg-slate-50 px-8 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Transaction History</h4>
+                        <span class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">No recent activity</span>
+                    </div>
+                    <div class="p-12 text-center bg-white">
+                        <div class="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="refresh-ccw" class="h-6 w-6 text-slate-200"></i>
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Your transactions will appear here</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: SAVED UPI -->
+            <div id="section-payments" class="tab-section {{ $activeTab !== 'payments' ? 'hidden' : '' }} p-6 md:p-10 transition-all duration-300">
+                <div class="flex items-center justify-between mb-10">
+                    <div>
+                        <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900">Saved UPI Methods</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">One-click secure payments</p>
+                    </div>
+                    <button class="bg-indigo-600 text-white px-6 py-3 text-[9px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-100">
+                        <i data-lucide="plus" class="h-3 w-3"></i> Add New VPA
+                    </button>
+                </div>
+
+                <div class="space-y-4 max-w-2xl">
+                    <!-- UPI Item: Google Pay -->
+                    <div class="flex items-center gap-6 p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-indigo-100 transition-all group">
+                        <div class="h-14 w-14 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0">
+                            <i data-lucide="smartphone" class="h-6 w-6 text-indigo-500"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3">
+                                <h4 class="text-xs font-black text-slate-800 uppercase tracking-tight">Google Pay / GPay</h4>
+                                <span class="bg-emerald-50 text-emerald-600 text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest">Verified</span>
+                            </div>
+                            <p class="text-[11px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">prashant@okaxis</p>
+                        </div>
+                        <button class="text-slate-300 hover:text-rose-500 transition-colors">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- UPI Item: PhonePe -->
+                    <div class="flex items-center gap-6 p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-indigo-100 transition-all group">
+                        <div class="h-14 w-14 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0">
+                            <i data-lucide="zap" class="h-6 w-6 text-purple-500"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3">
+                                <h4 class="text-xs font-black text-slate-800 uppercase tracking-tight">PhonePe</h4>
+                                <span class="bg-emerald-50 text-emerald-600 text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest">Verified</span>
+                            </div>
+                            <p class="text-[11px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">9876543210@ybl</p>
+                        </div>
+                        <button class="text-slate-300 hover:text-rose-500 transition-colors">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Add New UI Suggestion -->
+                    <div class="p-12 border-2 border-dashed border-slate-100 rounded-[2.5rem] text-center flex flex-col items-center justify-center bg-slate-50/20 mt-8">
+                        <div class="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center mb-4">
+                            <i data-lucide="shield-check" class="h-6 w-6 text-slate-200"></i>
+                        </div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Secure UPI Storage</p>
+                        <p class="text-[9px] font-medium text-slate-300 uppercase tracking-[0.2em]">All payment methods are encrypted and 100% secure</p>
+                    </div>
                 </div>
             </div>
 

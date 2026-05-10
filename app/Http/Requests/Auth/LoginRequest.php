@@ -41,13 +41,29 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $user = \App\Models\User::where('email', $this->email)->first();
+        // Check for user including those who deactivated their accounts (soft-deleted)
+        $user = \App\Models\User::withTrashed()->where('email', $this->email)->first();
 
         if (!$user) {
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'email' => 'This email address is not registered with us. Please check for typos or create a new account.',
             ]);
+        }
+
+        // If the account is deactivated (soft-deleted), we check the password manually.
+        // If correct, we restore the account automatically as per the user's request.
+        if ($user->trashed()) {
+            if (\Illuminate\Support\Facades\Hash::check($this->password, $user->password)) {
+                $user->restore();
+                // Optional: Add a flash message to notify them they are back
+                session()->flash('status', 'Welcome back! Your account has been reactivated.');
+            } else {
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'password' => 'The password you entered is incorrect.',
+                ]);
+            }
         }
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
