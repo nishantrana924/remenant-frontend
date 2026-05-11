@@ -1,84 +1,98 @@
 @extends('admin.layouts.app')
 
-@section('header')
-    <div class="flex items-center justify-between w-full pr-4">
-        <div class="flex flex-col justify-center">
-            <h2 class="font-black text-xl text-slate-800 leading-none tracking-tight">Customer Intelligence</h2>
-            <div class="flex items-center gap-2 mt-1.5">
-                <span class="h-1 w-1 bg-indigo-500 rounded-full animate-pulse"></span>
-                <p class="text-[9px] text-slate-400 uppercase tracking-[0.2em] font-black">Managing {{ $items->count() }} Profiles</p>
+@section('content')
+<div class="space-y-8 pb-24" x-data="{ search: '' }">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight uppercase">Customer List</h1>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manage Users & Loyalty • Remenant Engine</p>
+        </div>
+    </div>
+
+    <!-- Customer Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="saas-card bg-orange-600 border-0 shadow-2xl shadow-orange-100">
+            <p class="text-[9px] font-bold text-orange-100 uppercase tracking-widest mb-3">Total Customers</p>
+            <div class="flex items-baseline justify-between">
+                <h3 class="text-3xl font-bold text-white tracking-tighter">{{ $items->count() }}</h3>
+                <i data-lucide="users" class="w-6 h-6 text-orange-400"></i>
+            </div>
+        </div>
+        <div class="saas-card">
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Active Now</p>
+            <div class="flex items-baseline justify-between">
+                <h3 class="text-3xl font-bold text-slate-900 tracking-tighter">{{ $items->whereNull('deleted_at')->count() }}</h3>
+                <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
+            </div>
+        </div>
+        <div class="saas-card">
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">New This Month</p>
+            <div class="flex items-baseline justify-between">
+                <h3 class="text-3xl font-bold text-slate-900 tracking-tighter">+{{ $items->where('created_at', '>=', now()->startOfMonth())->count() }}</h3>
+                <i data-lucide="trending-up" class="w-5 h-5 text-emerald-100"></i>
             </div>
         </div>
     </div>
-@endsection
 
-@section('content')
-<div class="space-y-6">
-    <!-- Customer List Table -->
-    <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+    <!-- Identity Core -->
+    <div class="saas-card p-0 overflow-hidden border border-slate-100 shadow-xl shadow-slate-200/40">
+        <div class="px-8 py-6 border-b border-slate-50 bg-slate-50/20 flex items-center justify-between">
+            <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Customer Directory</h3>
+            <div class="relative w-72">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
+                <input type="text" x-model="search" placeholder="Search customers..." class="saas-input pl-10 py-1.5 text-[10px] uppercase font-bold tracking-widest">
+            </div>
+        </div>
+        
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left">
                 <thead>
-                    <tr class="bg-slate-50/50">
-                        <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Customer Identity</th>
-                        <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Contact</th>
-                        <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Account Type</th>
-                        <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">LTV</th>
-                        <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Actions</th>
+                    <tr class="text-[8px] font-bold uppercase tracking-[0.25em] text-slate-400 bg-slate-50/50">
+                        <th class="px-8 py-4">Customer</th>
+                        <th class="px-8 py-4">Total Spent (LTV)</th>
+                        <th class="px-8 py-4">Orders</th>
+                        <th class="px-8 py-4">Status</th>
+                        <th class="px-8 py-4 text-right">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
-                    @forelse($items as $item)
-                        <tr class="hover:bg-slate-50/30 transition-colors group {{ $item->deleted_at ? 'bg-red-50/40' : '' }}">
-                            <td class="px-8 py-5">
-                                <div class="flex items-center gap-4">
-                                    <div class="h-12 w-12 rounded-[1.25rem] {{ $item->deleted_at ? 'bg-slate-100 text-slate-400' : ((int)$item->role_id === 1 ? 'bg-orange-50 text-orange-500' : 'bg-indigo-50 text-indigo-500') }} flex items-center justify-center font-black text-lg flex-shrink-0">
-                                        {{ strtoupper(substr($item->name, 0, 1)) }}
-                                    </div>
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <h4 class="font-black {{ $item->deleted_at ? 'text-slate-400 line-through' : 'text-slate-800' }} leading-tight">{{ $item->name }}</h4>
-                                            @if($item->deleted_at)
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 text-red-600 text-[9px] font-black uppercase tracking-widest">
-                                                    <i data-lucide="user-x" class="w-2.5 h-2.5"></i> Deactivated
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <p class="text-[10px] text-slate-400 mt-1 font-bold tracking-wide uppercase">ID: #{{ $item->id }} {{ $item->deleted_at ? '• Deleted ' . $item->deleted_at->diffForHumans() : '' }}</p>
-                                    </div>
+                    @foreach($items as $user)
+                    <tr x-show="!search || '{{ strtolower($user->name) }}'.includes(search.toLowerCase()) || '{{ strtolower($user->email) }}'.includes(search.toLowerCase())"
+                        class="hover:bg-slate-50/50 transition-all group">
+                        <td class="px-8 py-6">
+                            <div class="flex items-center gap-4">
+                                <div class="h-10 w-10 rounded-xl bg-orange-600 flex items-center justify-center text-white font-bold text-sm border-4 border-orange-100 shadow-sm">
+                                    {{ substr($user->name, 0, 1) }}
                                 </div>
-                            </td>
-                            <td class="px-8 py-5">
-                                <div class="flex flex-col">
-                                    <span class="text-xs font-bold text-slate-700">{{ $item->email }}</span>
-                                    <span class="text-[10px] text-slate-400">{{ $item->phone ?? 'No phone' }}</span>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-tight">{{ $user->name }}</h4>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{{ $user->email }}</p>
                                 </div>
-                            </td>
-                            <td class="px-8 py-5">
-                                <form action="{{ route('admin.customers.update-role', $item->id) }}" method="POST" class="inline">
-                                    @csrf
-                                    <select name="role" onchange="this.form.submit()" class="text-[10px] font-black uppercase tracking-widest border-0 bg-transparent focus:ring-0 cursor-pointer {{ (int)$item->role_id === 1 ? 'text-orange-600' : 'text-indigo-600' }}">
-                                        <option value="2" {{ (int)$item->role_id === 2 ? 'selected' : '' }}>Regular User</option>
-                                        <option value="1" {{ (int)$item->role_id === 1 ? 'selected' : '' }}>Administrator</option>
-                                    </select>
-                                </form>
-                            </td>
-                            <td class="px-8 py-5">
-                                <span class="text-sm font-black text-slate-800">₹{{ number_format($item->orders()->where('payment_status', 'paid')->sum('total_amount')) }}</span>
-                            </td>
-                            <td class="px-8 py-5 text-right flex items-center justify-end gap-3">
-                                <a href="{{ route('admin.customers.show', $item->id) }}" class="h-9 w-9 inline-flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all">
-                                    <i data-lucide="eye" class="h-4 w-4"></i>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6">
+                            <span class="text-[10px] font-bold text-slate-900 tracking-tighter">₹{{ number_format($user->orders->where('payment_status', 'paid')->sum('total_amount')) }}</span>
+                        </td>
+                        <td class="px-8 py-6">
+                            <span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">{{ $user->orders->count() }} Orders</span>
+                        </td>
+                        <td class="px-8 py-6">
+                            @if($user->deleted_at)
+                            <span class="px-2 py-0.5 rounded-full text-[8px] font-bold uppercase bg-rose-50 text-rose-500 border border-rose-100">Deactivated</span>
+                            @else
+                            <span class="px-2 py-0.5 rounded-full text-[8px] font-bold uppercase bg-emerald-50 text-emerald-500 border border-emerald-100">Verified</span>
+                            @endif
+                        </td>
+                        <td class="px-8 py-6 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('admin.customers.show', $user->id) }}" class="h-8 w-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-orange-500 hover:border-orange-200 transition-all shadow-sm">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                                 </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="px-8 py-20 text-center">
-                                <p class="text-slate-400 italic">No customers found</p>
-                            </td>
-                        </tr>
-                    @endforelse
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>

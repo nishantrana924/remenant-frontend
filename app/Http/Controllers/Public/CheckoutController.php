@@ -81,16 +81,32 @@ class CheckoutController extends Controller
 
         $subtotal = collect($items)->sum(fn($item) => $item['price'] * $item['quantity']);
         $shipping = $subtotal > 999 ? 0 : 99;
-        $total = $subtotal + $shipping;
+        
+        // Handle Coupon
+        $discount = 0;
+        if ($request->filled('coupon_code')) {
+            $coupon = \App\Models\Coupon::where('code', $request->coupon_code)->first();
+            if ($coupon) {
+                if ($coupon->type === 'percentage') {
+                    $discount = ($subtotal * $coupon->value) / 100;
+                } else {
+                    $discount = $coupon->value;
+                }
+                $discount = min($discount, $subtotal); // Don't exceed subtotal
+            }
+        }
+
+        $total = ($subtotal - $discount) + $shipping;
 
         $order = \App\Models\Order::create([
             'user_id' => auth()->id(),
             'order_number' => 'ORD-' . strtoupper(Str::random(10)),
             'total_amount' => $total,
             'shipping_charge' => $shipping,
+            'discount_amount' => $discount,
             'status' => 'pending',
             'payment_status' => 'unpaid',
-            'payment_method' => 'razorpay',
+            'payment_method' => $request->payment_method, // prepaid or cod
             'customer_name' => $request->first_name . ' ' . $request->last_name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -108,9 +124,15 @@ class CheckoutController extends Controller
             ]);
         }
 
-        // Clear cart if it was a normal checkout
+        // Clear cart
         if (!$request->has('buy_now_product_id')) {
             session()->forget('cart');
+        }
+
+        // If COD, go straight to success
+        if ($order->payment_method === 'cod') {
+            $order->update(['status' => 'processing']);
+            return redirect()->route('checkout.success', ['order' => $order->order_number])->with('success', 'Order placed successfully! (COD)');
         }
 
         return redirect()->route('checkout.payment', $order->order_number);
@@ -120,42 +142,54 @@ class CheckoutController extends Controller
     {
         $order = \App\Models\Order::where('order_number', $orderNumber)->firstOrFail();
 
-        // If order is already paid, redirect to success
         if ($order->payment_status === 'paid') {
             return redirect()->route('checkout.success', ['order' => $order->order_number]);
         }
 
-        /* 
-        // TEMPORARILY COMMENTED OUT FOR TESTING WITHOUT REAL KEYS
-        // Create Razorpay Order
-        $api = new Api(config('services.razorpay.key_id'), config('services.razorpay.key_secret'));
-        
-        $razorpayOrder = $api->order->create([
-            'receipt'         => $order->order_number,
-            'amount'          => $order->total_amount * 100, // Amount in paise
-            'currency'        => 'INR',
-            'payment_capture' => 1 // Auto capture
-        ]);
+        $razorpayKey = config('services.razorpay.key_id');
+        $razorpaySecret = config('services.razorpay.key_secret');
 
-        $order->update([
-            'razorpay_order_id' => $razorpayOrder['id']
-        ]);
+        // REAL MODE (Only if keys are present)
+        if ($razorpayKey && $razorpaySecret && !str_contains($razorpayKey, 'YOUR_')) {
+            try {
+                $api = new Api($razorpayKey, $razorpaySecret);
+                $razorpayOrder = $api->order->create([
+                    'receipt'         => $order->order_number,
+                    'amount'          => $order->total_amount * 100,
+                    'currency'        => 'INR',
+                    'payment_capture' => 1
+                ]);
 
+                $order->update(['razorpay_order_id' => $razorpayOrder['id']]);
+
+                return view('public.payment', [
+                    'order' => $order,
+                    'razorpay_order_id' => $razorpayOrder['id'],
+                    'razorpay_key' => $razorpayKey
+                ]);
+            } catch (\Exception $e) {
+                // If real API fails, fallback to sandbox/mock for user testing
+                \Illuminate\Support\Facades\Log::error('Razorpay Error: ' . $e->getMessage());
+            }
+        }
+
+        // SANDBOX / MOCK MODE
         return view('public.payment', [
             'order' => $order,
-            'razorpay_order_id' => $razorpayOrder['id'],
-            'razorpay_key' => config('services.razorpay.key_id')
+            'is_sandbox' => true
         ]);
-        */
+    }
 
-        // MOCK PAYMENT FOR TESTING
+    public function mockPayment(Request $request, $orderNumber)
+    {
+        $order = \App\Models\Order::where('order_number', $orderNumber)->firstOrFail();
         $order->update([
             'payment_status' => 'paid',
             'razorpay_payment_id' => 'pay_mock_' . Str::random(14),
             'status' => 'processing'
         ]);
 
-        return redirect()->route('checkout.success', ['order' => $order->order_number])->with('success', 'Payment Successful (Mock Mode)!');
+        return redirect()->route('checkout.success', ['order' => $order->order_number])->with('success', 'Payment Successful (Sandbox Mode)!');
     }
 
     public function verifyPayment(Request $request)

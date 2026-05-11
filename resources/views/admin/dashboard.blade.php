@@ -1,196 +1,186 @@
 @extends('admin.layouts.app')
 
 @section('header')
-    <h2 class="font-black text-xl text-slate-900 leading-tight">Intelligence Hub</h2>
+    <h2 class="font-bold text-xl text-slate-900 leading-tight">Control Center</h2>
 @endsection
 
 @section('content')
 <div class="space-y-8 pb-12">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
+    <!-- Systematic Welcome Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900">Intelligence Overview</h1>
-            <p class="text-sm text-slate-500 mt-1">Real-time performance metrics and business health</p>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight uppercase">Overview</h1>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="h-1.5 w-1.5 rounded-full bg-orange-500"></span>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Business Health • Real-time Sync</p>
+            </div>
         </div>
         <div class="flex items-center gap-3">
-            <div class="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100">
-                <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-600">Remenant Engine Active</span>
+            <div class="hidden sm:flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-slate-100 shadow-sm">
+                <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-[9px] font-bold uppercase tracking-widest text-slate-600">System Live</span>
             </div>
-            <button class="saas-btn-primary">
-                <i data-lucide="download" class="w-4 h-4"></i>
-                Export Insights
+            <button class="saas-btn-secondary py-2.5">
+                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                Timeline
+            </button>
+            <button class="saas-btn-primary py-2.5 px-6">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                Create New
             </button>
         </div>
     </div>
 
-    <!-- KPI Grid -->
+    <!-- Metric Pulse Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Revenue -->
-        <div class="saas-card group hover:border-orange-200 transition-all hover:shadow-2xl hover:shadow-orange-100/50">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600 group-hover:bg-orange-500 group-hover:text-white transition-all duration-500 shadow-sm">
-                    <i data-lucide="banknote" class="w-6 h-6"></i>
-                </div>
-                <div class="text-right">
-                    <span class="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">+12.5%</span>
+        <!-- Revenue pulse -->
+        <div class="saas-card group relative overflow-hidden bg-orange-600 border-0 shadow-2xl shadow-orange-100">
+            <div class="absolute -right-4 -top-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
+                <i data-lucide="banknote" class="w-24 h-24 text-white"></i>
+            </div>
+            <div class="relative z-10">
+                <p class="text-[9px] font-bold text-orange-100 uppercase tracking-[0.2em] mb-4">Total Revenue</p>
+                <div class="flex items-baseline gap-2">
+                    <h3 class="text-3xl font-bold text-white tracking-tighter">₹{{ number_format($stats['total_revenue'] ?? 452800) }}</h3>
+                    <span class="text-[9px] font-bold text-white/80">+12%</span>
                 </div>
             </div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Gross Revenue</p>
-            <h3 class="text-3xl font-black text-slate-900 mt-1">₹{{ number_format($stats['total_revenue'] ?? 452800) }}</h3>
         </div>
 
-        <!-- Orders -->
-        <div class="saas-card group hover:border-blue-200 transition-all hover:shadow-2xl hover:shadow-blue-100/50">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500 shadow-sm">
-                    <i data-lucide="shopping-cart" class="w-6 h-6"></i>
-                </div>
-                <div class="text-right">
-                    <span class="text-[10px] font-black text-blue-500 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">Orders</span>
+        <div class="saas-card group hover:border-orange-500 transition-all duration-300">
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">Total Orders</p>
+            <div class="flex items-baseline justify-between">
+                <h3 class="text-3xl font-bold text-slate-900 tracking-tighter">{{ number_format($stats['total_orders'] ?? 1254) }}</h3>
+                <div class="h-10 w-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-all">
+                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
                 </div>
             </div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Transactions</p>
-            <h3 class="text-3xl font-black text-slate-900 mt-1">{{ number_format($stats['total_orders'] ?? 1254) }}</h3>
         </div>
 
-        <!-- Products -->
-        <div class="saas-card group hover:border-indigo-200 transition-all hover:shadow-2xl hover:shadow-indigo-100/50">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-500 shadow-sm">
-                    <i data-lucide="package" class="w-6 h-6"></i>
-                </div>
-                <div class="text-right">
-                    <span class="text-[10px] font-black text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">Active</span>
+        <div class="saas-card group hover:border-blue-500 transition-all duration-300">
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">Products</p>
+            <div class="flex items-baseline justify-between">
+                <h3 class="text-3xl font-bold text-slate-900 tracking-tighter">{{ $stats['total_products'] ?? 42 }}</h3>
+                <div class="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                    <i data-lucide="layers" class="w-5 h-5"></i>
                 </div>
             </div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Products</p>
-            <h3 class="text-3xl font-black text-slate-900 mt-1">{{ $stats['total_products'] ?? 42 }}</h3>
         </div>
 
-        <!-- Inventory Alerts -->
-        <div class="saas-card group hover:border-rose-200 transition-all hover:shadow-2xl hover:shadow-rose-100/50">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-all duration-500 shadow-sm">
-                    <i data-lucide="shield-alert" class="w-6 h-6"></i>
-                </div>
-                <div class="text-right">
-                    <span class="text-[10px] font-black text-rose-500 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-100">Low Stock</span>
+        <div class="saas-card group hover:border-rose-500 transition-all duration-300">
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">Low Stock</p>
+            <div class="flex items-baseline justify-between">
+                <h3 class="text-3xl font-bold text-slate-900 tracking-tighter">{{ $stats['low_stock'] ?? 12 }}</h3>
+                <div class="h-10 w-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all">
+                    <i data-lucide="shield-alert" class="w-5 h-5"></i>
                 </div>
             </div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Warehouse Alerts</p>
-            <h3 class="text-3xl font-black text-slate-900 mt-1">{{ $stats['low_stock'] ?? 12 }}</h3>
         </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Revenue Growth -->
-        <div class="lg:col-span-2 saas-card p-8">
+    <!-- Core Intelligence Matrix -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Visual Data Flow -->
+        <div class="lg:col-span-8 saas-card p-8">
             <div class="flex items-center justify-between mb-10">
                 <div>
-                    <h3 class="text-base font-black text-slate-900 uppercase tracking-widest">Revenue Growth</h3>
-                    <p class="text-xs text-slate-400 mt-1 font-medium">Monthly performance analysis</p>
+                    <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Revenue Stats</h3>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Monthly performance analysis</p>
                 </div>
                 <div class="flex items-center gap-6">
                     <div class="flex items-center gap-2">
                         <span class="w-3 h-3 rounded-full bg-orange-500 shadow-lg shadow-orange-200"></span>
-                        <span class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Current Year</span>
-                    </div>
-                    <div class="flex items-center gap-2 opacity-30">
-                        <span class="w-3 h-3 rounded-full bg-slate-300"></span>
-                        <span class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Target</span>
+                        <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest">Actual</span>
                     </div>
                 </div>
             </div>
-            <div class="h-[250px] sm:h-[350px] relative">
+            <div class="h-[300px] sm:h-[400px] relative">
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
 
-        <!-- Recent Activity Feed -->
-        <div class="saas-card">
-            <div class="flex items-center justify-between mb-8">
-                <h3 class="text-base font-black text-slate-900 uppercase tracking-widest">Recent Activity</h3>
-                <i data-lucide="history" class="w-4 h-4 text-slate-300"></i>
+        <!-- High-Velocity Feed -->
+        <div class="lg:col-span-4 saas-card flex flex-col">
+            <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-50">
+                <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Recent Orders</h3>
+                <span class="h-6 w-6 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
+                    <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                </span>
             </div>
-            <div class="space-y-6">
+            <div class="flex-1 space-y-6">
                 @foreach($recent_orders ?? [] as $order)
-                <div class="flex items-start gap-4 p-3 rounded-2xl hover:bg-slate-50 transition-all cursor-pointer group">
-                    <div class="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-orange-500 transition-colors">
-                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                <div class="flex items-start gap-4 p-3 rounded-2xl hover:bg-slate-50 transition-all cursor-pointer group border border-transparent hover:border-slate-100">
+                    <div class="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all">
+                        <i data-lucide="package" class="w-5 h-5"></i>
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
-                            <p class="text-sm font-bold text-slate-900">#{{ $order->order_number }}</p>
+                            <p class="text-xs font-bold text-slate-900 uppercase">#{{ $order->order_number }}</p>
                             @php
                                 $statusColors = [
-                                    'paid' => 'text-emerald-500',
-                                    'unpaid' => 'text-rose-500',
-                                    'pending' => 'text-orange-500',
-                                    'awaiting_payment' => 'text-blue-500'
+                                    'paid' => 'bg-emerald-50 text-emerald-600',
+                                    'unpaid' => 'bg-rose-50 text-rose-600',
+                                    'pending' => 'bg-orange-50 text-orange-600',
                                 ];
-                                $color = $statusColors[$order->payment_status] ?? 'text-slate-400';
+                                $color = $statusColors[$order->payment_status] ?? 'bg-slate-50 text-slate-400';
                             @endphp
-                            <span class="text-[9px] font-black {{ $color }} uppercase">{{ str_replace('_', ' ', $order->payment_status) }}</span>
+                            <span class="text-[8px] font-black {{ $color }} px-2 py-0.5 rounded-full uppercase">{{ $order->payment_status }}</span>
                         </div>
-                        <p class="text-xs text-slate-400 truncate mt-0.5">{{ $order->customer_name ?? ($order->user->name ?? 'Guest Customer') }}</p>
-                        <p class="text-[9px] text-slate-300 font-bold mt-1 tracking-wider">{{ $order->created_at->diffForHumans() }}</p>
+                        <p class="text-[10px] font-bold text-slate-400 truncate mt-0.5 uppercase tracking-tighter">{{ $order->customer_name }}</p>
+                        <p class="text-[8px] text-slate-300 font-black mt-1 uppercase">{{ $order->created_at->diffForHumans() }}</p>
                     </div>
                 </div>
                 @endforeach
                 
                 @if(count($recent_orders ?? []) == 0)
-                <div class="text-center py-16">
-                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="package-search" class="w-8 h-8 text-slate-200"></i>
+                <div class="text-center py-20">
+                    <div class="w-16 h-16 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                        <i data-lucide="loader-2" class="w-8 h-8 text-slate-200 animate-spin"></i>
                     </div>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">No Recent Orders</p>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Awaiting Transactions</p>
                 </div>
                 @endif
             </div>
-            <a href="{{ route('admin.orders.index') }}" class="block w-full mt-8 py-4 bg-slate-50 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center hover:bg-orange-500 hover:text-white transition-all shadow-sm">Audit All Records</a>
+            <a href="{{ route('admin.orders.index') }}" class="mt-8 py-3 bg-slate-50 rounded-xl text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em] text-center hover:bg-orange-600 hover:text-white transition-all">View All Orders</a>
         </div>
     </div>
 
-    <!-- Quick Operations -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="saas-card overflow-hidden">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-base font-black text-slate-900 uppercase tracking-widest">Recent Users</h3>
-                <a href="{{ route('admin.customers.index') }}" class="text-[10px] font-black text-orange-500 uppercase tracking-widest hover:underline">View All</a>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="saas-table">
-                    <thead>
-                        <tr>
-                            <th>Customer</th>
-                            <th>Identity</th>
-                            <th class="text-right">Onboarded</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($recent_users ?? [] as $user)
-                        <tr>
-                            <td>
-                                <div class="flex items-center gap-3">
-                                    <div class="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-black text-xs">
-                                        {{ substr($user->name, 0, 1) }}
-                                    </div>
-                                    <span class="font-bold text-slate-900 text-sm">{{ $user->name }}</span>
+    <!-- Detailed Ledger Section -->
+    <div class="saas-card overflow-hidden bg-white border border-slate-100 shadow-xl shadow-slate-200/40">
+        <div class="p-6 border-b border-slate-50 flex items-center justify-between">
+            <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Recent Customers</h3>
+            <a href="{{ route('admin.customers.index') }}" class="text-[9px] font-bold text-orange-500 uppercase tracking-[0.2em] hover:brightness-110">View All</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="text-[8px] font-bold uppercase tracking-[0.25em] text-slate-400 bg-slate-50/50">
+                        <th class="px-6 py-4">Customer</th>
+                        <th class="px-6 py-4">Email</th>
+                        <th class="px-6 py-4 text-right">Joined</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    @foreach($recent_users ?? [] as $user)
+                    <tr class="hover:bg-slate-50/50 transition-all cursor-default">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="h-8 w-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 font-bold text-[10px] border border-orange-100">
+                                    {{ substr($user->name, 0, 1) }}
                                 </div>
-                            </td>
-                            <td>
-                                <span class="text-xs text-slate-400">{{ $user->email }}</span>
-                            </td>
-                            <td class="text-right">
-                                <span class="text-[10px] font-black text-slate-400 uppercase">{{ $user->created_at->format('d M, Y') }}</span>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                                <span class="font-bold text-slate-900 text-xs uppercase tracking-tight">{{ $user->name }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ $user->email }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{{ $user->created_at->format('d M • Y') }}</span>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

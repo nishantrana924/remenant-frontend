@@ -4,6 +4,9 @@
 <div class="space-y-8" x-data="{ 
     selectedItems: [],
     allItems: @js($items->pluck('id')),
+    search: '',
+    typeFilter: 'all',
+    stockFilter: 'all',
     
     toggleAll() {
         if (this.selectedItems.length === this.allItems.length) {
@@ -51,12 +54,18 @@
         <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
             <div class="relative w-72">
                 <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                <input type="text" placeholder="Search products..." class="saas-input pl-10">
+                <input type="text" x-model="search" placeholder="Search products..." class="saas-input pl-10">
             </div>
             <div class="flex items-center gap-3">
-                <button class="saas-btn-secondary px-3 py-2 flex items-center gap-2 text-xs">
-                    <i data-lucide="filter" class="w-4 h-4"></i> Filter
-                </button>
+                <div class="flex bg-white rounded-lg p-1 border border-slate-100 shadow-sm">
+                    <button @click="typeFilter = 'all'" :class="typeFilter === 'all' ? 'bg-orange-600 text-white' : 'text-slate-400'" class="px-3 py-1 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all">All Types</button>
+                    <button @click="typeFilter = 'single'" :class="typeFilter === 'single' ? 'bg-orange-600 text-white' : 'text-slate-400'" class="px-3 py-1 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all">Single</button>
+                    <button @click="typeFilter = 'combo'" :class="typeFilter === 'combo' ? 'bg-orange-600 text-white' : 'text-slate-400'" class="px-3 py-1 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all">Combo</button>
+                </div>
+                <div class="flex bg-white rounded-lg p-1 border border-slate-100 shadow-sm">
+                    <button @click="stockFilter = 'all'" :class="stockFilter === 'all' ? 'bg-orange-600 text-white' : 'text-slate-400'" class="px-3 py-1 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all">All Stock</button>
+                    <button @click="stockFilter = 'low'" :class="stockFilter === 'low' ? 'bg-orange-600 text-white' : 'text-slate-400'" class="px-3 py-1 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all">Low Stock</button>
+                </div>
             </div>
         </div>
         
@@ -76,7 +85,8 @@
                 </thead>
                 <tbody>
                     @foreach($items as $item)
-                    <tr :class="selectedItems.includes({{ $item->id }}) ? 'bg-orange-50/50' : ''">
+                    <tr x-show="(!search || '{{ strtolower($item->title) }}'.includes(search.toLowerCase()) || '{{ strtolower($item->sku) }}'.includes(search.toLowerCase())) && (typeFilter === 'all' || '{{ $item->product_type ?? 'single' }}' === typeFilter || (typeFilter === 'single' && '{{ $item->product_type }}' === 'both')) && (stockFilter === 'all' || (stockFilter === 'low' && {{ $item->stock }} < 10))"
+                        :class="selectedItems.includes({{ $item->id }}) ? 'bg-orange-50/50' : ''">
                         <td>
                             <input type="checkbox" x-model="selectedItems" value="{{ $item->id }}" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
                         </td>
@@ -86,8 +96,8 @@
                                     <img src="{{ \App\Helpers\ImageHelper::getUrl($item->image) }}" class="h-full w-full object-contain" onerror="this.src='https://ui-avatars.com/api/?name=P&background=F97316&color=fff'">
                                 </div>
                                 <div>
-                                    <h4 class="font-semibold text-slate-900 text-sm">{{ $item->title }}</h4>
-                                    <p class="text-xs text-slate-400 mt-0.5">SKU: {{ $item->sku ?? 'NOT_SET' }}</p>
+                                    <h4 class="font-bold text-slate-900 text-sm uppercase tracking-tight">{{ $item->title }}</h4>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">SKU: {{ $item->sku ?? 'NOT_SET' }}</p>
                                 </div>
                             </div>
                         </td>

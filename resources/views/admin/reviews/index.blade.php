@@ -4,6 +4,8 @@
 <div class="space-y-8" x-data="{ 
     selectedItems: [],
     allItems: @js($items->pluck('id')),
+    search: '',
+    activeStatus: '{{ request('status', 'all') }}',
     
     toggleAll() {
         if (this.selectedItems.length === this.allItems.length) {
@@ -79,8 +81,8 @@
             <div class="flex items-center gap-4">
                 <div class="h-12 w-12 rounded-2xl bg-white/20 flex items-center justify-center"><i data-lucide="star" class="w-6 h-6"></i></div>
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-orange-200">Total Reviews</p>
-                    <p class="text-2xl font-black">{{ \App\Models\Review::count() }}</p>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-orange-200">Total Reviews</p>
+                    <p class="text-2xl font-bold">{{ \App\Models\Review::count() }}</p>
                 </div>
             </div>
         </div>
@@ -88,8 +90,8 @@
             <div class="flex items-center gap-4">
                 <div class="h-12 w-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500"><i data-lucide="clock" class="w-6 h-6"></i></div>
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pending Approval</p>
-                    <p class="text-2xl font-black text-slate-900">{{ \App\Models\Review::where('status', 'pending')->count() }}</p>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Pending Approval</p>
+                    <p class="text-2xl font-bold text-slate-900">{{ \App\Models\Review::where('status', 'pending')->count() }}</p>
                 </div>
             </div>
         </div>
@@ -97,8 +99,8 @@
             <div class="flex items-center gap-4">
                 <div class="h-12 w-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500"><i data-lucide="award" class="w-6 h-6"></i></div>
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Featured Reviews</p>
-                    <p class="text-2xl font-black text-slate-900">{{ \App\Models\Review::where('is_featured', true)->count() }}</p>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Featured Reviews</p>
+                    <p class="text-2xl font-bold text-slate-900">{{ \App\Models\Review::where('is_featured', true)->count() }}</p>
                 </div>
             </div>
         </div>
@@ -107,12 +109,16 @@
     <!-- Table Section -->
     <div class="saas-card p-0 overflow-hidden">
         <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <div class="flex items-center gap-4">
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Filters:</span>
-                <div class="flex gap-2">
-                    <a href="?status=pending" class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border {{ request('status') === 'pending' ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50' }}">Pending</a>
-                    <a href="?status=approved" class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border {{ request('status') === 'approved' ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50' }}">Approved</a>
-                    <a href="{{ route('admin.reviews.index') }}" class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border {{ !request('status') ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50' }}">All</a>
+            <div class="flex items-center gap-6">
+                <div class="relative w-64">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
+                    <input type="text" x-model="search" placeholder="Search reviews..." class="saas-input pl-10 py-1.5 text-[10px] uppercase font-bold tracking-widest">
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Filter:</span>
+                    <button @click="activeStatus = 'pending'" :class="activeStatus === 'pending' ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'" class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter border">Pending</button>
+                    <button @click="activeStatus = 'approved'" :class="activeStatus === 'approved' ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'" class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter border">Approved</button>
+                    <button @click="activeStatus = 'all'" :class="activeStatus === 'all' ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'" class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter border">All</button>
                 </div>
             </div>
         </div>
@@ -133,13 +139,14 @@
                 </thead>
                 <tbody>
                     @foreach($items as $item)
-                    <tr :class="selectedItems.includes({{ $item->id }}) ? 'bg-orange-50/50' : ''">
+                    <tr x-show="(!search || '{{ strtolower($item->user->name ?? '') }}'.includes(search.toLowerCase()) || '{{ strtolower($item->product->title ?? '') }}'.includes(search.toLowerCase())) && (activeStatus === 'all' || '{{ $item->status }}' === activeStatus)"
+                        :class="selectedItems.includes({{ $item->id }}) ? 'bg-orange-50/50' : ''">
                         <td>
                             <input type="checkbox" x-model="selectedItems" value="{{ $item->id }}" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
                         </td>
                         <td>
                             <div class="flex items-center gap-4">
-                                <div class="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center text-white text-[10px] font-black uppercase">
+                                <div class="h-10 w-10 rounded-full bg-orange-600 flex items-center justify-center text-white text-[10px] font-bold uppercase">
                                     {{ substr($item->user->name ?? 'G', 0, 1) }}
                                 </div>
                                 <div>
@@ -154,7 +161,7 @@
                                     <i data-lucide="star" class="w-3 h-3 {{ $i <= $item->rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200' }}"></i>
                                 @endfor
                             </div>
-                            <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed italic">"{{ $item->comment }}"</p>
+                            <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">"{{ $item->comment }}"</p>
                             @if($item->images && count($item->images) > 0)
                                 <div class="flex gap-1 mt-2">
                                     @foreach($item->images as $img)
@@ -167,11 +174,11 @@
                         </td>
                         <td>
                             @if($item->status === 'pending')
-                                <span class="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-full text-[9px] font-black uppercase tracking-wider animate-pulse">Pending</span>
+                                <span class="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-full text-[9px] font-bold uppercase tracking-wider animate-pulse">Pending</span>
                             @elseif($item->status === 'approved')
-                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-full text-[9px] font-black uppercase tracking-wider">Approved</span>
+                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-full text-[9px] font-bold uppercase tracking-wider">Approved</span>
                             @else
-                                <span class="px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-full text-[9px] font-black uppercase tracking-wider">Rejected</span>
+                                <span class="px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-full text-[9px] font-bold uppercase tracking-wider">Rejected</span>
                             @endif
                         </td>
                         <td>
@@ -182,9 +189,9 @@
                         <td class="text-right">
                             <div class="flex justify-end gap-2">
                                 @if($item->status !== 'approved')
-                                    <button @click="updateStatus({{ $item->id }}, 'approved')" class="h-8 px-3 bg-emerald-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 shadow-sm transition-all">Approve</button>
+                                    <button @click="updateStatus({{ $item->id }}, 'approved')" class="h-8 px-3 bg-emerald-500 text-white rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-600 shadow-sm transition-all">Approve</button>
                                 @else
-                                    <button @click="updateStatus({{ $item->id }}, 'rejected')" class="h-8 px-3 bg-slate-900 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 shadow-sm transition-all">Reject</button>
+                                    <button @click="updateStatus({{ $item->id }}, 'rejected')" class="h-8 px-3 bg-orange-600 text-white rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-orange-700 shadow-sm transition-all">Reject</button>
                                 @endif
                                 <button onclick="window.confirmAction('Delete Review?', 'This action cannot be undone.', () => window.fastSubmit('{{ route('admin.reviews.destroy', $item->id) }}', { method: 'DELETE', success: (res) => { window.toast(res.message); setTimeout(() => location.reload(), 500); } }))" class="h-8 w-8 rounded-lg border border-slate-100 text-rose-500 flex items-center justify-center hover:bg-rose-50 transition-all">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>

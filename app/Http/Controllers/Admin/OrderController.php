@@ -24,7 +24,7 @@ class OrderController extends BaseController
 
     public function show($id)
     {
-        $item = $this->service->getById($id);
+        $item = \App\Models\Order::with(['user', 'orderItems.product', 'timelines.user'])->findOrFail($id);
         return view('admin.orders.show', compact('item'));
     }
 
@@ -62,13 +62,16 @@ class OrderController extends BaseController
      */
     public function updateStatus(Request $request, $id)
     {
-        $data = $request->only(['status', 'delivery_status', 'tracking_id', 'courier_name', 'payment_status']);
-        $this->service->update($id, $data);
+        $data = $request->only(['status', 'delivery_status', 'tracking_id', 'courier_name', 'payment_status', 'message']);
+        $order = \App\Models\Order::findOrFail($id);
+        $order->update(collect($data)->except('message')->toArray());
+        
+        $order->logStatus($data['message'] ?? null);
 
         return response()->json([
             'success' => true,
             'message' => 'Order updated successfully',
-            'order' => $this->service->getById($id)
+            'order' => $order->load(['user', 'orderItems.product', 'timelines'])
         ]);
     }
 
@@ -102,5 +105,46 @@ class OrderController extends BaseController
             'success' => true,
             'message' => count($ids) . ' orders deleted successfully.'
         ]);
+    }
+
+    public function shipToShiprocket($id, \App\Services\ShiprocketService $shiprocket)
+    {
+        $order = \App\Models\Order::with('orderItems.product')->findOrFail($id);
+        
+        $response = $shiprocket->createOrder($order);
+
+        if (isset($response['shipment_id'])) {
+            $order->update([
+                'tracking_id' => $response['shipment_id'],
+                'courier_name' => $response['courier_name'] ?? 'Shiprocket',
+                'delivery_status' => 'packed',
+                'tracking_url' => $response['tracking_url'] ?? null
+            ]);
+
+            $order->logStatus("Pushed to Shiprocket. Shipment ID: " . $response['shipment_id']);
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'Order pushed to Shiprocket! Shipment ID: ' . $response['shipment_id']
+            ]);
+        }
+
+        return response()->json([
+            'success' => false, 
+            'message' => 'Failed to push to Shiprocket. Check logs.',
+            'error' => $response
+        ], 500);
+    }
+
+    public function generateInvoice($id)
+    {
+        $order = \App\Models\Order::with(['user', 'orderItems.product'])->findOrFail($id);
+        return view('admin.orders.invoice', compact('order'));
+    }
+
+    public function generatePackingSlip($id)
+    {
+        $order = \App\Models\Order::with(['user', 'orderItems.product'])->findOrFail($id);
+        return view('admin.orders.packing-slip', compact('order'));
     }
 }

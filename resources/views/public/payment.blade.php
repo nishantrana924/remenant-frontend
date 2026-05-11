@@ -30,73 +30,121 @@
 
             <!-- Simulation Steps -->
             <div x-data="{ step: 'options', processing: false }" class="space-y-8">
-                <!-- Payment Options -->
-                <div x-show="step === 'options'" class="space-y-4">
-                    <button @click="processing = true; setTimeout(() => { step = 'processing' }, 1000)" class="w-full group flex items-center justify-between p-6 rounded-2xl bg-slate-50 border-2 border-transparent hover:border-orange-500 hover:bg-orange-50 transition-all duration-300">
-                        <div class="flex items-center gap-4">
-                            <div class="h-12 w-12 rounded-xl bg-white flex items-center justify-center text-slate-400 group-hover:text-orange-500 transition-colors shadow-sm">
-                                <i data-lucide="smartphone" class="h-6 w-6"></i>
-                            </div>
-                            <div class="text-left">
-                                <span class="block text-sm font-black text-slate-900 uppercase">UPI / QR</span>
-                                <span class="block text-[10px] font-bold text-slate-400 uppercase">PhonePe, Google Pay, Paytm</span>
-                            </div>
+                @if(isset($is_sandbox))
+                    <!-- SANDBOX / MOCK MODE UI -->
+                    <div x-show="step === 'options'" class="space-y-4">
+                        <div class="p-4 bg-orange-50 rounded-2xl border border-orange-100 mb-6">
+                            <p class="text-[10px] font-black text-orange-600 uppercase tracking-widest flex items-center gap-2">
+                                <i data-lucide="info" class="h-3 w-3"></i>
+                                Sandbox Mode Active
+                            </p>
+                            <p class="text-[9px] font-bold text-orange-500 mt-1 uppercase">Click any method to simulate a successful payment for testing.</p>
                         </div>
-                        <i data-lucide="chevron-right" class="h-5 w-5 text-slate-300 group-hover:text-orange-500 transition-all"></i>
-                    </button>
 
-                    <button @click="processing = true; setTimeout(() => { step = 'processing' }, 1000)" class="w-full group flex items-center justify-between p-6 rounded-2xl bg-slate-50 border-2 border-transparent hover:border-orange-500 hover:bg-orange-50 transition-all duration-300">
-                        <div class="flex items-center gap-4">
-                            <div class="h-12 w-12 rounded-xl bg-white flex items-center justify-center text-slate-400 group-hover:text-orange-500 transition-colors shadow-sm">
-                                <i data-lucide="credit-card" class="h-6 w-6"></i>
+                        <button @click="step = 'processing'; setTimeout(() => { finalizeMockPayment() }, 2000)" class="w-full group flex items-center justify-between p-6 rounded-2xl bg-slate-50 border-2 border-transparent hover:border-orange-500 hover:bg-orange-50 transition-all duration-300">
+                            <div class="flex items-center gap-4">
+                                <div class="h-12 w-12 rounded-xl bg-white flex items-center justify-center text-slate-400 group-hover:text-orange-500 transition-colors shadow-sm">
+                                    <i data-lucide="smartphone" class="h-6 w-6"></i>
+                                </div>
+                                <div class="text-left">
+                                    <span class="block text-sm font-black text-slate-900 uppercase">UPI / QR (Sandbox)</span>
+                                    <span class="block text-[10px] font-bold text-slate-400 uppercase">PhonePe, Google Pay, Paytm</span>
+                                </div>
                             </div>
-                            <div class="text-left">
-                                <span class="block text-sm font-black text-slate-900 uppercase">Credit / Debit Card</span>
-                                <span class="block text-[10px] font-bold text-slate-400 uppercase">Visa, Mastercard, RuPay</span>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="h-5 w-5 text-slate-300 group-hover:text-orange-500 transition-all"></i>
-                    </button>
+                            <i data-lucide="chevron-right" class="h-5 w-5 text-slate-300 group-hover:text-orange-500 transition-all"></i>
+                        </button>
 
-                    <button @click="processing = true; setTimeout(() => { step = 'processing' }, 1000)" class="w-full group flex items-center justify-between p-6 rounded-2xl bg-slate-50 border-2 border-transparent hover:border-orange-500 hover:bg-orange-50 transition-all duration-300">
-                        <div class="flex items-center gap-4">
-                            <div class="h-12 w-12 rounded-xl bg-white flex items-center justify-center text-slate-400 group-hover:text-orange-500 transition-colors shadow-sm">
-                                <i data-lucide="building-2" class="h-6 w-6"></i>
+                        <button @click="step = 'processing'; setTimeout(() => { finalizeMockPayment() }, 2000)" class="w-full group flex items-center justify-between p-6 rounded-2xl bg-slate-50 border-2 border-transparent hover:border-orange-500 hover:bg-orange-50 transition-all duration-300">
+                            <div class="flex items-center gap-4">
+                                <div class="h-12 w-12 rounded-xl bg-white flex items-center justify-center text-slate-400 group-hover:text-orange-500 transition-colors shadow-sm">
+                                    <i data-lucide="credit-card" class="h-6 w-6"></i>
+                                </div>
+                                <div class="text-left">
+                                    <span class="block text-sm font-black text-slate-900 uppercase">Cards (Sandbox)</span>
+                                    <span class="block text-[10px] font-bold text-slate-400 uppercase">Visa, Mastercard, RuPay</span>
+                                </div>
                             </div>
-                            <div class="text-left">
-                                <span class="block text-sm font-black text-slate-900 uppercase">Net Banking</span>
-                                <span class="block text-[10px] font-bold text-slate-400 uppercase">All Indian Banks</span>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="h-5 w-5 text-slate-300 group-hover:text-orange-500 transition-all"></i>
-                    </button>
-                </div>
+                            <i data-lucide="chevron-right" class="h-5 w-5 text-slate-300 group-hover:text-orange-500 transition-all"></i>
+                        </button>
+                    </div>
+
+                    <form id="mock-payment-form" action="{{ route('checkout.payment.mock', $order->order_number) }}" method="POST" class="hidden">
+                        @csrf
+                    </form>
+
+                    <script>
+                        function finalizeMockPayment() {
+                            document.getElementById('mock-payment-form').submit();
+                        }
+                    </script>
+                @else
+                    <!-- REAL RAZORPAY MODE -->
+                    <div x-show="step === 'options'" class="text-center py-8">
+                        <button id="rzp-button1" class="w-full py-5 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-[0.2em] text-sm shadow-2xl hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-3">
+                            <i data-lucide="shield-check" class="h-5 w-5 text-emerald-500"></i>
+                            Pay via Razorpay
+                        </button>
+                    </div>
+
+                    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                    <script>
+                        var options = {
+                            "key": "{{ $razorpay_key }}",
+                            "amount": "{{ $order->total_amount * 100 }}",
+                            "currency": "INR",
+                            "name": "Remenant Health",
+                            "description": "Payment for Order #{{ $order->order_number }}",
+                            "image": "{{ asset('images/logo/remenant-health-logo.png') }}",
+                            "order_id": "{{ $razorpay_order_id }}",
+                            "handler": function (response){
+                                var form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = "{{ route('checkout.payment.verify') }}";
+                                
+                                var inputs = {
+                                    '_token': "{{ csrf_token() }}",
+                                    'razorpay_payment_id': response.razorpay_payment_id,
+                                    'razorpay_order_id': response.razorpay_order_id,
+                                    'razorpay_signature': response.razorpay_signature,
+                                    'order_number': "{{ $order->order_number }}"
+                                };
+
+                                for (var key in inputs) {
+                                    var input = document.createElement('input');
+                                    input.type = 'hidden';
+                                    input.name = key;
+                                    input.value = inputs[key];
+                                    form.appendChild(input);
+                                }
+
+                                document.body.appendChild(form);
+                                form.submit();
+                            },
+                            "prefill": {
+                                "name": "{{ $order->customer_name }}",
+                                "email": "{{ $order->email }}",
+                                "contact": "{{ $order->phone }}"
+                            },
+                            "theme": { "color": "#FF6B00" }
+                        };
+                        var rzp1 = new Razorpay(options);
+                        document.getElementById('rzp-button1').onclick = function(e){
+                            rzp1.open();
+                            e.preventDefault();
+                        }
+                    </script>
+                @endif
 
                 <!-- Processing Simulation -->
-                <div x-show="step === 'processing'" class="text-center py-10" x-init="$watch('step', value => { if(value === 'processing') { setTimeout(() => { step = 'success' }, 3000) } })">
+                <div x-show="step === 'processing'" class="text-center py-10">
                     <div class="relative inline-block mb-8">
                         <div class="h-24 w-24 rounded-[2.5rem] border-4 border-orange-100 animate-[spin_3s_linear_infinite]"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
                             <i data-lucide="lock" class="h-8 w-8 text-orange-500 animate-pulse"></i>
                         </div>
                     </div>
-                    <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight">Verifying with Bank...</h3>
-                    <p class="text-sm font-bold text-slate-400 mt-2">Please do not refresh the page or press back button.</p>
-                </div>
-
-                <!-- Success State -->
-                <div x-show="step === 'success'" class="text-center py-6 animate-[modalSlideUp_0.5s_ease-out]">
-                    <div class="h-20 w-20 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-emerald-200">
-                        <i data-lucide="check" class="h-10 w-10"></i>
-                    </div>
-                    <h3 class="text-3xl font-black text-slate-900 uppercase tracking-tighter italic">Payment Successful!</h3>
-                    <p class="text-slate-400 font-bold mt-2 uppercase tracking-widest text-xs">Your order has been confirmed.</p>
-                    
-                    <div class="mt-12">
-                        <a href="{{ route('checkout.success', ['order' => $order->order_number]) }}" class="inline-flex items-center justify-center px-12 py-4 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-[0.2em] text-xs shadow-2xl hover:brightness-110 active:scale-95 transition-all">
-                            View Order Details
-                        </a>
-                    </div>
+                    <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight">Securing Connection...</h3>
+                    <p class="text-sm font-bold text-slate-400 mt-2">Processing your transaction securely.</p>
                 </div>
             </div>
         </div>
@@ -111,9 +159,9 @@
 </div>
 
 <style>
-    @keyframes modalSlideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
 </style>
 @endsection

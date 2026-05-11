@@ -1,246 +1,379 @@
 @extends('admin.layouts.app')
 
-@section('header')
-    <div class="flex items-center justify-between w-full pr-4">
-        <div class="flex items-center gap-8">
-            <a href="{{ route('admin.orders.index') }}" class="flex items-center gap-2.5 text-slate-400 hover:text-orange-500 transition-all font-bold text-sm group">
-                <div class="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-orange-50 transition-colors">
-                    <i data-lucide="arrow-left" class="h-4 w-4"></i>
-                </div>
-                Back
+@section('content')
+<div class="pb-24" x-data="{ 
+    showStatusModal: false,
+    newStatus: '{{ $item->status }}',
+    statusMsg: '',
+    showShippingModal: false,
+    shippingData: { id: {{ $item->id }}, tracking_id: '{{ $item->tracking_id }}', courier_name: '{{ $item->courier_name ?? "BlueDart" }}' },
+    
+    updateStatus() {
+        fastSubmit('{{ route('admin.orders.update-status', $item->id) }}', {
+            data: { status: this.newStatus, message: this.statusMsg },
+            success: (res) => {
+                toast(res.message);
+                setTimeout(() => location.reload(), 1000);
+            }
+        });
+    },
+
+    openShipping() {
+        this.showShippingModal = true;
+    },
+
+    saveShipping() {
+        fastSubmit(`/admin/orders/${this.shippingData.id}/status`, {
+            data: { 
+                delivery_status: 'shipped', 
+                status: 'shipped',
+                tracking_id: this.shippingData.tracking_id, 
+                courier_name: this.shippingData.courier_name 
+            },
+            success: (res) => {
+                toast(res.message);
+                setTimeout(() => location.reload(), 1000);
+            }
+        });
+        this.showShippingModal = false;
+    }
+}">
+    <!-- Top Header & Navigation -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+        <div class="flex items-center gap-4">
+            <a href="{{ route('admin.orders.index') }}" class="h-10 w-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-orange-500 transition-all shadow-sm">
+                <i data-lucide="chevron-left" class="w-5 h-5"></i>
             </a>
-            <div class="h-10 w-px bg-slate-100 hidden md:block"></div>
-            <div class="flex flex-col justify-center">
-                <h2 class="font-black text-xl text-slate-800 leading-none tracking-tight">Order #{{ $item->order_number ?? $item->id }}</h2>
-                <div class="flex items-center gap-2 mt-1.5">
-                    <span class="h-1 w-1 bg-{{ $item->status_color }}-500 rounded-full animate-pulse"></span>
-                    <p class="text-[9px] text-slate-400 uppercase tracking-[0.2em] font-black">System Status: {{ $item->status }}</p>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-bold text-slate-900 tracking-tight uppercase">#{{ $item->order_number ?? $item->id }}</h1>
+                    <span class="px-3 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest bg-{{ $item->status_color }}-50 text-{{ $item->status_color }}-600 border border-{{ $item->status_color }}-100">
+                        {{ str_replace('_', ' ', $item->status) }}
+                    </span>
                 </div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Order Placed: {{ $item->created_at->format('d M Y • h:i A') }}</p>
             </div>
         </div>
-        
-        <div class="flex items-center gap-4">
-            <button onclick="window.print()" class="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-orange-500 transition-all shadow-sm border border-slate-100">
-                <i data-lucide="printer" class="h-5 w-5"></i>
-            </button>
-            <form action="{{ route('admin.orders.update', $item->id) }}" method="POST" class="flex items-center gap-3">
-                @csrf @method('PUT')
-                <div class="flex items-center bg-slate-100 rounded-2xl p-1 gap-1">
-                    <select name="status" class="bg-transparent border-0 text-[10px] font-black uppercase tracking-widest text-slate-600 focus:ring-0 cursor-pointer">
-                        <option value="pending" {{ $item->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="processing" {{ $item->status == 'processing' ? 'selected' : '' }}>Processing</option>
-                        <option value="completed" {{ $item->status == 'completed' ? 'selected' : '' }}>Completed</option>
-                        <option value="cancelled" {{ $item->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                    </select>
-                </div>
-                <button type="submit" class="bg-slate-800 text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all">
-                    Sync Status
-                </button>
-            </form>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.orders.packing-slip', $item->id) }}" target="_blank" class="saas-btn-secondary py-2.5">
+                <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                Packing Slip
+            </a>
+            <a href="{{ route('admin.orders.invoice', $item->id) }}" target="_blank" class="saas-btn-primary py-2.5 px-6 shadow-xl shadow-orange-200">
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                Tax Invoice
+            </a>
         </div>
     </div>
-@endsection
 
-@section('content')
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
-    <!-- Left Column: Items & Timeline -->
-    <div class="lg:col-span-2 space-y-8">
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <!-- Order Items -->
-        <div class="premium-card p-0 overflow-hidden bg-white shadow-sm border border-slate-100">
-            <div class="px-8 py-5 border-b border-slate-50 bg-slate-50/30">
-                <h3 class="font-black text-slate-800 uppercase tracking-widest text-xs flex items-center gap-2">
-                    <i data-lucide="shopping-bag" class="h-4 w-4 text-orange-500"></i>
-                    Fulfillment Line Items
-                </h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="text-[9px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-50">
-                            <th class="px-8 py-4">Product Details</th>
-                            <th class="px-8 py-4 text-center">Price</th>
-                            <th class="px-8 py-4 text-center">Qty</th>
-                            <th class="px-8 py-4 text-right">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-50">
-                        @foreach($item->orderItems as $oi)
-                        <tr class="group hover:bg-slate-50/50 transition-colors">
-                            <td class="px-8 py-4">
-                                <div class="flex items-center gap-4">
-                                    <div class="h-12 w-12 rounded-xl bg-slate-50 border border-slate-100 p-1 flex-shrink-0">
-                                        <img src="{{ asset('images/products/' . ($oi->product->image ?? '')) }}" class="h-full w-full object-contain" onerror="this.src='https://ui-avatars.com/api/?name=P&background=ea5f06&color=fff'">
-                                    </div>
-                                    <div>
-                                        <h4 class="text-xs font-black text-slate-800">{{ $oi->product->title ?? 'Deleted Product' }}</h4>
-                                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{{ $oi->variant_name ?? 'Standard' }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-8 py-4 text-center text-xs font-black text-slate-600">₹{{ number_format($oi->price) }}</td>
-                            <td class="px-8 py-4 text-center">
-                                <span class="px-2 py-1 bg-slate-100 rounded-lg text-[10px] font-black text-slate-500 uppercase">x{{ $oi->quantity }}</span>
-                            </td>
-                            <td class="px-8 py-4 text-right text-xs font-black text-slate-800">₹{{ number_format($oi->price * $oi->quantity) }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            <div class="p-8 bg-slate-50/50 flex flex-col items-end space-y-3">
-                <div class="flex justify-between w-64 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    <span>Subtotal</span>
-                    <span class="text-slate-800">₹{{ number_format($item->total_amount - $item->shipping_charge + $item->discount_amount) }}</span>
-                </div>
-                <div class="flex justify-between w-64 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    <span>Shipping Charge</span>
-                    <span class="text-emerald-500">+₹{{ number_format($item->shipping_charge) }}</span>
-                </div>
-                @if($item->discount_amount > 0)
-                <div class="flex justify-between w-64 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    <span>Discount</span>
-                    <span class="text-rose-500">-₹{{ number_format($item->discount_amount) }}</span>
-                </div>
-                @endif
-                <div class="h-px w-64 bg-slate-200 my-2"></div>
-                <div class="flex justify-between w-64">
-                    <span class="text-xs font-black text-slate-800 uppercase tracking-widest">Grand Total</span>
-                    <span class="text-2xl font-black text-orange-500">₹{{ number_format($item->total_amount) }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Shipment Tracking & Timeline -->
-        <div class="premium-card p-0 overflow-hidden bg-white shadow-sm border border-slate-100">
-            <div class="px-8 py-5 border-b border-slate-50 bg-slate-50/30 flex items-center justify-between">
-                <h3 class="font-black text-slate-800 uppercase tracking-widest text-xs flex items-center gap-2">
-                    <i data-lucide="truck" class="h-4 w-4 text-blue-500"></i>
-                    Logistics & Delivery Timeline
-                </h3>
-                <span class="text-[9px] font-black text-blue-600 uppercase bg-blue-50 px-2 py-1 rounded-lg">{{ $item->delivery_status }}</span>
-            </div>
-            <div class="p-8">
-                <!-- Status Stepper -->
-                <div class="relative flex items-center justify-between mb-12">
-                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-slate-100 z-0"></div>
-                    <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-blue-500 z-0 transition-all duration-1000" 
-                         style="width: {{ match($item->delivery_status) { 'pending' => '0%', 'packed' => '33%', 'shipped' => '66%', 'delivered' => '100%', 'returned' => '0%', default => '0%' } }}"></div>
+        <!-- Left: Order Details & Products -->
+        <div class="lg:col-span-2 space-y-8">
+            
+            <!-- Progression Pulse -->
+            <div class="saas-card p-8 overflow-hidden relative">
+                <div class="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
+                <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em] mb-8">Order Status</h3>
+                
+                <div class="relative flex items-center justify-between">
+                    @php
+                        $steps = ['pending', 'processing', 'packed', 'shipped', 'delivered'];
+                        $currentIdx = array_search($item->status, $steps);
+                        if($currentIdx === false) $currentIdx = 0;
+                    @endphp
                     
-                    @foreach(['pending', 'packed', 'shipped', 'delivered'] as $step)
-                    <div class="relative z-10 flex flex-col items-center">
-                        <div class="h-10 w-10 rounded-full flex items-center justify-center shadow-lg transition-all {{ $item->delivery_status == $step || (isset($past_steps) && in_array($step, $past_steps)) ? 'bg-blue-500 text-white scale-110' : 'bg-white text-slate-300 border-2 border-slate-100' }}">
-                            <i data-lucide="{{ match($step) { 'pending' => 'clock', 'packed' => 'package', 'shipped' => 'send', 'delivered' => 'check-circle' } }}" class="h-5 w-5"></i>
+                    <!-- Line -->
+                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-slate-50 rounded-full">
+                        <div class="h-full bg-orange-500 transition-all duration-1000" style="width: {{ ($currentIdx / (count($steps)-1)) * 100 }}%"></div>
+                    </div>
+                    
+                    @foreach($steps as $index => $step)
+                    <div class="relative z-10 flex flex-col items-center gap-3">
+                        <div class="h-10 w-10 rounded-full flex items-center justify-center border-4 transition-all duration-500
+                            {{ $index <= $currentIdx ? 'bg-orange-500 border-orange-100 text-white' : 'bg-white border-slate-50 text-slate-200' }}">
+                            <i data-lucide="{{ $index <= $currentIdx ? 'check' : 'circle' }}" class="w-4 h-4"></i>
                         </div>
-                        <span class="absolute -bottom-6 text-[8px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{{ $step }}</span>
+                        <span class="text-[8px] font-bold uppercase tracking-widest {{ $index <= $currentIdx ? 'text-slate-900' : 'text-slate-300' }}">
+                            {{ $step }}
+                        </span>
                     </div>
                     @endforeach
                 </div>
+            </div>
 
-                <!-- Logistics Form -->
-                <form action="{{ route('admin.orders.update', $item->id) }}" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-slate-50">
-                    @csrf @method('PUT')
+            <!-- Items Deck -->
+            <div class="saas-card p-0 overflow-hidden">
+                <div class="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+                    <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Product Details</h3>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ count($item->orderItems) }} Items</span>
+                </div>
+                <div class="divide-y divide-slate-50">
+                    @foreach($item->orderItems as $product)
+                    <div class="px-8 py-6 flex items-center gap-6 hover:bg-slate-50/50 transition-all">
+                        <div class="h-20 w-16 rounded-xl bg-slate-100 overflow-hidden border border-slate-200 group-hover:scale-105 transition-transform">
+                            <img src="{{ $product->product->image_url }}" class="h-full w-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-900 text-sm uppercase tracking-tight">{{ $product->product->name }}</h4>
+                            <div class="flex items-center gap-3 mt-1.5">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-white border border-slate-100 px-2 py-0.5 rounded-lg">SKU: {{ $product->sku ?? $product->product->sku }}</span>
+                                @if($product->variant_size)
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Size: {{ $product->variant_size }}</span>
+                                @endif
+                                @if($product->variant_color)
+                                <div class="flex items-center gap-1">
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Color:</span>
+                                    <div class="h-2 w-2 rounded-full border border-slate-200" style="background: {{ $product->variant_color }}"></div>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">₹{{ number_format($product->price) }} × {{ $product->quantity }}</p>
+                            <h5 class="text-lg font-bold text-slate-900 tracking-tighter">₹{{ number_format($product->price * $product->quantity) }}</h5>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                
+                <!-- Financials Footer -->
+                <div class="bg-orange-600 p-8 grid grid-cols-2 md:grid-cols-4 gap-8">
                     <div>
-                        <label class="block text-[8px] font-black uppercase text-slate-400 mb-2">Delivery Status</label>
-                        <select name="delivery_status" class="w-full premium-input px-4 py-3 text-xs font-black uppercase tracking-widest">
-                            <option value="pending" {{ $item->delivery_status == 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="packed" {{ $item->delivery_status == 'packed' ? 'selected' : '' }}>Packed</option>
-                            <option value="shipped" {{ $item->delivery_status == 'shipped' ? 'selected' : '' }}>Shipped</option>
-                            <option value="delivered" {{ $item->delivery_status == 'delivered' ? 'selected' : '' }}>Delivered</option>
-                            <option value="returned" {{ $item->delivery_status == 'returned' ? 'selected' : '' }}>Returned</option>
-                        </select>
+                        <p class="text-[9px] font-bold text-orange-100 uppercase tracking-[0.2em] mb-1">Subtotal</p>
+                        <p class="text-xl font-bold text-white tracking-tighter">₹{{ number_format($item->total_amount - $item->shipping_charge + $item->discount_amount) }}</p>
                     </div>
                     <div>
-                        <label class="block text-[8px] font-black uppercase text-slate-400 mb-2">Courier Name</label>
-                        <input type="text" name="courier_name" value="{{ $item->courier_name }}" class="w-full premium-input px-4 py-3 text-xs font-bold" placeholder="e.g. BlueDart, Delhivery">
+                        <p class="text-[9px] font-bold text-orange-100 uppercase tracking-[0.2em] mb-1">Shipping</p>
+                        <p class="text-xl font-bold text-white tracking-tighter">₹{{ number_format($item->shipping_charge) }}</p>
                     </div>
                     <div>
-                        <label class="block text-[8px] font-black uppercase text-slate-400 mb-2">Tracking ID</label>
+                        <p class="text-[9px] font-bold text-orange-100 uppercase tracking-[0.2em] mb-1">Discount</p>
+                        <p class="text-xl font-bold text-white tracking-tighter">-₹{{ number_format($item->discount_amount) }}</p>
+                    </div>
+                    <div class="text-right md:text-left">
+                        <p class="text-[9px] font-bold text-white uppercase tracking-[0.2em] mb-1">Total Amount</p>
+                        <p class="text-3xl font-bold text-white tracking-tighter">₹{{ number_format($item->total_amount) }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping & Logistics Control -->
+            <div class="saas-card p-8">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Shipping Info</h3>
+                    <i data-lucide="truck" class="w-4 h-4 text-slate-300"></i>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Courier Partner</p>
+                            <p class="text-sm font-bold text-slate-900 uppercase tracking-tight">{{ $item->courier_name ?? 'Not Assigned' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tracking ID</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-lg font-bold text-slate-900 tracking-tighter uppercase">{{ $item->tracking_id ?? '---' }}</p>
+                                @if($item->tracking_id)
+                                <button class="text-orange-500 hover:scale-110 transition-transform"><i data-lucide="external-link" class="w-4 h-4"></i></button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col justify-center gap-3">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">Ready for fulfillment?</p>
                         <div class="flex gap-2">
-                            <input type="text" name="tracking_id" value="{{ $item->tracking_id }}" class="flex-1 premium-input px-4 py-3 text-xs font-bold font-mono" placeholder="AWB12345678">
-                            <button type="submit" class="bg-blue-500 text-white px-4 rounded-xl hover:bg-blue-600 transition-all">
-                                <i data-lucide="save" class="h-4 w-4"></i>
+                            <button @click="openShipping()" class="flex-1 saas-btn-secondary py-3 text-[9px] font-bold uppercase tracking-widest">
+                                <i data-lucide="user-cog" class="w-3.5 h-3.5 mr-1"></i>
+                                Manual
+                            </button>
+                            <button @click="fastSubmit('{{ route('admin.orders.ship-to-shiprocket', $item->id) }}', { method: 'POST', success: (res) => { toast(res.message); setTimeout(()=>location.reload(), 1000); } })" 
+                                    class="flex-1 bg-orange-600 text-white rounded-xl py-3 text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-orange-700 transition-all">
+                                <i data-lucide="rocket" class="w-3.5 h-3.5"></i>
+                                Shiprocket
                             </button>
                         </div>
                     </div>
-                </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Customer & Timeline -->
+        <div class="space-y-8">
+            
+            <!-- Customer Identity -->
+            <div class="saas-card p-0 overflow-hidden">
+                <div class="p-6 border-b border-slate-50 bg-slate-50/50">
+                    <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Customer Registry</h3>
+                </div>
+                <div class="p-6 space-y-6">
+                    <div class="flex items-center gap-4">
+                        <div class="h-12 w-12 rounded-xl bg-orange-600 flex items-center justify-center text-white font-bold text-lg">
+                            {{ substr($item->customer_name ?? $item->user->name, 0, 1) }}
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm uppercase tracking-tight">{{ $item->customer_name }}</h4>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ $item->email }}</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 pt-4 border-t border-slate-50">
+                        <div>
+                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Primary Mobile</p>
+                            <p class="text-xs font-bold text-slate-900">{{ $item->phone }}</p>
+                        </div>
+                        @if($item->alternate_phone)
+                        <div>
+                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Alternate Mobile</p>
+                            <p class="text-xs font-bold text-slate-900">{{ $item->alternate_phone }}</p>
+                        </div>
+                        @endif
+                        <div>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Full Address</p>
+                            <p class="text-xs font-bold text-slate-600 leading-relaxed uppercase">
+                                {{ $item->address }}<br>
+                                @if($item->landmark) Landmark: {{ $item->landmark }}<br> @endif
+                                {{ $item->city }}, {{ $item->state }} - {{ $item->pincode }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Details -->
+            <div class="saas-card p-6 bg-white border border-slate-100 shadow-sm">
+                <h3 class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.25em] mb-4">Payment Details</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Method</span>
+                        <span class="text-[10px] font-bold text-slate-900 uppercase tracking-widest">{{ $item->payment_method }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</span>
+                        <span class="text-[10px] font-bold {{ $item->payment_status === 'paid' ? 'text-emerald-500' : 'text-orange-500' }} uppercase tracking-widest">{{ $item->payment_status }}</span>
+                    </div>
+                    @if($item->payment_transaction_id)
+                    <div class="pt-4 border-t border-slate-50">
+                        <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Transaction ID</p>
+                        <p class="text-[10px] font-bold text-slate-600 tracking-tighter">{{ $item->payment_transaction_id }}</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Order Timeline -->
+            <div class="saas-card p-0 overflow-hidden">
+                <div class="p-6 border-b border-slate-50 flex items-center justify-between">
+                    <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Order History</h3>
+                    <button @click="showStatusModal = true" class="text-[9px] font-bold text-orange-500 uppercase tracking-widest hover:underline">+ Update</button>
+                </div>
+                <div class="p-8 relative">
+                    <!-- Line -->
+                    <div class="absolute left-[2.25rem] top-8 bottom-8 w-px bg-slate-100"></div>
+                    
+                    <div class="space-y-8 relative">
+                        @foreach($item->timelines as $log)
+                        <div class="flex items-start gap-4">
+                            <div class="h-6 w-6 rounded-full bg-white border-2 border-slate-100 flex items-center justify-center z-10">
+                                <div class="h-2 w-2 rounded-full {{ $loop->first ? 'bg-orange-500 animate-pulse' : 'bg-slate-300' }}"></div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-[10px] font-bold text-slate-900 uppercase tracking-widest">{{ $log->status }}</p>
+                                    <span class="text-[8px] font-bold text-slate-300 uppercase">{{ $log->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500 mt-1 leading-relaxed">{{ $log->message }}</p>
+                                @if($log->user)
+                                <p class="text-[8px] font-black text-slate-400 mt-1 uppercase tracking-tighter">By: {{ $log->user->name }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="h-6 w-6 rounded-full bg-white border-2 border-slate-100 flex items-center justify-center z-10">
+                                <div class="h-2 w-2 rounded-full bg-slate-300"></div>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-[10px] font-bold text-slate-900 uppercase tracking-widest">Order Placed</p>
+                                <p class="text-[10px] text-slate-500 mt-1">Transaction initialized by customer.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Right Column: Sidebar Insights -->
-    <div class="space-y-8">
-        <!-- Customer Intelligence -->
-        <div class="premium-card p-8 bg-white border border-slate-100 shadow-sm">
-            <h3 class="font-black text-slate-800 uppercase tracking-widest text-[10px] mb-8">Customer Intelligence</h3>
-            <div class="flex flex-col items-center text-center pb-8 border-b border-slate-50 mb-8">
-                <div class="h-24 w-24 rounded-[2.5rem] bg-indigo-50 flex items-center justify-center text-indigo-500 font-black text-4xl mb-6 shadow-inner">
-                    {{ strtoupper(substr($item->customer_name ?? $item->user->name ?? 'G', 0, 1)) }}
+    <!-- Status Update Modal -->
+    <template x-if="showStatusModal">
+        <div class="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showStatusModal = false"></div>
+            <div class="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 overflow-hidden">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-xl font-bold text-slate-900 uppercase tracking-tight">Update Status</h3>
+                    <button @click="showStatusModal = false" class="text-slate-400 hover:text-rose-500"><i data-lucide="x" class="w-6 h-6"></i></button>
                 </div>
-                <h4 class="text-lg font-black text-slate-800 leading-none">{{ $item->customer_name ?? $item->user->name ?? 'Guest Customer' }}</h4>
-                <p class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-tighter">{{ $item->email }}</p>
+                
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">New Status</label>
+                        <select x-model="newStatus" class="saas-input uppercase text-[10px] font-bold tracking-widest">
+                            <option value="pending">Pending</option>
+                            <option value="processing">Confirmed / Processing</option>
+                            <option value="packed">Packed</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="out_for_delivery">Out for Delivery</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="returned">Returned</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Audit Note (Internal)</label>
+                        <textarea x-model="statusMsg" placeholder="Describe the reason for change..." class="saas-input min-h-[100px] text-xs"></textarea>
+                    </div>
+                    <button @click="updateStatus()" class="saas-btn-primary w-full py-4 text-sm font-bold uppercase tracking-widest mt-4">
+                        Update Status
+                    </button>
+                </div>
             </div>
-            
-            <div class="space-y-4">
-                <div class="flex justify-between p-4 bg-slate-50 rounded-2xl">
-                    <span class="text-[9px] font-black text-slate-400 uppercase">Total Spent</span>
-                    <span class="text-sm font-black text-slate-800">₹{{ number_format($item->user ? $item->user->orders()->where('payment_status', 'paid')->sum('total_amount') : $item->total_amount) }}</span>
-                </div>
-                <div class="flex justify-between p-4 bg-slate-50 rounded-2xl">
-                    <span class="text-[9px] font-black text-slate-400 uppercase">Lifetime Orders</span>
-                    <span class="text-sm font-black text-slate-800">{{ $item->user ? $item->user->orders()->count() : 1 }}</span>
-                </div>
-            </div>
-            
-            <button class="w-full mt-8 py-4 rounded-2xl border-2 border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-500 hover:border-indigo-500 transition-all">View Full Profile</button>
         </div>
+    </template>
 
-        <!-- Contact & Shipping -->
-        <div class="premium-card p-8 bg-white border border-slate-100 shadow-sm">
-            <h3 class="font-black text-slate-800 uppercase tracking-widest text-[10px] mb-6">Fulfillment Destination</h3>
-            <div class="space-y-6">
-                <div class="flex items-start gap-4">
-                    <div class="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
-                        <i data-lucide="map-pin" class="h-5 w-5"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-black text-slate-800">Shipping Address</p>
-                        <p class="text-xs text-slate-500 leading-relaxed mt-1">
-                            {{ $item->address }}<br>
-                            {{ $item->city }}, {{ $item->state }} - {{ $item->pincode }}
-                        </p>
-                    </div>
+    <!-- Manual Shipping Modal -->
+    <template x-if="showShippingModal">
+        <div class="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showShippingModal = false"></div>
+            <div class="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 overflow-hidden">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-xl font-bold text-slate-900 uppercase tracking-tight">Shipment Details</h3>
+                    <button @click="showShippingModal = false" class="text-slate-400 hover:text-rose-500"><i data-lucide="x" class="w-6 h-6"></i></button>
                 </div>
-                <div class="flex items-start gap-4">
-                    <div class="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
-                        <i data-lucide="phone" class="h-5 w-5"></i>
+                
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Courier Partner</label>
+                        <select x-model="shippingData.courier_name" class="saas-input uppercase text-[10px] font-bold tracking-widest">
+                            <option value="BlueDart">BlueDart</option>
+                            <option value="Delhivery">Delhivery</option>
+                            <option value="DTDC">DTDC</option>
+                            <option value="FedEx">FedEx</option>
+                            <option value="XpressBees">XpressBees</option>
+                            <option value="Other">Other / Local</option>
+                        </select>
                     </div>
-                    <div>
-                        <p class="text-xs font-black text-slate-800">Contact Number</p>
-                        <p class="text-xs text-slate-500 font-bold mt-1">{{ $item->phone }}</p>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Tracking ID / AWB Number</label>
+                        <input type="text" x-model="shippingData.tracking_id" placeholder="e.g. 1234567890" class="saas-input font-bold text-lg">
                     </div>
+                    <button @click="saveShipping()" class="saas-btn-primary w-full py-4 text-sm font-bold uppercase tracking-widest mt-4">
+                        Confirm & Dispatch
+                    </button>
                 </div>
             </div>
         </div>
-
-        <!-- Payment Intelligence -->
-        <div class="premium-card p-8 bg-slate-900 text-white border-0 shadow-2xl">
-            <h3 class="font-black uppercase tracking-widest text-[10px] mb-8 text-white/50">Payment Integrity</h3>
-            <div class="space-y-6">
-                <div class="flex items-center justify-between">
-                    <span class="text-[9px] font-black uppercase tracking-widest text-white/30">Payment Status</span>
-                    <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-emerald-500/20 text-emerald-400">{{ $item->payment_status }}</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-[9px] font-black uppercase tracking-widest text-white/30">Payment Method</span>
-                    <span class="text-xs font-black uppercase tracking-widest">{{ $item->payment_method ?? 'Prepaid / Razorpay' }}</span>
-                </div>
-                <div class="pt-6 border-t border-white/5">
-                    <p class="text-[8px] font-black uppercase tracking-[0.2em] text-white/20 mb-2">Transaction Fingerprint</p>
-                    <p class="text-[10px] font-mono text-white/60 truncate">{{ $item->transaction_id ?? 'TXN_MODULAR_'.Str::random(12) }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    </template>
 </div>
 @endsection

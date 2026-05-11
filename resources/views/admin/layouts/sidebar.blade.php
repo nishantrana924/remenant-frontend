@@ -18,27 +18,37 @@
         <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
             <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active-nav-item' : '' }}">
                 <i data-lucide="layout-grid" class="w-4 h-4 mr-3"></i>
-                <span class="sidebar-text">Intelligence</span>
+                <span class="sidebar-text">Dashboard</span>
             </a>
 
             <a href="{{ route('admin.products.index') }}" class="nav-item {{ request()->routeIs('admin.products.*') ? 'active-nav-item' : '' }}">
                 <i data-lucide="package" class="w-4 h-4 mr-3"></i>
-                <span class="sidebar-text">Product</span>
+                <span class="sidebar-text">Products</span>
             </a>
 
             <a href="{{ route('admin.inventory.index') }}" class="nav-item {{ request()->routeIs('admin.inventory.*') ? 'active-nav-item' : '' }}">
                 <i data-lucide="box" class="w-4 h-4 mr-3"></i>
-                <span class="sidebar-text">Stock Logistics</span>
+                <span class="sidebar-text">Inventory</span>
             </a>
 
             <a href="{{ route('admin.orders.index') }}" class="nav-item {{ request()->routeIs('admin.orders.*') ? 'active-nav-item' : '' }}">
                 <i data-lucide="shopping-cart" class="w-4 h-4 mr-3"></i>
-                <span class="sidebar-text">Order Flow</span>
+                <span class="sidebar-text">Orders</span>
+            </a>
+
+            <a href="{{ route('admin.shipping.index') }}" class="nav-item {{ request()->routeIs('admin.shipping.*') ? 'active-nav-item' : '' }}">
+                <i data-lucide="truck" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Shipping</span>
+            </a>
+
+            <a href="{{ route('admin.refunds.index') }}" class="nav-item {{ request()->routeIs('admin.refunds.*') ? 'active-nav-item' : '' }}">
+                <i data-lucide="rotate-ccw" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Refunds</span>
             </a>
 
             <a href="{{ route('admin.reviews.index') }}" class="nav-item {{ request()->routeIs('admin.reviews.*') ? 'active-nav-item' : '' }}">
                 <i data-lucide="message-square" class="w-4 h-4 mr-3"></i>
-                <span class="sidebar-text">Customer Voices</span>
+                <span class="sidebar-text">Reviews</span>
             </a>
 
             <a href="{{ route('admin.customers.index') }}" class="nav-item {{ request()->routeIs('admin.customers.*') ? 'active-nav-item' : '' }}">
@@ -47,12 +57,12 @@
             </a>
 
             <div class="pt-4 pb-2">
-                <p class="sidebar-text px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Growth</p>
+                <p class="sidebar-text px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Marketing</p>
             </div>
 
             <a href="{{ route('admin.coupons.index') }}" class="nav-item {{ request()->routeIs('admin.coupons.*') ? 'active-nav-item' : '' }}">
                 <i data-lucide="ticket" class="w-4 h-4 mr-3"></i>
-                <span class="sidebar-text">Campaigns</span>
+                <span class="sidebar-text">Coupons</span>
             </a>
 
             <div class="pt-4 pb-2">

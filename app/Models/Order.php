@@ -21,12 +21,28 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function timelines()
+    {
+        return $this->hasMany(OrderTimeline::class)->latest();
+    }
+
+    public function logStatus($message = null, $userId = null)
+    {
+        $this->timelines()->create([
+            'status' => $this->status,
+            'message' => $message ?? "Order status updated to " . ucfirst($this->status),
+            'user_id' => $userId ?? auth()->id(),
+        ]);
+    }
+
     public function getStatusColorAttribute()
     {
         return match($this->status) {
-            'completed' => 'emerald',
+            'completed', 'delivered' => 'emerald',
             'pending' => 'orange',
-            'cancelled' => 'rose',
+            'processing', 'packed' => 'indigo',
+            'shipped', 'out_for_delivery' => 'blue',
+            'cancelled', 'returned' => 'rose',
             default => 'slate',
         };
     }

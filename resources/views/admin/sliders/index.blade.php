@@ -14,10 +14,10 @@
             <div class="h-10 w-px bg-slate-100 hidden md:block"></div>
             
             <div class="flex flex-col justify-center">
-                <h2 class="font-black text-xl text-slate-800 leading-none tracking-tight">Slider Management</h2>
+                <h2 class="font-bold text-xl text-slate-800 leading-none tracking-tight uppercase">Slider Management</h2>
                 <div class="flex items-center gap-2 mt-1.5">
                     <span class="h-1 w-1 bg-orange-500 rounded-full animate-pulse"></span>
-                    <p class="text-[9px] text-slate-400 uppercase tracking-[0.2em] font-black">Control Center</p>
+                    <p class="text-[9px] text-slate-400 uppercase tracking-[0.2em] font-bold">Control Center</p>
                 </div>
             </div>
         </div>
@@ -33,52 +33,37 @@
 @endsection
 
 @section('content')
-    <div class="space-y-6">
+    <div class="space-y-6" x-data="{ search: '', statusFilter: 'all' }">
         <!-- Control Strip (Premium) -->
-        <form action="{{ route('admin.sliders.index') }}" method="GET" class="flex flex-col lg:flex-row items-center gap-4 bg-white/40 backdrop-blur-xl p-4 rounded-3xl shadow-xl shadow-slate-200/50">
+        <div class="flex flex-col lg:flex-row items-center gap-4 bg-white/40 backdrop-blur-xl p-4 rounded-3xl shadow-xl shadow-slate-200/50 border border-white/60">
             <!-- Search Group -->
-            <div class="flex-1 w-full" style="min-height: 52px;">
-                <div style="display: flex; align-items: center; background: white; border: 1px solid #e2e8f0; border-radius: 9999px; padding: 0 20px;">
-                    <i data-lucide="search" style="width: 16px; height: 16px; color: #94a3b8; flex-shrink: 0;"></i>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search banners..." 
-                           style="flex: 1; background: transparent !important; border: 0 !important; outline: none !important; box-shadow: none !important; padding: 12px 15px; font-size: 14px; font-weight: 500; color: #475569; appearance: none !important;">
-                    @if(request('search'))
-                        <a href="{{ route('admin.sliders.index') }}" style="color: #cbd5e1; text-decoration: none; margin-left: 10px;">
-                            <i data-lucide="x" style="width: 16px; height: 16px;"></i>
-                        </a>
-                    @endif
+            <div class="flex-1 w-full">
+                <div class="flex items-center bg-white border border-slate-200 rounded-full px-5 py-0.5">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                    <input type="text" x-model="search" placeholder="Search banners..." 
+                           class="flex-1 bg-transparent border-0 focus:ring-0 px-4 py-3 text-sm font-bold text-slate-600 uppercase tracking-widest placeholder:text-slate-300">
                 </div>
             </div>
 
             <!-- Filter Group (Segmented Controls) -->
             <div class="flex items-center gap-1.5 bg-slate-100/50 p-1.5 rounded-2xl border border-slate-100 w-full lg:w-auto">
-                <input type="hidden" name="status" value="{{ request('status', 'all') }}" id="status-filter-input">
-                
-                @php $currentStatus = request('status', 'all'); @endphp
-                <button type="button" onclick="setStatusFilter('all')" class="status-filter-btn flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all {{ $currentStatus == 'all' ? 'bg-white shadow-lg shadow-orange-500/10 text-orange-600 ring-1 ring-orange-100' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50' }}">
+                <button type="button" @click="statusFilter = 'all'" :class="statusFilter === 'all' ? 'bg-white shadow-lg shadow-orange-500/10 text-orange-600 ring-1 ring-orange-100' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'" class="flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
                     All
                 </button>
-                <button type="button" onclick="setStatusFilter('active')" class="status-filter-btn flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all {{ $currentStatus == 'active' ? 'bg-white shadow-lg shadow-emerald-500/10 text-emerald-600 ring-1 ring-emerald-100' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50' }}">
+                <button type="button" @click="statusFilter = 'active'" :class="statusFilter === 'active' ? 'bg-white shadow-lg shadow-emerald-500/10 text-emerald-600 ring-1 ring-emerald-100' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'" class="flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
                     Active
                 </button>
-                <button type="button" onclick="setStatusFilter('inactive')" class="status-filter-btn flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all {{ $currentStatus == 'inactive' ? 'bg-white shadow-lg shadow-slate-500/10 text-slate-600 ring-1 ring-slate-100' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50' }}">
+                <button type="button" @click="statusFilter = 'inactive'" :class="statusFilter === 'inactive' ? 'bg-white shadow-lg shadow-slate-500/10 text-slate-600 ring-1 ring-slate-100' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'" class="flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
                     Inactive
                 </button>
             </div>
-
-            <!-- Sort/Action Group -->
-            <div class="flex items-center gap-3 w-full lg:w-auto">
-                <button type="submit" class="w-full lg:w-64 bg-orange-500 text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-orange-600 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-xl shadow-orange-500/30">
-                    <i data-lucide="filter" class="h-4 w-4"></i>
-                    Apply Filter
-                </button>
-            </div>
-        </form>
+        </div>
 
         <!-- Compact Card Grid (5 columns on XL) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             @forelse($items ?? [] as $item)
-                <div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div x-show="(!search || '{{ strtolower($item->alt_text) }}'.includes(search.toLowerCase())) && (statusFilter === 'all' || (statusFilter === 'active' && {{ $item->status ? 'true' : 'false' }}) || (statusFilter === 'inactive' && {{ $item->status ? 'false' : 'true' }}))"
+                     class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <!-- Compact Thumbnail -->
                     <div class="relative aspect-video bg-slate-50 rounded-t-2xl overflow-hidden">
                         <img src="{{ \App\Helpers\ImageHelper::getUrl($item->image_desktop, 'images/banners') }}" 
@@ -136,10 +121,6 @@
 
 @push('scripts')
 <script>
-    function setStatusFilter(value) {
-        document.getElementById('status-filter-input').value = value;
-        // Auto-submit the form
-        document.getElementById('status-filter-input').closest('form').submit();
-    }
+    // Slider-specific scripts if needed
 </script>
 @endpush

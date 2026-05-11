@@ -39,6 +39,14 @@ class Product extends Model
         return $this->hasMany(InventoryLog::class)->latest();
     }
 
+    public function getImageUrlAttribute()
+    {
+        if (empty($this->image)) return 'https://ui-avatars.com/api/?name=P&background=ea5f06&color=fff';
+        return \Illuminate\Support\Str::startsWith($this->image, 'products/') 
+            ? asset('storage/' . $this->image) 
+            : asset('images/products/' . $this->image);
+    }
+
     public function reviews()
     {
         return $this->hasMany(Review::class)->latest();

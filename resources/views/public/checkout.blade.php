@@ -127,19 +127,21 @@
                                 03. Payment Method
                             </h2>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <label class="relative flex items-center gap-3 p-4 rounded-xl border-2 border-slate-50 cursor-pointer hover:border-orange-500/20 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/30 transition-all">
-                                    <input type="radio" name="payment_method" value="prepaid" class="h-4 w-4 text-orange-500" checked>
+                                <label class="relative flex items-center gap-3 p-5 rounded-2xl border-2 border-slate-50 cursor-pointer hover:border-orange-500/20 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/30 transition-all group">
+                                    <input type="radio" name="payment_method" value="prepaid" class="h-4 w-4 text-orange-500 border-slate-200 focus:ring-orange-500" checked>
                                     <div class="flex-1">
-                                        <span class="block text-xs font-black text-slate-900 uppercase">Online Payment</span>
-                                        <span class="block text-[9px] font-bold text-slate-400 uppercase mt-0.5">UPI, Cards, NetBanking</span>
+                                        <span class="block text-xs font-black text-slate-900 uppercase tracking-tight">Online Payment</span>
+                                        <span class="block text-[10px] font-bold text-slate-400 uppercase mt-0.5">UPI, Cards, NetBanking</span>
                                     </div>
+                                    <i data-lucide="shield-check" class="h-4 w-4 text-emerald-500 opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></i>
                                 </label>
-                                <label class="relative flex items-center gap-3 p-4 rounded-xl border-2 border-slate-50 cursor-pointer hover:border-orange-500/20 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/30 transition-all">
-                                    <input type="radio" name="payment_method" value="cod" class="h-4 w-4 text-orange-500">
+                                <label class="relative flex items-center gap-3 p-5 rounded-2xl border-2 border-slate-50 cursor-pointer hover:border-orange-500/20 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/30 transition-all group">
+                                    <input type="radio" name="payment_method" value="cod" class="h-4 w-4 text-orange-500 border-slate-200 focus:ring-orange-500">
                                     <div class="flex-1">
-                                        <span class="block text-xs font-black text-slate-900 uppercase">Cash on Delivery</span>
-                                        <span class="block text-[9px] font-bold text-slate-400 uppercase mt-0.5">Pay at your doorstep</span>
+                                        <span class="block text-xs font-black text-slate-900 uppercase tracking-tight">Cash on Delivery</span>
+                                        <span class="block text-[10px] font-bold text-slate-400 uppercase mt-0.5">Pay at your doorstep</span>
                                     </div>
+                                    <i data-lucide="hand-coins" class="h-4 w-4 text-slate-400 opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></i>
                                 </label>
                             </div>
                         </section>
@@ -158,7 +160,6 @@
                     <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Order Summary</h2>
                     
                     <div class="space-y-4 mb-6">
-
                         @foreach($items as $item)
                             <div class="flex gap-4 items-center p-3 rounded-2xl bg-slate-50/50 ring-1 ring-black/[0.02]">
                                 <div class="h-16 w-16 shrink-0 rounded-xl bg-white p-2 shadow-sm relative overflow-hidden bg-gray-100">
@@ -179,11 +180,27 @@
                         @endforeach
                     </div>
 
+                    <!-- Coupon Code Section -->
+                    <div class="p-6 rounded-3xl bg-slate-50 ring-1 ring-black/[0.02] mb-6" x-data="{ coupon: '', applying: false, msg: '', success: false }">
+                        <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Have a promo code?</h4>
+                        <div class="flex gap-2">
+                            <input type="text" x-model="coupon" placeholder="ENTER CODE" class="flex-1 bg-white border border-slate-100 rounded-xl px-4 py-3 text-xs font-black placeholder:text-slate-300 focus:outline-none focus:border-orange-500 uppercase tracking-widest">
+                            <button type="button" @click="applyCoupon()" class="bg-slate-900 text-white rounded-xl px-6 text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">
+                                Apply
+                            </button>
+                        </div>
+                        <p x-show="msg" :class="success ? 'text-emerald-600' : 'text-rose-500'" class="text-[10px] font-bold uppercase mt-3" x-text="msg"></p>
+                    </div>
+
                     <!-- Totals -->
-                    <div class="space-y-3 pt-6 border-t border-slate-100">
+                    <div class="space-y-3 pt-6 border-t border-slate-100" id="totals-section">
                         <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
                             <span>Subtotal</span>
                             <span class="text-slate-900 font-black">₹{{ number_format($subtotal) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400" id="discount-row" style="display: none;">
+                            <span class="text-emerald-600">Discount (<span id="coupon-display"></span>)</span>
+                            <span class="text-emerald-600 font-black">- ₹<span id="discount-val">0</span></span>
                         </div>
                         <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
                             <span>Shipping</span>
@@ -195,7 +212,7 @@
                         </div>
                         <div class="flex justify-between items-center pt-4 mt-4 border-t border-slate-100">
                             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total</span>
-                            <span class="text-2xl font-black text-slate-900">₹{{ number_format($total) }}</span>
+                            <span class="text-2xl font-black text-slate-900">₹<span id="total-val">{{ number_format($total) }}</span></span>
                         </div>
                     </div>
 
@@ -211,6 +228,51 @@
 </div>
 
 <script>
+    // Coupon Application Logic
+    function applyCoupon() {
+        const component = Alpine.find(document.querySelector('[x-data*="applying"]'));
+        if (!component.coupon) return;
+        
+        component.applying = true;
+        component.msg = 'Applying...';
+        
+        const productId = "{{ isset($buyNowProduct) ? $buyNowProduct->id : 'cart' }}";
+        const amount = "{{ $subtotal }}";
+
+        axios.post("{{ route('coupons.apply') }}", {
+            code: component.coupon,
+            product_id: productId === 'cart' ? 1 : productId, // Default to 1 for cart testing
+            amount: amount
+        }).then(res => {
+            component.success = true;
+            component.msg = res.data.message;
+            
+            // Update UI
+            document.getElementById('discount-row').style.display = 'flex';
+            document.getElementById('coupon-display').innerText = res.data.code;
+            document.getElementById('discount-val').innerText = res.data.discount.toLocaleString();
+            document.getElementById('total-val').innerText = ({{ $total }} - res.data.discount).toLocaleString();
+            
+            // Add to main form
+            const form = document.getElementById('checkout-form');
+            let hiddenInput = form.querySelector('input[name="coupon_code"]');
+            if (!hiddenInput) {
+                hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'coupon_code';
+                form.appendChild(hiddenInput);
+            }
+            hiddenInput.value = res.data.code;
+            
+            toast(res.data.message);
+        }).catch(err => {
+            component.success = false;
+            component.msg = err.response?.data?.message || 'Failed to apply coupon';
+        }).finally(() => {
+            component.applying = false;
+        });
+    }
+
     // Auto-Save Persistence
     const STORAGE_KEY = 'remenant_checkout_draft';
 

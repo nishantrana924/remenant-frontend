@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('content')
-<div class="pb-24">
+<div class="pb-24" x-data="{ search: '' }">
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
         <div class="flex items-center gap-4">
@@ -9,7 +9,7 @@
                 <i data-lucide="ticket" class="w-6 h-6"></i>
             </div>
             <div>
-                <h1 class="text-xl font-black text-slate-900 tracking-tight">Campaigns</h1>
+                <h1 class="text-xl font-bold text-slate-900 tracking-tight uppercase">Campaigns</h1>
                 <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5">Remenant Engine • Compact Classic</p>
             </div>
         </div>
@@ -23,11 +23,11 @@
 
     <!-- KPI Matrix (Compact) -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="saas-card p-5 bg-slate-900 text-white border-0 shadow-lg shadow-slate-200">
-            <p class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">Live Codes</p>
+        <div class="saas-card p-5 bg-orange-600 text-white border-0 shadow-lg shadow-orange-100">
+            <p class="text-[8px] font-bold uppercase tracking-[0.2em] text-orange-200 mb-2">Live Codes</p>
             <div class="flex items-baseline gap-1.5">
-                <h3 class="text-2xl font-black text-white tracking-tighter">{{ \App\Models\Coupon::where('is_active', true)->count() }}</h3>
-                <span class="text-[9px] font-bold text-orange-500 uppercase">Active</span>
+                <h3 class="text-2xl font-bold text-white tracking-tighter">{{ \App\Models\Coupon::where('is_active', true)->count() }}</h3>
+                <span class="text-[9px] font-bold text-white opacity-80 uppercase">Active</span>
             </div>
         </div>
         <div class="saas-card p-5 bg-white border-slate-100 shadow-sm">
@@ -54,7 +54,14 @@
     </div>
 
     <!-- Data Core (Classic Table) -->
-    <div class="saas-card overflow-hidden border border-slate-100 bg-white shadow-xl shadow-slate-200/30">
+    <div class="saas-card p-0 overflow-hidden border border-slate-100 bg-white shadow-xl shadow-slate-200/30">
+        <div class="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/20">
+            <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Coupon Inventory</h3>
+            <div class="relative w-64">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
+                <input type="text" x-model="search" placeholder="Search codes..." class="saas-input pl-10 py-1.5 text-[10px] uppercase font-bold tracking-widest">
+            </div>
+        </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left table-fixed">
                 <thead>
@@ -69,7 +76,8 @@
                 </thead>
                 <tbody class="divide-y divide-slate-50">
                     @forelse($items as $item)
-                        <tr class="group hover:bg-slate-50/30 transition-all">
+                        <tr x-show="!search || '{{ strtolower($item->code) }}'.includes(search.toLowerCase())"
+                            class="group hover:bg-slate-50/30 transition-all">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="h-9 w-9 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600 border border-orange-100">
