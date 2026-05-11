@@ -210,118 +210,120 @@
             </div>
         </div>
     </div>
-@endsection
+    
+    <script>
+        function initCartPage() {
+            if (typeof jQuery === 'undefined') return;
+            
+            let itemToRemove = null;
 
-@push('scripts')
-<script>
-    $(document).ready(function () {
-        let itemToRemove = null;
-
-        // AJAX Update Quantity
-        function updateCart(id, qty, row) {
-            $.ajax({
-                url: '{{ route("cart.update") }}',
-                method: "patch",
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    id: id,
-                    quantity: qty
-                },
-                success: function (response) {
-                    if (response.success) {
-                        // Update quantity in UI
-                        row.find('.quantity-value').text(qty);
-                        
-                        // Update individual item total if needed (optional)
-                        
-                        // Update sidebar totals
-                        updateSidebarTotals(response.totals);
-                        
-                        // Show success toast using our global system
-                        if (window.RemenantApp) {
-                            RemenantApp.showToast('success', 'Cart updated');
-                        }
-                    }
-                }
-            });
-        }
-
-        // AJAX Remove Item
-        function removeItem(id) {
-            $.ajax({
-                url: '{{ route("cart.remove") }}',
-                method: "DELETE",
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    id: id
-                },
-                success: function (response) {
-                    if (response.success) {
-                        // Remove item from DOM
-                        $(`.cart-item[data-item-id="${id}"]`).fadeOut(300, function() {
-                            $(this).remove();
-                            
-                            // If cart is empty, reload to show empty state
-                            if (response.totals.count === 0) {
-                                location.reload();
+            // AJAX Update Quantity
+            function updateCart(id, qty, row) {
+                $.ajax({
+                    url: '{{ route("cart.update") }}',
+                    method: "patch",
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: id,
+                        quantity: qty
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            row.find('.quantity-value').text(qty);
+                            updateSidebarTotals(response.totals);
+                            if (window.RemenantApp) {
+                                RemenantApp.showToast('success', 'Cart updated');
                             }
-                        });
-
-                        // Update sidebar totals
-                        updateSidebarTotals(response.totals);
-                        
-                        if (window.RemenantApp) {
-                            RemenantApp.showToast('success', 'Item removed');
-                            RemenantApp.updateCartCount(response.totals.count);
                         }
-                        
-                        hideRemoveModal();
+                    }
+                });
+            }
+
+            // AJAX Remove Item
+            function removeItem(id) {
+                $.ajax({
+                    url: '{{ route("cart.remove") }}',
+                    method: "DELETE",
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: id
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            $(`.cart-item[data-item-id="${id}"]`).fadeOut(300, function() {
+                                $(this).remove();
+                                if (response.totals.count === 0) {
+                                    location.reload();
+                                }
+                            });
+
+                            updateSidebarTotals(response.totals);
+                            if (window.RemenantApp) {
+                                RemenantApp.showToast('success', 'Item removed');
+                                RemenantApp.updateCartCount(response.totals.count);
+                            }
+                            hideRemoveModal();
+                        }
+                    }
+                });
+            }
+
+            function updateSidebarTotals(totals) {
+                $('#cart-items-count').text(`Price (${totals.count} items)`);
+                $('#cart-mrp-total').text(`₹${totals.subtotal}`);
+                $('#cart-discount-total').text(`- ₹${totals.discount}`);
+                $('#cart-final-total').text(`₹${totals.total}`);
+                $('#cart-savings-amount').text(`₹${totals.discount}`);
+            }
+
+            $('.btn-increase').off('click').on('click', function () {
+                const row = $(this).closest('.cart-item');
+                const id = row.data('item-id');
+                const qty = parseInt(row.find('.quantity-value').first().text()) + 1;
+                updateCart(id, qty, row);
+            });
+
+            $('.btn-decrease').off('click').on('click', function () {
+                const row = $(this).closest('.cart-item');
+                const id = row.data('item-id');
+                const qty = parseInt(row.find('.quantity-value').first().text()) - 1;
+                if (qty > 0) updateCart(id, qty, row);
+                else showRemoveModal(id);
+            });
+
+            $('.btn-remove').off('click').on('click', function () {
+                const id = $(this).closest('.cart-item').data('item-id');
+                showRemoveModal(id);
+            });
+
+            function showRemoveModal(id) {
+                itemToRemove = id;
+                $('#removeConfirmModal').removeClass('hidden').addClass('flex');
+                setTimeout(() => { $('#removeConfirmModal').removeClass('opacity-0').addClass('opacity-100'); $('#removeConfirmModal > div').removeClass('scale-90').addClass('scale-100'); }, 10);
+            }
+
+            function hideRemoveModal() {
+                $('#removeConfirmModal').addClass('opacity-0').removeClass('opacity-100');
+                setTimeout(() => { $('#removeConfirmModal').addClass('hidden').removeClass('flex'); itemToRemove = null; }, 300);
+            }
+
+            $('#cancelRemove').off('click').on('click', hideRemoveModal);
+            $('#confirmRemove').off('click').on('click', function () { if (itemToRemove) removeItem(itemToRemove); hideRemoveModal(); });
+        }
+
+        // Initial load
+        $(document).ready(initCartPage);
+        
+        // Unpoly re-init
+        if (window.up) {
+            up.on('up:fragment:inserted', function(event) {
+                const fragment = event.fragment || event.target;
+                if (fragment && typeof fragment.querySelector === 'function') {
+                    if (fragment.querySelector('.cart-item') || fragment.querySelector('#removeConfirmModal')) {
+                        initCartPage();
                     }
                 }
             });
         }
-
-        function updateSidebarTotals(totals) {
-            $('#cart-items-count').text(`Price (${totals.count} items)`);
-            $('#cart-mrp-total').text(`₹${totals.subtotal}`);
-            $('#cart-discount-total').text(`- ₹${totals.discount}`);
-            $('#cart-final-total').text(`₹${totals.total}`);
-            $('#cart-savings-amount').text(`₹${totals.discount}`);
-        }
-
-        $('.btn-increase').on('click', function () {
-            const row = $(this).closest('.cart-item');
-            const id = row.data('item-id');
-            const qty = parseInt(row.find('.quantity-value').first().text()) + 1;
-            updateCart(id, qty, row);
-        });
-
-        $('.btn-decrease').on('click', function () {
-            const row = $(this).closest('.cart-item');
-            const id = row.data('item-id');
-            const qty = parseInt(row.find('.quantity-value').first().text()) - 1;
-            if (qty > 0) updateCart(id, qty, row);
-            else showRemoveModal(id);
-        });
-
-        $('.btn-remove').on('click', function () {
-            const id = $(this).closest('.cart-item').data('item-id');
-            showRemoveModal(id);
-        });
-
-        function showRemoveModal(id) {
-            itemToRemove = id;
-            $('#removeConfirmModal').removeClass('hidden').addClass('flex');
-            setTimeout(() => { $('#removeConfirmModal').removeClass('opacity-0').addClass('opacity-100'); $('#removeConfirmModal > div').removeClass('scale-90').addClass('scale-100'); }, 10);
-        }
-
-        function hideRemoveModal() {
-            $('#removeConfirmModal').addClass('opacity-0').removeClass('opacity-100');
-            setTimeout(() => { $('#removeConfirmModal').addClass('hidden').removeClass('flex'); itemToRemove = null; }, 300);
-        }
-
-        $('#cancelRemove').on('click', hideRemoveModal);
-        $('#confirmRemove').on('click', function () { if (itemToRemove) removeItem(itemToRemove); hideRemoveModal(); });
-    });
-</script>
-@endpush
+    </script>
+@endsection

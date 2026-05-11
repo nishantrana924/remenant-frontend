@@ -28,6 +28,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/owl-carousel/owl.carousel.min.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/global-styles.css') }}">
     <style>
         :root {
@@ -109,12 +111,11 @@
     </div>
 
     <!-- Scripts (Local) -->
-    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
-    <script src="{{ asset('assets/owl-carousel/owl.carousel.min.js') }}"></script>
     <script src="{{ asset('js/icons.js') }}?v={{ filemtime(public_path('js/icons.js')) }}"></script>
     <script src="{{ asset('js/public-sidebar.js') }}?v={{ filemtime(public_path('js/public-sidebar.js')) }}"></script>
     <script src="{{ asset('js/public-header.js') }}?v={{ filemtime(public_path('js/public-header.js')) }}"></script>
     <script src="{{ asset('js/public-account.js') }}?v={{ filemtime(public_path('js/public-account.js')) }}"></script>
+    <script src="{{ asset('js/search-autocomplete.js') }}?v={{ filemtime(public_path('js/search-autocomplete.js')) }}"></script>
     <script src="{{ asset('js/global-ajax.js') }}?v={{ filemtime(public_path('js/global-ajax.js')) }}"></script>
     <script src="{{ asset('js/product-page.js') }}?v={{ filemtime(public_path('js/product-page.js')) }}"></script>
 
@@ -182,7 +183,6 @@
             up.compiler('[data-lucide]', function(element) {
                 if (window.lucide && typeof lucide.createIcons === 'function') {
                     lucide.createIcons({
-                        icons: { [element.getAttribute('data-lucide')]: true },
                         node: element.parentElement
                     });
                 }

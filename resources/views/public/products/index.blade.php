@@ -123,6 +123,11 @@
                             </button>
                             <p class="text-sm font-bold uppercase tracking-widest text-[color:var(--text-secondary)]">
                                 Showing <span id="results-count">{{ count($products) }}</span> Products
+                                @if(request('search'))
+                                    <span class="ml-2 text-[color:var(--text-muted)] font-medium normal-case tracking-normal">
+                                        for "<span class="text-[color:var(--text-primary)]">{{ request('search') }}</span>"
+                                    </span>
+                                @endif
                             </p>
                         </div>
                         
@@ -232,8 +237,49 @@
             </div>
         </section>
     </div>
-    @push('scripts')
+    
     <script>
+        function initShopPage() {
+            const priceRange = document.getElementById('price-range');
+            const priceValue = document.getElementById('price-value');
+
+            if (priceRange) {
+                // Ensure the event listener is only added once
+                priceRange.oninput = function() {
+                    priceValue.textContent = '₹' + parseInt(this.value).toLocaleString();
+                };
+
+                priceRange.onchange = function() {
+                    filterProducts();
+                };
+            }
+
+            // Initialize Combo Carousel
+            const $combo = $('.combo-carousel');
+            if ($combo.length > 0 && !$combo.hasClass('owl-loaded')) {
+                const comboCarousel = $combo.owlCarousel({
+                    loop: false,
+                    margin: 20,
+                    nav: false,
+                    dots: false,
+                    responsive: {
+                        0: { items: 1.2, margin: 15 },
+                        640: { items: 2.2 },
+                        1024: { items: 3 },
+                        1280: { items: 4 }
+                    }
+                });
+                $combo.addClass('owl-loaded');
+
+                $('[data-combo-prev]').off('click').on('click', function() {
+                    comboCarousel.trigger('prev.owl.carousel');
+                });
+                $('[data-combo-next]').off('click').on('click', function() {
+                    comboCarousel.trigger('next.owl.carousel');
+                });
+            }
+        }
+
         function resetCategories(el) {
             if (el.checked) {
                 document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = false);
@@ -247,34 +293,30 @@
             const countLabel = document.getElementById('results-count');
             const allCheckbox = document.getElementById('all-products-checkbox');
             
-            // Show loader
-            gridLoader.classList.remove('hidden');
+            if (gridLoader) gridLoader.classList.remove('hidden');
             
-            // Gather filters
             const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked'))
                 .map(cb => cb.value);
             
-            // Uncheck "All" if any category is selected
             if (selectedCategories.length > 0) {
-                allCheckbox.checked = false;
+                if (allCheckbox) allCheckbox.checked = false;
             } else {
-                allCheckbox.checked = true;
+                if (allCheckbox) allCheckbox.checked = true;
             }
 
-            const maxPrice = document.getElementById('price-range').value;
-            const sort = document.getElementById('sort-select').value;
+            const priceRange = document.getElementById('price-range');
+            const maxPrice = priceRange ? priceRange.value : 0;
+            const sortSelect = document.getElementById('sort-select');
+            const sort = sortSelect ? sortSelect.value : 'best-selling';
             
-            // Build URL
             const url = new URL(window.location.href);
             url.searchParams.delete('categories[]');
             selectedCategories.forEach(cat => url.searchParams.append('categories[]', cat));
             url.searchParams.set('max_price', maxPrice);
             url.searchParams.set('sort', sort);
             
-            // Push to history
             window.history.pushState({}, '', url);
             
-            // Fetch via AJAX
             fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -283,62 +325,33 @@
             .then(response => response.json())
             .then(data => {
                 gridContainer.innerHTML = data.html + `
-                    <!-- Loading Overlay (Restored after innerHTML replace) -->
                     <div id="grid-loader" class="hidden absolute inset-0 z-20 bg-white/50 backdrop-blur-[2px] flex items-center justify-center rounded-3xl">
                         <div class="h-10 w-10 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 `;
-                countLabel.textContent = data.count;
-                
-                // Re-initialize Lucide icons if any
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
+                if (countLabel) countLabel.textContent = data.count;
+                if (window.lucide) window.lucide.createIcons();
             })
             .catch(error => console.error('Error filtering:', error))
             .finally(() => {
-                // Loader is now inside gridContainer, need to find it again
-                document.getElementById('grid-loader').classList.add('hidden');
+                const loader = document.getElementById('grid-loader');
+                if (loader) loader.classList.add('hidden');
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const priceRange = document.getElementById('price-range');
-            const priceValue = document.getElementById('price-value');
-
-            if (priceRange) {
-                priceRange.addEventListener('input', function() {
-                    priceValue.textContent = '₹' + parseInt(this.value).toLocaleString();
-                });
-
-                priceRange.addEventListener('change', function() {
-                    filterProducts();
-                });
-            }
-
-            // Initialize Combo Carousel
-            if ($('.combo-carousel').length > 0) {
-                const comboCarousel = $('.combo-carousel').owlCarousel({
-                    loop: false,
-                    margin: 20,
-                    nav: false,
-                    dots: false,
-                    responsive: {
-                        0: { items: 1.2, margin: 15 },
-                        640: { items: 2.2 },
-                        1024: { items: 3 },
-                        1280: { items: 4 }
+        // Initial load
+        $(document).ready(initShopPage);
+        
+        // Unpoly re-init
+        if (window.up) {
+            up.on('up:fragment:inserted', function(event) {
+                const fragment = event.fragment || event.target;
+                if (fragment && typeof fragment.querySelector === 'function') {
+                    if (fragment.querySelector('#products-grid-container') || fragment.querySelector('.combo-carousel')) {
+                        initShopPage();
                     }
-                });
-
-                $('[data-combo-prev]').click(function() {
-                    comboCarousel.trigger('prev.owl.carousel');
-                });
-                $('[data-combo-next]').click(function() {
-                    comboCarousel.trigger('next.owl.carousel');
-                });
-            }
-        });
+                }
+            });
+        }
     </script>
-    @endpush
 @endsection

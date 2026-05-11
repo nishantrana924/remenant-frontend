@@ -12,6 +12,19 @@ class ProductController extends Controller
     {
         $request = $request ?: request();
         $query = Product::where('status', 'published');
+        
+        // Search Filter
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('description', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('tagline', 'LIKE', "%{$searchTerm}%")
+                  ->orWhereHas('categories', function($sq) use ($searchTerm) {
+                      $sq->where('name', 'LIKE', "%{$searchTerm}%");
+                  });
+            });
+        }
 
         // Multiple Category Filter
         if ($request->has('categories') && is_array($request->categories)) {
@@ -223,5 +236,32 @@ class ProductController extends Controller
             'images' => $imagePaths,
             'status' => 'pending'
         ]);
+    }
+
+    public function searchSuggestions(Request $request)
+    {
+        $query = $request->get('query');
+        if (empty($query)) {
+            return response()->json([]);
+        }
+
+        $products = Product::where('status', 'published')
+            ->where(function($q) use ($query) {
+                $q->where('title', 'LIKE', "%{$query}%")
+                  ->orWhere('tagline', 'LIKE', "%{$query}%")
+                  ->orWhere('description', 'LIKE', "%{$query}%")
+                  ->orWhereHas('categories', function($sq) use ($query) {
+                      $sq->where('name', 'LIKE', "%{$query}%");
+                  });
+            })
+            ->take(6)
+            ->get(['id', 'title', 'slug', 'image', 'price', 'tagline']);
+
+        $products->transform(function($product) {
+            $product->image_url = \App\Helpers\ImageHelper::getUrl($product->image, 'images/products');
+            return $product;
+        });
+
+        return response()->json($products);
     }
 }

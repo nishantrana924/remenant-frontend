@@ -87,11 +87,17 @@ function initHomeSliders() {
 }
 
 // Initial call
-$(document).ready(initHomeSliders);
+if (typeof jQuery !== 'undefined') {
+    $(document).ready(initHomeSliders);
+} else {
+    document.addEventListener('DOMContentLoaded', initHomeSliders);
+}
 
 // Unpoly re-init
 if (window.up) {
     up.on('up:fragment:inserted', function() {
-        initHomeSliders();
+        if (typeof initHomeSliders === 'function') {
+            initHomeSliders();
+        }
     });
 }

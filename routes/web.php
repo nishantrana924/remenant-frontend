@@ -34,6 +34,7 @@ Route::patch('/cart/update', [CartController::class, 'update'])->name('cart.upda
 Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/search-suggestions', [ProductController::class, 'searchSuggestions'])->name('products.search-suggestions');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/product/{slug}/reviews', [ProductController::class, 'reviews'])->name('products.reviews');
 Route::post('/product/{id}/reviews', [ProductController::class, 'storeReview'])->name('products.reviews.store');

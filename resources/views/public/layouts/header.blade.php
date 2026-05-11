@@ -148,13 +148,19 @@
             @if(!$isAuthPage)
                 <!-- Search -->
                 <div class="flex-1">
-                    <div class="relative max-w-[520px]">
+                    <form action="{{ route('products.index') }}" method="GET" class="relative max-w-[520px]" data-search-form>
                         <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/80">
                             <i data-lucide="search" class="h-5 w-5"></i>
                         </span>
-                        <input type="search" placeholder="Search for products…"
-                            class="w-full rounded-full border border-white/30 bg-white/10 py-2 pl-10 pr-4 text-white placeholder:text-white/60 outline-none transition-all duration-300 focus:max-w-[580px] focus:bg-white/20 focus:ring-0 focus:border-white/50 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                    </div>
+                        <input type="search" name="search" value="{{ request('search') }}" placeholder="Search for products…" autocomplete="off"
+                            class="w-full rounded-full border border-white/30 bg-white/10 py-2 pl-10 pr-4 text-white placeholder:text-white/60 outline-none transition-all duration-300 focus:max-w-[580px] focus:bg-white/20 focus:ring-0 focus:border-white/50 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                            data-search-input>
+                        
+                        <!-- Suggestions Container -->
+                        <div class="absolute left-0 right-0 top-full mt-2 hidden overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 z-[60]" data-search-suggestions>
+                            <!-- AJAX content here -->
+                        </div>
+                    </form>
                 </div>
             @else
                 <div class="flex-1"></div>
@@ -247,25 +253,25 @@
                     </a>
                 </div>
             @endif
-        </div>
-    </div>
-</header>
-
-<!-- Mobile search bar (Non-sticky) -->
-<div class="sm:hidden brand-gradient px-4 pb-4 -mt-1">
-    <div class="mx-auto max-w-[1600px]">
-        <div class="public-mobile-search {{ $isAuthPage || request()->routeIs('products.show', 'cart') ? 'hidden' : '' }}"
+        <!-- Mobile search bar (Sticky) -->
+        <div class="sm:hidden public-mobile-search px-4 pb-4 -mt-1 {{ $isAuthPage || request()->routeIs('products.show', 'cart') ? 'hidden' : '' }}"
             data-mobile-search>
-            <div class="relative">
+            <form action="{{ route('products.index') }}" method="GET" class="relative" data-search-form>
                 <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/80">
                     <i data-lucide="search" class="h-5 w-5"></i>
                 </span>
-                <input type="search" placeholder="Search for products…"
-                    class="w-full rounded-full border border-white/30 bg-white/10 py-3 pl-11 pr-4 text-white placeholder:text-white/60 outline-none transition-all duration-300 focus:bg-white/20 focus:ring-0 focus:border-white/50 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-            </div>
+                <input type="search" name="search" value="{{ request('search') }}" placeholder="Search for products…" autocomplete="off"
+                    class="w-full rounded-full border border-white/30 bg-white/10 py-3 pl-11 pr-4 text-white placeholder:text-white/60 outline-none transition-all duration-300 focus:bg-white/20 focus:ring-0 focus:border-white/50 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                    data-search-input>
+                
+                <!-- Mobile Suggestions Container -->
+                <div class="absolute left-0 right-0 top-full mt-1 hidden overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 z-[60]" data-search-suggestions>
+                    <!-- AJAX content here -->
+                </div>
+            </form>
         </div>
     </div>
-</div>
+</header>
 
 <style>
     /* Reinforce sticky behavior */
