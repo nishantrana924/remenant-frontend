@@ -39,14 +39,25 @@
         document.querySelectorAll(DROPDOWN_SELECTOR).forEach((dd) => {
             dd.addEventListener('toggle', onToggle);
         });
-        document.addEventListener('click', onDocClick);
-        document.addEventListener('keydown', onKeyDown);
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+    if (window.up) {
+        up.compiler(DROPDOWN_SELECTOR, function(element) {
+            element.addEventListener('toggle', onToggle);
+        });
     } else {
-        init();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    }
+
+    // Global listeners only need to be added once
+    if (!window._accountListenersAdded) {
+        document.addEventListener('click', onDocClick);
+        document.addEventListener('keydown', onKeyDown);
+        window._accountListenersAdded = true;
     }
 })();
 

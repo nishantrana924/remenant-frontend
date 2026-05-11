@@ -23,7 +23,8 @@ class CheckoutController extends Controller
                         "title" => $buyNowProduct->title,
                         "quantity" => 1,
                         "price" => $buyNowProduct->price,
-                        "image" => $buyNowProduct->image
+                        "image" => $buyNowProduct->image,
+                        "slug" => $buyNowProduct->slug
                     ]
                 ];
             } else {
@@ -41,7 +42,9 @@ class CheckoutController extends Controller
         $shipping = $subtotal > 999 ? 0 : 99;
         $total = $subtotal + $shipping;
 
-        return view('public.checkout', compact('items', 'subtotal', 'shipping', 'total', 'buyNowProduct'));
+        $addresses = auth()->check() ? auth()->user()->addresses : [];
+
+        return view('public.checkout', compact('items', 'subtotal', 'shipping', 'total', 'buyNowProduct', 'addresses'));
     }
 
     public function store(Request $request)
@@ -70,7 +73,8 @@ class CheckoutController extends Controller
                     "title" => $product->title,
                     "quantity" => 1,
                     "price" => $product->price,
-                    "image" => $product->image
+                    "image" => $product->image,
+                    "slug" => $product->slug
                 ]
             ];
         }

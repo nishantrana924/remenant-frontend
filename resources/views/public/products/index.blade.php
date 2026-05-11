@@ -61,23 +61,26 @@
                                 <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Categories</h3>
                                 <div class="space-y-3">
                                     <label class="group flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" name="categories[]" value="all" 
-                                               onchange="filterProducts()"
-                                               class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
+                                        <input type="checkbox" id="all-products-checkbox"
+                                               onchange="resetCategories(this)"
+                                               class="h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
+                                               {{ !request('categories') ? 'checked' : '' }}>
                                         <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">All Products</span>
                                     </label>
                                     @foreach($categories as $cat)
                                         <label class="group flex items-center gap-3 cursor-pointer">
                                             <input type="checkbox" name="categories[]" value="{{ $cat->slug }}"
                                                    onchange="filterProducts()"
-                                                   class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
+                                                   class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
+                                                   {{ (is_array(request('categories')) && (in_array($cat->slug, request('categories')) || in_array($cat->name, request('categories')))) ? 'checked' : '' }}>
                                             <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">{{ $cat->name }}</span>
                                         </label>
                                     @endforeach
                                     <label class="group flex items-center gap-3 cursor-pointer">
                                         <input type="checkbox" name="categories[]" value="Combo Offers"
                                                onchange="filterProducts()"
-                                               class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
+                                               class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
+                                               {{ (is_array(request('categories')) && in_array('Combo Offers', request('categories'))) ? 'checked' : '' }}>
                                         <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">Combo Offers</span>
                                     </label>
                                 </div>
@@ -87,32 +90,15 @@
                             <div>
                                 <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Price Range</h3>
                                 <div class="space-y-4">
-                                    <input type="range" id="price-range" min="0" max="5000" step="100" value="{{ request('max_price', 5000) }}" class="w-full accent-[var(--primary)]">
+                                    <input type="range" id="price-range" min="{{ $minPrice }}" max="{{ $maxPrice }}" step="10" value="{{ request('max_price', $maxPrice) }}" class="w-full accent-[var(--primary)]">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-xs font-black text-[color:var(--text-muted)]">₹0</span>
-                                        <span class="text-xs font-black text-[color:var(--primary)]" id="price-value">₹{{ number_format(request('max_price', 5000)) }}</span>
-                                        <span class="text-xs font-black text-[color:var(--text-muted)]">₹5,000+</span>
+                                        <span class="text-xs font-black text-[color:var(--text-muted)]">₹{{ number_format($minPrice) }}</span>
+                                        <span class="text-xs font-black text-[color:var(--primary)]" id="price-value">₹{{ number_format(request('max_price', $maxPrice)) }}</span>
+                                        <span class="text-xs font-black text-[color:var(--text-muted)]">₹{{ number_format($maxPrice) }}+</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Availability -->
-                            <div>
-                                <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Availability</h3>
-                                <div class="space-y-3">
-                                    <label class="group flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" 
-                                               class="h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
-                                               checked>
-                                        <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">In Stock</span>
-                                    </label>
-                                    <label class="group flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" 
-                                               class="h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all">
-                                        <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">Out of Stock</span>
-                                    </label>
-                                </div>
-                            </div>
 
                             <!-- Reset Filters -->
                             <div class="pt-6 lg:pt-0">
@@ -137,6 +123,11 @@
                             </button>
                             <p class="text-sm font-bold uppercase tracking-widest text-[color:var(--text-secondary)]">
                                 Showing <span id="results-count">{{ count($products) }}</span> Products
+                                @if(request('search'))
+                                    <span class="ml-2 text-[color:var(--text-muted)] font-medium normal-case tracking-normal">
+                                        for "<span class="text-[color:var(--text-primary)]">{{ request('search') }}</span>"
+                                    </span>
+                                @endif
                             </p>
                         </div>
                         
@@ -246,79 +237,27 @@
             </div>
         </section>
     </div>
-    @push('scripts')
+    
     <script>
-        function filterProducts() {
-            const gridContainer = document.getElementById('products-grid-container');
-            const gridLoader = document.getElementById('grid-loader');
-            const countLabel = document.getElementById('results-count');
-            
-            // Show loader
-            gridLoader.classList.remove('hidden');
-            
-            // Gather filters
-            const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked'))
-                .map(cb => cb.value)
-                .filter(v => v !== 'all');
-            
-            const maxPrice = document.getElementById('price-range').value;
-            const sort = document.getElementById('sort-select').value;
-            
-            // Build URL
-            const url = new URL(window.location.href);
-            url.searchParams.delete('categories[]');
-            selectedCategories.forEach(cat => url.searchParams.append('categories[]', cat));
-            url.searchParams.set('max_price', maxPrice);
-            url.searchParams.set('sort', sort);
-            
-            // Push to history
-            window.history.pushState({}, '', url);
-            
-            // Fetch via AJAX
-            fetch(url, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                gridContainer.innerHTML = data.html + `
-                    <!-- Loading Overlay (Restored after innerHTML replace) -->
-                    <div id="grid-loader" class="hidden absolute inset-0 z-20 bg-white/50 backdrop-blur-[2px] flex items-center justify-center rounded-3xl">
-                        <div class="h-10 w-10 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                `;
-                countLabel.textContent = data.count;
-                
-                // Re-initialize Lucide icons if any
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            })
-            .catch(error => console.error('Error filtering:', error))
-            .finally(() => {
-                // Loader is now inside gridContainer, need to find it again
-                document.getElementById('grid-loader').classList.add('hidden');
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
+        function initShopPage() {
             const priceRange = document.getElementById('price-range');
             const priceValue = document.getElementById('price-value');
 
             if (priceRange) {
-                priceRange.addEventListener('input', function() {
+                // Ensure the event listener is only added once
+                priceRange.oninput = function() {
                     priceValue.textContent = '₹' + parseInt(this.value).toLocaleString();
-                });
+                };
 
-                priceRange.addEventListener('change', function() {
+                priceRange.onchange = function() {
                     filterProducts();
-                });
+                };
             }
 
             // Initialize Combo Carousel
-            if ($('.combo-carousel').length > 0) {
-                const comboCarousel = $('.combo-carousel').owlCarousel({
+            const $combo = $('.combo-carousel');
+            if ($combo.length > 0 && !$combo.hasClass('owl-loaded')) {
+                const comboCarousel = $combo.owlCarousel({
                     loop: false,
                     margin: 20,
                     nav: false,
@@ -330,15 +269,89 @@
                         1280: { items: 4 }
                     }
                 });
+                $combo.addClass('owl-loaded');
 
-                $('[data-combo-prev]').click(function() {
+                $('[data-combo-prev]').off('click').on('click', function() {
                     comboCarousel.trigger('prev.owl.carousel');
                 });
-                $('[data-combo-next]').click(function() {
+                $('[data-combo-next]').off('click').on('click', function() {
                     comboCarousel.trigger('next.owl.carousel');
                 });
             }
-        });
+        }
+
+        function resetCategories(el) {
+            if (el.checked) {
+                document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = false);
+                filterProducts();
+            }
+        }
+
+        function filterProducts() {
+            const gridContainer = document.getElementById('products-grid-container');
+            const gridLoader = document.getElementById('grid-loader');
+            const countLabel = document.getElementById('results-count');
+            const allCheckbox = document.getElementById('all-products-checkbox');
+            
+            if (gridLoader) gridLoader.classList.remove('hidden');
+            
+            const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked'))
+                .map(cb => cb.value);
+            
+            if (selectedCategories.length > 0) {
+                if (allCheckbox) allCheckbox.checked = false;
+            } else {
+                if (allCheckbox) allCheckbox.checked = true;
+            }
+
+            const priceRange = document.getElementById('price-range');
+            const maxPrice = priceRange ? priceRange.value : 0;
+            const sortSelect = document.getElementById('sort-select');
+            const sort = sortSelect ? sortSelect.value : 'best-selling';
+            
+            const url = new URL(window.location.href);
+            url.searchParams.delete('categories[]');
+            selectedCategories.forEach(cat => url.searchParams.append('categories[]', cat));
+            url.searchParams.set('max_price', maxPrice);
+            url.searchParams.set('sort', sort);
+            
+            window.history.pushState({}, '', url);
+            
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                gridContainer.innerHTML = data.html + `
+                    <div id="grid-loader" class="hidden absolute inset-0 z-20 bg-white/50 backdrop-blur-[2px] flex items-center justify-center rounded-3xl">
+                        <div class="h-10 w-10 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                `;
+                if (countLabel) countLabel.textContent = data.count;
+                if (window.lucide) window.lucide.createIcons();
+            })
+            .catch(error => console.error('Error filtering:', error))
+            .finally(() => {
+                const loader = document.getElementById('grid-loader');
+                if (loader) loader.classList.add('hidden');
+            });
+        }
+
+        // Initial load
+        $(document).ready(initShopPage);
+        
+        // Unpoly re-init
+        if (window.up) {
+            up.on('up:fragment:inserted', function(event) {
+                const fragment = event.fragment || event.target;
+                if (fragment && typeof fragment.querySelector === 'function') {
+                    if (fragment.querySelector('#products-grid-container') || fragment.querySelector('.combo-carousel')) {
+                        initShopPage();
+                    }
+                }
+            });
+        }
     </script>
-    @endpush
 @endsection

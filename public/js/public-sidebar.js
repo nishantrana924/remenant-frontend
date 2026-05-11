@@ -60,33 +60,39 @@
     }
 
     function init() {
-        const openBtns = Array.from(document.querySelectorAll(SELECTORS.open));
-        const closeBtn = document.querySelector(SELECTORS.close);
-        const overlay = document.querySelector(SELECTORS.overlay);
-        const panel = document.querySelector(SELECTORS.panel);
-
-        if (openBtns.length === 0 || !closeBtn || !overlay || !panel) return;
-
-        overlay.setAttribute('aria-hidden', 'true');
-        openBtns.forEach((btn) => setExpanded(btn, false));
-
-        openBtns.forEach((btn) => {
-            btn.addEventListener('click', () => openSidebar(btn));
-        });
-        closeBtn.addEventListener('click', closeSidebar);
-        
-        // Close sidebar when clicking any link inside it (especially for anchor links)
-        const sidebarLinks = panel.querySelectorAll('a');
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', closeSidebar);
+        // Use event delegation for open buttons
+        document.addEventListener('click', (e) => {
+            const openBtn = e.target.closest(SELECTORS.open);
+            if (openBtn) {
+                e.preventDefault();
+                openSidebar(openBtn);
+            }
         });
 
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) closeSidebar();
+        // Use event delegation for close buttons and sidebar links
+        document.addEventListener('click', (e) => {
+            const closeBtn = e.target.closest(SELECTORS.close);
+            const sidebarLink = e.target.closest(`${SELECTORS.panel} a`);
+            const overlayClick = e.target.closest(SELECTORS.overlay) === e.target;
+
+            if (closeBtn || sidebarLink || overlayClick) {
+                closeSidebar();
+            }
         });
+
         document.addEventListener('keydown', onKeyDown);
+
+        // Close sidebar when Unpoly swaps a fragment (navigation)
+        if (window.up) {
+            up.on('up:fragment:inserted', closeSidebar);
+        }
+        
+        // Initial accessibility setup
+        const overlay = document.querySelector(SELECTORS.overlay);
+        if (overlay) overlay.setAttribute('aria-hidden', 'true');
     }
 
+    // Initialize once on first load
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

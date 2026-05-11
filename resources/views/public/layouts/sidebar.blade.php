@@ -93,7 +93,7 @@
                     </a>
                 @endauth
                 @auth
-                    <form method="POST" action="{{ route('logout') }}" class="mt-2">
+                    <form method="POST" action="{{ route('logout') }}" class="mt-2" up-follow="false">
                         @csrf
                         <button type="submit"
                             class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 transition">

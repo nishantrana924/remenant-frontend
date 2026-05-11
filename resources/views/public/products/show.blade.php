@@ -124,13 +124,13 @@
                          data-gallery-images='@json(array_map(fn($img) => \App\Helpers\ImageHelper::getUrl($img, "images/products"), $galleryImages))'>
                         <div class="absolute right-3 top-3 sm:right-4 sm:top-4 z-30 flex flex-col gap-2">
 
-                            <button type="button" aria-label="Share product" class="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-[color:var(--text-primary)] shadow-lg ring-1 ring-black/10 transition hover:text-[color:var(--primary)] active:scale-95">
+                            <button type="button" onclick="shareProduct()" aria-label="Share product" class="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-[color:var(--text-primary)] shadow-lg ring-1 ring-black/10 transition hover:text-[color:var(--primary)] active:scale-95">
                                 <i data-lucide="send" class="h-5 w-5"></i>
                             </button>
                         </div>
                         <div class="product-gallery-carousel owl-carousel owl-theme">
                             @foreach($galleryImages as $index => $img)
-                                <div class="relative aspect-square overflow-hidden cursor-zoom-in bg-gray-100"
+                                <div class="relative aspect-square overflow-hidden cursor-pointer bg-gray-100"
                                      onclick="openLightbox({{ $index }})">
                                     <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay z-[5]"></div>
                                     <img src="{{ \App\Helpers\ImageHelper::getUrl($img, 'images/products') }}" 
@@ -722,7 +722,7 @@
                                     $b = (object)$benefit;
                                     $iconName = $b->icon ?? 'star';
                                 @endphp
-                                <div class="flex items-start gap-6 py-8 first:pt-0 last:pb-0 group">
+                                <div class="flex items-start gap-6 py-8 first:pt-0 group">
                                     <div class="shrink-0 w-12 pt-1">
                                         <span class="text-base font-bold text-slate-300 tabular-nums">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
                                     </div>
@@ -1397,6 +1397,8 @@
 
         // Review Modal Logic
         var selectedRating = 0;
+        var reviewImages = [];
+
         window.setReviewRating = function(rating) {
             selectedRating = rating;
             $('.review-star').each(function() {
@@ -1404,12 +1406,132 @@
                 $(this).toggleClass('active text-orange-400', starVal <= rating);
                 $(this).toggleClass('text-gray-300', starVal > rating);
             });
+            $('#rating-label').text(['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rating - 1]);
         };
+
         window.openWriteReviewModal = function() {
-            $('#review-modal').removeClass('hidden');
+            @auth
+                $('#review-modal').removeClass('hidden');
+                $('body').css('overflow', 'hidden');
+            @else
+                window.location.href = '{{ route("login") }}?redirect=' + encodeURIComponent(window.location.href + '#reviews');
+            @endauth
         };
+
         window.closeWriteReviewModal = function() {
             $('#review-modal').addClass('hidden');
+            $('body').css('overflow', 'auto');
+        };
+
+        window.handleReviewImageUpload = function(input) {
+            const files = Array.from(input.files);
+            const container = $('#review-image-previews');
+            
+            files.forEach(file => {
+                if (reviewImages.length >= 4) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const id = Date.now() + Math.random();
+                    reviewImages.push({ id, file });
+                    
+                    const html = `
+                        <div class="preview-thumb" data-id="${id}">
+                            <img src="${e.target.result}">
+                            <button type="button" class="remove-btn" onclick="removeReviewImage(${id})">
+                                <i data-lucide="x" class="h-3 w-3"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.append(html);
+                    container.removeClass('hidden');
+                    if (window.lucide) window.lucide.createIcons();
+                };
+                reader.readAsDataURL(file);
+            });
+            input.value = ''; // Reset input
+        };
+
+        window.removeReviewImage = function(id) {
+            reviewImages = reviewImages.filter(img => img.id !== id);
+            $(`.preview-thumb[data-id="${id}"]`).remove();
+            if (reviewImages.length === 0) $('#review-image-previews').addClass('hidden');
+        };
+
+        window.submitReview = function() {
+            if (selectedRating === 0) {
+                showToast('Please select a rating', 'warning');
+                return;
+            }
+            const comment = $('#review-content').val().trim();
+            if (comment.length < 10) {
+                showToast('Please write at least 10 characters', 'warning');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('rating', selectedRating);
+            formData.append('comment', comment);
+            formData.append('_token', '{{ csrf_token() }}');
+            
+            reviewImages.forEach(img => {
+                formData.append('images[]', img.file);
+            });
+
+            const btn = $('#review-modal button[onclick="submitReview()"]');
+            const originalText = btn.html();
+            btn.prop('disabled', true).html('<i data-lucide="loader-2" class="h-4 w-4 animate-spin"></i> Submitting...');
+            if (window.lucide) window.lucide.createIcons();
+
+            $.ajax({
+                url: '{{ route("products.reviews.store", $product->id) }}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    if (res.requires_login) {
+                        window.location.href = res.redirect;
+                        return;
+                    }
+                    if (res.success) {
+                        showToast(res.message, 'success');
+                        closeWriteReviewModal();
+                        // Wait a moment for the toast to be seen before reloading
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    }
+                },
+                error: function(err) {
+                    const msg = err.responseJSON?.message || 'Something went wrong';
+                    showToast(msg, 'error');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html(originalText);
+                    if (window.lucide) window.lucide.createIcons();
+                }
+            });
+        };
+
+        window.shareProduct = function() {
+            const shareData = {
+                title: '{{ addslashes($product->title) }}',
+                text: 'Check out this amazing product from Remenant Health!',
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).catch((error) => console.log('Error sharing', error));
+            } else {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    if (window.showToast) {
+                        window.showToast('Product link copied to clipboard!', 'success');
+                    } else {
+                        alert('Link copied to clipboard!');
+                    }
+                });
+            }
         };
     </script>
 @endsection

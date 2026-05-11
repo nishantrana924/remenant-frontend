@@ -3,104 +3,120 @@
 @section('title', 'Login - ' . config('app.name', 'Remenant Health'))
 
 @section('content')
-<div class="bg-[var(--bg-main)] flex flex-col lg:flex-row lg:h-[calc(100vh-100px)] lg:min-h-[600px]">
-    
-    <!-- Left Side: Full Bleed Image (Desktop Only) -->
-    <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center p-12 text-center">
-        <img src="{{ asset('images/products/remenant-product10.jpg') }}" alt="Wellness" class="absolute inset-0 h-full w-full object-cover">
-        <div class="absolute inset-0 bg-black/30"></div>
-        <div class="relative z-10">
-            <h2 class="text-6xl font-black italic tracking-tighter text-white uppercase leading-none mb-6">Elevate<br>Your Life.</h2>
-            <div class="h-1.5 w-16 bg-[color:var(--primary)] mx-auto rounded-full"></div>
+    <div class="bg-[var(--bg-main)] flex flex-col lg:flex-row lg:h-[calc(100vh-80px)] lg:min-h-[600px]">
+
+        <!-- Left Side: Full Bleed Image (Desktop Only) -->
+        <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center p-12 text-center">
+            <img src="{{ asset('images/products/remenant-product10.jpg') }}" alt="Wellness"
+                class="absolute inset-0 h-full w-full object-cover">
+            <div class="absolute inset-0 bg-black/30"></div>
+            <div class="relative z-10">
+                <h2 class="text-6xl font-black italic tracking-tighter text-white uppercase leading-none mb-6">
+                    Elevate<br>Your Life.</h2>
+                <div class="h-1.5 w-16 bg-[color:var(--primary)] mx-auto rounded-full"></div>
+            </div>
         </div>
-    </div>
 
-    <!-- Right Side: Login Form -->
-    <div class="flex-1 flex items-start justify-center p-6 lg:pt-32 relative">
-        <div class="w-full max-w-[440px]">
-            
-            <!-- Account Deleted Banner -->
-            @if (session('status') === 'account-deleted')
-                <div class="mb-6 rounded-2xl bg-red-50 p-4 ring-1 ring-red-100 flex items-center gap-3">
-                    <i data-lucide="user-x" class="h-5 w-5 text-red-500 shrink-0"></i>
-                    <div>
-                        <p class="text-[11px] font-black text-red-700 uppercase tracking-wider">Account Deactivated</p>
-                        <p class="text-xs text-red-500 mt-0.5">Your account has been successfully deleted. We're sorry to see you go.</p>
+        <!-- Right Side: Login Form -->
+        <div class="flex-1 flex items-start justify-center p-6 lg:pt-32 relative">
+            <div class="w-full max-w-[440px]">
+
+                <!-- Account Deleted Banner -->
+                @if (session('status') === 'account-deleted')
+                    <div class="mb-6 rounded-2xl bg-red-50 p-4 ring-1 ring-red-100 flex items-center gap-3">
+                        <i data-lucide="user-x" class="h-5 w-5 text-red-500 shrink-0"></i>
+                        <div>
+                            <p class="text-[11px] font-black text-red-700 uppercase tracking-wider">Account Deactivated</p>
+                            <p class="text-xs text-red-500 mt-0.5">Your account has been successfully deleted. We're sorry to
+                                see you go.</p>
+                        </div>
                     </div>
-                </div>
-            @elseif (session('status'))
-                <!-- Session Status -->
-                <div class="mb-6 rounded-2xl bg-green-50 p-4 ring-1 ring-green-100 flex items-center gap-3">
-                    <i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>
-                    <p class="text-[11px] font-bold text-green-700 uppercase tracking-wider">{{ session('status') }}</p>
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('login') }}" class="space-y-6" onsubmit="handleAuthSubmit(this)">
-                @csrf
-
-                <!-- Email Address -->
-                <div class="space-y-2">
-                    <label for="email" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email Address</label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
-                           class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300"
-                           placeholder="Enter Your mail">
-                    @error('email')
-                        <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Password -->
-                <div class="space-y-2" x-data="{ show: false }">
-                    <div class="flex items-center justify-between px-1">
-                        <label for="password" class="text-[10px] font-black uppercase tracking-widest text-gray-400">Password</label>
-                        @if (Route::has('password.request'))
-                            <a href="javascript:void(0)" onclick="openForgotPasswordFlow()" class="text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-[color:var(--primary)] transition">Forgot?</a>
-                        @endif
+                @elseif (session('status'))
+                    <!-- Session Status -->
+                    <div class="mb-6 rounded-2xl bg-green-50 p-4 ring-1 ring-green-100 flex items-center gap-3">
+                        <i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>
+                        <p class="text-[11px] font-bold text-green-700 uppercase tracking-wider">{{ session('status') }}</p>
                     </div>
-                    <div class="relative group">
-                        <input id="password" :type="show ? 'text' : 'password'" name="password" required autocomplete="current-password"
-                               class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 pr-14"
-                               placeholder="••••••••">
-                        <button type="button" @click="show = !show" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[color:var(--primary)] transition-colors">
-                            <i :data-lucide="show ? 'eye-off' : 'eye'" class="h-4 w-4"></i>
+                @endif
+
+                <form method="POST" action="{{ route('login') }}" class="space-y-6" onsubmit="handleAuthSubmit(this)"
+                    up-target="_self">
+                    @csrf
+
+                    <!-- Email Address -->
+                    <div class="space-y-2">
+                        <label for="email" class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email
+                            Address</label>
+                        <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
+                            class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300"
+                            placeholder="Enter Your mail">
+                        @error('email')
+                            <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Password -->
+                    <div class="space-y-2" x-data="{ show: false }">
+                        <div class="flex items-center justify-between px-1">
+                            <label for="password"
+                                class="text-[10px] font-black uppercase tracking-widest text-gray-400">Password</label>
+                            @if (Route::has('password.request'))
+                                <a href="javascript:void(0)" onclick="openForgotPasswordFlow()"
+                                    class="text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-[color:var(--primary)] transition">Forgot?</a>
+                            @endif
+                        </div>
+                        <div class="relative group">
+                            <input id="password" :type="show ? 'text' : 'password'" name="password" required
+                                autocomplete="current-password"
+                                class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 pr-14"
+                                placeholder="••••••••">
+                            <button type="button" @click="show = !show"
+                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[color:var(--primary)] transition-colors">
+                                <i data-lucide="eye" x-show="!show" class="h-4 w-4"></i>
+                                <i data-lucide="eye-off" x-show="show" class="h-4 w-4" style="display:none;"></i>
+                            </button>
+                        </div>
+                        @error('password')
+                            <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="flex items-center px-1">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="checkbox" name="remember"
+                                class="h-4 w-4 rounded border-gray-200 text-[color:var(--primary)] focus:ring-[color:var(--primary)] transition">
+                            <span
+                                class="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-600 transition">Keep
+                                me signed in</span>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-4">
+                        <button type="submit"
+                            class="w-full rounded-2xl bg-[color:var(--text-primary)] py-5 text-xs font-black text-white uppercase tracking-[0.2em] shadow-2xl shadow-black/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 group">
+                            Enter Account
+                            <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1"></i>
                         </button>
                     </div>
-                    @error('password')
-                        <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{{ $message }}</p>
-                    @enderror
-                </div>
 
-                <!-- Remember Me -->
-                <div class="flex items-center px-1">
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox" name="remember" class="h-4 w-4 rounded border-gray-200 text-[color:var(--primary)] focus:ring-[color:var(--primary)] transition">
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-600 transition">Keep me signed in</span>
-                    </label>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="pt-4">
-                    <button type="submit" class="w-full rounded-2xl bg-[color:var(--text-primary)] py-5 text-xs font-black text-white uppercase tracking-[0.2em] shadow-2xl shadow-black/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 group">
-                        Enter Account
-                        <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1"></i>
-                    </button>
-                </div>
-
-                <!-- Register Redirect -->
-                <div class="pt-6 text-center">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                        No account? 
-                        <a href="{{ route('register') }}" class="text-[color:var(--primary)] hover:underline underline-offset-4">Create One</a>
-                    </p>
-                </div>
-            </form>
+                    <!-- Register Redirect -->
+                    <div class="pt-6 text-center">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                            No account?
+                            <a href="{{ route('register') }}"
+                                class="text-[color:var(--primary)] hover:underline underline-offset-4">Create One</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         function handleAuthSubmit(form) {
             const btn = form.querySelector('button[type="submit"]');

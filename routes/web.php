@@ -35,9 +35,10 @@ Route::patch('/cart/update', [CartController::class, 'update'])->name('cart.upda
 Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/search-suggestions', [ProductController::class, 'searchSuggestions'])->name('products.search-suggestions');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/product/{slug}/reviews', [ProductController::class, 'reviews'])->name('products.reviews');
-Route::post('/product/{id}/reviews', [ProductController::class, 'storeReview'])->name('products.reviews.store')->middleware('auth');
+Route::post('/product/{id}/reviews', [ProductController::class, 'storeReview'])->name('products.reviews.store');
 Route::post('/coupons/apply', [\App\Http\Controllers\Public\CouponController::class, 'apply'])->name('coupons.apply');
 
 // Admin routes (all authenticated users are admins)
@@ -57,6 +58,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', function() { return redirect()->route('my-orders', ['tab' => 'profile']); })->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Address Management
+    Route::post('/addresses', [\App\Http\Controllers\Public\AddressController::class, 'store'])->name('addresses.store');
+    Route::put('/addresses/{address}', [\App\Http\Controllers\Public\AddressController::class, 'update'])->name('addresses.update');
+    Route::delete('/addresses/{address}', [\App\Http\Controllers\Public\AddressController::class, 'destroy'])->name('addresses.destroy');
+    Route::post('/addresses/{address}/default', [\App\Http\Controllers\Public\AddressController::class, 'setDefault'])->name('addresses.set-default');
 });
 
 // Admin routes

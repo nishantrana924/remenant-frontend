@@ -29,27 +29,29 @@
                                         @endphp
                                         
                                         <!-- Desktop Image -->
-                                        <div class="hidden sm:block w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 relative group/img">
+                                        <a href="{{ route('products.show', $details['slug']) }}" class="hidden sm:block w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 relative group/img">
                                             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay"></div>
                                             <img src="{{ $imagePath }}" 
                                                  alt="{{ $details['title'] }}" 
-                                                 class="h-full w-full object-contain p-2 opacity-0 transition-opacity duration-300"
+                                                 class="h-full w-full object-cover opacity-0 transition-opacity duration-300"
                                                  onload="this.classList.remove('opacity-0'); this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
                                                  onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($details['title']) }}&color=ea5f06&background=fff1e8'; this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
-                                        </div>
+                                        </a>
 
                                         <!-- Mobile Header -->
                                         <div class="flex sm:hidden gap-4 items-start">
-                                            <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 relative">
+                                            <a href="{{ route('products.show', $details['slug']) }}" class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 relative">
                                                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay"></div>
                                                 <img src="{{ $imagePath }}" 
                                                      alt="{{ $details['title'] }}" 
-                                                     class="h-full w-full object-contain p-2 opacity-0 transition-opacity duration-300"
+                                                     class="h-full w-full object-cover opacity-0 transition-opacity duration-300"
                                                      onload="this.classList.remove('opacity-0'); this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
                                                      onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($details['title']) }}&color=ea5f06&background=fff1e8'; this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
-                                            </div>
+                                            </a>
                                             <div class="flex-1">
-                                                <h3 class="text-sm font-extrabold text-slate-900 leading-tight">{{ $details['title'] }}</h3>
+                                                <a href="{{ route('products.show', $details['slug']) }}" class="block">
+                                                    <h3 class="text-sm font-extrabold text-slate-900 leading-tight hover:text-[var(--primary)] transition-colors">{{ $details['title'] }}</h3>
+                                                </a>
                                                 <p class="text-[11px] text-gray-400 mt-1 font-medium">{{ $details['subtitle'] ?? 'Remenant Health' }}</p>
                                                 <div class="mt-3 flex items-center gap-2">
                                                     <span class="text-sm text-gray-400 line-through">₹{{ number_format($details['mrp']) }}</span>
@@ -62,7 +64,9 @@
                                         <div class="hidden sm:flex flex-1 flex flex-col justify-between">
                                             <div class="flex justify-between items-start gap-4">
                                                 <div class="flex-1">
-                                                    <h3 class="text-base font-semibold text-slate-900 leading-tight">{{ $details['title'] }}</h3>
+                                                    <a href="{{ route('products.show', $details['slug']) }}" class="block group/title">
+                                                        <h3 class="text-base font-semibold text-slate-900 leading-tight group-hover/title:text-[var(--primary)] transition-colors">{{ $details['title'] }}</h3>
+                                                    </a>
                                                     <p class="text-xs text-gray-400 mt-2 font-medium">{{ $details['subtitle'] ?? 'Remenant Health' }} • {{ $details['details'] ?? 'Standard' }}</p>
                                                     <div class="mt-3 flex items-center gap-2 text-[11px] text-gray-500 font-bold bg-gray-50/50 w-fit px-2 py-1 rounded border border-gray-100">
                                                         <i data-lucide="truck" class="w-3.5 h-3.5 text-gray-400"></i>
@@ -206,118 +210,120 @@
             </div>
         </div>
     </div>
-@endsection
+    
+    <script>
+        function initCartPage() {
+            if (typeof jQuery === 'undefined') return;
+            
+            let itemToRemove = null;
 
-@push('scripts')
-<script>
-    $(document).ready(function () {
-        let itemToRemove = null;
-
-        // AJAX Update Quantity
-        function updateCart(id, qty, row) {
-            $.ajax({
-                url: '{{ route("cart.update") }}',
-                method: "patch",
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    id: id,
-                    quantity: qty
-                },
-                success: function (response) {
-                    if (response.success) {
-                        // Update quantity in UI
-                        row.find('.quantity-value').text(qty);
-                        
-                        // Update individual item total if needed (optional)
-                        
-                        // Update sidebar totals
-                        updateSidebarTotals(response.totals);
-                        
-                        // Show success toast using our global system
-                        if (window.RemenantApp) {
-                            RemenantApp.showToast('success', 'Cart updated');
-                        }
-                    }
-                }
-            });
-        }
-
-        // AJAX Remove Item
-        function removeItem(id) {
-            $.ajax({
-                url: '{{ route("cart.remove") }}',
-                method: "DELETE",
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    id: id
-                },
-                success: function (response) {
-                    if (response.success) {
-                        // Remove item from DOM
-                        $(`.cart-item[data-item-id="${id}"]`).fadeOut(300, function() {
-                            $(this).remove();
-                            
-                            // If cart is empty, reload to show empty state
-                            if (response.totals.count === 0) {
-                                location.reload();
+            // AJAX Update Quantity
+            function updateCart(id, qty, row) {
+                $.ajax({
+                    url: '{{ route("cart.update") }}',
+                    method: "patch",
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: id,
+                        quantity: qty
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            row.find('.quantity-value').text(qty);
+                            updateSidebarTotals(response.totals);
+                            if (window.RemenantApp) {
+                                RemenantApp.showToast('success', 'Cart updated');
                             }
-                        });
-
-                        // Update sidebar totals
-                        updateSidebarTotals(response.totals);
-                        
-                        if (window.RemenantApp) {
-                            RemenantApp.showToast('success', 'Item removed');
-                            RemenantApp.updateCartCount(response.totals.count);
                         }
-                        
-                        hideRemoveModal();
+                    }
+                });
+            }
+
+            // AJAX Remove Item
+            function removeItem(id) {
+                $.ajax({
+                    url: '{{ route("cart.remove") }}',
+                    method: "DELETE",
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: id
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            $(`.cart-item[data-item-id="${id}"]`).fadeOut(300, function() {
+                                $(this).remove();
+                                if (response.totals.count === 0) {
+                                    location.reload();
+                                }
+                            });
+
+                            updateSidebarTotals(response.totals);
+                            if (window.RemenantApp) {
+                                RemenantApp.showToast('success', 'Item removed');
+                                RemenantApp.updateCartCount(response.totals.count);
+                            }
+                            hideRemoveModal();
+                        }
+                    }
+                });
+            }
+
+            function updateSidebarTotals(totals) {
+                $('#cart-items-count').text(`Price (${totals.count} items)`);
+                $('#cart-mrp-total').text(`₹${totals.subtotal}`);
+                $('#cart-discount-total').text(`- ₹${totals.discount}`);
+                $('#cart-final-total').text(`₹${totals.total}`);
+                $('#cart-savings-amount').text(`₹${totals.discount}`);
+            }
+
+            $('.btn-increase').off('click').on('click', function () {
+                const row = $(this).closest('.cart-item');
+                const id = row.data('item-id');
+                const qty = parseInt(row.find('.quantity-value').first().text()) + 1;
+                updateCart(id, qty, row);
+            });
+
+            $('.btn-decrease').off('click').on('click', function () {
+                const row = $(this).closest('.cart-item');
+                const id = row.data('item-id');
+                const qty = parseInt(row.find('.quantity-value').first().text()) - 1;
+                if (qty > 0) updateCart(id, qty, row);
+                else showRemoveModal(id);
+            });
+
+            $('.btn-remove').off('click').on('click', function () {
+                const id = $(this).closest('.cart-item').data('item-id');
+                showRemoveModal(id);
+            });
+
+            function showRemoveModal(id) {
+                itemToRemove = id;
+                $('#removeConfirmModal').removeClass('hidden').addClass('flex');
+                setTimeout(() => { $('#removeConfirmModal').removeClass('opacity-0').addClass('opacity-100'); $('#removeConfirmModal > div').removeClass('scale-90').addClass('scale-100'); }, 10);
+            }
+
+            function hideRemoveModal() {
+                $('#removeConfirmModal').addClass('opacity-0').removeClass('opacity-100');
+                setTimeout(() => { $('#removeConfirmModal').addClass('hidden').removeClass('flex'); itemToRemove = null; }, 300);
+            }
+
+            $('#cancelRemove').off('click').on('click', hideRemoveModal);
+            $('#confirmRemove').off('click').on('click', function () { if (itemToRemove) removeItem(itemToRemove); hideRemoveModal(); });
+        }
+
+        // Initial load
+        $(document).ready(initCartPage);
+        
+        // Unpoly re-init
+        if (window.up) {
+            up.on('up:fragment:inserted', function(event) {
+                const fragment = event.fragment || event.target;
+                if (fragment && typeof fragment.querySelector === 'function') {
+                    if (fragment.querySelector('.cart-item') || fragment.querySelector('#removeConfirmModal')) {
+                        initCartPage();
                     }
                 }
             });
         }
-
-        function updateSidebarTotals(totals) {
-            $('#cart-items-count').text(`Price (${totals.count} items)`);
-            $('#cart-mrp-total').text(`₹${totals.subtotal}`);
-            $('#cart-discount-total').text(`- ₹${totals.discount}`);
-            $('#cart-final-total').text(`₹${totals.total}`);
-            $('#cart-savings-amount').text(`₹${totals.discount}`);
-        }
-
-        $('.btn-increase').on('click', function () {
-            const row = $(this).closest('.cart-item');
-            const id = row.data('item-id');
-            const qty = parseInt(row.find('.quantity-value').first().text()) + 1;
-            updateCart(id, qty, row);
-        });
-
-        $('.btn-decrease').on('click', function () {
-            const row = $(this).closest('.cart-item');
-            const id = row.data('item-id');
-            const qty = parseInt(row.find('.quantity-value').first().text()) - 1;
-            if (qty > 0) updateCart(id, qty, row);
-            else showRemoveModal(id);
-        });
-
-        $('.btn-remove').on('click', function () {
-            const id = $(this).closest('.cart-item').data('item-id');
-            showRemoveModal(id);
-        });
-
-        function showRemoveModal(id) {
-            itemToRemove = id;
-            $('#removeConfirmModal').removeClass('hidden').addClass('flex');
-            setTimeout(() => { $('#removeConfirmModal').removeClass('opacity-0').addClass('opacity-100'); $('#removeConfirmModal > div').removeClass('scale-90').addClass('scale-100'); }, 10);
-        }
-
-        function hideRemoveModal() {
-            $('#removeConfirmModal').addClass('opacity-0').removeClass('opacity-100');
-            setTimeout(() => { $('#removeConfirmModal').addClass('hidden').removeClass('flex'); itemToRemove = null; }, 300);
-        }
-
-        $('#cancelRemove').on('click', hideRemoveModal);
-        $('#confirmRemove').on('click', function () { if (itemToRemove) removeItem(itemToRemove); hideRemoveModal(); });
-    });
-</script>
-@endpush
+    </script>
+@endsection

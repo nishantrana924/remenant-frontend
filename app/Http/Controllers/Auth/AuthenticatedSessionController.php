@@ -28,6 +28,27 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Check for pending review
+        if ($pending = $request->session()->pull('pending_review')) {
+            try {
+                (new \App\Http\Controllers\Public\ProductController)->executeReviewCreation(
+                    $pending['product_id'],
+                    auth()->id(),
+                    $pending['rating'],
+                    $pending['comment'],
+                    $pending['images'] ?? []
+                );
+
+                $product = \App\Models\Product::find($pending['product_id']);
+                if ($product) {
+                    return redirect()->route('products.show', $product->slug)
+                        ->with('success', 'Welcome back! Your review has been submitted.');
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to post pending review: ' . $e->getMessage());
+            }
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

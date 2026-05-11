@@ -64,14 +64,42 @@
                                 <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
                                 02. Shipping Address
                             </h2>
-                            <div class="space-y-4">
+
+                            @if(count($addresses) > 0)
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                                @foreach($addresses as $address)
+                                <label class="relative flex flex-col p-5 rounded-2xl border-2 cursor-pointer transition-all address-card {{ $address->is_default ? 'border-orange-500 bg-orange-50/30' : 'border-slate-50 hover:border-orange-200' }}">
+                                    <input type="radio" name="selected_address_id" value="{{ $address->id }}" 
+                                           class="absolute top-4 right-4 h-4 w-4 text-orange-500"
+                                           {{ $address->is_default ? 'checked' : '' }}
+                                           onchange="handleAddressSelection(this, {{ json_encode($address) }})">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i data-lucide="{{ $address->type === 'Work' ? 'briefcase' : 'home' }}" class="h-3 w-3 text-slate-400"></i>
+                                        <span class="text-[10px] font-black text-slate-900 uppercase tracking-tight">{{ $address->type }}</span>
+                                    </div>
+                                    <span class="text-[11px] font-bold text-slate-500 leading-relaxed">
+                                        <span class="text-slate-900">{{ $address->full_name }}</span><br>
+                                        {{ Str::limit($address->address_line1, 30) }}<br>
+                                        {{ $address->city }}, {{ $address->pincode }}
+                                    </span>
+                                </label>
+                                @endforeach
+                                <label class="relative flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-slate-100 cursor-pointer hover:border-orange-200 transition-all address-card" onclick="clearAddressForm()">
+                                    <input type="radio" name="selected_address_id" value="new" class="hidden">
+                                    <i data-lucide="plus" class="h-4 w-4 text-slate-300 mb-1"></i>
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">New Address</span>
+                                </label>
+                            </div>
+                            @endif
+
+                            <div class="space-y-4 {{ count($addresses) > 0 ? 'hidden opacity-0' : '' }} transition-all duration-300" id="address-form-fields">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <input type="text" name="first_name" required placeholder="First Name" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
-                                    <input type="text" name="last_name" required placeholder="Last Name" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
+                                    <input type="text" name="first_name" id="ship-first-name" required placeholder="First Name" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
+                                    <input type="text" name="last_name" id="ship-last-name" required placeholder="Last Name" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
                                 </div>
-                                <input type="text" name="address" required placeholder="Street Address, House No, Area" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
+                                <input type="text" name="address" id="ship-address" required placeholder="Street Address, House No, Area" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <input type="text" name="pincode" required pattern="[0-9]{6}" placeholder="Pincode" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
+                                    <input type="text" name="pincode" id="ship-pincode" required pattern="[0-9]{6}" placeholder="Pincode" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
                                     <input type="text" id="city-input" name="city" required placeholder="City" class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 transition-all">
                                     <div class="relative">
                                         <select id="state-select" name="state" required class="w-full rounded-xl bg-slate-50/50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-orange-500 appearance-none transition-all">
@@ -162,17 +190,19 @@
                     <div class="space-y-4 mb-6">
                         @foreach($items as $item)
                             <div class="flex gap-4 items-center p-3 rounded-2xl bg-slate-50/50 ring-1 ring-black/[0.02]">
-                                <div class="h-16 w-16 shrink-0 rounded-xl bg-white p-2 shadow-sm relative overflow-hidden bg-gray-100">
+                                <a href="{{ route('products.show', $item['slug'] ?? '#') }}" class="h-16 w-16 shrink-0 rounded-xl bg-white p-2 shadow-sm relative overflow-hidden bg-gray-100 group/img">
                                     <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite] skeleton-overlay"></div>
                                     <img src="{{ \App\Helpers\ImageHelper::getUrl($item['image'], 'products') }}" 
                                          alt="{{ $item['title'] }}" 
-                                         class="h-full w-full object-contain opacity-0 transition-opacity duration-300"
+                                         class="h-full w-full object-cover opacity-0 transition-opacity duration-300"
                                          onload="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
                                          onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($item['title']) }}&color=ea5f06&background=fff1e8'; this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
                                     <span class="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-slate-900 text-white text-[9px] font-black flex items-center justify-center z-10">{{ $item['quantity'] }}</span>
-                                </div>
+                                </a>
                                 <div class="flex-1 min-w-0">
-                                    <h3 class="text-xs font-black text-slate-900 uppercase truncate">{{ $item['title'] }}</h3>
+                                    <a href="{{ route('products.show', $item['slug'] ?? '#') }}" class="block group/title">
+                                        <h3 class="text-xs font-black text-slate-900 uppercase truncate group-hover/title:text-orange-500 transition-colors">{{ $item['title'] }}</h3>
+                                    </a>
                                     <p class="text-[9px] font-bold text-slate-400 uppercase mt-0.5 truncate">₹{{ number_format($item['price']) }} x {{ $item['quantity'] }}</p>
                                     <p class="text-sm font-black text-slate-900 mt-1">₹{{ number_format($item['price'] * $item['quantity']) }}</p>
                                 </div>
@@ -307,6 +337,48 @@
         } catch (e) { console.error('Failed to load draft', e); }
     }
 
+    window.handleAddressSelection = function(radio, address) {
+        // Update UI
+        document.querySelectorAll('.address-card').forEach(c => c.classList.remove('border-orange-500', 'bg-orange-50/30'));
+        radio.parentElement.classList.add('border-orange-500', 'bg-orange-50/30');
+
+        const formFields = document.getElementById('address-form-fields');
+        formFields.classList.add('hidden', 'opacity-0');
+
+        // Split name
+        const names = address.full_name.split(' ');
+        document.getElementById('ship-first-name').value = names[0] || '';
+        document.getElementById('ship-last-name').value = names.slice(1).join(' ') || '';
+        document.getElementById('ship-address').value = address.address_line1 + (address.address_line2 ? ', ' + address.address_line2 : '');
+        document.getElementById('ship-pincode').value = address.pincode;
+        document.getElementById('city-input').value = address.city;
+        document.getElementById('state-select').value = address.state;
+        
+        // Update phone
+        document.querySelector('[name="phone"]').value = address.phone;
+
+        saveDraft();
+    }
+
+    window.clearAddressForm = function() {
+        document.querySelectorAll('.address-card').forEach(c => c.classList.remove('border-orange-500', 'bg-orange-50/30'));
+        const newCard = document.querySelector('input[value="new"]').parentElement;
+        newCard.classList.add('border-orange-500', 'bg-orange-50/30');
+
+        const formFields = document.getElementById('address-form-fields');
+        formFields.classList.remove('hidden');
+        setTimeout(() => formFields.classList.remove('opacity-0'), 10);
+
+        document.getElementById('ship-first-name').value = '';
+        document.getElementById('ship-last-name').value = '';
+        document.getElementById('ship-address').value = '';
+        document.getElementById('ship-pincode').value = '';
+        document.getElementById('city-input').value = '';
+        document.getElementById('state-select').value = 'Madhya Pradesh';
+        
+        saveDraft();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         loadDraft();
         const form = document.getElementById('checkout-form');
@@ -314,9 +386,19 @@
             input.addEventListener('input', saveDraft);
             input.addEventListener('change', saveDraft);
         });
+
+        // Initialize with default address if exists
+        const defaultRadio = document.querySelector('input[name="selected_address_id"]:checked');
+        if (defaultRadio && defaultRadio.value !== 'new') {
+            const initialAddress = @json($addresses->where('is_default', true)->first());
+            if (initialAddress) handleAddressSelection(defaultRadio, initialAddress);
+        } else if (!defaultRadio) {
+            clearAddressForm();
+        }
     });
 
     function autoDetectState(city) {
+        // ... (existing code) ...
         const stateSelect = document.getElementById('state-select');
         const cityLower = city.toLowerCase().trim();
         const mapping = {

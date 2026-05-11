@@ -48,6 +48,27 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // Check for pending review
+        if ($pending = $request->session()->pull('pending_review')) {
+            try {
+                (new \App\Http\Controllers\Public\ProductController)->executeReviewCreation(
+                    $pending['product_id'],
+                    $user->id,
+                    $pending['rating'],
+                    $pending['comment'],
+                    $pending['images'] ?? []
+                );
+
+                $product = \App\Models\Product::find($pending['product_id']);
+                if ($product) {
+                    return redirect()->route('products.show', $product->slug)
+                        ->with('success', 'Account created! Your review has also been submitted.');
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to post pending review after registration: ' . $e->getMessage());
+            }
+        }
+
         return redirect(route('dashboard', absolute: false));
     }
 }

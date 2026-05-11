@@ -26,7 +26,7 @@ class UserController extends Controller
 
     public function show($id)
     {
-        $item = User::withTrashed()->with(['orders.orderItems.product'])->findOrFail($id);
+        $item = User::withTrashed()->with(['orders.orderItems.product', 'addresses'])->findOrFail($id);
         
         $stats = [
             'total_spent' => $item->orders()->where('payment_status', 'paid')->sum('total_amount'),

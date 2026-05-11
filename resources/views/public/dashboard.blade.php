@@ -66,7 +66,7 @@
             
             <!-- SECTION: ORDERS -->
             <div id="section-orders" class="tab-section {{ $activeTab !== 'orders' ? 'hidden' : '' }} transition-all duration-300">
-                <div class="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row items-center gap-6 justify-between bg-white sticky top-0 z-10">
+                <div class="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row items-center gap-6 justify-between bg-white sticky top-[72px] lg:top-[80px] z-10">
                     <h3 class="text-lg font-black uppercase tracking-tighter text-slate-900">Order Intelligence</h3>
                     <div class="relative w-full md:w-72">
                         <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300"></i>
@@ -207,51 +207,47 @@
                         <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900">Manage Addresses</h3>
                         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Primary delivery locations</p>
                     </div>
-                    <button class="bg-slate-900 text-white px-6 py-3 text-[9px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all rounded-xl flex items-center gap-2">
+                    <button onclick="openAddressModal()" class="bg-slate-900 text-white px-6 py-3 text-[9px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all rounded-xl flex items-center gap-2">
                         <i data-lucide="plus" class="h-3 w-3"></i> Add New Address
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Default Address Card -->
-                    <div class="border-2 border-orange-500 bg-white p-8 rounded-[2rem] relative group shadow-xl shadow-orange-50">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="addresses-container">
+                    @forelse($addresses as $address)
+                    <div class="border-2 {{ $address->is_default ? 'border-orange-500 shadow-xl shadow-orange-50' : 'border-slate-100 hover:border-slate-200' }} bg-white p-8 rounded-[2rem] relative group transition-all">
+                        @if($address->is_default)
                         <div class="absolute top-6 right-6">
                             <span class="bg-orange-500 text-white text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Default</span>
                         </div>
-                        <div class="h-10 w-10 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center mb-6">
-                            <i data-lucide="home" class="h-5 w-5"></i>
+                        @endif
+                        <div class="h-10 w-10 {{ $address->is_default ? 'bg-orange-50 text-orange-500' : 'bg-slate-50 text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-500' }} rounded-xl flex items-center justify-center mb-6 transition-all">
+                            <i data-lucide="{{ $address->type === 'Work' ? 'briefcase' : 'home' }}" class="h-5 w-5"></i>
                         </div>
-                        <h4 class="font-black text-slate-900 uppercase text-xs mb-2">Home Address</h4>
+                        <h4 class="font-black text-slate-900 uppercase text-xs mb-2">{{ $address->type }} Address</h4>
                         <p class="text-xs text-slate-500 leading-relaxed font-medium mb-6">
-                            {{ auth()->user()->name }}<br>
-                            Plot No. 12, Sector 44, Gurgaon<br>
-                            Haryana, 122003<br>
-                            Phone: {{ auth()->user()->phone ?? '+91 98765 43210' }}
+                            <strong>{{ $address->full_name }}</strong><br>
+                            {{ $address->address_line1 }}@if($address->address_line2), {{ $address->address_line2 }}@endif<br>
+                            {{ $address->city }}, {{ $address->state }}, {{ $address->pincode }}<br>
+                            Phone: {{ $address->phone }}
                         </p>
                         <div class="flex items-center gap-4 pt-6 border-t border-slate-50">
-                            <button class="text-[9px] font-black text-slate-400 hover:text-orange-500 uppercase tracking-widest">Edit Address</button>
+                            <button onclick="editAddress({{ json_encode($address) }})" class="text-[9px] font-black text-slate-400 hover:text-orange-500 uppercase tracking-widest">Edit Address</button>
+                            @if(!$address->is_default)
                             <span class="h-3 w-px bg-slate-100"></span>
-                            <button class="text-[9px] font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest">Remove</button>
+                            <button onclick="setDefaultAddress({{ $address->id }})" class="text-[9px] font-black text-slate-400 hover:text-indigo-500 uppercase tracking-widest">Set Default</button>
+                            @endif
+                            <span class="h-3 w-px bg-slate-100"></span>
+                            <button onclick="deleteAddress({{ $address->id }})" class="text-[9px] font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest">Remove</button>
                         </div>
                     </div>
-
-                    <!-- Work Address Card -->
-                    <div class="border border-slate-100 bg-white p-8 rounded-[2rem] hover:border-slate-200 transition-all group">
-                        <div class="h-10 w-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all">
-                            <i data-lucide="briefcase" class="h-5 w-5"></i>
+                    @empty
+                    <div class="col-span-full py-20 text-center border-2 border-dashed border-slate-100 rounded-[2.5rem]">
+                        <div class="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="map-pin" class="h-6 w-6 text-slate-200"></i>
                         </div>
-                        <h4 class="font-black text-slate-900 uppercase text-xs mb-2">Work Office</h4>
-                        <p class="text-xs text-slate-500 leading-relaxed font-medium mb-6">
-                            Remenant Health HQ<br>
-                            Cyber Hub, DLF Phase 3<br>
-                            Gurgaon, Haryana, 122002
-                        </p>
-                        <div class="flex items-center gap-4 pt-6 border-t border-slate-50">
-                            <button class="text-[9px] font-black text-slate-400 hover:text-indigo-500 uppercase tracking-widest">Edit Address</button>
-                            <span class="h-3 w-px bg-slate-100"></span>
-                            <button class="text-[9px] font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest">Remove</button>
-                        </div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">No addresses saved yet</p>
                     </div>
+                    @endforelse
                 </div>
             </div>
 
@@ -372,51 +368,235 @@
     </div>
 </div>
 
+<!-- Address Modal -->
+<div id="address-modal" class="fixed inset-0 z-[10000] hidden">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-500 opacity-0" id="address-modal-overlay" onclick="closeAddressModal()"></div>
+    <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col transform translate-x-full transition-transform duration-500" id="address-modal-content">
+        <div class="p-8 border-b border-slate-50 flex items-center justify-between shrink-0">
+            <div>
+                <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900" id="address-modal-title">Add Address</h3>
+                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Fill in the delivery details</p>
+            </div>
+            <button onclick="closeAddressModal()" class="h-10 w-10 rounded-full hover:bg-slate-50 flex items-center justify-center text-slate-400 transition-all">
+                <i data-lucide="x" class="h-5 w-5"></i>
+            </button>
+        </div>
+        
+        <form id="address-form" class="flex-1 overflow-y-auto p-8 space-y-6" onsubmit="saveAddress(event)">
+            @csrf
+            <input type="hidden" id="address-id" name="id">
+            
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Address Type</label>
+                    <select name="type" id="address-type" class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+                        <option value="Home">Home</option>
+                        <option value="Work">Work</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="space-y-2 flex items-end">
+                    <label class="flex items-center gap-3 cursor-pointer group pb-3.5 pl-1">
+                        <input type="checkbox" name="is_default" id="address-default" value="1" class="rounded border-slate-200 text-orange-500 focus:ring-orange-500/20">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-slate-600 transition-colors">Set Default</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                <input type="text" name="full_name" id="address-name" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
+                <input type="text" name="phone" id="address-phone" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Address Line 1</label>
+                <input type="text" name="address_line1" id="address-line1" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Address Line 2 (Optional)</label>
+                <input type="text" name="address_line2" id="address-line2" class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">City</label>
+                    <input type="text" name="city" id="address-city" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">State</label>
+                    <input type="text" name="state" id="address-state" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Pincode</label>
+                    <input type="text" name="pincode" id="address-pincode" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Country</label>
+                    <input type="text" name="country" value="India" readonly class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl opacity-60">
+                </div>
+            </div>
+
+            <div class="pt-6">
+                <button type="submit" id="address-submit-btn" class="w-full bg-slate-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all rounded-xl shadow-lg shadow-slate-100 flex items-center justify-center gap-2">
+                    <span>Save Address</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <style>
     main { padding: 0 !important; margin: 0 !important; max-width: none !important; }
     .nav-link.active { background: #FFF7ED; color: #F97316; border-right: 4px solid #F97316; }
     .nav-link:not(.active) { color: #64748B; border-right: 4px solid transparent; }
 </style>
 
-<script>
-    function switchTab(tabId, el) {
-        // Hide all sections
-        document.querySelectorAll('.tab-section').forEach(s => s.classList.add('hidden'));
-        // Show target section
-        document.getElementById('section-' + tabId).classList.remove('hidden');
+    // Address Management
+    function openAddressModal(address = null) {
+        const modal = document.getElementById('address-modal');
+        const content = document.getElementById('address-modal-content');
+        const overlay = document.getElementById('address-modal-overlay');
+        const form = document.getElementById('address-form');
+        const title = document.getElementById('address-modal-title');
         
-        // Update nav links
-        document.querySelectorAll('.nav-link').forEach(l => {
-            l.classList.remove('active', 'bg-orange-50', 'text-orange-600', 'border-r-4', 'border-orange-500');
-        });
-        el.classList.add('active', 'bg-orange-50', 'text-orange-600', 'border-r-4', 'border-orange-500');
+        form.reset();
+        document.getElementById('address-id').value = '';
         
-        // Update URL without refresh
-        const url = new URL(window.location);
-        url.searchParams.set('tab', tabId);
-        window.history.pushState({}, '', url);
-        
-        if(window.lucide) lucide.createIcons();
+        if (address) {
+            title.innerText = 'Edit Address';
+            document.getElementById('address-id').value = address.id;
+            document.getElementById('address-type').value = address.type;
+            document.getElementById('address-name').value = address.full_name;
+            document.getElementById('address-phone').value = address.phone;
+            document.getElementById('address-line1').value = address.address_line1;
+            document.getElementById('address-line2').value = address.address_line2 || '';
+            document.getElementById('address-city').value = address.city;
+            document.getElementById('address-state').value = address.state;
+            document.getElementById('address-pincode').value = address.pincode;
+            document.getElementById('address-default').checked = address.is_default;
+        } else {
+            title.innerText = 'Add Address';
+        }
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            overlay.classList.remove('opacity-0');
+            content.classList.remove('translate-x-full');
+        }, 10);
+        document.body.style.overflow = 'hidden';
     }
 
-    // Toggle Password Visibility
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.toggle-password')) {
-            const btn = e.target.closest('.toggle-password');
-            const input = btn.parentElement.querySelector('.password-input');
-            const eye = btn.querySelector('.eye-icon');
-            const eyeOff = btn.querySelector('.eye-off-icon');
+    function closeAddressModal() {
+        const content = document.getElementById('address-modal-content');
+        const overlay = document.getElementById('address-modal-overlay');
+        const modal = document.getElementById('address-modal');
+
+        content.classList.add('translate-x-full');
+        overlay.classList.add('opacity-0');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }, 500);
+    }
+
+    window.saveAddress = async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const id = document.getElementById('address-id').value;
+        const btn = document.getElementById('address-submit-btn');
+        const originalHtml = btn.innerHTML;
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="h-4 w-4 animate-spin"></i> Processing...';
+        if(window.lucide) lucide.createIcons();
+
+        const url = id ? `/addresses/${id}` : '/addresses';
+        const method = id ? 'PUT' : 'POST';
+        
+        const formData = new FormData(form);
+        if (id) formData.append('_method', 'PUT');
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const data = await response.json();
             
-            if (input.type === 'password') {
-                input.type = 'text';
-                eye.classList.add('hidden');
-                eyeOff.classList.remove('hidden');
+            if (response.ok) {
+                showToast(data.message, 'success');
+                closeAddressModal();
+                setTimeout(() => location.reload(), 1000);
             } else {
-                input.type = 'password';
-                eye.classList.remove('hidden');
-                eyeOff.classList.add('hidden');
+                showToast(data.message || 'Validation failed', 'error');
             }
+        } catch (error) {
+            showToast('Something went wrong', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            if(window.lucide) lucide.createIcons();
         }
-    });
-</script>
+    }
+
+    window.editAddress = function(address) {
+        openAddressModal(address);
+    }
+
+    window.deleteAddress = async function(id) {
+        if (!confirm('Are you sure you want to remove this address?')) return;
+        
+        try {
+            const response = await fetch(`/addresses/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                showToast(data.message, 'success');
+                setTimeout(() => location.reload(), 1000);
+            }
+        } catch (error) {
+            showToast('Failed to delete address', 'error');
+        }
+    }
+
+    window.setDefaultAddress = async function(id) {
+        try {
+            const response = await fetch(`/addresses/${id}/default`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                showToast(data.message, 'success');
+                setTimeout(() => location.reload(), 1000);
+            }
+        } catch (error) {
+            showToast('Failed to update default address', 'error');
+        }
+    }
 @endsection

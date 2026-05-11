@@ -146,6 +146,26 @@
         pointer-events: none;
     }
 
+    /* Search Suggestions Responsive Tuning */
+    [data-search-suggestions] {
+        max-height: 80vh;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary) transparent;
+    }
+
+    @media (max-width: 640px) {
+        [data-search-suggestions] {
+            left: -1rem; /* compensate for header padding if needed */
+            right: -1rem;
+            width: calc(100vw - 2rem);
+            margin: 0.5rem auto;
+            position: absolute;
+            border-radius: 1.5rem;
+            max-height: 60vh;
+        }
+    }
+
     /* Top bar marquee */
     .marquee {
         overflow: hidden;
