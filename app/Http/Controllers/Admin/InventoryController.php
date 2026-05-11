@@ -9,30 +9,28 @@ use Illuminate\Http\Request;
 
 class InventoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('variants')->get();
+        $products = Product::with('variants')->latest()->paginate(20);
         
+        // Stats for the top bar (all low stock items across entire DB)
         $low_stock_items = [];
-        foreach ($products as $p) {
+        $all_low = Product::with('variants')->get();
+        foreach ($all_low as $p) {
             if ($p->variants->count() > 0) {
                 foreach ($p->variants as $v) {
-                    if ($v->stock < 10) {
+                    if ($v->stock <= 10) {
                         $low_stock_items[] = [
-                            'name' => $p->title . ' (' . $v->variant_name . ')',
+                            'name' => $p->title . ' (' . ($v->size ?? $v->color ?? $v->weight) . ')',
                             'stock' => $v->stock,
-                            'id' => $p->id,
-                            'type' => 'Variant'
                         ];
                     }
                 }
             } else {
-                if ($p->stock < 10) {
+                if ($p->stock <= 10) {
                     $low_stock_items[] = [
                         'name' => $p->title,
                         'stock' => $p->stock,
-                        'id' => $p->id,
-                        'type' => 'Product'
                     ];
                 }
             }
