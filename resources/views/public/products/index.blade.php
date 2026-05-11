@@ -72,7 +72,7 @@
                                             <input type="checkbox" name="categories[]" value="{{ $cat->slug }}"
                                                    onchange="filterProducts()"
                                                    class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
-                                                   {{ (is_array(request('categories')) && in_array($cat->slug, request('categories'))) ? 'checked' : '' }}>
+                                                   {{ (is_array(request('categories')) && (in_array($cat->slug, request('categories')) || in_array($cat->name, request('categories')))) ? 'checked' : '' }}>
                                             <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">{{ $cat->name }}</span>
                                         </label>
                                     @endforeach

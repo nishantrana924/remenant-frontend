@@ -153,7 +153,7 @@ class AboutController extends Controller
                 'title' => 'Ready to Upgrade Your Health?',
                 'description' => 'Experience the ultimate in bioavailability and convenience. Our science-backed formulations are designed to seamlessly integrate into your modern lifestyle.',
                 'image' => 'images/about/remenant-cta.png',
-                'whatsapp' => 'https://wa.me/17567776796',
+                'whatsapp' => 'https://wa.me/+917567776796?text=Hello%20Remenant%20Health%2C%20I%20have%20a%20question%20about%20your%20products.',
                 'shop_url' => '/#shop'
             ]
         ];

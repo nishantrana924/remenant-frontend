@@ -94,6 +94,41 @@
                 </div>
             </div>
         </div>
+
+        <!-- Address Portfolio -->
+        <div class="premium-card p-8 bg-white border border-slate-100 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="font-black text-slate-800 uppercase tracking-widest text-[10px]">Address Portfolio</h3>
+                <span class="text-[8px] font-black bg-slate-50 text-slate-400 px-2 py-0.5 rounded uppercase tracking-widest">{{ $item->addresses->count() }} Saved</span>
+            </div>
+            
+            <div class="space-y-4">
+                @forelse($item->addresses as $address)
+                <div class="p-4 rounded-2xl border {{ $address->is_default ? 'border-orange-100 bg-orange-50/20' : 'border-slate-50' }} group relative">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i data-lucide="{{ $address->type === 'Work' ? 'briefcase' : 'home' }}" class="h-3.5 w-3.5 {{ $address->is_default ? 'text-orange-500' : 'text-slate-400' }}"></i>
+                        <span class="text-[9px] font-black text-slate-900 uppercase tracking-tight">{{ $address->type }}</span>
+                        @if($address->is_default)
+                        <span class="ml-auto text-[7px] font-black bg-orange-500 text-white px-1.5 py-0.5 rounded uppercase tracking-widest">Default</span>
+                        @endif
+                    </div>
+                    <p class="text-[11px] font-bold text-slate-600 leading-relaxed">
+                        <span class="text-slate-900">{{ $address->full_name }}</span><br>
+                        {{ $address->address_line1 }}@if($address->address_line2), {{ $address->address_line2 }}@endif<br>
+                        {{ $address->city }}, {{ $address->state }}, {{ $address->pincode }}<br>
+                        <span class="flex items-center gap-1 mt-1 text-slate-400">
+                            <i data-lucide="phone" class="h-2.5 w-2.5"></i> {{ $address->phone }}
+                        </span>
+                    </p>
+                </div>
+                @empty
+                <div class="text-center py-8">
+                    <i data-lucide="map-pin" class="h-8 w-8 text-slate-100 mx-auto mb-2"></i>
+                    <p class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">No addresses found</p>
+                </div>
+                @endforelse
+            </div>
+        </div>
     </div>
 
     <!-- Right Column: Order History & Preferences -->

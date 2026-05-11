@@ -14,10 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Faster navigation — follow all standard internal links & forms via Unpoly
-    // Exclude mailto, tel, and explicitly disabled links
-    up.link.config.followSelectors.push('a[href^="/"]:not([up-follow="false"])');
-    up.link.config.followSelectors.push('a[href^="' + window.location.origin + '"]:not([up-follow="false"])');
-    up.form.config.submitSelectors.push('form:not([up-follow="false"])');
+    // Exclude admin area, mailto, tel, and explicitly disabled items
+    const adminPattern = '/admin';
+    up.link.config.followSelectors.push(`a[href^="/"]:not([href^="${adminPattern}"]):not([up-follow="false"])`);
+    up.link.config.followSelectors.push(`a[href^="${window.location.origin}"]:not([href^="${window.location.origin}${adminPattern}"]):not([up-follow="false"])`);
+    up.form.config.submitSelectors.push(`form:not([action^="${adminPattern}"]):not([action^="${window.location.origin}${adminPattern}"]):not([up-follow="false"])`);
 
     // Disable Unpoly's built-in progress bar (we use NProgress instead)
     up.network.config.progressBar = false;

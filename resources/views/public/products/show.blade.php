@@ -1460,12 +1460,12 @@
 
         window.submitReview = function() {
             if (selectedRating === 0) {
-                alert('Please select a rating');
+                showToast('Please select a rating', 'warning');
                 return;
             }
             const comment = $('#review-content').val().trim();
             if (comment.length < 10) {
-                alert('Please write at least 10 characters');
+                showToast('Please write at least 10 characters', 'warning');
                 return;
             }
 
@@ -1491,19 +1491,21 @@
                 contentType: false,
                 success: function(res) {
                     if (res.requires_login) {
-                        // Progress is saved in session by controller
                         window.location.href = res.redirect;
                         return;
                     }
                     if (res.success) {
-                        alert(res.message);
+                        showToast(res.message, 'success');
                         closeWriteReviewModal();
-                        location.reload();
+                        // Wait a moment for the toast to be seen before reloading
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
                     }
                 },
                 error: function(err) {
                     const msg = err.responseJSON?.message || 'Something went wrong';
-                    alert(msg);
+                    showToast(msg, 'error');
                 },
                 complete: function() {
                     btn.prop('disabled', false).html(originalText);

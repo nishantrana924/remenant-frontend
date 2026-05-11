@@ -19,7 +19,7 @@
     <div class="flex-1 flex items-start justify-center p-6 lg:pt-16 relative">
         <div class="w-full max-w-[520px]">
 
-            <form method="POST" action="{{ route('register') }}" class="space-y-6">
+            <form method="POST" action="{{ route('register') }}" class="space-y-6" up-follow="false">
                 @csrf
 
                 <!-- Full Name -->
@@ -64,7 +64,8 @@
                                    class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner pr-14"
                                    placeholder="••••••••">
                             <button type="button" @click="show = !show" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[color:var(--primary)] transition-colors">
-                                <i :data-lucide="show ? 'eye-off' : 'eye'" class="h-4 w-4"></i>
+                                <i data-lucide="eye" x-show="!show" class="h-4 w-4"></i>
+                                <i data-lucide="eye-off" x-show="show" class="h-4 w-4" style="display:none;"></i>
                             </button>
                         </div>
                         @error('password')
@@ -80,7 +81,8 @@
                                    class="w-full rounded-2xl bg-gray-50 border-2 border-transparent px-6 py-4 text-sm font-bold text-[color:var(--text-primary)] focus:bg-white focus:ring-0 focus:border-[color:var(--primary)] focus:outline-none transition-all placeholder:text-gray-300 shadow-inner pr-14"
                                    placeholder="••••••••">
                             <button type="button" @click="show = !show" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[color:var(--primary)] transition-colors">
-                                <i :data-lucide="show ? 'eye-off' : 'eye'" class="h-4 w-4"></i>
+                                <i data-lucide="eye" x-show="!show" class="h-4 w-4"></i>
+                                <i data-lucide="eye-off" x-show="show" class="h-4 w-4" style="display:none;"></i>
                             </button>
                         </div>
                     </div>

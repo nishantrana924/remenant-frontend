@@ -42,7 +42,9 @@ class CheckoutController extends Controller
         $shipping = $subtotal > 999 ? 0 : 99;
         $total = $subtotal + $shipping;
 
-        return view('public.checkout', compact('items', 'subtotal', 'shipping', 'total', 'buyNowProduct'));
+        $addresses = auth()->check() ? auth()->user()->addresses : [];
+
+        return view('public.checkout', compact('items', 'subtotal', 'shipping', 'total', 'buyNowProduct', 'addresses'));
     }
 
     public function store(Request $request)

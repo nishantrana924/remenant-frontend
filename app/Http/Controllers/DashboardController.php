@@ -14,10 +14,16 @@ class DashboardController extends Controller
      */
     public function index(Request $request): RedirectResponse
     {
-        if ($request->user()->isAdmin()) {
-            return redirect()->route('admin.dashboard');
+        $redirect = $request->user()->isAdmin() ? route('admin.dashboard') : route('my-orders');
+
+        // Break out of Unpoly's fragment swapping if we're switching between public and admin layouts
+        if ($request->header('X-Up-Target')) {
+            return response()->redirectTo($redirect)
+                ->header('X-Up-Target', ':main') // Force full page reload
+                ->header('X-Up-Location', $redirect);
         }
-        return redirect()->route('my-orders');
+
+        return redirect()->to($redirect);
     }
 
     /**
@@ -32,8 +38,9 @@ class DashboardController extends Controller
         }
 
         $orders = \App\Models\Order::where('user_id', $user->id)->latest()->get();
+        $addresses = $user->addresses()->latest()->get();
         $activeTab = $request->get('tab', 'orders');
-        return view('public.dashboard', compact('orders', 'user', 'activeTab'));
+        return view('public.dashboard', compact('orders', 'user', 'activeTab', 'addresses'));
     }
 
     /**

@@ -49,7 +49,6 @@
                         @php $cartCount = count(session('cart', [])); @endphp
                         <a href="{{ route('cart') }}"
                             class="header-btn relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
-                            class="header-btn relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
                             aria-label="Cart">
                             <i data-lucide="shopping-cart" class="h-6 w-6"></i>
                             <span
@@ -58,7 +57,7 @@
                             </span>
                         </a>
 
-                        <details class="relative" data-account-dropdown>
+                        <details class="relative" data-account-dropdown-mobile>
                             <summary
                                 class="header-btn list-none inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
                                 aria-label="Account">
@@ -79,7 +78,7 @@
                                 <div class="p-2">
                                     @auth
                                         @if(auth()->user()->isAdmin())
-                                            <a href="{{ route('admin.dashboard') }}"
+                                            <a href="{{ route('admin.dashboard') }}" up-follow="false"
                                                 class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
                                                 <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
                                                 Admin Dashboard
@@ -171,7 +170,6 @@
                 <div class="flex items-center gap-2">
                     <a href="{{ route('cart') }}"
                         class="header-btn relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
-                        class="header-btn relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
                         aria-label="Cart">
                         <i data-lucide="shopping-cart" class="h-5 w-5"></i>
                         <span
@@ -201,7 +199,7 @@
                             <div class="p-2">
                                 @auth
                                     @if(auth()->user()->isAdmin())
-                                        <a href="{{ route('admin.dashboard') }}"
+                                        <a href="{{ route('admin.dashboard') }}" up-follow="false"
                                             class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50">
                                             <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
                                             Admin Dashboard
@@ -254,7 +252,7 @@
                 </div>
             @endif
         <!-- Mobile search bar (Sticky) -->
-        <div class="sm:hidden public-mobile-search px-4 pb-4 -mt-1 {{ $isAuthPage || request()->routeIs('products.show', 'cart') ? 'hidden' : '' }}"
+        <div class="sm:hidden public-mobile-search px-4 pb-4 -mt-1 {{ $isAuthPage || request()->routeIs('products.show', 'cart', 'dashboard', 'my-orders') ? 'hidden' : '' }}"
             data-mobile-search>
             <form action="{{ route('products.index') }}" method="GET" class="relative" data-search-form>
                 <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/80">
@@ -272,6 +270,50 @@
         </div>
     </div>
 </header>
+
+<script>
+    // Handle Account Dropdown Persistence and Behavior
+    (function() {
+        function initAccountDropdown() {
+            const dropdowns = document.querySelectorAll('[data-account-dropdown], [data-account-dropdown-mobile]');
+            
+            dropdowns.forEach(dropdown => {
+                // Close on outside click
+                const outsideClickListener = (e) => {
+                    if (!dropdown.contains(e.target) && dropdown.open) {
+                        dropdown.open = false;
+                    }
+                };
+                
+                document.removeEventListener('click', outsideClickListener);
+                document.addEventListener('click', outsideClickListener);
+
+                // Close on Escape key
+                const escListener = (e) => {
+                    if (e.key === 'Escape' && dropdown.open) {
+                        dropdown.open = false;
+                    }
+                };
+                document.removeEventListener('keydown', escListener);
+                document.addEventListener('keydown', escListener);
+
+                // Close when a link inside is clicked
+                const links = dropdown.querySelectorAll('a, button');
+                links.forEach(link => {
+                    link.addEventListener('click', () => {
+                        dropdown.open = false;
+                    });
+                });
+            });
+        }
+
+        // Initialize on load and after Unpoly fragment insertion
+        initAccountDropdown();
+        if (window.up) {
+            up.on('up:fragment:inserted', initAccountDropdown);
+        }
+    })();
+</script>
 
 <style>
     /* Reinforce sticky behavior */

@@ -3,7 +3,7 @@
 @section('title', 'Track Your Order - Remenant')
 
 @section('content')
-<div class="min-h-screen bg-[#f1f3f6] pt-12 pb-12 px-2 sm:px-4">
+<div class="min-h-screen bg-[#f1f3f6] pt-24 pb-12 px-2 sm:px-4">
     <div class="max-w-[1100px] mx-auto">
         
         <!-- Flipkart-style Search Bar -->

@@ -57,6 +57,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', function() { return redirect()->route('my-orders', ['tab' => 'profile']); })->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Address Management
+    Route::post('/addresses', [\App\Http\Controllers\Public\AddressController::class, 'store'])->name('addresses.store');
+    Route::put('/addresses/{address}', [\App\Http\Controllers\Public\AddressController::class, 'update'])->name('addresses.update');
+    Route::delete('/addresses/{address}', [\App\Http\Controllers\Public\AddressController::class, 'destroy'])->name('addresses.destroy');
+    Route::post('/addresses/{address}/default', [\App\Http\Controllers\Public\AddressController::class, 'setDefault'])->name('addresses.set-default');
 });
 
 // Admin routes

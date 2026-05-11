@@ -228,7 +228,7 @@
 
                         <div class="mt-10 flex flex-wrap justify-center lg:justify-start gap-4">
                             <!-- WhatsApp Button -->
-                            <a href="https://wa.me/17567776796" target="_blank"
+                            <a href="https://wa.me/+917567776796?text=Hello%20Remenant%20Health%2C%20I%20have%20a%20question%20about%20your%20products." target="_blank"
                                 class="inline-flex items-center gap-3 rounded-[20px] bg-[#25D366] px-8 py-4 hover:opacity-90 shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                                 <svg class="h-6 w-6 fill-white" viewBox="0 0 24 24">
                                     <path
@@ -363,7 +363,7 @@
                             Weight<br>Management</h3>
 
                         <div class="mt-auto">
-                            <a href="{{ route('products.index') }}"
+                            <a href="{{ route('products.index', ['categories' => ['Weight Management']]) }}"
                                 class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#2E7D32] shadow-xl transition hover:bg-green-50 hover:scale-105 active:scale-95">
                                 Explore All
                             </a>
@@ -383,7 +383,7 @@
                             Daily<br>Performance</h3>
 
                         <div class="mt-auto">
-                            <a href="{{ route('products.index') }}"
+                            <a href="{{ route('products.index', ['categories' => ['Daily Performance']]) }}"
                                 class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#E91E63] shadow-xl transition hover:bg-pink-50 hover:scale-105 active:scale-95">
                                 Explore All
                             </a>
@@ -403,7 +403,7 @@
                             Hair &<br>Skin Care</h3>
 
                         <div class="mt-auto">
-                            <a href="{{ route('products.index') }}"
+                            <a href="{{ route('products.index', ['categories' => ['Hair & Skin Care']]) }}"
                                 class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#EF6C00] shadow-xl transition hover:bg-orange-50 hover:scale-105 active:scale-95">
                                 Explore All
                             </a>
