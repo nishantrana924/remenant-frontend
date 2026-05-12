@@ -345,7 +345,7 @@
                             <div class="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-2 scrollbar-hide" id="category-list">
                                 @foreach(\App\Models\Category::all() as $category)
                                     <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all cursor-pointer group">
-                                        <input type="checkbox" name="categories[]" value="{{ $category->id }}" {{ $item->categories->contains($category->id) ? 'checked' : '' }} class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
+                                        <input type="checkbox" name="categories[]" value="{{ $category->id }}" x-model="formData.categories" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
                                         <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">{{ $category->name }}</span>
                                     </label>
                                 @endforeach
@@ -424,7 +424,7 @@
                         <div class="pt-4 border-t border-slate-100">
                             <div class="flex items-center justify-between mb-3">
                                 <label class="saas-label font-bold mb-0">Gallery Collection</label>
-                                <span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold" id="gallery-count" x-text="formData.existing_gallery.length + ' Active'"></span>
+                                <span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold" id="gallery-count" x-text="(formData.existing_gallery_count || 0) + '/4 Active'"></span>
                             </div>
                             @if($item->gallery && count($item->gallery) > 0)
                                 <div class="grid grid-cols-4 gap-2 mb-4">
@@ -452,7 +452,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <p class="mt-2 text-[10px] text-slate-400 text-center italic">Upload new images to expand the collection</p>
+                            <p class="mt-2 text-[10px] text-slate-400 text-center italic">Max 4 total images. Max 2MB per image.</p>
                         </div>
                     </div>
                 </div>
@@ -487,11 +487,11 @@
                     <div class="grid grid-cols-2 gap-4 mb-6">
                         <div>
                             <label class="saas-label">SKU</label>
-                            <input type="text" name="sku" value="{{ $item->sku }}" class="saas-input uppercase" placeholder="RM-VITC-01">
+                            <input type="text" name="sku" x-model="formData.sku" class="saas-input uppercase" placeholder="RM-VITC-01">
                         </div>
                         <div>
                             <label class="saas-label">HSN Code</label>
-                            <input type="text" name="hsn_code" value="{{ $item->hsn_code }}" class="saas-input" placeholder="21069099">
+                            <input type="text" name="hsn_code" x-model="formData.hsn_code" class="saas-input" placeholder="21069099">
                         </div>
                     </div>
                     <div class="space-y-6">
@@ -670,7 +670,11 @@ function productSystem() {
                 3: { title: {!! json_encode($item->ritual[3]['title'] ?? '') !!}, desc: {!! json_encode($item->ritual[3]['desc'] ?? '') !!} }
             },
             highlights_list: {!! json_encode($item->highlights ?? []) !!},
-            removed_gallery_images: []
+            sku: {!! json_encode($item->sku) !!},
+            hsn_code: {!! json_encode($item->hsn_code) !!},
+            categories: {!! json_encode($item->categories->pluck('id')) !!},
+            removed_gallery_images: [],
+            existing_gallery_count: {{ count($item->gallery ?? []) }}
         },
         init() {
             this.initEditors();
@@ -792,9 +796,30 @@ function productSystem() {
             });
         },
         initFilePond() {
-            FilePond.registerPlugin(FilePondPluginImagePreview);
-            FilePond.create(document.querySelector('.filepond-main'), { storeAsFile: true });
-            FilePond.create(document.querySelector('.filepond-gallery'), { storeAsFile: true, allowMultiple: true });
+            FilePond.registerPlugin(
+                FilePondPluginImagePreview,
+                FilePondPluginFileValidateSize,
+                FilePondPluginFileValidateType
+            );
+
+            FilePond.create(document.querySelector('.filepond-main'), { 
+                storeAsFile: true,
+                maxFileSize: '2MB',
+                acceptedFileTypes: ['image/*']
+            });
+
+            const gallery = FilePond.create(document.querySelector('.filepond-gallery'), { 
+                storeAsFile: true, 
+                allowMultiple: true,
+                maxFiles: 4,
+                maxFileSize: '2MB',
+                acceptedFileTypes: ['image/*']
+            });
+
+            gallery.on('updatefiles', (files) => {
+                const total = this.formData.existing_gallery_count + files.length;
+                document.getElementById('gallery-count').innerText = total + '/4 Active';
+            });
         },
         async quickAddCategory(event) {
             if (!this.newCategoryName) return;

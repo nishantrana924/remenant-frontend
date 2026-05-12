@@ -192,8 +192,8 @@
                                 <template x-for="step in [1, 2, 3]" :key="step">
                                     <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
                                         <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px] font-bold mb-3" x-text="step"></div>
-                                        <input type="text" :name="'ritual['+step+'][title]'" class="saas-input h-8 mb-2 text-xs font-bold" placeholder="Step Title">
-                                        <textarea :name="'ritual['+step+'][desc]'" rows="2" class="saas-input h-auto py-2 text-[10px]" placeholder="Instruction..."></textarea>
+                                        <input type="text" :name="'ritual['+step+'][title]'" x-model="formData.ritual[step].title" class="saas-input h-8 mb-2 text-xs font-bold" placeholder="Step Title">
+                                        <textarea :name="'ritual['+step+'][desc]'" x-model="formData.ritual[step].desc" rows="2" class="saas-input h-auto py-2 text-[10px]" placeholder="Instruction..."></textarea>
                                     </div>
                                 </template>
                             </div>
@@ -342,7 +342,7 @@
                             <div class="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-2 scrollbar-hide" id="category-list">
                                 @foreach(\App\Models\Category::all() as $category)
                                     <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all cursor-pointer group">
-                                        <input type="checkbox" name="categories[]" value="{{ $category->id }}" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
+                                        <input type="checkbox" name="categories[]" value="{{ $category->id }}" x-model="formData.categories" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
                                         <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">{{ $category->name }}</span>
                                     </label>
                                 @endforeach
@@ -416,7 +416,7 @@
                         <div class="pt-4 border-t border-slate-100">
                             <div class="flex items-center justify-between mb-3">
                                 <label class="saas-label font-bold mb-0">Gallery Collection</label>
-                                <span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold" id="gallery-count">0 Selected</span>
+                                <span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold" id="gallery-count">0/4 Selected</span>
                             </div>
                             <div class="gallery-upload-area relative">
                                 <input type="file" name="gallery[]" multiple class="filepond-gallery">
@@ -426,7 +426,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <p class="mt-2 text-[10px] text-slate-400 text-center italic">Drag and drop multiple images to create a story</p>
+                            <p class="mt-2 text-[10px] text-slate-400 text-center italic">Max 4 images. Max 2MB per image.</p>
                         </div>
                     </div>
                 </div>
@@ -461,11 +461,11 @@
                     <div class="grid grid-cols-2 gap-4 mb-6">
                         <div>
                             <label class="saas-label">SKU</label>
-                            <input type="text" name="sku" class="saas-input uppercase" placeholder="RM-VITC-01">
+                            <input type="text" name="sku" x-model="formData.sku" class="saas-input uppercase" placeholder="RM-VITC-01">
                         </div>
                         <div>
                             <label class="saas-label">HSN Code</label>
-                            <input type="text" name="hsn_code" class="saas-input" placeholder="21069099">
+                            <input type="text" name="hsn_code" x-model="formData.hsn_code" class="saas-input" placeholder="21069099">
                         </div>
                     </div>
                     <div class="space-y-6">
@@ -621,7 +621,16 @@ function productSystem() {
                 {id: 2, icon: 'leaf', title: 'Pure Ingredients', desc: 'Clean Label Certified Ingredients.'},
                 {id: 3, icon: 'star', title: 'Zero Compromise', desc: 'Zero Sugar & No Artificial Colors.'},
                 {id: 4, icon: 'smile', title: 'Fast & Gentle', desc: 'Fast Acting & Gentle on the Stomach.'}
-            ]
+            ],
+            ritual: {
+                1: {title: '', desc: ''},
+                2: {title: '', desc: ''},
+                3: {title: '', desc: ''}
+            },
+            sku: '',
+            hsn_code: '',
+            categories: [],
+            hero_draft_image: null
         },
         init() {
             // Force reset on load
@@ -662,6 +671,18 @@ function productSystem() {
                     if (ed && h.desc) ed.setData(h.desc);
                 });
                 this.hasDraft = false;
+                
+                // Restore Hero Image to FilePond
+                if (this.formData.hero_draft_image) {
+                    try {
+                        const mainPondEl = document.querySelector('.filepond-main');
+                        if (mainPondEl) {
+                            const pond = FilePond.find(mainPondEl);
+                            if (pond) pond.addFile(this.formData.hero_draft_image);
+                        }
+                    } catch (e) { console.warn('Hero image restoration failed', e); }
+                }
+
                 Swal.fire({ icon: 'success', title: 'Draft Restored', timer: 1500, showConfirmButton: false });
             }
         },
@@ -721,33 +742,55 @@ function productSystem() {
             this.$nextTick(() => lucide.createIcons());
         },
         initFilePond() {
-            FilePond.registerPlugin(FilePondPluginImagePreview);
+            FilePond.registerPlugin(
+                FilePondPluginImagePreview,
+                FilePondPluginFileValidateSize,
+                FilePondPluginFileValidateType
+            );
             
             const mainPond = FilePond.create(document.querySelector('.filepond-main'), {
                 labelIdle: 'Drag & Drop Hero Image',
                 allowImagePreview: true,
                 imagePreviewHeight: 180,
                 storeAsFile: true,
+                maxFileSize: '2MB',
+                acceptedFileTypes: ['image/*'],
+                labelMaxFileSizeExceeded: 'File is too large',
+                labelMaxFileSize: 'Maximum file size is {filesize}',
             });
 
             mainPond.on('addfile', (error, file) => {
                 if (!error) {
                     const reader = new FileReader();
-                    reader.onload = (e) => { this.imagePreview = e.target.result; };
+                    reader.onload = (e) => { 
+                        this.imagePreview = e.target.result; 
+                        // Only save to draft if it's reasonably small to avoid localStorage limits
+                        if (e.target.result.length < 2 * 1024 * 1024) { // 2MB base64
+                            this.formData.hero_draft_image = e.target.result;
+                        }
+                    };
                     reader.readAsDataURL(file.file);
                 }
+            });
+
+            mainPond.on('removefile', () => {
+                this.imagePreview = null;
+                this.formData.hero_draft_image = null;
             });
 
             const gallery = FilePond.create(document.querySelector('.filepond-gallery'), {
                 labelIdle: 'Drag & Drop Gallery Images',
                 allowMultiple: true,
+                maxFiles: 4,
+                maxFileSize: '2MB',
+                acceptedFileTypes: ['image/*'],
                 allowImagePreview: true,
                 imagePreviewHeight: 100,
                 storeAsFile: true,
             });
 
             gallery.on('updatefiles', (files) => {
-                document.getElementById('gallery-count').innerText = files.length + ' Selected';
+                document.getElementById('gallery-count').innerText = files.length + '/4 Selected';
             });
         },
         initEditors() {
