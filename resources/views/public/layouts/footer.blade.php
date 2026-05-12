@@ -156,8 +156,10 @@
             </div>
             <div
                 class="flex items-center gap-2.5 bg-black/[0.04] px-4 py-2 rounded-full border border-black/[0.05] shadow-inner transition hover:bg-black/[0.06]">
-                <span class="text-[10px] uppercase font-semibold tracking-tight !text-black">Crafted by</span>
-                <span class="font-bold tracking-tight !text-black">Brand Sphere</span>
+                <a href="https://brandsphereit.com/" target="_blank"
+                    class="text-[10px] uppercase font-semibold tracking-tight !text-black">Crafted by
+                    Brand
+                    Sphere</a>
             </div>
         </div>
     </div>

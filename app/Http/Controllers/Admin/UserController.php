@@ -11,8 +11,16 @@ class UserController extends Controller
     public function index()
     {
         // withTrashed() ensures soft-deleted users still appear in the admin list
-        $items = User::withTrashed()->with('orders')->latest()->get();
+        // Filter for role_id 2 (Regular Customers)
+        $items = User::where('role_id', 2)->withTrashed()->with('orders')->latest()->get();
         return view('admin.customers.index', compact('items'));
+    }
+
+    public function admins()
+    {
+        // Filter for role_id 1 (Administrators)
+        $items = User::where('role_id', 1)->withTrashed()->with('orders')->latest()->get();
+        return view('admin.admins.index', compact('items'));
     }
 
     public function updateRole(Request $request, $id)

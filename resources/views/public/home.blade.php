@@ -60,7 +60,7 @@
                             <img src="{{ asset('images/icons/clinically-tested.png') }}" alt="Clinically tested"
                                 class="h-10 w-10 object-contain sm:h-16 sm:w-16 lg:h-20 lg:w-20">
                             <p class="text-[10px] font-bold leading-tight text-[color:var(--secondary)] sm:text-sm">
-                                Clean Label<br class="hidden sm:block">Certified
+                                Clean Label <br class="hidden sm:block">Certified
                             </p>
                         </div>
 
@@ -69,7 +69,7 @@
                             <img src="{{ asset('images/icons/premium-quality.png') }}" alt="Premium quality"
                                 class="h-10 w-10 object-contain sm:h-16 sm:w-16 lg:h-20 lg:w-20">
                             <p class="text-[10px] font-bold leading-tight text-[color:var(--secondary)] sm:text-sm">
-                                Premium Quality<br class="hidden sm:block">Ingredients
+                                Premium Quality <br class="hidden sm:block">Ingredients
                             </p>
                         </div>
 
@@ -78,7 +78,7 @@
                             <img src="{{ asset('images/icons/safe-daily-use.png') }}" alt="Safe and effective"
                                 class="h-10 w-10 object-contain sm:h-16 sm:w-16 lg:h-20 lg:w-20">
                             <p class="text-[10px] font-bold leading-tight text-[color:var(--secondary)] sm:text-sm">
-                                Safe &amp; Effective<br class="hidden sm:block">Daily Use
+                                Safe &amp; Effective <br class="hidden sm:block">Daily Use
                             </p>
                         </div>
                     </div>
@@ -363,7 +363,7 @@
                             Weight<br>Management</h3>
 
                         <div class="mt-auto">
-                            <a href="{{ route('products.index', ['categories' => ['Weight Management']]) }}"
+                            <a href="{{ route('products.index', ['categories' => ['weight-management']]) }}"
                                 class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#2E7D32] shadow-xl transition hover:bg-green-50 hover:scale-105 active:scale-95">
                                 Explore All
                             </a>
@@ -383,7 +383,7 @@
                             Daily<br>Performance</h3>
 
                         <div class="mt-auto">
-                            <a href="{{ route('products.index', ['categories' => ['Daily Performance']]) }}"
+                            <a href="{{ route('products.index', ['categories' => ['daily-performance']]) }}"
                                 class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#E91E63] shadow-xl transition hover:bg-pink-50 hover:scale-105 active:scale-95">
                                 Explore All
                             </a>
@@ -403,7 +403,7 @@
                             Hair &<br>Skin Care</h3>
 
                         <div class="mt-auto">
-                            <a href="{{ route('products.index', ['categories' => ['Hair & Skin Care']]) }}"
+                            <a href="{{ route('products.index', ['categories' => ['hair-skin-care']]) }}"
                                 class="btn-text inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-[#EF6C00] shadow-xl transition hover:bg-orange-50 hover:scale-105 active:scale-95">
                                 Explore All
                             </a>

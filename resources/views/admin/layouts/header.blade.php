@@ -17,6 +17,7 @@
                 @endif
 
                 <!-- Global Quick Search -->
+                @if(!request()->routeIs('admin.sliders.*'))
                 <div class="hidden xl:flex items-center flex-1 max-w-md ml-8" x-data="{ 
                     search: '',
                     showResults: false,
@@ -58,6 +59,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
         </div>
         

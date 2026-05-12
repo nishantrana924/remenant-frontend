@@ -5,9 +5,9 @@
 <aside id="admin-sidebar" class="fixed top-0 left-0 z-[60] h-screen bg-white text-slate-600 transform -translate-x-full transition-all duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:z-[60] border-r border-slate-100" data-collapsed="false">
     <div class="flex flex-col h-full bg-white">
         <!-- Sidebar Header -->
-        <div class="flex items-center h-16 px-6 border-b border-slate-100">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
+        <div class="flex items-center h-16 px-6 border-b border-slate-100 sidebar-header-container">
+            <div class="flex items-center gap-3 sidebar-header-inner">
+                <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center shrink-0">
                     <i data-lucide="zap" class="w-5 h-5 text-white"></i>
                 </div>
                 <h1 class="font-bold text-slate-900 text-sm tracking-tight sidebar-text uppercase">REMENANT</h1>
@@ -49,6 +49,11 @@
             <a href="{{ route('admin.reviews.index') }}" class="nav-item {{ request()->routeIs('admin.reviews.*') ? 'active-nav-item' : '' }}" up-alias="/admin/reviews*" up-target="#main-content, #admin-nav">
                 <i data-lucide="message-square" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Reviews</span>
+            </a>
+
+            <a href="{{ route('admin.admins.index') }}" class="nav-item {{ request()->routeIs('admin.admins.*') ? 'active-nav-item' : '' }}" up-alias="/admin/admins*" up-target="#main-content, #admin-nav">
+                <i data-lucide="shield-check" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Administrators</span>
             </a>
 
             <a href="{{ route('admin.customers.index') }}" class="nav-item {{ request()->routeIs('admin.customers.*') ? 'active-nav-item' : '' }}" up-alias="/admin/customers*" up-target="#main-content, #admin-nav">
@@ -101,8 +106,35 @@
 <style>
     #admin-sidebar[data-collapsed="true"] { width: 4.5rem; }
     #admin-sidebar[data-collapsed="false"] { width: 15rem; }
-    #admin-sidebar[data-collapsed="true"] .sidebar-text { display: none; }
     
+    /* Hide text and adjust padding when collapsed */
+    #admin-sidebar[data-collapsed="true"] .sidebar-text { 
+        display: none !important; 
+    }
+    
+    #admin-sidebar[data-collapsed="true"] .sidebar-header-container {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        justify-content: center !important;
+    }
+    
+    #admin-sidebar[data-collapsed="true"] .sidebar-header-inner {
+        gap: 0 !important;
+        justify-content: center !important;
+    }
+
+    #admin-sidebar[data-collapsed="true"] .nav-item {
+        justify-content: center !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    #admin-sidebar[data-collapsed="true"] .nav-item i {
+        margin-right: 0 !important;
+        width: 1.25rem !important; /* w-5 */
+        height: 1.25rem !important; /* h-5 */
+    }
+
     @media (min-width: 1024px) {
         #admin-main-content {
             margin-left: 15rem;
@@ -141,8 +173,66 @@
             icon.setAttribute('data-lucide', 'chevron-right');
         } else {
             icon.setAttribute('data-lucide', 'chevron-left');
+            // Hide tooltips when expanding
+            document.querySelectorAll('#sidebar-floating-tooltip').forEach(t => t.remove());
         }
         refreshIcons();
+    }
+
+    function initSidebarTooltips() {
+        // Clear any orphaned tooltips first
+        document.querySelectorAll('#sidebar-floating-tooltip').forEach(t => t.remove());
+
+        const items = document.querySelectorAll('.nav-item');
+        items.forEach(item => {
+            item.removeEventListener('mouseenter', handleMouseEnter);
+            item.removeEventListener('mouseleave', handleMouseLeave);
+            
+            item.addEventListener('mouseenter', handleMouseEnter);
+            item.addEventListener('mouseleave', handleMouseLeave);
+        });
+    }
+
+    function handleMouseEnter(e) {
+        const sidebar = document.getElementById('admin-sidebar');
+        if (sidebar && sidebar.getAttribute('data-collapsed') !== 'true') return;
+        
+        // Immediate cleanup of any existing tooltips
+        document.querySelectorAll('#sidebar-floating-tooltip').forEach(t => t.remove());
+        
+        const item = e.currentTarget;
+        const textSpan = item.querySelector('.sidebar-text');
+        if (!textSpan) return;
+        
+        const text = textSpan.innerText;
+        
+        const tooltip = document.createElement('div');
+        tooltip.id = 'sidebar-floating-tooltip';
+        tooltip.className = 'fixed z-[9999] px-3 py-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-2xl pointer-events-none transform -translate-y-1/2 opacity-0 transition-opacity duration-200';
+        tooltip.innerText = text;
+        
+        const arrow = document.createElement('div');
+        arrow.className = 'absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-900 rotate-45';
+        tooltip.appendChild(arrow);
+        
+        document.body.appendChild(tooltip);
+        
+        const rect = item.getBoundingClientRect();
+        tooltip.style.left = (rect.right + 12) + 'px';
+        tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+        
+        requestAnimationFrame(() => {
+            if (tooltip.parentElement) tooltip.classList.remove('opacity-0');
+        });
+    }
+
+    function handleMouseLeave() {
+        document.querySelectorAll('#sidebar-floating-tooltip').forEach(tooltip => {
+            tooltip.classList.add('opacity-0');
+            setTimeout(() => {
+                if (tooltip.parentElement) tooltip.remove();
+            }, 200);
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -159,5 +249,10 @@
                 refreshIcons();
             }
         }
+
+        initSidebarTooltips();
     });
+
+    // Re-init tooltips after Unpoly fragment updates just in case
+    document.addEventListener('up:fragment:inserted', initSidebarTooltips);
 </script>

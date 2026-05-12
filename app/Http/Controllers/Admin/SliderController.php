@@ -50,4 +50,27 @@ class SliderController extends BaseController
         $this->service->delete($id);
         return redirect()->route('admin.sliders.index')->with('success', 'Slider deleted successfully.');
     }
+
+    public function toggleStatus($id)
+    {
+        $item = $this->service->getById($id);
+        
+        // Ensure at least one slider remains active
+        if ($item->status) {
+            $activeCount = \App\Models\Slider::where('status', true)->count();
+            if ($activeCount <= 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'At least one slider must remain active.'
+                ], 422);
+            }
+        }
+
+        $this->service->update($id, ['status' => !$item->status]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Status updated successfully.'
+        ]);
+    }
 }

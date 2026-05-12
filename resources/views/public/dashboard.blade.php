@@ -66,12 +66,8 @@
             
             <!-- SECTION: ORDERS -->
             <div id="section-orders" class="tab-section {{ $activeTab !== 'orders' ? 'hidden' : '' }} transition-all duration-300">
-                <div class="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row items-center gap-6 justify-between bg-white sticky top-[72px] lg:top-[80px] z-10">
+                <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white sticky top-[72px] lg:top-[80px] z-10">
                     <h3 class="text-lg font-black uppercase tracking-tighter text-slate-900">Order Intelligence</h3>
-                    <div class="relative w-full md:w-72">
-                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300"></i>
-                        <input type="text" placeholder="Search orders..." class="w-full bg-slate-50 border border-slate-100 pl-10 pr-4 py-2 text-[10px] font-bold outline-none rounded-sm">
-                    </div>
                 </div>
                 <div class="divide-y divide-slate-50 bg-white">
                     @forelse($orders as $order)
@@ -127,7 +123,7 @@
                         <input type="email" name="email" value="{{ $user->email }}" class="w-full bg-[#F1F3F6] border-none px-6 py-3 text-xs font-bold outline-none rounded-sm focus:ring-1 focus:ring-orange-500/20">
                     </div>
                     <div class="pt-4 flex items-center justify-between">
-                        <button type="submit" class="bg-slate-900 text-white px-10 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all">Save Changes</button>
+                        <button type="submit" class="bg-orange-600 text-white px-10 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-orange-700 transition-all rounded-xl shadow-lg shadow-orange-100">Save Changes</button>
                     </div>
                 </form>
 
@@ -175,7 +171,7 @@
                     </div>
 
                     <div class="pt-4">
-                        <button type="submit" class="bg-slate-900 text-white px-10 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all">Update Password</button>
+                        <button type="submit" class="bg-orange-600 text-white px-10 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-orange-700 transition-all rounded-xl shadow-lg shadow-orange-100">Update Password</button>
                     </div>
                 </form>
 
@@ -207,7 +203,7 @@
                         <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900">Manage Addresses</h3>
                         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Primary delivery locations</p>
                     </div>
-                    <button onclick="openAddressModal()" class="bg-slate-900 text-white px-6 py-3 text-[9px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all rounded-xl flex items-center gap-2">
+                    <button onclick="openAddressModal()" class="bg-orange-600 text-white px-6 py-3 text-[9px] font-black uppercase tracking-widest hover:bg-orange-700 transition-all rounded-xl flex items-center gap-2 shadow-lg shadow-orange-100">
                         <i data-lucide="plus" class="h-3 w-3"></i> Add New Address
                     </button>
                 </div>
@@ -285,7 +281,7 @@
                             <div class="space-y-2">
                                 <input type="text" placeholder="XXXX-XXXX-XXXX" class="w-full bg-white border border-slate-200 px-6 py-4 text-xs font-black outline-none rounded-xl focus:ring-2 focus:ring-orange-500/10 text-center tracking-[0.2em] uppercase">
                             </div>
-                            <button class="w-full bg-slate-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all rounded-xl shadow-lg shadow-slate-100">Apply to Balance</button>
+                            <button class="w-full bg-orange-600 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-orange-700 transition-all rounded-xl shadow-lg shadow-orange-100">Apply to Balance</button>
                         </div>
                     </div>
                 </div>
@@ -371,7 +367,8 @@
 <!-- Address Modal -->
 <div id="address-modal" class="fixed inset-0 z-[10000] hidden">
     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-500 opacity-0" id="address-modal-overlay" onclick="closeAddressModal()"></div>
-    <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col transform translate-x-full transition-transform duration-500" id="address-modal-content">
+    <div class="absolute right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl flex flex-col transform translate-x-full transition-transform duration-500 overflow-hidden" id="address-modal-content">
+        <!-- Header: Fixed at top -->
         <div class="p-8 border-b border-slate-50 flex items-center justify-between shrink-0">
             <div>
                 <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900" id="address-modal-title">Add Address</h3>
@@ -382,75 +379,78 @@
             </button>
         </div>
         
-        <form id="address-form" class="flex-1 overflow-y-auto p-8 space-y-6" onsubmit="saveAddress(event)">
-            @csrf
-            <input type="hidden" id="address-id" name="id">
-            
-            <div class="grid grid-cols-2 gap-6">
+        <!-- Scrollable content area -->
+        <div class="flex-1 overflow-y-auto overscroll-contain" data-lenis-prevent style="-webkit-overflow-scrolling: touch;">
+            <form id="address-form" class="p-8 space-y-6" onsubmit="saveAddress(event)">
+                @csrf
+                <input type="hidden" id="address-id" name="id">
+                
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Address Type</label>
+                        <select name="type" id="address-type" class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+                            <option value="Home">Home</option>
+                            <option value="Work">Work</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2 flex items-end">
+                        <label class="flex items-center gap-3 cursor-pointer group pb-3.5 pl-1">
+                            <input type="checkbox" name="is_default" id="address-default" value="1" class="rounded border-slate-200 text-orange-500 focus:ring-orange-500/20">
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-slate-600 transition-colors">Set Default</span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="space-y-2">
-                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Address Type</label>
-                    <select name="type" id="address-type" class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
-                        <option value="Home">Home</option>
-                        <option value="Work">Work</option>
-                        <option value="Other">Other</option>
-                    </select>
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                    <input type="text" name="full_name" id="address-name" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
                 </div>
-                <div class="space-y-2 flex items-end">
-                    <label class="flex items-center gap-3 cursor-pointer group pb-3.5 pl-1">
-                        <input type="checkbox" name="is_default" id="address-default" value="1" class="rounded border-slate-200 text-orange-500 focus:ring-orange-500/20">
-                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-slate-600 transition-colors">Set Default</span>
-                    </label>
-                </div>
-            </div>
 
-            <div class="space-y-2">
-                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                <input type="text" name="full_name" id="address-name" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
-                <input type="text" name="phone" id="address-phone" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Address Line 1</label>
-                <input type="text" name="address_line1" id="address-line1" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Address Line 2 (Optional)</label>
-                <input type="text" name="address_line2" id="address-line2" class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
-            </div>
-
-            <div class="grid grid-cols-2 gap-6">
                 <div class="space-y-2">
-                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">City</label>
-                    <input type="text" name="city" id="address-city" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
+                    <input type="text" name="phone" id="address-phone" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">State</label>
-                    <input type="text" name="state" id="address-state" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
-                </div>
-            </div>
 
-            <div class="grid grid-cols-2 gap-6">
                 <div class="space-y-2">
-                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Pincode</label>
-                    <input type="text" name="pincode" id="address-pincode" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Address Line 1</label>
+                    <input type="text" name="address_line1" id="address-line1" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Country</label>
-                    <input type="text" name="country" value="India" readonly class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl opacity-60">
-                </div>
-            </div>
 
-            <div class="pt-6">
-                <button type="submit" id="address-submit-btn" class="w-full bg-slate-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all rounded-xl shadow-lg shadow-slate-100 flex items-center justify-center gap-2">
-                    <span>Save Address</span>
-                </button>
-            </div>
-        </form>
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Address Line 2 (Optional)</label>
+                    <input type="text" name="address_line2" id="address-line2" class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">City</label>
+                        <input type="text" name="city" id="address-city" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">State</label>
+                        <input type="text" name="state" id="address-state" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Pincode</label>
+                        <input type="text" name="pincode" id="address-pincode" required class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl focus:ring-1 focus:ring-orange-500/20">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Country</label>
+                        <input type="text" name="country" value="India" readonly class="w-full bg-[#F1F3F6] border-none px-6 py-3.5 text-xs font-bold outline-none rounded-xl opacity-60">
+                    </div>
+                </div>
+
+                <div class="pt-6 pb-12">
+                    <button type="submit" id="address-submit-btn" class="w-full bg-orange-600 !text-white py-4 text-[12px] font-black uppercase tracking-widest hover:bg-orange-700 transition-all rounded-xl shadow-lg shadow-orange-100 flex items-center justify-center gap-2">
+                        <span class="!text-white">Save Address</span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -459,6 +459,61 @@
     .nav-link.active { background: #FFF7ED; color: #F97316; border-right: 4px solid #F97316; }
     .nav-link:not(.active) { color: #64748B; border-right: 4px solid transparent; }
 </style>
+
+@push('scripts')
+<script>
+    // Tab Switching Logic
+    window.switchTab = function(tabId, btn) {
+        // Update URL without reload for persistence
+        const url = new URL(window.location);
+        url.searchParams.set('tab', tabId);
+        window.history.pushState({}, '', url);
+
+        // Hide all sections
+        document.querySelectorAll('.tab-section').forEach(section => {
+            section.classList.add('hidden');
+        });
+
+        // Show target section
+        const target = document.getElementById('section-' + tabId);
+        if (target) target.classList.remove('hidden');
+
+        // Update Nav Links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active', 'bg-orange-50', 'text-orange-600', 'border-r-4', 'border-orange-500');
+            link.classList.add('text-slate-500');
+        });
+
+        // Activate clicked button
+        if (btn) {
+            btn.classList.add('active', 'bg-orange-50', 'text-orange-600', 'border-r-4', 'border-orange-500');
+            btn.classList.remove('text-slate-500');
+        }
+
+        // Refresh icons in case new content appeared
+        if (window.lucide) lucide.createIcons();
+    };
+
+    // Password Toggle Logic
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', () => {
+                const input = button.parentElement.querySelector('.password-input');
+                const eyeIcon = button.querySelector('.eye-icon');
+                const eyeOffIcon = button.querySelector('.eye-off-icon');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    eyeIcon.classList.add('hidden');
+                    eyeOffIcon.classList.remove('hidden');
+                } else {
+                    input.type = 'password';
+                    eyeIcon.classList.remove('hidden');
+                    eyeOffIcon.classList.add('hidden');
+                }
+            });
+        });
+    });
 
     // Address Management
     function openAddressModal(address = null) {
@@ -493,6 +548,7 @@
             content.classList.remove('translate-x-full');
         }, 10);
         document.body.style.overflow = 'hidden';
+        if (window.lenis) window.lenis.stop();
     }
 
     function closeAddressModal() {
@@ -506,6 +562,7 @@
         setTimeout(() => {
             modal.classList.add('hidden');
             document.body.style.overflow = '';
+            if (window.lenis) window.lenis.start();
         }, 500);
     }
 
@@ -599,4 +656,6 @@
             showToast('Failed to update default address', 'error');
         }
     }
+</script>
+@endpush
 @endsection

@@ -19,7 +19,14 @@ class SliderRequest extends FormRequest
             'alt_text' => 'nullable|string|max:255',
             'link' => 'nullable|string|max:255',
             'order' => 'nullable|integer',
-            'status' => 'nullable|boolean',
+            'status' => 'boolean',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'status' => $this->has('status') ? 1 : 0,
+        ]);
     }
 }
