@@ -173,14 +173,18 @@
             icon.setAttribute('data-lucide', 'chevron-right');
         } else {
             icon.setAttribute('data-lucide', 'chevron-left');
+            // Hide tooltips when expanding
+            document.querySelectorAll('#sidebar-floating-tooltip').forEach(t => t.remove());
         }
         refreshIcons();
     }
 
     function initSidebarTooltips() {
+        // Clear any orphaned tooltips first
+        document.querySelectorAll('#sidebar-floating-tooltip').forEach(t => t.remove());
+
         const items = document.querySelectorAll('.nav-item');
         items.forEach(item => {
-            // Remove existing listeners to prevent duplicates
             item.removeEventListener('mouseenter', handleMouseEnter);
             item.removeEventListener('mouseleave', handleMouseLeave);
             
@@ -191,7 +195,10 @@
 
     function handleMouseEnter(e) {
         const sidebar = document.getElementById('admin-sidebar');
-        if (sidebar.getAttribute('data-collapsed') !== 'true') return;
+        if (sidebar && sidebar.getAttribute('data-collapsed') !== 'true') return;
+        
+        // Immediate cleanup of any existing tooltips
+        document.querySelectorAll('#sidebar-floating-tooltip').forEach(t => t.remove());
         
         const item = e.currentTarget;
         const textSpan = item.querySelector('.sidebar-text');
@@ -204,29 +211,28 @@
         tooltip.className = 'fixed z-[9999] px-3 py-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-2xl pointer-events-none transform -translate-y-1/2 opacity-0 transition-opacity duration-200';
         tooltip.innerText = text;
         
+        const arrow = document.createElement('div');
+        arrow.className = 'absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-900 rotate-45';
+        tooltip.appendChild(arrow);
+        
         document.body.appendChild(tooltip);
         
         const rect = item.getBoundingClientRect();
         tooltip.style.left = (rect.right + 12) + 'px';
         tooltip.style.top = (rect.top + rect.height / 2) + 'px';
         
-        // Add a small arrow
-        const arrow = document.createElement('div');
-        arrow.className = 'absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-900 rotate-45';
-        tooltip.appendChild(arrow);
-        
-        // Trigger animation
         requestAnimationFrame(() => {
-            tooltip.classList.remove('opacity-0');
+            if (tooltip.parentElement) tooltip.classList.remove('opacity-0');
         });
     }
 
     function handleMouseLeave() {
-        const tooltip = document.getElementById('sidebar-floating-tooltip');
-        if (tooltip) {
+        document.querySelectorAll('#sidebar-floating-tooltip').forEach(tooltip => {
             tooltip.classList.add('opacity-0');
-            setTimeout(() => tooltip.remove(), 200);
-        }
+            setTimeout(() => {
+                if (tooltip.parentElement) tooltip.remove();
+            }, 200);
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function() {

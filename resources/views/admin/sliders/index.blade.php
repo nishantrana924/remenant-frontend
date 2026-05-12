@@ -80,8 +80,8 @@
                             <a href="{{ route('admin.sliders.edit', $item->id) }}" class="p-2 bg-white rounded-lg shadow-sm text-slate-400 hover:text-indigo-500 transition-colors">
                                 <i data-lucide="edit-3" class="h-4 w-4"></i>
                             </a>
-                            <a href="{{ $item->link ?: '#' }}" target="_blank" class="p-2 bg-white rounded-lg shadow-sm text-slate-400 hover:text-emerald-500 transition-colors">
-                                <i data-lucide="external-link" class="h-4 w-4"></i>
+                            <a href="{{ route('home') }}" target="_blank" class="p-2 bg-white rounded-lg shadow-sm text-slate-400 hover:text-emerald-500 transition-colors">
+                                <i data-lucide="eye" class="h-4 w-4"></i>
                             </a>
                             <form action="{{ route('admin.sliders.destroy', $item->id) }}" method="POST" class="inline" onsubmit="return confirm('Delete slider?')">
                                 @csrf @method('DELETE')
@@ -104,7 +104,9 @@
                             <span class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">{{ $item->updated_at->format('d M') }}</span>
                             <!-- Inline Status Toggle -->
                             <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="status" {{ $item->status ? 'checked' : '' }} class="sr-only peer">
+                                <input type="checkbox" name="status" {{ $item->status ? 'checked' : '' }} 
+                                       onchange="toggleSliderStatus({{ $item->id }}, this)"
+                                       class="sr-only peer">
                                 <div class="w-6 h-3 bg-slate-200 rounded-full peer peer-checked:bg-orange-500 after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:rounded-full after:h-2.5 after:w-2.5 after:transition-all peer-checked:after:translate-x-3"></div>
                             </label>
                         </div>
@@ -121,6 +123,16 @@
 
 @push('scripts')
 <script>
-    // Slider-specific scripts if needed
+    async function toggleSliderStatus(id, el) {
+        try {
+            const response = await axios.patch(`/admin/sliders/${id}/toggle-status`);
+            if (response.data.success) {
+                window.toast(response.data.message);
+            }
+        } catch (error) {
+            el.checked = !el.checked; // Revert on failure
+            window.toast('Failed to update status', 'error');
+        }
+    }
 </script>
 @endpush

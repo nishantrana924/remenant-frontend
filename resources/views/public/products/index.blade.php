@@ -60,11 +60,14 @@
                             <div>
                                 <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)] mb-6">Categories</h3>
                                 <div class="space-y-3">
+                                    @php
+                                        $activeCategories = (array) request('categories', []);
+                                    @endphp
                                     <label class="group flex items-center gap-3 cursor-pointer">
                                         <input type="checkbox" id="all-products-checkbox"
                                                onchange="resetCategories(this)"
                                                class="h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
-                                               {{ !request('categories') ? 'checked' : '' }}>
+                                               {{ empty($activeCategories) ? 'checked' : '' }}>
                                         <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">All Products</span>
                                     </label>
                                     @foreach($categories as $cat)
@@ -72,7 +75,7 @@
                                             <input type="checkbox" name="categories[]" value="{{ $cat->slug }}"
                                                    onchange="filterProducts()"
                                                    class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
-                                                   {{ (is_array(request('categories')) && (in_array($cat->slug, request('categories')) || in_array($cat->name, request('categories')))) ? 'checked' : '' }}>
+                                                   {{ (in_array($cat->slug, $activeCategories) || in_array($cat->name, $activeCategories)) ? 'checked' : '' }}>
                                             <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">{{ $cat->name }}</span>
                                         </label>
                                     @endforeach
@@ -80,7 +83,7 @@
                                         <input type="checkbox" name="categories[]" value="Combo Offers"
                                                onchange="filterProducts()"
                                                class="category-checkbox h-5 w-5 rounded border-gray-300 text-[var(--primary)] focus:ring-0 focus:ring-offset-0 outline-none cursor-pointer transition-all"
-                                               {{ (is_array(request('categories')) && in_array('Combo Offers', request('categories'))) ? 'checked' : '' }}>
+                                               {{ in_array('Combo Offers', $activeCategories) ? 'checked' : '' }}>
                                         <span class="text-sm font-bold text-[color:var(--text-secondary)] group-hover:text-[color:var(--text-primary)] transition">Combo Offers</span>
                                     </label>
                                 </div>

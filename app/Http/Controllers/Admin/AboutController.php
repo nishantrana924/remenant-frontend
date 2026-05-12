@@ -18,6 +18,16 @@ class AboutController extends Controller
             ->take(10)
             ->get();
 
+        $content = $about->content;
+        $fields = ['hero.title', 'vision.title', 'mission.title'];
+        foreach ($fields as $field) {
+            [$section, $key] = explode('.', $field);
+            if (isset($content[$section][$key])) {
+                $content[$section][$key] = str_replace(['<br class="hidden lg:block">', '<br>', '<br/>'], "\n", $content[$section][$key]);
+            }
+        }
+        $about->content = $content;
+
         return view('admin.about.edit', compact('about', 'versions'));
     }
 
@@ -26,6 +36,18 @@ class AboutController extends Controller
         $about = PageContent::where('slug', 'about')->firstOrFail();
         
         $content = $request->input('content');
+
+        // Pre-process hero title to convert newlines to special desktop break
+        if (isset($content['hero']['title'])) {
+            $content['hero']['title'] = str_replace("\n", '<br class="hidden lg:block">', $content['hero']['title']);
+        }
+
+        if (isset($content['vision']['title'])) {
+            $content['vision']['title'] = str_replace("\n", '<br>', $content['vision']['title']);
+        }
+        if (isset($content['mission']['title'])) {
+            $content['mission']['title'] = str_replace("\n", '<br>', $content['mission']['title']);
+        }
 
         // Post-process bio to split by newline into array
         if (isset($content['founders']['list'])) {
@@ -73,10 +95,19 @@ class AboutController extends Controller
             'status' => $version->status
         ]);
 
+        $content = $version->content;
+        $fields = ['hero.title', 'vision.title', 'mission.title'];
+        foreach ($fields as $field) {
+            [$section, $key] = explode('.', $field);
+            if (isset($content[$section][$key])) {
+                $content[$section][$key] = str_replace(['<br class="hidden lg:block">', '<br>', '<br/>'], "\n", $content[$section][$key]);
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Version restored successfully.',
-            'content' => $version->content
+            'content' => $content
         ]);
     }
 }

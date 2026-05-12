@@ -77,6 +77,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('products/bulk-delete', [\App\Http\Controllers\Admin\ProductController::class, 'bulkDestroy'])->name('products.bulk-destroy');
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
     Route::resource('sliders', \App\Http\Controllers\Admin\SliderController::class);
+    Route::patch('sliders/{slider}/toggle-status', [\App\Http\Controllers\Admin\SliderController::class, 'toggleStatus'])->name('sliders.toggle-status');
     Route::post('orders/bulk-update-status', [\App\Http\Controllers\Admin\OrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
     Route::post('orders/bulk-delete', [\App\Http\Controllers\Admin\OrderController::class, 'bulkDestroy'])->name('orders.bulk-delete');
     Route::post('orders/{id}/ship-to-shiprocket', [\App\Http\Controllers\Admin\OrderController::class, 'shipToShiprocket'])->name('orders.ship-to-shiprocket');
