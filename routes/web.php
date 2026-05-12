@@ -39,7 +39,10 @@ Route::get('/products/search-suggestions', [ProductController::class, 'searchSug
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/product/{slug}/reviews', [ProductController::class, 'reviews'])->name('products.reviews');
 Route::post('/product/{id}/reviews', [ProductController::class, 'storeReview'])->name('products.reviews.store');
+
+// Coupon Routes
 Route::post('/coupons/apply', [\App\Http\Controllers\Public\CouponController::class, 'apply'])->name('coupons.apply');
+Route::get('/coupons/apply', function() { return redirect()->back()->with('error', 'Direct access not allowed.'); });
 
 // Admin routes (all authenticated users are admins)
 
@@ -140,4 +143,4 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     })->name('clear-cache');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__.'/auth.php'; 

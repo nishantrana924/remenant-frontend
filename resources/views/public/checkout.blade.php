@@ -2,6 +2,11 @@
 
 @section('title', 'Checkout - Remenant')
 
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+@endpush
+
 @section('content')
 <style>
     @keyframes shimmer {
@@ -35,6 +40,7 @@
             <div class="lg:col-span-7">
                 <form id="checkout-form" method="POST" action="{{ route('checkout.store') }}" class="space-y-6">
                     @csrf
+                    <input type="hidden" name="coupon_code" id="coupon-input-hidden">
                     @if(isset($buyNowProduct))
                         <input type="hidden" name="buy_now_product_id" value="{{ $buyNowProduct->id }}">
                     @endif
@@ -211,12 +217,65 @@
                     </div>
 
                     <!-- Coupon Code Section -->
-                    <div class="p-6 rounded-3xl bg-slate-50 ring-1 ring-black/[0.02] mb-6" x-data="{ coupon: '', applying: false, msg: '', success: false }">
+                    <div class="p-6 rounded-3xl bg-slate-50 ring-1 ring-black/[0.02] mb-6" 
+                         x-data="{ 
+                            coupon: '', 
+                            applying: false, 
+                            msg: '', 
+                            success: false,
+                            apply() {
+                                if (!this.coupon) return;
+                                this.applying = true;
+                                this.msg = 'Applying...';
+                                
+                                const rawSubtotal = '{{ $subtotal }}'.replace(/,/g, '');
+                                const payload = {
+                                    code: this.coupon,
+                                    product_id: parseInt('{{ isset($buyNowProduct) ? $buyNowProduct->id : (count($items) > 0 ? collect($items)->first()['id'] : 0) }}'),
+                                    amount: parseFloat(rawSubtotal)
+                                };
+
+                                axios.post('{{ route('coupons.apply') }}', payload, {
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content
+                                    }
+                                }).then(res => {
+                                    this.success = true;
+                                    this.msg = res.data.message;
+                                    
+                                    const discount = parseFloat(res.data.discount || 0);
+                                    const subtotal = parseFloat(rawSubtotal);
+                                    const shipping = parseFloat('{{ $shipping }}'.replace(/,/g, ''));
+                                    
+                                    // Update UI Safely
+                                    const discountRow = document.getElementById('discount-row');
+                                    const couponDisp = document.getElementById('coupon-display');
+                                    const discountVal = document.getElementById('discount-val');
+                                    const totalVal = document.getElementById('total-val');
+                                    const hiddenInput = document.getElementById('coupon-input-hidden');
+
+                                    if (discountRow) discountRow.style.display = 'flex';
+                                    if (couponDisp) couponDisp.innerText = res.data.code;
+                                    if (discountVal) discountVal.innerText = discount.toLocaleString();
+                                    if (totalVal) totalVal.innerText = (subtotal + shipping - discount).toLocaleString();
+                                    if (hiddenInput) hiddenInput.value = res.data.code;
+                                    
+                                    if (window.showToast) window.showToast(res.data.message);
+                                }).catch(err => {
+                                    this.success = false;
+                                    this.msg = err.response?.data?.message || 'Invalid coupon';
+                                    console.error('Coupon Error:', err);
+                                }).finally(() => {
+                                    this.applying = false;
+                                });
+                            }
+                         }">
                         <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Have a promo code?</h4>
                         <div class="flex gap-2">
-                            <input type="text" x-model="coupon" placeholder="ENTER CODE" class="flex-1 bg-white border border-slate-100 rounded-xl px-4 py-3 text-xs font-black placeholder:text-slate-300 focus:outline-none focus:border-orange-500 uppercase tracking-widest">
-                            <button type="button" @click="applyCoupon()" class="bg-slate-900 text-white rounded-xl px-6 text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">
-                                Apply
+                            <input type="text" x-model="coupon" @keyup.enter="apply()" placeholder="ENTER CODE" class="flex-1 bg-white border border-slate-100 rounded-xl px-4 py-3 text-xs font-black placeholder:text-slate-300 focus:outline-none focus:border-orange-500 uppercase tracking-widest">
+                            <button type="button" @click="apply()" :disabled="applying" class="bg-slate-900 text-white rounded-xl px-6 text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all disabled:opacity-50">
+                                <span x-show="!applying">Apply</span>
+                                <span x-show="applying">...</span>
                             </button>
                         </div>
                         <p x-show="msg" :class="success ? 'text-emerald-600' : 'text-rose-500'" class="text-[10px] font-bold uppercase mt-3" x-text="msg"></p>
@@ -258,51 +317,6 @@
 </div>
 
 <script>
-    // Coupon Application Logic
-    function applyCoupon() {
-        const component = Alpine.find(document.querySelector('[x-data*="applying"]'));
-        if (!component.coupon) return;
-        
-        component.applying = true;
-        component.msg = 'Applying...';
-        
-        const productId = "{{ isset($buyNowProduct) ? $buyNowProduct->id : 'cart' }}";
-        const amount = "{{ $subtotal }}";
-
-        axios.post("{{ route('coupons.apply') }}", {
-            code: component.coupon,
-            product_id: productId === 'cart' ? 1 : productId, // Default to 1 for cart testing
-            amount: amount
-        }).then(res => {
-            component.success = true;
-            component.msg = res.data.message;
-            
-            // Update UI
-            document.getElementById('discount-row').style.display = 'flex';
-            document.getElementById('coupon-display').innerText = res.data.code;
-            document.getElementById('discount-val').innerText = res.data.discount.toLocaleString();
-            document.getElementById('total-val').innerText = ({{ $total }} - res.data.discount).toLocaleString();
-            
-            // Add to main form
-            const form = document.getElementById('checkout-form');
-            let hiddenInput = form.querySelector('input[name="coupon_code"]');
-            if (!hiddenInput) {
-                hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'coupon_code';
-                form.appendChild(hiddenInput);
-            }
-            hiddenInput.value = res.data.code;
-            
-            toast(res.data.message);
-        }).catch(err => {
-            component.success = false;
-            component.msg = err.response?.data?.message || 'Failed to apply coupon';
-        }).finally(() => {
-            component.applying = false;
-        });
-    }
-
     // Auto-Save Persistence
     const STORAGE_KEY = 'remenant_checkout_draft';
 
@@ -362,12 +376,17 @@
 
     window.clearAddressForm = function() {
         document.querySelectorAll('.address-card').forEach(c => c.classList.remove('border-orange-500', 'bg-orange-50/30'));
-        const newCard = document.querySelector('input[value="new"]').parentElement;
-        newCard.classList.add('border-orange-500', 'bg-orange-50/30');
+        const newCardInput = document.querySelector('input[value="new"]');
+        if (newCardInput) {
+            const newCard = newCardInput.parentElement;
+            newCard.classList.add('border-orange-500', 'bg-orange-50/30');
+        }
 
         const formFields = document.getElementById('address-form-fields');
-        formFields.classList.remove('hidden');
-        setTimeout(() => formFields.classList.remove('opacity-0'), 10);
+        if (formFields) {
+            formFields.classList.remove('hidden');
+            setTimeout(() => formFields.classList.remove('opacity-0'), 10);
+        }
 
         document.getElementById('ship-first-name').value = '';
         document.getElementById('ship-last-name').value = '';
