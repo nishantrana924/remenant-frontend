@@ -390,3 +390,96 @@
     transition: none;
     opacity: 1;
 }
+
+/* Global Toast & Loader System */
+@layer components {
+    [x-cloak] {
+        display: none !important;
+    }
+
+    #nprogress .bar {
+        background: var(--primary) !important;
+        height: 3px !important;
+    }
+
+    #nprogress .spinner-icon {
+        border-top-color: var(--primary) !important;
+        border-left-color: var(--primary) !important;
+    }
+
+    /* Premium Loader Animation */
+    @keyframes spin-slow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .animate-spin-slow {
+        animation: spin-slow 8s linear infinite;
+    }
+
+    /* Global Toast Container */
+    .toast-container {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .custom-toast {
+        font-family: theme('fontFamily.sans');
+        width: 320px;
+        padding: 16px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transform: translateX(120%);
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .custom-toast.show {
+        transform: translateX(0);
+    }
+
+    .toast-icon {
+        flex-shrink: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .toast-content {
+        flex: 1;
+    }
+
+    .toast-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .toast-message {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-top: 1px;
+    }
+
+    .toast-success .toast-icon {
+        background: #F0FDF4;
+        color: #22C55E;
+    }
+
+    .toast-error .toast-icon {
+        background: #FEF2F2;
+        color: #EF4444;
+    }
+}

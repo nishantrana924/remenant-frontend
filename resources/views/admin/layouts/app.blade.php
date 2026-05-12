@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Admin - {{ config('app.name', 'Laravel') }}</title>
+    <meta name="layout" content="admin">
     <link rel="icon" href="{{ asset('images/logo/remenant-health-favicon.jpg') }}" type="image/jpeg">
 
     <!-- Fonts -->
@@ -30,107 +31,14 @@
     <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
+    <!-- Unpoly SPA (Required for smooth transitions) -->
+    <script src="https://unpkg.com/unpoly@3.14.3/unpoly.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/unpoly@3.14.3/unpoly.css">
+
     <!-- Assets -->
     @vite(['resources/css/admin.css', 'resources/js/app.js'])
     @stack('styles')
 
-    <style>
-        .toast-container {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .custom-toast {
-            font-family: 'Inter', sans-serif;
-            width: 340px;
-            padding: 16px;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: start;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-            animation: toast-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-            border: 1px solid transparent;
-            backdrop-filter: blur(8px);
-        }
-
-        @keyframes toast-in {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .custom-toast.hide {
-            animation: toast-out 0.5s ease forwards;
-        }
-
-        @keyframes toast-out {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(120%); opacity: 0; }
-        }
-
-        /* Error Variant */
-        .custom-toast.error {
-            background: #FCE8DB;
-            border-color: rgba(239, 102, 91, 0.2);
-        }
-        .custom-toast.error .toast-icon svg { color: #EF665B; }
-        .custom-toast.error .toast-title { color: #71192F; }
-        .custom-toast.error .toast-close svg { color: #71192F; }
-
-        /* Success Variant */
-        .custom-toast.success {
-            background: #F0FDF4;
-            border-color: rgba(34, 197, 94, 0.2);
-        }
-        .custom-toast.success .toast-icon svg { color: #22C55E; }
-        .custom-toast.success .toast-title { color: #166534; }
-        .custom-toast.success .toast-close svg { color: #166534; }
-
-        /* Warning/Info Variant */
-        .custom-toast.warning {
-            background: #FFFBEB;
-            border-color: rgba(245, 158, 11, 0.2);
-        }
-        .custom-toast.warning .toast-icon svg { color: #F59E0B; }
-        .custom-toast.warning .toast-title { color: #92400E; }
-        .custom-toast.warning .toast-close svg { color: #92400E; }
-
-        .toast-icon {
-            width: 22px;
-            height: 22px;
-            margin-right: 12px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .toast-title {
-            font-weight: 600;
-            font-size: 13px;
-            flex-grow: 1;
-            line-height: 1.4;
-        }
-
-        .toast-close {
-            width: 20px;
-            height: 20px;
-            margin-left: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            opacity: 0.5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .toast-close:hover { opacity: 1; transform: rotate(90deg); }
-    </style>
 </head>
 
 <body class="font-sans antialiased bg-white h-screen overflow-hidden flex flex-col">
@@ -144,7 +52,7 @@
             @include('admin.layouts.header')
 
             <!-- Page Content -->
-            <main class="flex-1 p-4 sm:p-6 overflow-y-auto" up-main>
+            <main id="main-content" class="flex-1 p-4 sm:p-6 overflow-y-auto" up-main>
                 <div class="min-h-[70vh]">
                     @yield('content')
                 </div>
@@ -276,7 +184,7 @@
                 data = data || new FormData(form);
             }
 
-            const submitBtn = form ? (form.querySelector('[type="submit"]') || form.querySelector('button:not([type="button"])')) : null;
+            const submitBtn = options.button || (form ? (form.querySelector('[type="submit"]') || form.querySelector('button:not([type="button"])')) : null);
 
             if (submitBtn) {
                 submitBtn.disabled = true;
@@ -334,6 +242,30 @@
                 prefetchLink.href = link.href;
                 document.head.appendChild(prefetchLink);
                 window.prefetched.add(link.href);
+            }
+        });
+
+        // 6. Global Form Loading Indicator
+        document.addEventListener('submit', (e) => {
+            const form = e.target;
+            if (form.classList.contains('no-loader')) return;
+            
+            const submitBtn = e.submitter || form.querySelector('[type="submit"]') || form.querySelector('button:not([type="button"])');
+            
+            if (submitBtn && !submitBtn.hasAttribute('no-loader')) {
+                const originalContent = submitBtn.innerHTML;
+                
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                submitBtn.innerHTML = '<i data-lucide="loader-2" class="h-4 w-4 animate-spin flex items-center justify-center gap-2"></i> Processing...';
+                refreshIcons();
+                
+                setTimeout(() => {
+                    if (submitBtn.innerHTML.includes('Processing')) {
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                        submitBtn.innerHTML = originalContent;
+                        refreshIcons();
+                    }
+                }, 10000);
             }
         });
     </script>

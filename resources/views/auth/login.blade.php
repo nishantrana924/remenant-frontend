@@ -39,8 +39,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('login') }}" class="space-y-6" onsubmit="handleAuthSubmit(this)"
-                    up-target="_self">
+                <form method="POST" action="{{ route('login') }}" class="space-y-6" onsubmit="handleAuthSubmit(this)" up-submit="false">
                     @csrf
 
                     <!-- Email Address -->

@@ -1,6 +1,6 @@
 <!-- Sidebar overlay -->
 <div class="fixed inset-0 z-[130] hidden bg-black/50 opacity-0 backdrop-blur-[1px] transition-opacity duration-200"
-    data-sidebar-overlay>
+    data-sidebar-overlay onclick="togglePublicSidebar(false)">
     <!-- Sidebar panel -->
     <aside
         class="absolute left-0 top-0 h-full w-[88vw] max-w-[360px] -translate-x-full overflow-y-auto bg-[var(--sidebar-bg)] shadow-2xl transition-transform duration-200 sm:w-[360px]"
@@ -13,7 +13,7 @@
 
             <button type="button"
                 class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/5 hover:bg-black/10 transition"
-                data-sidebar-close aria-label="Close sidebar">
+                onclick="togglePublicSidebar(false)" aria-label="Close sidebar">
                 <i data-lucide="x" class="h-5 w-5"></i>
             </button>
         </div>

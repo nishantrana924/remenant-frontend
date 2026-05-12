@@ -34,7 +34,7 @@
                 <div class="flex items-center gap-2">
                     <button type="button"
                         class="header-btn inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
-                        aria-label="Open menu" data-sidebar-open aria-expanded="false">
+                        aria-label="Open menu" onclick="togglePublicSidebar(true)" aria-expanded="false">
                         <i data-lucide="menu" class="h-6 w-6"></i>
                     </button>
 
@@ -134,7 +134,7 @@
             <!-- Menu -->
             <button type="button"
                 class="header-btn inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/20 transition"
-                aria-label="Open menu" data-sidebar-open aria-expanded="false">
+                aria-label="Open menu" onclick="togglePublicSidebar(true)" aria-expanded="false">
                 <i data-lucide="menu" class="h-5 w-5"></i>
             </button>
 

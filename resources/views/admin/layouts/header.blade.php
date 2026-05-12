@@ -87,7 +87,7 @@
                         Profile Settings
                     </a>
                     <div class="h-px bg-gray-50 my-2"></div>
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('logout') }}" up-submit="false">
                         @csrf
                         <button type="submit" class="flex w-full items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
                             <i data-lucide="log-out" class="w-4 h-4"></i>

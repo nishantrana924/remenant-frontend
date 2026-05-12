@@ -17,9 +17,14 @@ class HandleUnpolyRequests
     {
         $response = $next($request);
 
-        $unpoly = new \Webstronauts\Unpoly\Unpoly();
+        // 1. Identify Layout Identity
+        // We use versions to trigger full reloads on layout change
+        $isDashboard = $request->is('admin') || $request->is('admin/*') || $request->is('dashboard');
+        $revision = $isDashboard ? 'layout-admin-v1.1' : 'layout-public-v1.1';
         
-        // Decorate the response with Unpoly headers/cookies
+        $response->headers->set('X-Up-Assets-Revision', $revision);
+
+        $unpoly = new \Webstronauts\Unpoly\Unpoly();
         $unpoly->decorateResponse($request, $response);
 
         return $response;

@@ -21,7 +21,7 @@
                 <i data-lucide="smartphone" class="w-4 h-4"></i>
                 Live Preview
             </button>
-            <button type="button" @click="submitForm()" class="saas-btn-primary shadow-lg shadow-orange-100">
+            <button type="button" @click="submitForm($event)" class="saas-btn-primary shadow-lg shadow-orange-100">
                 <i data-lucide="check" class="w-4 h-4"></i>
                 Save Changes
             </button>
@@ -355,7 +355,7 @@
                             <label class="saas-label">Quick Add Category</label>
                             <div class="flex gap-2">
                                 <input type="text" x-model="newCategoryName" class="saas-input h-10 text-xs" placeholder="New Category Name">
-                                <button type="button" @click="quickAddCategory()" class="h-10 px-4 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">Add</button>
+                                <button type="button" @click="quickAddCategory($event)" class="h-10 px-4 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">Add</button>
                             </div>
                         </div>
                         <div class="pt-4 border-t border-slate-100">
@@ -796,8 +796,14 @@ function productSystem() {
             FilePond.create(document.querySelector('.filepond-main'), { storeAsFile: true });
             FilePond.create(document.querySelector('.filepond-gallery'), { storeAsFile: true, allowMultiple: true });
         },
-        async quickAddCategory() {
+        async quickAddCategory(event) {
             if (!this.newCategoryName) return;
+            const btn = event.currentTarget;
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="h-3 w-3 animate-spin"></i>';
+            refreshIcons();
+
             try {
                 const response = await fetch('{{ route("admin.categories.quick-add") }}', {
                     method: 'POST',
@@ -823,10 +829,20 @@ function productSystem() {
                 }
             } catch (error) {
                 console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+                refreshIcons();
             }
         },
-        submitForm() {
+        submitForm(event) {
+            // Sync all CKEditors back to their respective textareas
+            Object.values(this.editors).forEach(editor => {
+                if (editor.updateSourceElement) editor.updateSourceElement();
+            });
+
             fastSubmit('#product-form', {
+                button: event.currentTarget,
                 success: (data) => {
                     this.persistence.clear();
                     Swal.fire({

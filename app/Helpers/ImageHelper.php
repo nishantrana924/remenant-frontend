@@ -8,31 +8,53 @@ use Illuminate\Support\Str;
 class ImageHelper
 {
     /**
-     * Upload an image directly to the public folder.
+     * Upload and convert an image to WebP.
      */
     public static function upload($file, $directory = 'products'): string
     {
         if (!$file) return '';
         
-        // Ensure directory starts with 'uploads/' but doesn't repeat it
         $directory = trim($directory, '/');
         if (!\Illuminate\Support\Str::startsWith($directory, 'uploads')) {
             $directory = 'uploads/' . $directory;
         }
         
         $uploadPath = public_path($directory);
-        
         if (!file_exists($uploadPath)) {
             mkdir($uploadPath, 0777, true);
         }
         
-        // Generate a clean filename
-        $filename = time() . '-' . \Illuminate\Support\Str::random(10) . '.' . $file->getClientOriginalExtension();
+        $filename = time() . '-' . \Illuminate\Support\Str::random(10) . '.webp';
+        $fullPath = $uploadPath . '/' . $filename;
+
+        // Convert to WebP using GD
+        $image = null;
+        $extension = strtolower($file->getClientOriginalExtension());
         
-        // Move file directly to public directory
-        $file->move($uploadPath, $filename);
+        try {
+            if ($extension === 'jpeg' || $extension === 'jpg') {
+                $image = imagecreatefromjpeg($file->getRealPath());
+            } elseif ($extension === 'png') {
+                $image = imagecreatefrompng($file->getRealPath());
+                imagepalettetotruecolor($image);
+                imagealphablending($image, true);
+                imagesavealpha($image, true);
+            } elseif ($extension === 'webp') {
+                $image = imagecreatefromwebp($file->getRealPath());
+            }
+
+            if ($image) {
+                imagewebp($image, $fullPath, 80); // 80 quality
+                imagedestroy($image);
+            } else {
+                // Fallback to simple move if GD fails
+                $file->move($uploadPath, $filename);
+            }
+        } catch (\Exception $e) {
+            // Fallback
+            $file->move($uploadPath, $filename);
+        }
         
-        // Return relative path from public root
         return $directory . '/' . $filename;
     }
 

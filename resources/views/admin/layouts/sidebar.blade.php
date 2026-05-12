@@ -15,43 +15,43 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
-            <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active-nav-item' : '' }}">
+        <nav id="admin-nav" class="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar" up-nav>
+            <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active-nav-item' : '' }}" up-target="#main-content, #admin-nav">
                 <i data-lucide="layout-grid" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Dashboard</span>
             </a>
 
-            <a href="{{ route('admin.products.index') }}" class="nav-item {{ request()->routeIs('admin.products.*') ? 'active-nav-item' : '' }}">
+            <a href="{{ route('admin.products.index') }}" class="nav-item {{ request()->routeIs('admin.products.*') ? 'active-nav-item' : '' }}" up-alias="/admin/products*" up-target="#main-content, #admin-nav">
                 <i data-lucide="package" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Products</span>
             </a>
 
-            <a href="{{ route('admin.inventory.index') }}" class="nav-item {{ request()->routeIs('admin.inventory.*') ? 'active-nav-item' : '' }}">
+            <a href="{{ route('admin.inventory.index') }}" class="nav-item {{ request()->routeIs('admin.inventory.*') ? 'active-nav-item' : '' }}" up-alias="/admin/inventory*" up-target="#main-content, #admin-nav">
                 <i data-lucide="box" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Inventory</span>
             </a>
 
-            <a href="{{ route('admin.orders.index') }}" class="nav-item {{ request()->routeIs('admin.orders.*') ? 'active-nav-item' : '' }}">
+            <a href="{{ route('admin.orders.index') }}" class="nav-item {{ request()->routeIs('admin.orders.*') ? 'active-nav-item' : '' }}" up-alias="/admin/orders*" up-target="#main-content, #admin-nav">
                 <i data-lucide="shopping-cart" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Orders</span>
             </a>
 
-            <a href="{{ route('admin.shipping.index') }}" class="nav-item {{ request()->routeIs('admin.shipping.*') ? 'active-nav-item' : '' }}">
+            <a href="{{ route('admin.shipping.index') }}" class="nav-item {{ request()->routeIs('admin.shipping.*') ? 'active-nav-item' : '' }}" up-alias="/admin/shipping*" up-target="#main-content, #admin-nav">
                 <i data-lucide="truck" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Shipping</span>
             </a>
 
-            <a href="{{ route('admin.refunds.index') }}" class="nav-item {{ request()->routeIs('admin.refunds.*') ? 'active-nav-item' : '' }}">
+            <a href="{{ route('admin.refunds.index') }}" class="nav-item {{ request()->routeIs('admin.refunds.*') ? 'active-nav-item' : '' }}" up-alias="/admin/refunds*" up-target="#main-content, #admin-nav">
                 <i data-lucide="rotate-ccw" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Refunds</span>
             </a>
 
-            <a href="{{ route('admin.reviews.index') }}" class="nav-item {{ request()->routeIs('admin.reviews.*') ? 'active-nav-item' : '' }}">
+            <a href="{{ route('admin.reviews.index') }}" class="nav-item {{ request()->routeIs('admin.reviews.*') ? 'active-nav-item' : '' }}" up-alias="/admin/reviews*" up-target="#main-content, #admin-nav">
                 <i data-lucide="message-square" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Reviews</span>
             </a>
 
-            <a href="{{ route('admin.customers.index') }}" class="nav-item {{ request()->routeIs('admin.customers.*') ? 'active-nav-item' : '' }}">
+            <a href="{{ route('admin.customers.index') }}" class="nav-item {{ request()->routeIs('admin.customers.*') ? 'active-nav-item' : '' }}" up-alias="/admin/customers*" up-target="#main-content, #admin-nav">
                 <i data-lucide="users" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Customers</span>
             </a>
@@ -60,7 +60,7 @@
                 <p class="sidebar-text px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Marketing</p>
             </div>
 
-            <a href="{{ route('admin.coupons.index') }}" class="nav-item {{ request()->routeIs('admin.coupons.*') ? 'active-nav-item' : '' }}">
+            <a href="{{ route('admin.coupons.index') }}" class="nav-item {{ request()->routeIs('admin.coupons.*') ? 'active-nav-item' : '' }}" up-alias="/admin/coupons*" up-target="#main-content, #admin-nav">
                 <i data-lucide="ticket" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Coupons</span>
             </a>
@@ -69,12 +69,12 @@
                 <p class="sidebar-text px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Branding</p>
             </div>
 
-            <a href="{{ route('admin.sliders.index') }}" class="nav-item {{ request()->routeIs('admin.sliders.*') ? 'active-nav-item' : '' }}">
+            <a href="{{ route('admin.sliders.index') }}" class="nav-item {{ request()->routeIs('admin.sliders.*') ? 'active-nav-item' : '' }}" up-alias="/admin/sliders*" up-target="#main-content, #admin-nav">
                 <i data-lucide="image" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Web Banners</span>
             </a>
 
-            <a href="{{ route('admin.about.edit') }}" class="nav-item {{ request()->routeIs('admin.about.*') ? 'active-nav-item' : '' }}">
+            <a href="{{ route('admin.about.edit') }}" class="nav-item {{ request()->routeIs('admin.about.*') ? 'active-nav-item' : '' }}" up-alias="/admin/about*" up-target="#main-content, #admin-nav">
                 <i data-lucide="info" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">About Page</span>
             </a>
@@ -83,7 +83,7 @@
                 <p class="sidebar-text px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Compliance</p>
             </div>
 
-            <a href="{{ route('admin.legal.index') }}" class="nav-item {{ request()->routeIs('admin.legal.*') ? 'active-nav-item' : '' }}">
+            <a href="{{ route('admin.legal.index') }}" class="nav-item {{ request()->routeIs('admin.legal.*') ? 'active-nav-item' : '' }}" up-alias="/admin/legal*" up-target="#main-content, #admin-nav">
                 <i data-lucide="shield" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Legal Pages</span>
             </a>
