@@ -109,7 +109,7 @@
                             <td class="pl-8">
                                 <div class="flex items-center gap-4 py-1">
                                     <div class="h-10 w-10 rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-1 flex-shrink-0">
-                                        <img src="{{ $p->image_url }}" class="h-full w-full object-contain">
+                                        <img src="{{ \App\Helpers\ImageHelper::getUrl($p->image) }}" class="h-full w-full object-contain" onerror="this.src='https://ui-avatars.com/api/?name=P&background=F97316&color=fff'">
                                     </div>
                                     <div>
                                         <h4 class="font-bold text-slate-900 text-xs uppercase tracking-tight">{{ $p->title }}</h4>

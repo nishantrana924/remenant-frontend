@@ -48,8 +48,16 @@
         @include('admin.layouts.sidebar')
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col h-full overflow-hidden" id="admin-main-content">
+        <div class="flex-1 flex flex-col h-full overflow-hidden relative" id="admin-main-content">
             @include('admin.layouts.header')
+
+            <!-- Page Loader (Limited to Content Area) -->
+            <div id="page-loader" class="absolute inset-0 top-16 z-[80] bg-white/60 backdrop-blur-sm flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none">
+                <div class="flex flex-col items-center gap-4">
+                    <div class="w-12 h-12 border-4 border-slate-100 border-t-orange-500 rounded-full animate-spin"></div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 animate-pulse">Loading...</p>
+                </div>
+            </div>
 
             <!-- Page Content -->
             <main id="main-content" class="flex-1 p-4 sm:p-6 overflow-y-auto" up-main>
@@ -62,6 +70,20 @@
     </div>
 
     <div id="toast-wrapper" class="toast-container"></div>
+
+    <script>
+        // Unpoly Loader Logic
+        document.addEventListener('up:request:load', (e) => {
+            // Only show loader for major page transitions (main content updates)
+            if (e.request.target.includes('#main-content')) {
+                document.getElementById('page-loader').classList.remove('opacity-0', 'pointer-events-none');
+            }
+        });
+
+        document.addEventListener('up:fragment:inserted', () => {
+            document.getElementById('page-loader').classList.add('opacity-0', 'pointer-events-none');
+        });
+    </script>
 
     <!-- External JavaScript (Deferred) -->
     <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
