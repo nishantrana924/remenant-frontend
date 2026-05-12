@@ -561,6 +561,8 @@
 
 <script>
 function productSystem() {
+    const editors = {}; // Non-reactive closure variable
+    
     return {
         showIconPicker: false,
         iconSearch: '',
@@ -568,7 +570,6 @@ function productSystem() {
         currentBenefitIndex: null,
         imagePreview: null,
         hasDraft: false,
-        editors: {},
         get filteredIcons() {
             if (!this.iconSearch) return this.iconLibrary;
             return this.iconLibrary.filter(i => i.includes(this.iconSearch.toLowerCase()));
@@ -662,12 +663,12 @@ function productSystem() {
             if (savedData) {
                 this.formData = Object.assign({}, this.formData, savedData);
                 // Sync CKEditors
-                Object.keys(this.editors).forEach(id => {
-                    if (this.formData[id]) this.editors[id].setData(this.formData[id]);
+                Object.keys(editors).forEach(id => {
+                    if (this.formData[id]) editors[id].setData(this.formData[id]);
                 });
                 // Sync Highlight Editors
                 this.formData.highlights_list.forEach(h => {
-                    const ed = this.editors['highlight_' + h.id];
+                    const ed = editors['highlight_' + h.id];
                     if (ed && h.desc) ed.setData(h.desc);
                 });
                 this.hasDraft = false;
@@ -725,8 +726,6 @@ function productSystem() {
         },
         removeHighlight(index) {
             this.formData.highlights_list.splice(index, 1);
-            // Re-init editors might be needed if IDs shift, but CKEditor doesn't like shifting.
-            // Better to keep the array stable or re-render carefully.
         },
         selectIcon(icon) {
             if(this.pickerMode === 'benefit') {
@@ -764,8 +763,7 @@ function productSystem() {
                     const reader = new FileReader();
                     reader.onload = (e) => { 
                         this.imagePreview = e.target.result; 
-                        // Only save to draft if it's reasonably small to avoid localStorage limits
-                        if (e.target.result.length < 2 * 1024 * 1024) { // 2MB base64
+                        if (e.target.result.length < 2 * 1024 * 1024) { 
                             this.formData.hero_draft_image = e.target.result;
                         }
                     };
@@ -805,7 +803,7 @@ function productSystem() {
                     ],
                     table: { contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'] }
                 }).then(editor => {
-                    this.editors[id] = editor;
+                    editors[id] = editor;
                     editor.model.document.on('change:data', () => { 
                         this.formData[id] = editor.getData(); 
                     });
@@ -827,7 +825,7 @@ function productSystem() {
                 toolbar: ['bold', 'italic', 'link', 'undo', 'redo']
             }).then(editor => {
                 el.classList.add('ck-editor-initialized');
-                this.editors['highlight_' + id] = editor;
+                editors['highlight_' + id] = editor;
                 editor.model.document.on('change:data', () => { 
                     const item = this.formData.highlights_list.find(h => h.id === id);
                     if(item) item.desc = editor.getData(); 
@@ -882,7 +880,7 @@ function productSystem() {
         },
         submitForm(event) {
             // Sync all CKEditors back to their respective textareas
-            Object.values(this.editors).forEach(editor => {
+            Object.values(editors).forEach(editor => {
                 if (editor.updateSourceElement) editor.updateSourceElement();
             });
 

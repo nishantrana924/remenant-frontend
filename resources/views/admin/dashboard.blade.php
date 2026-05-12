@@ -20,14 +20,14 @@
                 <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
                 <span class="text-[9px] font-bold uppercase tracking-widest text-slate-600">System Live</span>
             </div>
-            <button class="saas-btn-secondary py-2.5">
+            <a href="{{ route('admin.orders.index') }}" class="saas-btn-secondary py-2.5">
                 <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
                 Timeline
-            </button>
-            <button class="saas-btn-primary py-2.5 px-6">
+            </a>
+            <a href="{{ route('admin.products.create') }}" class="saas-btn-primary py-2.5 px-6">
                 <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                 Create New
-            </button>
+            </a>
         </div>
     </div>
 
@@ -82,7 +82,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <!-- Visual Data Flow -->
         <div class="lg:col-span-8 saas-card p-8">
-            <div class="flex items-center justify-between mb-10">
+            <div class="flex items-center justify-between mb-6">
                 <div>
                     <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Revenue Stats</h3>
                     <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Monthly performance analysis</p>
@@ -94,7 +94,7 @@
                     </div>
                 </div>
             </div>
-            <div class="h-[300px] sm:h-[400px] relative">
+            <div class="h-[300px] sm:h-[350px] relative">
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>

@@ -210,7 +210,7 @@
 
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
                 var originalContent = submitBtn.innerHTML;
                 submitBtn.innerHTML = '<i data-lucide="loader-2" class="h-4 w-4 animate-spin"></i> Processing...';
                 refreshIcons();
@@ -247,14 +247,53 @@
             } finally {
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
                     submitBtn.innerHTML = originalContent;
                     refreshIcons();
                 }
             }
         }
 
-        // 5. Link Prefetching
+        // 5. Unpoly-Aware Button Loaders (Navigation & Forms)
+        if (window.up) {
+            // Handle Link Clicks (Navigation)
+            up.on('up:link:follow', function(event) {
+                const btn = event.target.closest('a, button');
+                if (btn && (btn.classList.contains('saas-btn-primary') || btn.classList.contains('saas-btn-secondary'))) {
+                    if (btn.hasAttribute('no-loader')) return;
+                    
+                    btn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                    btn.dataset.originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<i data-lucide="loader-2" class="h-4 w-4 animate-spin"></i>';
+                    refreshIcons();
+                }
+            });
+
+            // Handle Standard Form Submissions (Unpoly)
+            up.on('up:form:submit', function(event) {
+                const btn = event.submitter || event.target.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                    btn.dataset.originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<i data-lucide="loader-2" class="h-4 w-4 animate-spin"></i> Processing...';
+                    refreshIcons();
+                }
+            });
+
+            // Revert button if Unpoly request fails or is aborted
+            up.on('up:request:offline up:request:aborted', function(event) {
+                document.querySelectorAll('.pointer-events-none').forEach(btn => {
+                    if (btn.dataset.originalHtml) {
+                        btn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                        btn.innerHTML = btn.dataset.originalHtml;
+                        delete btn.dataset.originalHtml;
+                    }
+                });
+                refreshIcons();
+            });
+        }
+
+        // 6. Link Prefetching
         window.prefetched = window.prefetched || new Set();
         document.addEventListener('mouseover', (e) => {
             const link = e.target.closest('a');
@@ -264,30 +303,6 @@
                 prefetchLink.href = link.href;
                 document.head.appendChild(prefetchLink);
                 window.prefetched.add(link.href);
-            }
-        });
-
-        // 6. Global Form Loading Indicator
-        document.addEventListener('submit', (e) => {
-            const form = e.target;
-            if (form.classList.contains('no-loader')) return;
-            
-            const submitBtn = e.submitter || form.querySelector('[type="submit"]') || form.querySelector('button:not([type="button"])');
-            
-            if (submitBtn && !submitBtn.hasAttribute('no-loader')) {
-                const originalContent = submitBtn.innerHTML;
-                
-                submitBtn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-                submitBtn.innerHTML = '<i data-lucide="loader-2" class="h-4 w-4 animate-spin flex items-center justify-center gap-2"></i> Processing...';
-                refreshIcons();
-                
-                setTimeout(() => {
-                    if (submitBtn.innerHTML.includes('Processing')) {
-                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-                        submitBtn.innerHTML = originalContent;
-                        refreshIcons();
-                    }
-                }, 10000);
             }
         });
     </script>

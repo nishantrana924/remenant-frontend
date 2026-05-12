@@ -626,6 +626,8 @@
 
 <script>
 function productSystem() {
+    const editors = {}; // Non-reactive closure variable
+    
     return {
         showIconPicker: false,
         showInventoryHistory: false,
@@ -635,7 +637,6 @@ function productSystem() {
         newCategoryName: '',
         imagePreview: {!! $item->image ? json_encode(\App\Helpers\ImageHelper::getUrl($item->image)) : 'null' !!},
         hasDraft: false,
-        editors: {},
         get filteredIcons() {
             if (!this.iconSearch) return this.iconLibrary;
             return this.iconLibrary.filter(i => i.includes(this.iconSearch.toLowerCase()));
@@ -702,12 +703,12 @@ function productSystem() {
             if (savedData) {
                 this.formData = Object.assign({}, this.formData, savedData);
                 // Sync CKEditors
-                Object.keys(this.editors).forEach(id => {
-                    if (this.formData[id]) this.editors[id].setData(this.formData[id]);
+                Object.keys(editors).forEach(id => {
+                    if (this.formData[id]) editors[id].setData(this.formData[id]);
                 });
                 // Sync Highlight Editors
                 this.formData.highlights_list.forEach(h => {
-                    const ed = this.editors['highlight_' + h.id];
+                    const ed = editors['highlight_' + h.id];
                     if (ed && h.desc) ed.setData(h.desc);
                 });
                 this.hasDraft = false;
@@ -724,7 +725,7 @@ function productSystem() {
                 const el = document.querySelector('#'+id+'_editor');
                 if (!el) return;
                 ClassicEditor.create(el).then(editor => {
-                    this.editors[id] = editor;
+                    editors[id] = editor;
                     editor.model.document.on('change:data', () => { this.formData[id] = editor.getData(); });
                 });
             });
@@ -733,7 +734,7 @@ function productSystem() {
             const el = document.querySelector('#highlight_editor_' + id);
             if(!el) return;
             ClassicEditor.create(el, { toolbar: ['bold', 'italic', 'link', 'undo', 'redo'] }).then(editor => {
-                this.editors['highlight_' + id] = editor;
+                editors['highlight_' + id] = editor;
                 const item = this.formData.highlights_list.find(h => h.id === id);
                 if(item && item.desc) editor.setData(item.desc);
                 editor.model.document.on('change:data', () => { if(item) item.desc = editor.getData(); });
@@ -862,7 +863,7 @@ function productSystem() {
         },
         submitForm(event) {
             // Sync all CKEditors back to their respective textareas
-            Object.values(this.editors).forEach(editor => {
+            Object.values(editors).forEach(editor => {
                 if (editor.updateSourceElement) editor.updateSourceElement();
             });
 
