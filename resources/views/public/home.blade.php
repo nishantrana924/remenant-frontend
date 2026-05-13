@@ -449,18 +449,7 @@
             </div>
 
             <div class="mt-16 testimonial-carousel owl-carousel owl-theme">
-                @php
-                    $testimonials = [
-                        ['name' => 'Ananya Sharma', 'location' => 'Mumbai', 'text' => 'The Glutathione tablets have completely changed my morning routine. My skin is noticeably brighter and I feel more confident!', 'rating' => 5],
-                        ['name' => 'Rahul Mehta', 'location' => 'Bangalore', 'text' => 'Finally a Vitamin C supplement that actually tastes good and feels effective. No more boring pills or chalky tablets.', 'rating' => 5],
-                        ['name' => 'Priya Kapoor', 'location' => 'Delhi', 'text' => 'Perfect for my busy lifestyle. I just drop a tablet in my bottle and I am good to go. Love the Biotin formula!', 'rating' => 5],
-                        ['name' => 'Vikram Rao', 'location' => 'Pune', 'text' => 'Best ACV tablets I have tried. No bad aftertaste and helped with my digestion significantly. Highly recommend for detox.', 'rating' => 5],
-                        ['name' => 'Sneha Patil', 'location' => 'Hyderabad', 'text' => 'Quality ingredients and great packaging. You can tell they care about the product. The results speak for themselves!', 'rating' => 5],
-                        ['name' => 'Arjun Gupta', 'location' => 'Chennai', 'text' => 'The energy boost from the Vitamin C combo is real. Feeling much more active throughout the day without the jitter.', 'rating' => 5],
-                    ];
-                @endphp
-
-                @foreach ($testimonials as $testimonial)
+                @forelse ($featuredReviews ?? [] as $testimonial)
                     <div class="item">
                         <div
                             class="testimonial-card rounded-[2.5rem] bg-white p-7 sm:p-10 shadow-xl shadow-gray-100/50 ring-1 ring-black/[0.02] flex flex-col relative overflow-hidden group h-full">
@@ -471,36 +460,67 @@
                             </div>
 
                             <div class="flex gap-1 text-orange-400">
-                                @for ($i = 0; $i < $testimonial['rating']; $i++)
-                                    <i data-lucide="star" class="h-4 w-4 fill-current"></i>
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <i data-lucide="star" class="h-4 w-4 {{ $i <= $testimonial->rating ? 'fill-current' : 'text-gray-200' }}"></i>
                                 @endfor
                             </div>
 
                             <div class="mt-6 sm:mt-8 flex-1">
                                 <p class="text-lg sm:text-xl font-semibold leading-relaxed text-gray-900">
-                                    "{{ $testimonial['text'] }}"</p>
+                                    "{{ $testimonial->comment }}"</p>
                             </div>
 
                             <div class="mt-8 sm:mt-10 flex items-center gap-3 sm:gap-4">
                                 <div
                                     class="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-full bg-gradient-to-br from-[var(--primary)] to-orange-400 flex items-center justify-center font-black text-white text-lg sm:text-xl shadow-lg">
-                                    {{ substr($testimonial['name'], 0, 1) }}
+                                    {{ substr($testimonial->user->name ?? 'G', 0, 1) }}
                                 </div>
                                 <div>
                                     <h4
                                         class="text-sm sm:text-base font-bold text-gray-900 leading-none flex items-center gap-2">
-                                        {{ $testimonial['name'] }}
+                                        {{ $testimonial->user->name ?? 'Verified User' }}
                                         <i data-lucide="check-circle-2"
                                             class="h-3 w-4 sm:h-4 sm:w-4 text-blue-500 fill-blue-50"></i>
                                     </h4>
                                     <p class="mt-1.5 text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-widest">
-                                        {{ $testimonial['location'] }} • Verified
+                                        {{ $testimonial->location ?? 'Verified Buyer' }}
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    @php
+                        $fallbackTestimonials = [
+                            ['name' => 'Ananya Sharma', 'location' => 'Mumbai', 'text' => 'The Glutathione tablets have completely changed my morning routine. My skin is noticeably brighter!', 'rating' => 5],
+                            ['name' => 'Rahul Mehta', 'location' => 'Bangalore', 'text' => 'Finally a Vitamin C supplement that actually tastes good and feels effective. Love it.', 'rating' => 5],
+                            ['name' => 'Priya Kapoor', 'location' => 'Delhi', 'text' => 'Perfect for my busy lifestyle. I just drop a tablet in my bottle and I am good to go.', 'rating' => 5],
+                        ];
+                    @endphp
+                    @foreach ($fallbackTestimonials as $testimonial)
+                        <div class="item">
+                            <div class="testimonial-card rounded-[2.5rem] bg-white p-7 sm:p-10 shadow-xl shadow-gray-100/50 ring-1 ring-black/[0.02] flex flex-col relative overflow-hidden h-full">
+                                <div class="flex gap-1 text-orange-400">
+                                    @for ($i = 0; $i < $testimonial['rating']; $i++)
+                                        <i data-lucide="star" class="h-4 w-4 fill-current"></i>
+                                    @endfor
+                                </div>
+                                <div class="mt-6 sm:mt-8 flex-1">
+                                    <p class="text-lg sm:text-xl font-semibold leading-relaxed text-gray-900">"{{ $testimonial['text'] }}"</p>
+                                </div>
+                                <div class="mt-8 sm:mt-10 flex items-center gap-3 sm:gap-4">
+                                    <div class="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-full bg-gradient-to-br from-[var(--primary)] to-orange-400 flex items-center justify-center font-black text-white text-lg sm:text-xl shadow-lg">
+                                        {{ substr($testimonial['name'], 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm sm:text-base font-bold text-gray-900 leading-none">{{ $testimonial['name'] }}</h4>
+                                        <p class="mt-1.5 text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-widest">{{ $testimonial['location'] }} • Verified</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @endforelse
             </div>
         </div>
     </section>

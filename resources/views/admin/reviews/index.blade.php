@@ -47,6 +47,16 @@
                 setTimeout(() => { location.reload(); }, 500);
             }
         });
+    },
+
+    async updateField(id, field, value) {
+        window.fastSubmit('{{ url("admin/reviews") }}/' + id + '/update-field', {
+            method: 'PATCH',
+            data: { field: field, value: value },
+            success: (res) => {
+                window.toast(res.message);
+            }
+        });
     }
 }">
     <!-- Header -->
@@ -132,6 +142,7 @@
                         </th>
                         <th>User & Product</th>
                         <th>Rating & Feedback</th>
+                        <th>Location</th>
                         <th>Status</th>
                         <th>Featured</th>
                         <th class="text-right">Action</th>
@@ -171,6 +182,13 @@
                                     @endforeach
                                 </div>
                             @endif
+                        </td>
+                        <td>
+                            <input type="text" 
+                                   value="{{ $item->location }}" 
+                                   @blur="updateField({{ $item->id }}, 'location', $event.target.value)"
+                                   placeholder="City (e.g. Mumbai)"
+                                   class="saas-input py-1 px-2 text-[10px] w-24 focus:w-32 transition-all">
                         </td>
                         <td>
                             @if($item->status === 'pending')

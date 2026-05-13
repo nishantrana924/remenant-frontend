@@ -15,7 +15,8 @@ class Review extends Model
         'comment',
         'images',
         'status',
-        'is_featured'
+        'is_featured',
+        'location'
     ];
 
     protected $casts = [

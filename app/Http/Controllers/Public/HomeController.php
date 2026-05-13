@@ -21,6 +21,13 @@ class HomeController extends Controller
         $products = $allProducts;
         $combos = Product::whereIn('product_type', ['combo', 'both'])->where('status', 'published')->get();
         
-        return view('public.home', compact('sliders', 'featuredProducts', 'products', 'combos'));
+        // Fetch featured reviews for homepage
+        $featuredReviews = \App\Models\Review::with('user')
+            ->where('is_featured', true)
+            ->where('status', 'approved')
+            ->latest()
+            ->get();
+        
+        return view('public.home', compact('sliders', 'featuredProducts', 'products', 'combos', 'featuredReviews'));
     }
 }

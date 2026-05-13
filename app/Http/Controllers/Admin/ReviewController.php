@@ -44,6 +44,20 @@ class ReviewController extends Controller
         ]);
     }
 
+    public function updateField(Request $request, $id)
+    {
+        $review = Review::findOrFail($id);
+        $field = $request->input('field');
+        $value = $request->input('value');
+        
+        if (in_array($field, ['location', 'comment', 'rating'])) {
+            $review->update([$field => $value]);
+            return response()->json(['success' => true, 'message' => ucfirst($field) . ' updated']);
+        }
+        
+        return response()->json(['success' => false, 'message' => 'Invalid field'], 422);
+    }
+
     public function destroy($id)
     {
         $review = Review::findOrFail($id);

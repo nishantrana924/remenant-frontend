@@ -99,6 +99,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('reviews/bulk-action', [\App\Http\Controllers\Admin\ReviewController::class, 'bulkAction'])->name('reviews.bulk-action');
     Route::post('reviews/{id}/status', [\App\Http\Controllers\Admin\ReviewController::class, 'updateStatus'])->name('reviews.update-status');
     Route::post('reviews/{id}/toggle-featured', [\App\Http\Controllers\Admin\ReviewController::class, 'toggleFeatured'])->name('reviews.toggle-featured');
+    Route::patch('reviews/{id}/update-field', [\App\Http\Controllers\Admin\ReviewController::class, 'updateField'])->name('reviews.update-field');
     Route::resource('reviews', \App\Http\Controllers\Admin\ReviewController::class)->only(['index', 'destroy']);
 
     Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class);
