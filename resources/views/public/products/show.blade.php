@@ -968,7 +968,7 @@
                                         <div class="flex flex-wrap gap-2 pt-1">
                                             @foreach($review->images as $imgIndex => $img)
                                                 <div class="group/img relative h-16 w-16 sm:h-20 sm:w-20 overflow-hidden rounded-xl bg-gray-50 ring-1 ring-black/5 cursor-zoom-in"
-                                                     onclick="openReviewLightbox({{ json_encode($reviewImages) }}, {{ $imgIndex }})">
+                                                     onclick='openReviewLightbox({!! json_encode($reviewImages) !!}, {{ $imgIndex }})'>
                                                     <img src="{{ \App\Helpers\ImageHelper::getUrl($img, 'reviews') }}" 
                                                          alt="User review image" 
                                                          class="h-full w-full object-cover">
@@ -1139,6 +1139,29 @@
                             </div>
                         @endforeach
                     @endforeach
+                </div>
+            </div>
+        </section>
+        
+        <!-- Join the Wellness Revolution Section -->
+        <section class="bg-white py-24 border-t border-black/5">
+            <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
+                <div class="rounded-[4rem] bg-[var(--bg-sage)] p-8 sm:p-20 relative overflow-hidden">
+                    <div class="relative z-10 text-center max-w-3xl mx-auto">
+                        <h2 class="text-4xl font-bold italic tracking-tight text-[#074D3D] sm:text-5xl">Join the Wellness Revolution</h2>
+                        <p class="mt-6 text-lg font-semibold text-[#074D3D]/80">
+                            Start your journey towards immortality today. Join our community for exclusive benefits.
+                        </p>
+                        
+                        <div class="mt-10 flex justify-center">
+                            <a href="{{ route('login') }}" class="rounded-2xl bg-[#074D3D] px-12 py-5 text-sm font-black uppercase tracking-widest text-white hover:opacity-90 transition active:scale-95 shadow-xl shadow-[#074D3D]/20">
+                                Get Started
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/20 blur-3xl"></div>
+                    <div class="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-black/5 blur-3xl"></div>
                 </div>
             </div>
         </section>
@@ -1534,4 +1557,7 @@
             }
         };
     </script>
+    @push('scripts')
+        <script src="{{ asset('js/product-page.js') }}"></script>
+    @endpush
 @endsection

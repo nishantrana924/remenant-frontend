@@ -22,6 +22,7 @@
                             <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
                         </svg>
                     </a>
+
                     <a href="https://www.facebook.com/share/18Pdh9bjAU/?mibextid=wwXIfr" target="_blank"
                         aria-label="Facebook"
                         class="group flex h-10 w-10 items-center justify-center rounded-xl bg-white/50 text-[color:var(--text-primary)] ring-1 ring-black/5 hover:bg-black hover:text-white transition-all duration-300 shadow-sm">
@@ -92,15 +93,14 @@
                 <h3 class="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-primary)]">
                     Headquarters</h3>
                 <address class="mt-6 not-italic text-sm leading-relaxed text-[color:var(--text-primary)]/70">
-                    224 , Ambika pinnacle, lajamani chowk, <br>
-                    mota varachha, surat, <br>
-                    Gujarat, India
+                    224, Ambika pinnacle Mall, Lajamani Chowk,<br>
+                    Mota Varachha, Surat, Gujarat - 394101
                 </address>
                 <div class="mt-4 text-sm font-bold text-black">
                     <a href="tel:7567776796" class="hover:underline">756 777 6796</a>
                 </div>
                 <div class="mt-4 text-sm font-bold text-black">
-                    <a href="mailto:support@remenanthealth.com" class="hover:underline">support@remenanthealth.com</a>
+                    <a href="mailto:support@remenant.in" class="hover:underline">support@remenant.in</a>
                 </div>
             </div>
         </div>

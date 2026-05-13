@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- 1. CORE CONFIGURATION ---
     up.fragment.config.mainTargets = ['#main-content', '[up-main]', '.content-area'];
     up.network.config.progressBar = false; 
-    up.link.config.prefetchSelectors.push('a[href^="/admin"]');
+    if (up.link.config.prefetchSelectors) {
+        up.link.config.prefetchSelectors.push('a[href^="/admin"]');
+    }
     up.fragment.config.navigateOptions.cache = true;
 
     // --- 2. MULTI-TARGET SYNC ---
