@@ -146,8 +146,15 @@
             </div>
         </div>
 
+        <!-- Medical Disclaimer -->
+        <div class="mt-12 border-t border-black/5 pt-10">
+            <p class="text-[10px] sm:text-[11px] leading-relaxed text-black/40 text-center max-w-5xl mx-auto italic">
+                <strong>Disclaimer:</strong> The information provided on this website is for educational purposes only and is not intended as a substitute for professional medical advice, diagnosis, or treatment. These products are not intended to diagnose, treat, cure, or prevent any disease. Always consult your healthcare professional before starting any new supplement regimen, especially if you are pregnant, nursing, or have a pre-existing medical condition.
+            </p>
+        </div>
+
         <div
-            class="mt-12 border-t border-black/5 pt-8 flex flex-col items-center gap-6 sm:flex-row sm:justify-between text-[11px] sm:text-xs font-medium !text-black">
+            class="mt-10 border-t border-black/5 pt-8 flex flex-col items-center gap-6 sm:flex-row sm:justify-between text-[11px] sm:text-xs font-medium !text-black">
             <div class="flex flex-col items-center gap-4 sm:flex-row sm:gap-8 text-center sm:text-left">
                 <div class="flex items-center gap-6">
                     <p class="font-semibold !text-black">&copy; {{ date('Y') }} Remenant Health. All rights reserved.
