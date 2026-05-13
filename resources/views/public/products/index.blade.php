@@ -159,51 +159,6 @@
                         </div>
                     </div>
 
-                    @if(isset($combos) && $combos->isNotEmpty())
-                    <!-- Combo Offers Slider (Only on products page) -->
-                    <div class="mt-24 mb-16">
-                        <div class="flex items-center justify-between mb-8">
-                            <h2 class="text-2xl font-bold italic text-[color:var(--text-primary)]">Special Combo Offers</h2>
-                            <div class="flex items-center gap-2">
-                                <button type="button" data-combo-prev class="h-10 w-10 rounded-full bg-white shadow-sm ring-1 ring-black/5 flex items-center justify-center hover:bg-gray-50 transition active:scale-95">
-                                    <i data-lucide="chevron-left" class="h-5 w-5"></i>
-                                </button>
-                                <button type="button" data-combo-next class="h-10 w-10 rounded-full bg-white shadow-sm ring-1 ring-black/5 flex items-center justify-center hover:bg-gray-50 transition active:scale-95">
-                                    <i data-lucide="chevron-right" class="h-5 w-5"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="combo-carousel owl-carousel owl-theme" data-items-count="{{ count($combos) }}">
-                            @foreach ($combos as $combo)
-                                <div class="item">
-                                    <div class="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
-                                        <a href="{{ route('products.show', $combo->slug) }}" class="absolute inset-0 z-10"></a>
-                                        <div class="aspect-square bg-gray-50 overflow-hidden">
-                                            <img src="{{ \App\Helpers\ImageHelper::getUrl($combo->image, 'images/products') }}" 
-                                                 alt="{{ $combo->title }}"
-                                                 class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
-                                        </div>
-                                        <div class="p-4 flex-1 flex flex-col">
-                                            <p class="text-[10px] font-black uppercase tracking-widest text-[color:var(--primary)] mb-1">{{ $combo->tagline }}</p>
-                                            <h4 class="text-sm font-bold text-[color:var(--text-primary)] mb-2 line-clamp-1">{{ $combo->title }}</h4>
-                                            <div class="mt-auto flex items-center justify-between">
-                                                <div class="flex items-baseline gap-2">
-                                                    <span class="text-base font-bold text-[color:var(--text-primary)]">₹{{ number_format($combo->price) }}</span>
-                                                    <span class="text-xs text-gray-400 line-through">₹{{ number_format($combo->mrp) }}</span>
-                                                </div>
-                                                <div class="h-8 w-8 rounded-full bg-[var(--primary)] flex items-center justify-center text-white relative z-20">
-                                                    <i data-lucide="plus" class="h-4 w-4"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
-
                     <!-- Load More (Placeholder) -->
                     @if(count($products) > 9)
                         <div class="mt-20 flex justify-center">
@@ -216,6 +171,78 @@
             </div>
         </section>
 
+        @if(isset($combos) && $combos->isNotEmpty())
+        <!-- Full Width Combo Offers Section -->
+        <section class="mx-auto max-w-[1600px] px-4 py-24 sm:px-6 lg:px-12 border-t border-black/5">
+            <div class="flex items-center justify-between mb-12">
+                <h2 class="text-3xl font-bold italic text-[color:var(--text-primary)]">Special Combo Offers</h2>
+                <div class="flex items-center gap-3">
+                    <button type="button" data-combo-prev class="h-12 w-12 rounded-full bg-white shadow-sm ring-1 ring-black/5 flex items-center justify-center hover:bg-gray-50 transition active:scale-95">
+                        <i data-lucide="chevron-left" class="h-6 w-6"></i>
+                    </button>
+                    <button type="button" data-combo-next class="h-12 w-12 rounded-full bg-white shadow-sm ring-1 ring-black/5 flex items-center justify-center hover:bg-gray-50 transition active:scale-95">
+                        <i data-lucide="chevron-right" class="h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="combo-carousel owl-carousel owl-theme" data-items-count="{{ count($combos) }}">
+                @foreach ($combos as $combo)
+                    <div class="item h-full">
+                        @php
+                            $discount = (int) round((1 - ($combo->price / max(1, $combo->mrp))) * 100);
+                        @endphp
+                        <div class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5">
+                            <a href="{{ route('products.show', $combo->slug) }}" class="absolute inset-0 z-[5]"></a>
+
+                            <div class="relative aspect-square overflow-hidden bg-[var(--bg-section)]">
+                                <img src="{{ \App\Helpers\ImageHelper::getUrl($combo->image, 'images/products') }}" 
+                                     alt="{{ $combo->title }}"
+                                     class="h-full w-full object-contain transition duration-500 group-hover:scale-105" 
+                                     onerror="this.src='{{ \App\Helpers\ImageHelper::getUrl('products/remenant-product1.jpg', 'images') }}'"
+                                     loading="lazy">
+                                 @if(isset($discount) && $discount > 0)
+                                     <div class="absolute left-3 top-3 rounded-full bg-[var(--primary)] px-3 py-1 text-xs font-extrabold text-white">
+                                         -{{ $discount }}%
+                                     </div>
+                                 @endif
+                             </div>
+
+                            <div class="flex flex-1 flex-col p-4">
+                                <p class="text-xs font-bold tracking-wide text-[color:var(--primary)] uppercase">
+                                    {{ $combo->tagline }}</p>
+                                <h3 class="mt-1 text-[color:var(--text-primary)] font-semibold truncate">
+                                    {{ $combo->title }}</h3>
+
+                                <div class="mt-3 flex items-center justify-between gap-3">
+                                    <div class="flex items-baseline gap-2">
+                                        <p class="text-base font-semibold text-[color:var(--primary)] tracking-tighter">
+                                            ₹{{ number_format($combo->price) }}</p>
+                                        <p class="text-xs font-medium text-[color:var(--text-muted)] line-through">
+                                            ₹{{ number_format($combo->mrp) }}</p>
+                                    </div>
+                                    <div class="flex items-center gap-1 rounded-full bg-black/5 px-2 py-1 text-xs font-semibold text-[color:var(--text-secondary)]">
+                                        <i data-lucide="star" class="h-4 w-4 fill-[color:var(--primary)] text-[color:var(--primary)]"></i>
+                                        {{ number_format($combo->rating, 1) }} ({{ number_format($combo->reviews) }})
+                                    </div>
+                                </div>
+
+                                <div class="mt-auto pt-3 relative z-10">
+                                    <form action="{{ route('cart.add', $combo->id) }}" method="POST" data-ajax="true">
+                                        @csrf
+                                        <button type="submit" class="w-full text-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
+                                            Add to cart
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+        @endif
+
         <!-- Newsletter Section -->
         <section class="bg-white py-24 border-t border-black/5">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-12">
@@ -223,15 +250,14 @@
                     <div class="relative z-10 text-center max-w-3xl mx-auto">
                         <h2 class="text-4xl font-bold italic tracking-tight text-[#074D3D] sm:text-5xl">Join the Wellness Revolution</h2>
                         <p class="mt-6 text-lg font-semibold text-[#074D3D]/80">
-                            Get 10% off your first order and stay updated with our latest health tips.
+                            Start your journey towards immortality today. Join our community for exclusive benefits.
                         </p>
                         
-                        <form class="mt-10 flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto">
-                            <input type="email" placeholder="Enter your email" class="flex-1 rounded-2xl border-none bg-white px-6 py-4 text-sm font-bold shadow-sm outline-none ring-1 ring-black/5 focus:ring-[var(--primary)] transition">
-                            <button type="submit" class="rounded-2xl bg-[#074D3D] px-8 py-4 text-sm font-black uppercase tracking-widest text-white hover:opacity-90 transition active:scale-95 shadow-xl shadow-[#074D3D]/20">
-                                Subscribe
-                            </button>
-                        </form>
+                        <div class="mt-10 flex justify-center">
+                            <a href="{{ route('login') }}" class="rounded-2xl bg-[#074D3D] px-12 py-5 text-sm font-black uppercase tracking-widest text-white hover:opacity-90 transition active:scale-95 shadow-xl shadow-[#074D3D]/20">
+                                Get Started
+                            </a>
+                        </div>
                     </div>
 
                     <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/20 blur-3xl"></div>
@@ -262,14 +288,14 @@
             if ($combo.length > 0 && !$combo.hasClass('owl-loaded')) {
                 const comboCarousel = $combo.owlCarousel({
                     loop: false,
-                    margin: 20,
+                    margin: 32,
                     nav: false,
                     dots: false,
                     responsive: {
-                        0: { items: 1.2, margin: 15 },
-                        640: { items: 2.2 },
-                        1024: { items: 3 },
-                        1280: { items: 4 }
+                        0: { items: 1.2, margin: 16 },
+                        640: { items: 2.2, margin: 24 },
+                        1024: { items: 3, margin: 32 },
+                        1280: { items: 4, margin: 32 }
                     }
                 });
                 $combo.addClass('owl-loaded');

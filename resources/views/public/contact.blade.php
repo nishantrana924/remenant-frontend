@@ -149,7 +149,7 @@
                                 </h3>
                                 <p class="text-lg font-medium text-gray-900 mb-4">Chat with us on WhatsApp for quick
                                     support.</p>
-                                <a href="https://wa.me/17567776796"
+                                <a href="https://wa.me/917567776796"
                                     class="inline-flex items-center gap-2 text-sm font-semibold text-[#25D366] hover:gap-3 transition-all">
                                     START CHAT <i data-lucide="arrow-right" class="h-4 w-4"></i>
                                 </a>
@@ -165,9 +165,9 @@
                             <div>
                                 <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Call Us</h3>
                                 <div class="flex flex-col gap-1">
-                                    <a href="tel:7567776796"
-                                        class="text-lg font-semibold text-gray-900 hover:text-[var(--primary)] transition-colors">756
-                                        777 6796</a>
+                                    <a href="tel:+917567776796"
+                                        class="text-lg font-semibold text-gray-900 hover:text-[var(--primary)] transition-colors">+91
+                                        7567776796</a>
                                 </div>
                             </div>
                         </div>
@@ -181,9 +181,9 @@
                             <div>
                                 <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Email Support
                                 </h3>
-                                <a href="mailto:support@remenanthealth.com"
+                                <a href="mailto:support@remenant.in"
                                     class="text-lg font-semibold text-gray-900 hover:text-[var(--primary)] transition-colors break-all">
-                                    support@remenanthealth.com
+                                    support@remenant.in
                                 </a>
                             </div>
                         </div>
