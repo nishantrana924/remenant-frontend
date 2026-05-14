@@ -1,7 +1,11 @@
 @extends('public.layouts.app')
 
-@section('title', $data['seo']['title'] ?? ($data['title'] . ' - Remenant Health'))
-@section('meta_description', $data['seo']['description'] ?? '')
+@php
+    seo()->set([
+        'title' => ($data['seo']['title'] ?? ($data['title'] . ' | ' . config('app.name'))),
+        'description' => $data['seo']['description'] ?? 'Official ' . $data['title'] . ' for Remenant Health. Read our policies regarding healthcare products and services.',
+    ]);
+@endphp
 
 @section('content')
     <!-- Hero Section -->

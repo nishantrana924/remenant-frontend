@@ -1,6 +1,17 @@
 @extends('public.layouts.app')
 
-@section('title', 'Shop All Products - ' . config('app.name', 'Remenant Health'))
+@php
+    seo()->set([
+        'title' => 'Shop All Effervescent Supplements | Remenant Health',
+        'description' => 'Browse our complete range of effervescent health supplements. From weight management to skincare, find the perfect clinically tested wellness formula for your daily routine.',
+    ]);
+
+    seo()->addSchema('CollectionPage', [
+        'name' => 'Remenant Health Product Collection',
+        'description' => 'Complete collection of premium effervescent wellness supplements.',
+        'url' => request()->url(),
+    ]);
+@endphp
 
 @section('content')
     <div class="bg-[var(--bg-main)]">

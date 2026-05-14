@@ -5,9 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @yield('seo')
+    
+    {!! seo()->render() !!}
 
-    <title>@yield('title', config('app.name', 'Remenant Health'))</title>
     <meta name="layout" content="public">
     <link rel="icon" href="{{ \App\Helpers\ImageHelper::getUrl('logo/remenant-health-favicon.jpg', 'images') }}" type="image/jpeg">
 

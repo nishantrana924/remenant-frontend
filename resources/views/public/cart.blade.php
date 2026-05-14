@@ -1,6 +1,11 @@
 @extends('public.layouts.app')
 
-@section('title', 'Shopping Cart - Remenant Health')
+@php
+    seo()->set([
+        'title' => 'Shopping Cart | Remenant Health',
+        'robots' => 'noindex, nofollow',
+    ]);
+@endphp
 
 @section('content')
     <style>

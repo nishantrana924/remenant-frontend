@@ -1,15 +1,38 @@
 @extends('public.layouts.app')
 
-@section('title', ($product->meta_title ?? null) ?: $product->title)
+@php
+    seo()->set([
+        'title' => ($product->meta_title ?? null) ?: $product->title . ' | ' . config('app.name'),
+        'description' => $product->meta_description ?? Str::limit(strip_tags($product->description), 160),
+        'keywords' => $product->meta_keywords ?? '',
+        'image' => \App\Helpers\ImageHelper::getUrl($product->image, 'images/products'),
+        'og_type' => 'product',
+    ]);
 
-@section('seo')
-    <meta name="description" content="{{ $product->meta_description ?? '' }}">
-    <meta name="keywords" content="{{ $product->meta_keywords ?? '' }}">
-    <meta property="og:title" content="{{ ($product->meta_title ?? null) ?: $product->title }}">
-    <meta property="og:description" content="{{ $product->meta_description ?? '' }}">
-    <meta property="og:image" content="{{ \App\Helpers\ImageHelper::getUrl($product->image) }}">
-    <meta property="og:type" content="product">
-@endsection
+    seo()->addSchema('Product', [
+        'name' => $product->title,
+        'image' => \App\Helpers\ImageHelper::getUrl($product->image, 'images/products'),
+        'description' => strip_tags($product->description),
+        'sku' => 'RH-' . $product->id,
+        'brand' => [
+            '@type' => 'Brand',
+            'name' => config('app.name')
+        ],
+        'offers' => [
+            '@type' => 'Offer',
+            'url' => request()->url(),
+            'priceCurrency' => 'INR',
+            'price' => $product->price,
+            'availability' => 'https://schema.org/InStock',
+            'itemCondition' => 'https://schema.org/NewCondition'
+        ],
+        'aggregateRating' => [
+            '@type' => 'AggregateRating',
+            'ratingValue' => $product->rating ?? 4.5,
+            'reviewCount' => $product->reviews ?? 10
+        ]
+    ]);
+@endphp
 
 @section('content')
     @php

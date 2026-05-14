@@ -1,8 +1,26 @@
 @extends('public.layouts.app')
 
-@section('title', config('app.name', 'Remenant Health') . ' - Home')
+@php
+    seo()->set([
+        'title' => 'Remenant Health | Premium Healthcare & Wellness Effervescent Supplements',
+        'description' => 'India\'s most trusted brand for effervescent health supplements. Shop Clinically Tested, 100% Vegan, and Toxin-Free wellness products for weight management, skin, and daily performance.',
+        'keywords' => 'effervescent tablets, wellness supplements, vegan health products, weight loss drink, skin glow supplements, Remenant Health',
+    ]);
+
+    seo()->addSchema('WebSite', [
+        'name' => config('app.name'),
+        'url' => config('app.url'),
+        'potentialAction' => [
+            '@type' => 'SearchAction',
+            'target' => config('app.url') . '/products?search={search_term_string}',
+            'query-input' => 'required name=search_term_string'
+        ]
+    ]);
+@endphp
 
 @section('content')
+    <h1 class="sr-only">Remenant Health - Premium Healthcare & Wellness Effervescent Supplements</h1>
+
     {{-- Page-specific assets (Inside content for Unpoly swap) --}}
     <link rel="stylesheet" href="{{ asset('assets/css/home-custom.css') }}">
     <script src="{{ asset('assets/js/home-custom.js') }}"></script>
@@ -278,7 +296,7 @@
                     <div class="order-2 lg:order-1 flex justify-center lg:block">
                         <div
                             class="lg:absolute relative -mt-10 lg:mt-0 bottom-0 left-0 lg:left-10 w-full lg:w-[450px] flex justify-center lg:justify-start pointer-events-none">
-                            <img src="{{ asset('images/home/remenant-bg.png') }}" alt="Why Remenant"
+                            <img src="{{ asset('images/home/remenant-bg.png') }}" alt="Remenant Health Premium Effervescent Supplements"
                                 class="w-[260px] sm:w-[320px] lg:w-full h-auto block lg:scale-105 lg:origin-bottom transition-transform duration-500 hover:scale-110">
                         </div>
                     </div>
@@ -330,7 +348,7 @@
                 <!-- Right Image -->
                 <div class="order-1 lg:order-2">
                     <div class="relative max-w-sm mx-auto lg:max-w-md">
-                        <img src="{{ asset('images/home/remenant-bg2.jpg') }}" alt="How it works"
+                        <img src="{{ asset('images/home/remenant-bg2.jpg') }}" alt="How to use Remenant effervescent tablets"
                             class="w-full h-auto object-contain rounded-[2rem] transition-transform duration-500 hover:scale-105">
                     </div>
                 </div>
@@ -446,7 +464,7 @@
             <!-- Mobile Image -->
             <source media="(max-width: 640px)" srcset="{{ asset('images/banners/mobile-bg/remenant-bg4.jpg') }}">
             <!-- Desktop Image -->
-            <img src="{{ asset('images/home/remenant-banner.jpg') }}" alt="Remenant Wellness" class="w-full h-auto"
+            <img src="{{ asset('images/home/remenant-banner.jpg') }}" alt="Remenant Health Wellness Lifestyle" class="w-full h-auto"
                 loading="eager">
         </picture>
     </section>

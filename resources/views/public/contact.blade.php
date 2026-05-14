@@ -1,6 +1,31 @@
 @extends('public.layouts.app')
 
-@section('title', 'Contact Us - Remenant Health')
+@php
+    seo()->set([
+        'title' => 'Contact Us | Remenant Health - Get Expert Wellness Support',
+        'description' => 'Have questions about our wellness supplements? Contact Remenant Health for product guidance, order support, or general inquiries. Reach us via WhatsApp, Email, or Visit our Surat office.',
+    ]);
+
+    seo()->addSchema('ContactPage', [
+        'name' => 'Contact Remenant Health',
+        'description' => 'Contact page for Remenant Health customer support and inquiries.',
+        'url' => request()->url(),
+        'mainEntity' => [
+            '@type' => 'LocalBusiness',
+            'name' => config('app.name'),
+            'telephone' => '+91-7567776796',
+            'email' => 'support@remenant.in',
+            'address' => [
+                '@type' => 'PostalAddress',
+                'streetAddress' => '224, Ambika Pinnacle Mall, Lajamani Chowk, Mota Varachha',
+                'addressLocality' => 'Surat',
+                'addressRegion' => 'Gujarat',
+                'postalCode' => '394101',
+                'addressCountry' => 'IN'
+            ]
+        ]
+    ]);
+@endphp
 
 @section('content')
 
