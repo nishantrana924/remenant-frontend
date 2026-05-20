@@ -36,9 +36,9 @@
                 <span class="sidebar-text">Orders</span>
             </a>
 
-            <a href="{{ route('admin.shipping.index') }}" class="nav-item {{ request()->routeIs('admin.shipping.*') ? 'active-nav-item' : '' }}" up-alias="/admin/shipping*" up-target="#main-content, #admin-nav">
+            <a href="{{ route('admin.logistics.dashboard') }}" class="nav-item {{ request()->routeIs('admin.logistics.*') ? 'active-nav-item' : '' }}" up-alias="/admin/logistics*" up-target="#main-content, #admin-nav">
                 <i data-lucide="truck" class="w-4 h-4 mr-3"></i>
-                <span class="sidebar-text">Shipping</span>
+                <span class="sidebar-text">Logistics</span>
             </a>
 
             <a href="{{ route('admin.refunds.index') }}" class="nav-item {{ request()->routeIs('admin.refunds.*') ? 'active-nav-item' : '' }}" up-alias="/admin/refunds*" up-target="#main-content, #admin-nav">

@@ -38,6 +38,15 @@ class CheckoutController extends Controller
             return redirect()->route('products.index')->with('error', 'Your cart is empty!');
         }
 
+        // Load actual products to get combo info
+        $productIds = collect($items)->pluck('id');
+        $fullProducts = \App\Models\Product::whereIn('id', $productIds)->with(['comboItems.product'])->get()->keyBy('id');
+        
+        // Attach full product to items for blade access
+        foreach ($items as &$item) {
+            $item['model'] = $fullProducts[$item['id']] ?? null;
+        }
+
         $subtotal = collect($items)->sum(fn($item) => $item['price'] * $item['quantity']);
         $shipping = $subtotal > 999 ? 0 : 99;
         $total = $subtotal + $shipping;

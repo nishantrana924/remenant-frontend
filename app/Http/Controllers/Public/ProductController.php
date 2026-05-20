@@ -82,7 +82,7 @@ class ProductController extends Controller
 
     public function show($slug)
     {
-        $product = Product::where('slug', $slug)->firstOrFail();
+        $product = Product::where('slug', $slug)->with(['comboItems.product'])->firstOrFail();
 
         $relatedProducts = Product::where('slug', '!=', $slug)
             ->where('status', 'published')

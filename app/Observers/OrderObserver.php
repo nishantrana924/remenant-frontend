@@ -9,6 +9,18 @@ use Illuminate\Support\Facades\Log;
 class OrderObserver
 {
     /**
+     * Handle the Order "created" event.
+     */
+    public function created(Order $order): void
+    {
+        try {
+            \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderPlaced($order));
+        } catch (\Exception $e) {
+            Log::error("Failed to send order placed email for #{$order->order_number}: " . $e->getMessage());
+        }
+    }
+
+    /**
      * Handle the Order "updated" event.
      */
     public function updated(Order $order): void
@@ -18,21 +30,18 @@ class OrderObserver
             foreach ($order->orderItems as $item) {
                 $product = $item->product;
                 if ($product) {
-                    $oldStock = $product->stock;
-                    $product->decrement('stock', $item->quantity);
-                    
-                    // Log to inventory logs
-                    InventoryLog::create([
-                        'product_id' => $product->id,
-                        'user_id' => auth()->id(),
-                        'quantity' => $item->quantity,
-                        'type' => 'out',
-                        'note' => "Order #{$order->order_number} confirmed. Stock auto-deducted.",
-                        'previous_stock' => $oldStock,
-                        'current_stock' => $product->stock
-                    ]);
+                    $this->deductProductStock($product, $item->quantity, $order);
                 }
             }
+        }
+
+        // Send Shipped Email
+        if ($order->isDirty('delivery_status') && $order->delivery_status === 'shipped') {
+            try {
+               \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderShipped($order));
+           } catch (\Exception $e) {
+               Log::error("Failed to send order shipped email for #{$order->order_number}: " . $e->getMessage());
+           }
         }
 
         // Restock when order is 'cancelled'
@@ -40,18 +49,65 @@ class OrderObserver
             foreach ($order->orderItems as $item) {
                 $product = $item->product;
                 if ($product) {
-                    $oldStock = $product->stock;
-                    $product->increment('stock', $item->quantity);
-                    
-                    InventoryLog::create([
-                        'product_id' => $product->id,
-                        'user_id' => auth()->id(),
-                        'quantity' => $item->quantity,
-                        'type' => 'in',
-                        'note' => "Order #{$order->order_number} cancelled. Stock restored.",
-                        'previous_stock' => $oldStock,
-                        'current_stock' => $product->stock
-                    ]);
+                    $this->restoreProductStock($product, $item->quantity, $order);
+                }
+            }
+        }
+    }
+
+    /**
+     * Deduct stock for a product, handling combo items if necessary.
+     */
+    protected function deductProductStock($product, $quantity, $order)
+    {
+        $oldStock = $product->stock;
+        $product->decrement('stock', $quantity);
+        
+        InventoryLog::create([
+            'product_id' => $product->id,
+            'user_id' => auth()->id(),
+            'change_amount' => -$quantity,
+            'reason' => "Order #{$order->order_number} confirmed. Stock auto-deducted.",
+            'old_stock' => $oldStock,
+            'new_stock' => $product->stock
+        ]);
+
+        // If it's a combo, deduct from included items too
+        if (in_array($product->product_type, ['combo', 'both'])) {
+            foreach ($product->comboItems as $comboItem) {
+                $linkedProduct = $comboItem->product;
+                if ($linkedProduct) {
+                    $itemQty = $comboItem->quantity * $quantity;
+                    $this->deductProductStock($linkedProduct, $itemQty, $order);
+                }
+            }
+        }
+    }
+
+    /**
+     * Restore stock for a product, handling combo items if necessary.
+     */
+    protected function restoreProductStock($product, $quantity, $order)
+    {
+        $oldStock = $product->stock;
+        $product->increment('stock', $quantity);
+        
+        InventoryLog::create([
+            'product_id' => $product->id,
+            'user_id' => auth()->id(),
+            'change_amount' => $quantity,
+            'reason' => "Order #{$order->order_number} cancelled. Stock restored.",
+            'old_stock' => $oldStock,
+            'new_stock' => $product->stock
+        ]);
+
+        // If it's a combo, restore included items too
+        if (in_array($product->product_type, ['combo', 'both'])) {
+            foreach ($product->comboItems as $comboItem) {
+                $linkedProduct = $comboItem->product;
+                if ($linkedProduct) {
+                    $itemQty = $comboItem->quantity * $quantity;
+                    $this->restoreProductStock($linkedProduct, $itemQty, $order);
                 }
             }
         }

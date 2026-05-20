@@ -1,9 +1,14 @@
+@php
+    $companyName = \App\Models\SiteSetting::getValue('invoice_company_name', 'REMENANT');
+    $prefix = \App\Models\SiteSetting::getValue('invoice_prefix', 'REM');
+    $displayOrderNumber = rtrim($prefix, '-') . '-' . str_pad($order->id, 5, '0', STR_PAD_LEFT);
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Packing Slip - #{{ $order->order_number }}</title>
+    <title>Packing Slip - #{{ $displayOrderNumber }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -42,11 +47,11 @@
         <div class="flex justify-between items-center border-b-2 border-orange-600 pb-6 mb-8">
             <div>
                 <h1 class="text-3xl font-bold text-slate-900 uppercase tracking-tighter">Packing Slip</h1>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1">Remenant Fulfillment Center</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1">{{ $companyName }} Fulfillment Center</p>
             </div>
             <div class="text-right">
                 <p class="text-xs font-bold text-slate-400 uppercase">Order Number</p>
-                <p class="text-2xl font-bold text-orange-600">#{{ $order->order_number }}</p>
+                <p class="text-2xl font-bold text-orange-600">#{{ $displayOrderNumber }}</p>
             </div>
         </div>
 
@@ -99,13 +104,13 @@
                             <div class="h-6 w-6 border-2 border-slate-200 rounded-md"></div>
                         </td>
                         <td class="px-6 py-6">
-                            <p class="font-bold text-slate-900 text-sm uppercase">{{ $item->product->name }}</p>
+                            <p class="font-bold text-slate-900 text-sm uppercase">{{ $item->product->title ?? $item->product->name }}</p>
                             @if($item->variant_name)
                             <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Variant: {{ $item->variant_name }}</p>
                             @endif
                         </td>
                         <td class="px-6 py-6 text-center text-[10px] font-bold text-slate-400 uppercase">
-                            {{ $item->product->sku ?? 'RM-'.rand(1000, 9999) }}
+                            {{ $item->sku ?? $item->product->sku ?? 'N/A' }}
                         </td>
                         <td class="px-6 py-6 text-right">
                             <span class="inline-flex items-center justify-center h-10 w-10 bg-orange-50 rounded-full font-bold text-orange-600 text-lg">
@@ -136,7 +141,7 @@
                 <div class="w-48 border-b-2 border-slate-100"></div>
             </div>
             <div class="text-right">
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Remenant Logistics Core v2.0</p>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{{ $companyName }} Fulfillment Core</p>
             </div>
         </div>
     </div>

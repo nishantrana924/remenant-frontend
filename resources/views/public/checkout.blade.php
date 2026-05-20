@@ -27,10 +27,12 @@
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Order Review & Shipping</p>
                 </div>
             </div>
-            <div class="hidden sm:flex items-center gap-6 opacity-40 grayscale">
-                <img src="{{ asset('images/icons/visa.png') }}" alt="Visa" class="h-3 object-contain">
-                <img src="{{ asset('images/icons/mastercard.png') }}" alt="Mastercard" class="h-5 object-contain">
-                <img src="{{ asset('images/icons/pci.png') }}" alt="PCI" class="h-6 object-contain">
+            <div class="hidden sm:flex items-center gap-3 opacity-40 grayscale text-[10px] font-black uppercase tracking-widest">
+                <span>Visa</span>
+                <span>•</span>
+                <span>Mastercard</span>
+                <span>•</span>
+                <span>PCI Secured</span>
             </div>
         </div>
 
@@ -211,6 +213,20 @@
                                     </a>
                                     <p class="text-[9px] font-bold text-slate-400 uppercase mt-0.5 truncate">₹{{ number_format($item['price']) }} x {{ $item['quantity'] }}</p>
                                     <p class="text-sm font-black text-slate-900 mt-1">₹{{ number_format($item['price'] * $item['quantity']) }}</p>
+                                    
+                                    @if(isset($item['model']) && in_array($item['model']->product_type, ['combo', 'both']) && $item['model']->comboItems->count() > 0)
+                                        <div class="mt-2 space-y-1">
+                                            <p class="text-[8px] font-black text-orange-500 uppercase tracking-widest">Included in Bundle:</p>
+                                            @foreach($item['model']->comboItems as $ci)
+                                                @if($ci->product)
+                                                    <div class="flex items-center gap-1.5">
+                                                        <i data-lucide="check" class="h-2 w-2 text-emerald-500"></i>
+                                                        <span class="text-[9px] font-bold text-slate-500 uppercase truncate">{{ $ci->quantity }}x {{ $ci->product->title }}</span>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
@@ -305,10 +321,12 @@
                         </div>
                     </div>
 
-                    <div class="mt-8 flex items-center justify-center gap-2 grayscale opacity-30">
-                        <img src="{{ asset('images/icons/visa.png') }}" class="h-2.5">
-                        <img src="{{ asset('images/icons/mastercard.png') }}" class="h-4">
-                        <img src="{{ asset('images/icons/upi.png') }}" class="h-3">
+                    <div class="mt-8 flex items-center justify-center gap-3 text-[9px] font-black uppercase tracking-widest text-slate-300">
+                        <span>Visa</span>
+                        <span>•</span>
+                        <span>Mastercard</span>
+                        <span>•</span>
+                        <span>UPI</span>
                     </div>
                 </div>
             </div>

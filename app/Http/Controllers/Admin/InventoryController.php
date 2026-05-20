@@ -39,12 +39,31 @@ class InventoryController extends Controller
         return view('admin.inventory.index', compact('products', 'low_stock_items'));
     }
 
+    public function logs()
+    {
+        $logs = \App\Models\InventoryLog::with(['product', 'user'])->latest()->paginate(50);
+        return view('admin.inventory.logs', compact('logs'));
+    }
+
     public function updateStock(Request $request)
     {
         if ($request->type == 'product') {
-            Product::where('id', $request->id)->update(['stock' => $request->stock]);
+            $product = Product::findOrFail($request->id);
+            $oldStock = $product->stock;
+            $product->update(['stock' => $request->stock]);
+            
+            \App\Models\InventoryLog::create([
+                'product_id' => $product->id,
+                'old_stock' => $oldStock,
+                'new_stock' => $request->stock,
+                'change_amount' => $request->stock - $oldStock,
+                'reason' => 'manual_update',
+                'user_id' => auth()->id()
+            ]);
         } else {
-            ProductVariant::where('id', $request->id)->update(['stock' => $request->stock]);
+            $variant = ProductVariant::findOrFail($request->id);
+            $variant->update(['stock' => $request->stock]);
+            // For now, variants might not have detailed logs in the same table or need separate handling
         }
 
         return response()->json(['message' => 'Stock updated successfully']);

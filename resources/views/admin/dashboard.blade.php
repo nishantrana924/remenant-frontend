@@ -145,37 +145,104 @@
         </div>
     </div>
 
-    <!-- Detailed Ledger Section -->
-    <div class="saas-card overflow-hidden bg-white border border-slate-100 shadow-xl shadow-slate-200/40">
-        <div class="p-6 border-b border-slate-50 flex items-center justify-between">
-            <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Recent Customers</h3>
-            <a href="{{ route('admin.customers.index') }}" class="text-[9px] font-bold text-orange-500 uppercase tracking-[0.2em] hover:brightness-110">View All</a>
+    <!-- Intelligence Layer: Top Products & Categories -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Top Products -->
+        <div class="saas-card">
+            <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-50">
+                <div>
+                    <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Top Performing Products</h3>
+                    <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-1">Based on unit sales volume</p>
+                </div>
+                <div class="h-8 w-8 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500">
+                    <i data-lucide="trophy" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="space-y-4">
+                @foreach($topProducts as $tp)
+                <div class="flex items-center gap-4 group">
+                    <div class="h-10 w-10 rounded-lg bg-slate-50 p-1 border border-slate-100 flex-shrink-0">
+                        <img src="{{ \App\Helpers\ImageHelper::getUrl($tp->product->image) }}" class="h-full w-full object-contain">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[10px] font-black text-slate-900 uppercase truncate">{{ $tp->product->title }}</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-orange-500 rounded-full" style="width: {{ ($tp->total_sold / ($topProducts->first()->total_sold ?: 1)) * 100 }}%"></div>
+                            </div>
+                            <span class="text-[9px] font-bold text-slate-400">{{ $tp->total_sold }} sold</span>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
         </div>
-        <div class="overflow-x-auto">
+
+        <!-- Category Performance -->
+        <div class="saas-card">
+            <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-50">
+                <div>
+                    <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Category Performance</h3>
+                    <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-1">Revenue distribution by category</p>
+                </div>
+                <div class="h-8 w-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
+                    <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="space-y-6">
+                @foreach($categoryRevenue as $cr)
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="h-2 w-2 rounded-full bg-blue-500"></div>
+                        <span class="text-[10px] font-black text-slate-900 uppercase tracking-widest">{{ $cr['name'] }}</span>
+                    </div>
+                    <span class="text-xs font-black text-slate-900">₹{{ number_format($cr['revenue']) }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Audit Trail Feed -->
+    <div class="saas-card">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-50">
+            <div>
+                <h3 class="text-[10px] font-bold text-slate-900 uppercase tracking-[0.25em]">Live Audit Trail</h3>
+                <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-1">System & Inventory Movements</p>
+            </div>
+            <a href="{{ route('admin.inventory.index') }}" class="saas-btn-secondary py-1.5 px-4 text-[9px]">Full Log</a>
+        </div>
+        <div class="space-y-1">
             <table class="w-full text-left">
                 <thead>
-                    <tr class="text-[8px] font-bold uppercase tracking-[0.25em] text-slate-400 bg-slate-50/50">
-                        <th class="px-6 py-4">Customer</th>
-                        <th class="px-6 py-4">Email</th>
-                        <th class="px-6 py-4 text-right">Joined</th>
+                    <tr class="text-[8px] font-black uppercase tracking-widest text-slate-400 bg-slate-50/50">
+                        <th class="px-6 py-3">Event</th>
+                        <th class="px-6 py-3">User</th>
+                        <th class="px-6 py-3 text-right">Time</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
-                    @foreach($recent_users ?? [] as $user)
-                    <tr class="hover:bg-slate-50/50 transition-all cursor-default">
+                    @foreach($recent_logs as $log)
+                    <tr class="hover:bg-slate-50/50 transition-all cursor-default group">
                         <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="h-8 w-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 font-bold text-[10px] border border-orange-100">
-                                    {{ substr($user->name, 0, 1) }}
+                            <div class="flex items-start gap-4">
+                                <div class="mt-1 h-2 w-2 rounded-full {{ $log->change_amount > 0 ? 'bg-emerald-500' : 'bg-rose-500' }}"></div>
+                                <div>
+                                    <p class="text-[11px] font-bold text-slate-900 uppercase tracking-tight">
+                                        {{ str_replace('_', ' ', $log->reason) }} • {{ $log->product->title ?? 'Product' }}
+                                    </p>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase mt-0.5">
+                                        Stock: {{ $log->old_stock }} <i data-lucide="arrow-right" class="inline w-2 h-2"></i> {{ $log->new_stock }} 
+                                        (<span class="{{ $log->change_amount > 0 ? 'text-emerald-600' : 'text-rose-600' }}">{{ $log->change_amount > 0 ? '+' : '' }}{{ $log->change_amount }}</span>)
+                                    </p>
                                 </div>
-                                <span class="font-bold text-slate-900 text-xs uppercase tracking-tight">{{ $user->name }}</span>
                             </div>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ $user->email }}</span>
+                        <td class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+                            {{ $log->user->name ?? 'System' }}
                         </td>
-                        <td class="px-6 py-4 text-right">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{{ $user->created_at->format('d M • Y') }}</span>
+                        <td class="px-6 py-4 text-right text-[9px] font-black text-slate-300 uppercase">
+                            {{ $log->created_at->diffForHumans() }}
                         </td>
                     </tr>
                     @endforeach

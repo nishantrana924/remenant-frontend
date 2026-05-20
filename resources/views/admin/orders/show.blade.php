@@ -5,8 +5,10 @@
     showStatusModal: false,
     newStatus: '{{ $item->status }}',
     statusMsg: '',
-    showShippingModal: false,
-    shippingData: { id: {{ $item->id }}, tracking_id: '{{ $item->tracking_id }}', courier_name: '{{ $item->courier_name ?? "BlueDart" }}' },
+    showCourierModal: false,
+    shippingConfig: { id: {{ $item->id }}, weight: 500, length: 10, breadth: 10, height: 10, courier_id: '' },
+    couriers: [],
+    fetchingRates: false,
     
     updateStatus() {
         fastSubmit('{{ route('admin.orders.update-status', $item->id) }}', {
@@ -18,24 +20,58 @@
         });
     },
 
-    openShipping() {
-        this.showShippingModal = true;
+    openCourierSelection() {
+        this.shippingConfig.weight = 500;
+        this.shippingConfig.courier_id = '';
+        this.couriers = [];
+        this.showCourierModal = true;
     },
 
-    saveShipping() {
-        fastSubmit(`/admin/orders/${this.shippingData.id}/status`, {
-            data: { 
-                delivery_status: 'shipped', 
-                status: 'shipped',
-                tracking_id: this.shippingData.tracking_id, 
-                courier_name: this.shippingData.courier_name 
+    fetchRates() {
+        if (!this.shippingConfig.weight) return window.toast('Please enter weight', 'error');
+        this.fetchingRates = true;
+        
+        window.fastSubmit(`/admin/orders/${this.shippingConfig.id}/nimbuspost-rates`, {
+            method: 'POST',
+            data: {
+                weight: this.shippingConfig.weight,
+                length: this.shippingConfig.length,
+                breadth: this.shippingConfig.breadth,
+                height: this.shippingConfig.height
             },
             success: (res) => {
-                toast(res.message);
-                setTimeout(() => location.reload(), 1000);
+                this.couriers = res.data;
+                if(this.couriers.length > 0) {
+                    this.shippingConfig.courier_id = this.couriers[0].id; // Nimbus uses 'id' not 'courier_id'
+                }
+                this.fetchingRates = false;
+            },
+            error: (err) => {
+                const msg = err.response && err.response.data && err.response.data.message ? err.response.data.message : (err.message || 'Failed to fetch rates');
+                window.toast(msg, 'error');
+                this.fetchingRates = false;
             }
         });
-        this.showShippingModal = false;
+    },
+
+    confirmShipment(btn) {
+        if(!this.shippingConfig.courier_id) return window.toast('Please select a courier', 'error');
+        
+        window.fastSubmit(`/admin/orders/${this.shippingConfig.id}/ship-to-nimbuspost`, {
+            method: 'POST',
+            data: this.shippingConfig,
+            button: btn,
+            success: (res) => {
+                window.toast(res.message);
+                this.showCourierModal = false;
+                setTimeout(() => location.reload(), 1000);
+            },
+            error: (err) => {
+                console.error('Shipment Error:', err);
+                const msg = err.response?.data?.message || err.response?.data?.error || 'Failed to push to NimbusPost';
+                window.toast(typeof msg === 'string' ? msg : 'Failed to push shipment', 'error');
+            }
+        });
     }
 }">
     <!-- Top Header & Navigation -->
@@ -116,7 +152,7 @@
                             <img src="{{ $product->product->image_url }}" class="h-full w-full object-cover">
                         </div>
                         <div class="flex-1">
-                            <h4 class="font-bold text-slate-900 text-sm uppercase tracking-tight">{{ $product->product->name }}</h4>
+                            <h4 class="font-bold text-slate-900 text-sm uppercase tracking-tight">{{ $product->product->title ?? $product->product->name }}</h4>
                             <div class="flex items-center gap-3 mt-1.5">
                                 <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-white border border-slate-100 px-2 py-0.5 rounded-lg">SKU: {{ $product->sku ?? $product->product->sku }}</span>
                                 @if($product->variant_size)
@@ -185,15 +221,22 @@
                     <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col justify-center gap-3">
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">Ready for fulfillment?</p>
                         <div class="flex gap-2">
-                            <button @click="openShipping()" class="flex-1 saas-btn-secondary py-3 text-[9px] font-bold uppercase tracking-widest">
-                                <i data-lucide="user-cog" class="w-3.5 h-3.5 mr-1"></i>
-                                Manual
-                            </button>
-                            <button @click="fastSubmit('{{ route('admin.orders.ship-to-shiprocket', $item->id) }}', { method: 'POST', success: (res) => { toast(res.message); setTimeout(()=>location.reload(), 1000); } })" 
-                                    class="flex-1 bg-orange-600 text-white rounded-xl py-3 text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-orange-700 transition-all">
-                                <i data-lucide="rocket" class="w-3.5 h-3.5"></i>
-                                Shiprocket
-                            </button>
+                            @if($item->shipment && $item->shipment->nimbus_shipment_id)
+                                <a href="{{ route('admin.orders.nimbus-label', $item->id) }}" target="_blank" class="flex-1 saas-btn-secondary py-3 text-[9px] font-bold uppercase tracking-widest text-blue-600 border-blue-100 hover:bg-blue-50">
+                                    <i data-lucide="printer" class="w-3.5 h-3.5 mr-1"></i>
+                                    Print Label
+                                </a>
+                                <button @click="fastSubmit('{{ route('admin.orders.cancel-nimbuspost', $item->id) }}', { method: 'POST', success: (res) => { toast(res.message); setTimeout(()=>location.reload(), 1000); } })" 
+                                        class="flex-1 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl py-3 text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-rose-100 transition-all">
+                                    <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
+                                    Cancel
+                                </button>
+                            @else
+                                <button @click="openCourierSelection()" class="w-full bg-orange-600 text-white rounded-xl py-3 text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-orange-700 transition-all shadow-lg shadow-orange-100">
+                                    <i data-lucide="rocket" class="w-3.5 h-3.5"></i>
+                                    Select Courier & Ship
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -275,7 +318,7 @@
                     <div class="space-y-8 relative">
                         @foreach($item->timelines as $log)
                         <div class="flex items-start gap-4">
-                            <div class="h-6 w-6 rounded-full bg-white border-2 border-slate-100 flex items-center justify-center z-10">
+                            <div class="relative h-6 w-6 rounded-full bg-white border-2 border-slate-100 flex items-center justify-center">
                                 <div class="h-2 w-2 rounded-full {{ $loop->first ? 'bg-orange-500 animate-pulse' : 'bg-slate-300' }}"></div>
                             </div>
                             <div class="flex-1">
@@ -292,7 +335,7 @@
                         @endforeach
                         
                         <div class="flex items-start gap-4">
-                            <div class="h-6 w-6 rounded-full bg-white border-2 border-slate-100 flex items-center justify-center z-10">
+                            <div class="relative h-6 w-6 rounded-full bg-white border-2 border-slate-100 flex items-center justify-center">
                                 <div class="h-2 w-2 rounded-full bg-slate-300"></div>
                             </div>
                             <div class="flex-1">
@@ -308,7 +351,7 @@
 
     <!-- Status Update Modal -->
     <template x-if="showStatusModal">
-        <div class="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div class="fixed inset-0 z-[1000] flex items-center justify-center p-4">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showStatusModal = false"></div>
             <div class="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 overflow-hidden">
                 <div class="flex items-center justify-between mb-8">
@@ -342,34 +385,88 @@
         </div>
     </template>
 
-    <!-- Manual Shipping Modal -->
-    <template x-if="showShippingModal">
-        <div class="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showShippingModal = false"></div>
-            <div class="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 overflow-hidden">
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-xl font-bold text-slate-900 uppercase tracking-tight">Shipment Details</h3>
-                    <button @click="showShippingModal = false" class="text-slate-400 hover:text-rose-500"><i data-lucide="x" class="w-6 h-6"></i></button>
+    <!-- Courier Selection Modal -->
+    <template x-if="showCourierModal">
+        <div class="fixed inset-0 z-[1000] flex items-center justify-center p-4 mt-12 sm:mt-8">
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showCourierModal = false"></div>
+            <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl p-8 overflow-hidden flex flex-col max-h-[80vh]">
+                <div class="flex items-center justify-between mb-5 shrink-0">
+                    <div>
+                        <h3 class="text-lg font-black text-slate-900 uppercase tracking-tight">Ship Order</h3>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Select Courier & Generate Label</p>
+                    </div>
+                    <button @click="showCourierModal = false" class="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all"><i data-lucide="x" class="w-4 h-4"></i></button>
                 </div>
                 
-                <div class="space-y-6">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Courier Partner</label>
-                        <select x-model="shippingData.courier_name" class="saas-input uppercase text-[10px] font-bold tracking-widest">
-                            <option value="BlueDart">BlueDart</option>
-                            <option value="Delhivery">Delhivery</option>
-                            <option value="DTDC">DTDC</option>
-                            <option value="FedEx">FedEx</option>
-                            <option value="XpressBees">XpressBees</option>
-                            <option value="Other">Other / Local</option>
-                        </select>
+                <div class="overflow-y-auto min-h-0 pr-2 space-y-6 flex-1">
+                    <!-- Step 1: Package Details -->
+                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                                <span class="h-1.5 w-1.5 rounded-full bg-orange-500"></span>
+                                Step 1: Package Dimensions
+                            </h4>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div>
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">Weight (g)</label>
+                                <input type="number" x-model="shippingConfig.weight" class="w-full rounded-xl bg-white border border-slate-200 px-4 py-2.5 text-sm font-bold focus:ring-orange-500 focus:border-orange-500 text-center">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">L (cm)</label>
+                                <input type="number" x-model="shippingConfig.length" class="w-full rounded-xl bg-white border border-slate-200 px-4 py-2.5 text-sm font-bold focus:ring-orange-500 focus:border-orange-500 text-center">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">W (cm)</label>
+                                <input type="number" x-model="shippingConfig.breadth" class="w-full rounded-xl bg-white border border-slate-200 px-4 py-2.5 text-sm font-bold focus:ring-orange-500 focus:border-orange-500 text-center">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">H (cm)</label>
+                                <input type="number" x-model="shippingConfig.height" class="w-full rounded-xl bg-white border border-slate-200 px-4 py-2.5 text-sm font-bold focus:ring-orange-500 focus:border-orange-500 text-center">
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button @click="fetchRates()" :disabled="fetchingRates" class="bg-slate-900 text-white rounded-xl px-6 py-2.5 text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-slate-200">
+                                <span x-show="!fetchingRates">Fetch Courier Rates</span>
+                                <span x-show="fetchingRates" class="flex items-center gap-2"><i class="animate-spin h-3 w-3 border-2 border-white/20 border-t-white rounded-full"></i> Loading...</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Tracking ID / AWB Number</label>
-                        <input type="text" x-model="shippingData.tracking_id" placeholder="e.g. 1234567890" class="saas-input font-bold text-lg">
+
+                    <!-- Step 2: Select Courier -->
+                    <div x-show="couriers.length > 0" x-transition class="space-y-4">
+                        <h4 class="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                            <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                            Step 2: Select Courier Partner
+                        </h4>
+                        
+                        <div class="space-y-2">
+
+
+                            <template x-for="c in couriers" :key="c.id">
+                                <label class="relative flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all"
+                                       :class="shippingConfig.courier_id == c.id ? 'border-orange-500 bg-orange-50/50' : 'border-slate-100 hover:border-orange-200 bg-white'">
+                                    <div class="flex items-center gap-4">
+                                        <input type="radio" name="courier" :value="c.id" x-model="shippingConfig.courier_id" class="h-4 w-4 text-orange-500 border-slate-300 focus:ring-orange-500">
+                                        <div>
+                                            <p class="text-xs font-black text-slate-900 uppercase" x-text="c.name"></p>
+                                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">ETA: <span x-text="c.edd || 'N/A'"></span></p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-black text-emerald-600">₹<span x-text="c.total_charges"></span></p>
+                                        <p class="text-[8px] font-bold text-slate-400 uppercase mt-0.5">Shipping Charge</p>
+                                    </div>
+                                </label>
+                            </template>
+                        </div>
                     </div>
-                    <button @click="saveShipping()" class="saas-btn-primary w-full py-4 text-sm font-bold uppercase tracking-widest mt-4">
-                        Confirm & Dispatch
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-slate-100 shrink-0">
+                    <button @click="confirmShipment($event.target)" :disabled="!shippingConfig.courier_id" class="w-full bg-orange-600 text-white rounded-2xl py-4 text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-orange-200 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                        <i data-lucide="rocket" class="w-4 h-4"></i>
+                        Dispatch Shipment
                     </button>
                 </div>
             </div>

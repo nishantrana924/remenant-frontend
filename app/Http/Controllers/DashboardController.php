@@ -50,7 +50,7 @@ class DashboardController extends Controller
     public function admin(Request $request): View
     {
         $stats = \Illuminate\Support\Facades\Cache::remember('admin_dashboard_stats', 600, function() {
-            // 1. Calculate Low Stock Count (Products without variants + All variants)
+            // 1. Calculate Low Stock Count
             $lowStockProducts = \App\Models\Product::doesntHave('variants')->where('stock', '<', 10)->count();
             $lowStockVariants = \App\Models\ProductVariant::where('stock', '<', 10)->count();
             $lowStockCount = $lowStockProducts + $lowStockVariants;
@@ -64,7 +64,7 @@ class DashboardController extends Controller
             ];
         });
 
-        // 2. Prepare Revenue Chart Data (Monthly for current year)
+        // 2. Prepare Revenue Chart Data (Monthly)
         $chartData = \Illuminate\Support\Facades\Cache::remember('admin_dashboard_chart_'.date('Y'), 3600, function() {
             $monthlyRevenue = \App\Models\Order::where('payment_status', 'paid')
                 ->whereYear('created_at', date('Y'))
@@ -81,10 +81,30 @@ class DashboardController extends Controller
             return $data;
         });
 
-        // Recent items are usually fresh, so we fetch them directly or with a very short cache
-        $recent_orders = \App\Models\Order::with('user')->latest()->take(5)->get();
-        $recent_users = \App\Models\User::latest()->take(5)->get();
+        // 3. Top Selling Products
+        $topProducts = \App\Models\OrderItem::select('product_id', \DB::raw('SUM(quantity) as total_sold'))
+            ->groupBy('product_id')
+            ->orderByDesc('total_sold')
+            ->with('product')
+            ->take(5)
+            ->get();
 
-        return view('admin.dashboard', compact('stats', 'recent_orders', 'recent_users', 'chartData'));
+        // 4. Revenue by Category
+        $categoryRevenue = \App\Models\Category::all()->map(function($cat) {
+            $revenue = \App\Models\OrderItem::whereHas('product.categories', function($q) use ($cat) {
+                $q->where('categories.id', $cat->id);
+            })->sum(\DB::raw('quantity * price'));
+
+            return [
+                'name' => $cat->name,
+                'revenue' => $revenue
+            ];
+        })->sortByDesc('revenue')->take(5);
+
+        // 5. Recent Activity
+        $recent_orders = \App\Models\Order::with('user')->latest()->take(5)->get();
+        $recent_logs = \App\Models\InventoryLog::with(['product', 'user'])->latest()->take(8)->get();
+
+        return view('admin.dashboard', compact('stats', 'recent_orders', 'chartData', 'topProducts', 'categoryRevenue', 'recent_logs'));
     }
 }

@@ -11,21 +11,19 @@ class HandleUnpolyRequests
     /**
      * Handle an incoming request.
      *
-     * @param  Closure(Request): (Response)  $next
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
 
-        // 1. Identify Layout Identity
-        // We use versions to trigger full reloads on layout change
-        $isDashboard = $request->is('admin') || $request->is('admin/*') || $request->is('dashboard');
-        $revision = $isDashboard ? 'layout-admin-v1.1' : 'layout-public-v1.1';
-        
-        $response->headers->set('X-Up-Assets-Revision', $revision);
-
-        $unpoly = new \Webstronauts\Unpoly\Unpoly();
-        $unpoly->decorateResponse($request, $response);
+        if ($request->hasHeader('X-Up-Target')) {
+            $response->headers->set('X-Up-Location', $request->fullUrl());
+            
+            if ($request->method() !== 'GET') {
+                $response->headers->set('X-Up-Method', $request->method());
+            }
+        }
 
         return $response;
     }

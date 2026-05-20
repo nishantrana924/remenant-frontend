@@ -8,11 +8,19 @@ use App\Http\Controllers\Public\CheckoutController;
 use App\Http\Controllers\Public\CartController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\NimbusWebhookController;
+
+// ─── NimbusPost Webhook (CSRF-exempt, no auth required) ───────────────────────
+Route::post('/webhooks/nimbuspost', [NimbusWebhookController::class, 'handle'])->name('webhooks.nimbuspost');
+// ──────────────────────────────────────────────────────────────────────────────
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout')->middleware('auth');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store')->middleware('auth');
 Route::get('/checkout/payment/{order}', [CheckoutController::class, 'payment'])->name('checkout.payment')->middleware('auth');
 Route::post('/checkout/payment/{order}/mock', [CheckoutController::class, 'mockPayment'])->name('checkout.payment.mock')->middleware('auth');
+Route::post('/checkout/payment/verify', [CheckoutController::class, 'verifyPayment'])->name('checkout.payment.verify')->middleware('auth');
 Route::get('/track-order/{order_number?}', [CheckoutController::class, 'track'])->name('order.track');
 Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success')->middleware('auth');
 Route::get('/order/{order}/invoice', [CheckoutController::class, 'invoice'])->name('order.invoice');
@@ -83,7 +91,11 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::patch('sliders/{slider}/toggle-status', [\App\Http\Controllers\Admin\SliderController::class, 'toggleStatus'])->name('sliders.toggle-status');
     Route::post('orders/bulk-update-status', [\App\Http\Controllers\Admin\OrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
     Route::post('orders/bulk-delete', [\App\Http\Controllers\Admin\OrderController::class, 'bulkDestroy'])->name('orders.bulk-delete');
-    Route::post('orders/{id}/ship-to-shiprocket', [\App\Http\Controllers\Admin\OrderController::class, 'shipToShiprocket'])->name('orders.ship-to-shiprocket');
+    Route::post('orders/{id}/ship-to-nimbuspost', [\App\Http\Controllers\Admin\OrderController::class, 'shipToNimbusPost'])->name('orders.ship-to-nimbuspost');
+    Route::post('orders/{id}/nimbuspost-rates', [\App\Http\Controllers\Admin\OrderController::class, 'fetchNimbusRates'])->name('orders.nimbuspost-rates');
+    Route::post('orders/{id}/cancel-nimbuspost', [\App\Http\Controllers\Admin\OrderController::class, 'cancelNimbusPost'])->name('orders.cancel-nimbuspost');
+    Route::post('orders/bulk-pickup', [\App\Http\Controllers\Admin\OrderController::class, 'bulkPickup'])->name('orders.bulk-pickup');
+    Route::get('orders/{id}/nimbus-label', [\App\Http\Controllers\Admin\OrderController::class, 'generateNimbusLabel'])->name('orders.nimbus-label');
     Route::get('orders/{id}/invoice', [\App\Http\Controllers\Admin\OrderController::class, 'generateInvoice'])->name('orders.invoice');
     Route::get('orders/{id}/packing-slip', [\App\Http\Controllers\Admin\OrderController::class, 'generatePackingSlip'])->name('orders.packing-slip');
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
@@ -105,6 +117,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class);
     Route::patch('coupons/{coupon}/toggle-status', [\App\Http\Controllers\Admin\CouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
     Route::get('inventory', [\App\Http\Controllers\Admin\InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('inventory/logs', [\App\Http\Controllers\Admin\InventoryController::class, 'logs'])->name('inventory.logs');
     Route::post('inventory/update', [\App\Http\Controllers\Admin\InventoryController::class, 'updateStock'])->name('inventory.update');
     Route::post('products/preview', [\App\Http\Controllers\Public\ProductController::class, 'preview'])->name('products.preview');
 
@@ -142,6 +155,31 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Artisan::call('view:clear');
         return "Cache cleared successfully!";
     })->name('clear-cache');
+    // Logistics Module
+    Route::prefix('logistics')->name('logistics.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ShippingController::class, 'dashboard'])->name('dashboard');
+        Route::post('/sync-all', [\App\Http\Controllers\Admin\ShippingController::class, 'syncAll'])->name('sync-all');
+        Route::get('/orders', [\App\Http\Controllers\Admin\ShippingController::class, 'index'])->name('index');
+        Route::get('/all-shipments', [\App\Http\Controllers\Admin\ShippingController::class, 'allShipments'])->name('all-shipments');
+        Route::get('/shipment-details/{id}', [\App\Http\Controllers\Admin\ShippingController::class, 'showShipment'])->name('shipment-details');
+        Route::post('/calculate-rates', [\App\Http\Controllers\Admin\ShippingController::class, 'calculateRates'])->name('calculate-rates');
+        Route::post('/create-shipment/{orderId}', [\App\Http\Controllers\Admin\ShippingController::class, 'createShipment'])->name('create-shipment');
+        Route::post('/cancel-shipment/{id}', [\App\Http\Controllers\Admin\ShippingController::class, 'cancelShipment'])->name('cancel-shipment');
+        Route::get('/track/{awb}', [\App\Http\Controllers\Admin\ShippingController::class, 'track'])->name('track');
+        Route::post('/bulk-labels', [\App\Http\Controllers\Admin\ShippingController::class, 'bulkLabels'])->name('bulk-labels');
+
+        Route::resource('warehouses', \App\Http\Controllers\Admin\WarehouseController::class);
+        Route::post('warehouses/sync-from-nimbus', [\App\Http\Controllers\Admin\WarehouseController::class, 'syncFromNimbus'])->name('warehouses.sync');
+        Route::post('warehouses/{id}/set-default', [\App\Http\Controllers\Admin\WarehouseController::class, 'setDefault'])->name('warehouses.set-default');
+
+        Route::get('/ndr', [\App\Http\Controllers\Admin\LogisticsController::class, 'ndr'])->name('ndr');
+        Route::post('/ndr/action', [\App\Http\Controllers\Admin\LogisticsController::class, 'ndrAction'])->name('ndr.action');
+        Route::get('/logs', [\App\Http\Controllers\Admin\LogisticsController::class, 'logs'])->name('logs');
+    });
+
+    // Settings
+    Route::get('settings/invoice', [\App\Http\Controllers\Admin\SettingController::class, 'invoice'])->name('settings.invoice');
+    Route::post('settings/invoice', [\App\Http\Controllers\Admin\SettingController::class, 'updateInvoice'])->name('settings.invoice.update');
 });
 
 require __DIR__.'/auth.php'; 

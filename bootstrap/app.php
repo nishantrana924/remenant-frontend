@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleUnpolyRequests::class,
         ]);
         
+        // Exclude NimbusPost webhook from CSRF verification
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/nimbuspost',
+        ]);
+        
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);

@@ -39,6 +39,10 @@
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Real-time stock auditing • Remenant Engine</p>
         </div>
         <div class="flex items-center gap-4">
+            <a href="{{ route('admin.inventory.logs') }}" class="saas-btn-secondary px-6 py-2.5">
+                <i data-lucide="history" class="w-4 h-4 mr-2"></i>
+                Audit Trail
+            </a>
             <div class="flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-2xl border border-rose-100 shadow-sm shadow-rose-100">
                 <div class="h-2 w-2 rounded-full bg-rose-500 animate-pulse"></div>
                 <span class="text-[9px] font-bold uppercase tracking-widest text-rose-600">{{ count($low_stock_items) }} Alerts</span>

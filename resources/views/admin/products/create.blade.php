@@ -287,6 +287,48 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 5. Combo Architecture (Only for Combo/Both types) -->
+                <div class="saas-card" x-show="formData.product_type === 'combo' || formData.product_type === 'both'" x-transition>
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600"><i data-lucide="layers" class="w-5 h-5"></i></div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-900">Combo Architecture</h3>
+                                <p class="text-[10px] text-slate-400 font-medium tracking-wide uppercase">Select individual products included in this bundle</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <template x-for="(item, index) in formData.combo_products" :key="index">
+                            <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 group">
+                                <div class="flex-1">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Select Product</label>
+                                    <select :name="'combo_products['+index+'][product_id]'" x-model="item.product_id" class="saas-input h-10 bg-white">
+                                        <option value="">-- Choose Product --</option>
+                                        @foreach($allProducts as $p)
+                                            <option value="{{ $p->id }}">{{ $p->title }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="w-24">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Quantity</label>
+                                    <input type="number" :name="'combo_products['+index+'][quantity]'" x-model="item.quantity" class="saas-input h-10 bg-white text-center font-bold" min="1">
+                                </div>
+                                <div class="pt-5">
+                                    <button type="button" @click="formData.combo_products.splice(index, 1)" class="h-10 w-10 rounded-xl text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-all">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                        
+                        <button type="button" @click="formData.combo_products.push({product_id: '', quantity: 1})" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-orange-500 hover:text-orange-500 transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add Product to Combo
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Right Side: Marketing & Media -->
@@ -631,6 +673,7 @@ function productSystem() {
             sku: '',
             hsn_code: '',
             categories: [],
+            combo_products: [],
             hero_draft_image: null
         },
         init() {

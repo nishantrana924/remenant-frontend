@@ -8,15 +8,13 @@ use Illuminate\Support\Facades\Log;
 class ShippingService
 {
     protected $providers = [
-        'shiprocket' => ShiprocketService::class,
-        // 'delhivery' => DelhiveryService::class,
-        // 'bluedart' => BlueDartService::class,
+        'nimbuspost' => NimbusPostService::class,
     ];
 
     /**
      * Dispatch order to a specific provider
      */
-    public function dispatch(Order $order, $providerName = 'shiprocket')
+    public function dispatch(Order $order, $providerName = 'nimbuspost')
     {
         if (!isset($this->providers[$providerName])) {
             throw new \Exception("Shipping provider {$providerName} not found.");
@@ -31,20 +29,21 @@ class ShippingService
 
         $response = $provider->createOrder($order);
 
-        if (isset($response['shipment_id'])) {
+        if (isset($response['status']) && $response['status'] === true) {
+            $data = $response['data'];
             $order->update([
-                'tracking_id' => $response['shipment_id'],
-                'courier_name' => $response['courier_name'] ?? ucfirst($providerName),
+                'tracking_id' => $data['awb_number'] ?? $data['shipment_id'],
+                'courier_name' => $data['courier_name'] ?? ucfirst($providerName),
                 'delivery_status' => 'shipped',
                 'status' => 'shipped',
-                'tracking_url' => $response['tracking_url'] ?? null
+                'tracking_url' => $data['tracking_url'] ?? null
             ]);
 
-            $order->logStatus("Order dispatched via " . ucfirst($providerName) . ". Tracking ID: " . $response['shipment_id']);
+            $order->logStatus("Order dispatched via " . ucfirst($providerName) . ". AWB: " . ($data['awb_number'] ?? $data['shipment_id']));
             
             return [
                 'success' => true,
-                'tracking_id' => $response['shipment_id'],
+                'tracking_id' => $data['awb_number'] ?? $data['shipment_id'],
                 'message' => "Shipment created successfully via " . ucfirst($providerName)
             ];
         }

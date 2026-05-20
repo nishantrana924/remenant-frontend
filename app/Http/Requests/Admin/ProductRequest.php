@@ -59,6 +59,9 @@ class ProductRequest extends FormRequest
             'product_type' => 'nullable|string|in:single,combo,both',
             'removed_gallery_images' => 'nullable|array',
             'removed_gallery_images.*' => 'string',
+            'combo_products' => 'nullable|array',
+            'combo_products.*.product_id' => 'required|exists:products,id',
+            'combo_products.*.quantity' => 'required|integer|min:1',
         ];
     }
 }

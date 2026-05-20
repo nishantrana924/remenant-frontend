@@ -24,7 +24,8 @@ class ProductController extends BaseController
 
     public function create()
     {
-        return view('admin.products.create');
+        $allProducts = \App\Models\Product::where('product_type', 'single')->get();
+        return view('admin.products.create', compact('allProducts'));
     }
 
     public function store(ProductRequest $request)
@@ -36,7 +37,8 @@ class ProductController extends BaseController
     public function edit($id)
     {
         $item = $this->service->getById($id);
-        return view('admin.products.edit', compact('item'));
+        $allProducts = \App\Models\Product::where('product_type', 'single')->get();
+        return view('admin.products.edit', compact('item', 'allProducts'));
     }
 
     public function update(ProductRequest $request, $id)

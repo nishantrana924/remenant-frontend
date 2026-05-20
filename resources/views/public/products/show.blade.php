@@ -345,6 +345,40 @@
                                 </button>
                             </div>
                         </div>
+                        
+                        <!-- Bundle Included Section (For Combos) -->
+                        @if(in_array($product->product_type, ['combo', 'both']) && $product->comboItems->count() > 0)
+                        <div class="mt-10 border-t border-black/5 pt-10">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600 shadow-sm">
+                                    <i data-lucide="layers" class="h-5 w-5"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-bold uppercase tracking-widest text-gray-900 leading-none">Bundle Architecture</h3>
+                                    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mt-2">What's inside this combo</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                @foreach($product->comboItems as $ci)
+                                    @if($ci->product)
+                                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50 border border-black/5 group hover:bg-white hover:shadow-lg transition-all duration-300">
+                                        <div class="h-14 w-14 shrink-0 rounded-xl bg-white p-1 border border-black/5 overflow-hidden">
+                                            <img src="{{ \App\Helpers\ImageHelper::getUrl($ci->product->image) }}" class="h-full w-full object-contain group-hover:scale-110 transition-transform">
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-sm font-bold text-gray-900 truncate">{{ $ci->product->title }}</h4>
+                                            <p class="text-[10px] font-black text-[color:var(--primary)] uppercase tracking-widest mt-1">{{ $ci->quantity }} Unit{{ $ci->quantity > 1 ? 's' : '' }} Included</p>
+                                        </div>
+                                        <div class="h-8 w-8 rounded-full bg-white flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i data-lucide="check" class="h-4 w-4 text-green-500"></i>
+                                        </div>
+                                    </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
 
                         <script>
                             function checkShortDesc() {

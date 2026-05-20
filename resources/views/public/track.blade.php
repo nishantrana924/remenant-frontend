@@ -99,6 +99,22 @@
                                 <h3 class="text-base font-bold text-gray-800 truncate">{{ $item->product->title }}</h3>
                                 <p class="text-xs text-gray-500 mt-1">{{ $item->product->subtitle ?? 'Premium Health Supplement' }}</p>
                                 <p class="text-sm font-bold text-gray-800 mt-2">₹{{ number_format($item->price) }} <span class="text-xs text-gray-400 font-normal">x {{ $item->quantity }}</span></p>
+                                
+                                @if($item->product && in_array($item->product->product_type, ['combo', 'both']) && $item->product->comboItems->count() > 0)
+                                    <div class="mt-3 p-3 bg-gray-50 rounded-sm border border-dashed border-gray-200">
+                                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Bundle Components:</p>
+                                        <div class="space-y-1.5">
+                                            @foreach($item->product->comboItems as $ci)
+                                                @if($ci->product)
+                                                    <div class="flex items-center gap-2">
+                                                        <i data-lucide="check" class="h-3 w-3 text-green-500"></i>
+                                                        <span class="text-[10px] font-bold text-gray-600 uppercase">{{ $ci->quantity }}x {{ $ci->product->title }}</span>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 

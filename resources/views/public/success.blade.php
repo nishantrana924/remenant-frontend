@@ -42,6 +42,19 @@
                         <div class="flex-1">
                             <span class="block text-sm font-black text-slate-900 uppercase truncate">{{ $item->product->title ?? 'Product' }}</span>
                             <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Qty: {{ $item->quantity }}</span>
+                            
+                            @if($item->product && in_array($item->product->product_type, ['combo', 'both']) && $item->product->comboItems->count() > 0)
+                                <div class="mt-2 space-y-1">
+                                    @foreach($item->product->comboItems as $ci)
+                                        @if($ci->product)
+                                            <div class="flex items-center gap-1.5">
+                                                <i data-lucide="check" class="h-2 w-2 text-emerald-500"></i>
+                                                <span class="text-[9px] font-bold text-slate-400 uppercase truncate">{{ $ci->quantity }}x {{ $ci->product->title }}</span>
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                         <div class="text-right">
                             <span class="text-sm font-black text-slate-900">₹{{ number_format($item->price) }}</span>

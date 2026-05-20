@@ -40,9 +40,10 @@ return [
         'key_secret' => env('RAZORPAY_KEY_SECRET'),
     ],
 
-    'shiprocket' => [
-        'email' => env('SHIPROCKET_EMAIL'),
-        'password' => env('SHIPROCKET_PASSWORD'),
+    'nimbuspost' => [
+        'email' => env('NIMBUSPOST_EMAIL'),
+        'password' => env('NIMBUSPOST_PASSWORD'),
+        'api_key' => env('NIMBUSPOST_API_KEY'),
     ],
 
 ];

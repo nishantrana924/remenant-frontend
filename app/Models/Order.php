@@ -26,6 +26,11 @@ class Order extends Model
         return $this->hasMany(OrderTimeline::class)->latest();
     }
 
+    public function shipment()
+    {
+        return $this->hasOne(Shipment::class);
+    }
+
     public function logStatus($message = null, $userId = null)
     {
         $this->timelines()->create([

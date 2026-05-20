@@ -45,7 +45,8 @@ class ProductService
         // 3. Extract Relationships
         $categories = $data['categories'] ?? [];
         $variants = $data['variants'] ?? [];
-        unset($data['categories'], $data['variants']);
+        $comboProducts = $data['combo_products'] ?? [];
+        unset($data['categories'], $data['variants'], $data['combo_products']);
 
         // 4. Create Product
         $product = $this->repository->create($data);
@@ -60,6 +61,15 @@ class ProductService
         // 6. Handle Categories
         if (!empty($categories)) {
             $product->categories()->sync($categories);
+        }
+
+        // 6.1 Handle Combo Products
+        if (!empty($comboProducts)) {
+            foreach ($comboProducts as $cp) {
+                if (!empty($cp['product_id'])) {
+                    $product->comboItems()->create($cp);
+                }
+            }
         }
 
         // 7. Log initial stock
@@ -120,7 +130,8 @@ class ProductService
         // 3. Extract Relationships
         $categories = $data['categories'] ?? null;
         $variants = $data['variants'] ?? null;
-        unset($data['categories'], $data['variants']);
+        $comboProducts = $data['combo_products'] ?? null;
+        unset($data['categories'], $data['variants'], $data['combo_products']);
 
         // 4. Update Product
         $product = $this->repository->update($id, $data);
@@ -136,6 +147,16 @@ class ProductService
         // 6. Update Categories
         if (is_array($categories)) {
             $product->categories()->sync($categories);
+        }
+
+        // 6.1 Update Combo Products
+        if (is_array($comboProducts)) {
+            $product->comboItems()->delete();
+            foreach ($comboProducts as $cp) {
+                if (!empty($cp['product_id'])) {
+                    $product->comboItems()->create($cp);
+                }
+            }
         }
 
         // 7. Log stock change if updated
