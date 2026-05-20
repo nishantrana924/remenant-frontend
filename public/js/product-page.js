@@ -98,27 +98,33 @@ function initProductGallery(element) {
     });
 
     // Initialize Lightbox Carousel
-    $lightbox.owlCarousel({
-        items: 1,
-        loop: false,
-        dots: false,
-        nav: false,
-        smartSpeed: 500,
-        mouseDrag: true,
-        touchDrag: true,
-        pullDrag: true,
-        onChanged: function(event) {
-            if (event.item) {
-                const index = event.item.index;
-                currentImageIndex = index;
-                $currentCounter.text(index + 1);
-                if ($lightbox.attr('data-gallery-type') === 'product') {
-                    $gallery.trigger("to.owl.carousel", [index, 200, true]);
+    function initLightbox(type = 'product') {
+        $lightbox.trigger('destroy.owl.carousel');
+        $lightbox.owlCarousel({
+            items: 1,
+            loop: false,
+            dots: false,
+            nav: false,
+            smartSpeed: 500,
+            mouseDrag: true,
+            touchDrag: true,
+            pullDrag: true,
+            onChanged: function(event) {
+                if (event.item) {
+                    const index = event.item.index;
+                    currentImageIndex = index;
+                    $currentCounter.text(index + 1);
+                    if ($lightbox.attr('data-gallery-type') === 'product') {
+                        $gallery.trigger("to.owl.carousel", [index, 200, true]);
+                    }
+                    updateLightboxNavState(index);
                 }
-                updateLightboxNavState(index);
             }
-        }
-    });
+        });
+        $lightbox.attr('data-gallery-type', type);
+    }
+
+    initLightbox('product');
 
     // Thumbnail Clicks
     $(".product-other-image-thumb").off('click').on("click", function() {
@@ -126,8 +132,33 @@ function initProductGallery(element) {
         $gallery.trigger("to.owl.carousel", [index, 500]);
     });
 
+    const originalLightboxContent = $lightbox.html();
+
     // Global Lightbox Methods
     window.openLightbox = function(index) {
+        if ($lightbox.attr('data-gallery-type') !== 'product') {
+            $lightbox.html(originalLightboxContent);
+            initLightbox('product');
+        }
+        currentImageIndex = index;
+        $modal.removeClass("hidden").addClass("flex");
+        $lightbox.trigger("to.owl.carousel", [index, 0]);
+        lockBackgroundScroll();
+        if(window.lucide) window.lucide.createIcons();
+    };
+
+    window.openReviewLightbox = function(images, index) {
+        let html = '';
+        images.forEach(img => {
+            html += `
+                <div class="relative flex h-full w-full items-center justify-center">
+                    <img src="${img}" class="h-full w-full object-contain select-none">
+                </div>
+            `;
+        });
+        $lightbox.html(html);
+        initLightbox('review');
+        
         currentImageIndex = index;
         $modal.removeClass("hidden").addClass("flex");
         $lightbox.trigger("to.owl.carousel", [index, 0]);

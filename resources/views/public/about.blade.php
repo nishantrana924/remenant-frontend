@@ -1,11 +1,17 @@
 @extends('public.layouts.app')
 
-@section('title', $data['seo']['title'] ?? 'About Us - Remenant Health')
-@if(isset($data['seo']['description']))
-    @section('seo')
-        <meta name="description" content="{{ $data['seo']['description'] }}">
-    @endsection
-@endif
+@php
+    seo()->set([
+        'title' => $data['seo']['title'] ?? 'About Us | Remenant Health - Our Mission & Vision',
+        'description' => $data['seo']['description'] ?? 'Learn about Remenant Health, India\'s leading effervescent wellness brand. Discover our journey, our clean-label commitment, and our mission to simplify healthcare for everyone.',
+    ]);
+
+    seo()->addSchema('AboutPage', [
+        'name' => 'About Remenant Health',
+        'description' => 'The story and mission of Remenant Health wellness brand.',
+        'url' => request()->url(),
+    ]);
+@endphp
 
 @section('content')
 

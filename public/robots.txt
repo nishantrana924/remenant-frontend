@@ -1,2 +1,23 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# Exclude Administrative & Protected Routes
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /password/
+Disallow: /checkout/
+Disallow: /cart
+Disallow: /account/
+Disallow: /my-orders/
+
+# Exclude Search Query Pages (to avoid duplicate content)
+Disallow: /*?search=
+Disallow: /*?sort=
+Disallow: /*?max_price=
+
+# Sitemaps
+Sitemap: https://remenant.in/sitemap.xml
+
+# Crawl-delay for smaller servers (optional)
+# Crawl-delay: 10

@@ -15,7 +15,7 @@ Route::post('/webhooks/nimbuspost', [NimbusWebhookController::class, 'handle'])-
 // ──────────────────────────────────────────────────────────────────────────────
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
+Route::get('/sitemap.xml', [\App\Http\Controllers\Public\SitemapController::class, 'index']);
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout')->middleware('auth');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store')->middleware('auth');
 Route::get('/checkout/payment/{order}', [CheckoutController::class, 'payment'])->name('checkout.payment')->middleware('auth');

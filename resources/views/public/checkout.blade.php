@@ -1,6 +1,11 @@
 @extends('public.layouts.app')
 
-@section('title', 'Checkout - Remenant')
+@php
+    seo()->set([
+        'title' => 'Secure Checkout | Remenant Health',
+        'robots' => 'noindex, nofollow',
+    ]);
+@endphp
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

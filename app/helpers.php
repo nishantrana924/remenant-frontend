@@ -89,3 +89,21 @@ if (!function_exists('reduceImageSize')) {
         }
     }
 }
+
+if (!function_exists('seo')) {
+    /**
+     * Get the SEO service instance or set meta values.
+     *
+     * @return \App\Services\SEOService
+     */
+    function seo($key = null, $value = null)
+    {
+        $service = app(\App\Services\SEOService::class);
+        
+        if (is_null($key)) {
+            return $service;
+        }
+        
+        return $service->set($key, $value);
+    }
+}
