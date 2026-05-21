@@ -4,6 +4,5 @@ $app = require_once 'bootstrap/app.php';
 $kernel = $app->make('Illuminate\Contracts\Console\Kernel');
 $kernel->bootstrap();
 $service = new App\Services\NimbusPostService();
-$token = $service->getToken(true);
-echo "TOKEN:[$token]\n";
-echo "HEX:" . bin2hex($token) . "\n";
+$res = $service->getCouriers();
+print_r($res);

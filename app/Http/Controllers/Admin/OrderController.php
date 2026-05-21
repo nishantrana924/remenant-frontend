@@ -201,13 +201,36 @@ class OrderController extends BaseController
         // Build full address (address + landmark if available)
         $fullAddress = trim($order->address . ($order->landmark ? ', ' . $order->landmark : ''));
 
+        $courierId = $request->input('courier_id');
+
+        // Debug: Log exactly what we received
+        \Illuminate\Support\Facades\Log::info('NimbusPost Ship Request - courier_id received: ' . var_export($courierId, true), [
+            'all_input' => $request->all()
+        ]);
+
+        if (empty($courierId)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Courier not selected. Please click "Fetch Courier Rates" and select a courier first.'
+            ], 422);
+        }
+
         $payload = [
-            'order' => [
-                'order_number'   => (string)$order->order_number,
-                'payment_type'   => $order->payment_method === 'cod' ? 'cod' : 'prepaid',
-                'total'          => (float)$order->total_amount,
-                'courier_id'     => $request->input('courier_id'),
-            ],
+            // ── Order Info (TOP LEVEL per NimbusPost docs) ──
+            'order_number'      => (string)$order->order_number,
+            'payment_type'      => $order->payment_method === 'cod' ? 'cod' : 'prepaid',
+            'order_amount'      => (float)$order->total_amount,
+            'courier_id'        => (int)$courierId,   // MUST be top-level
+
+            // ── Package Dimensions ──
+            'package_weight'    => (int)$request->input('weight', 500),
+            'package_length'    => (int)$request->input('length', 10),
+            'package_breadth'   => (int)$request->input('breadth', 10),
+            'package_height'    => (int)$request->input('height', 10),
+
+            'request_auto_pickup' => 0,
+
+            // ── Consignee (Customer) ──
             'consignee' => [
                 'name'    => $order->customer_name,
                 'address' => $fullAddress,
@@ -216,20 +239,34 @@ class OrderController extends BaseController
                 'pincode' => (string)$order->pincode,
                 'phone'   => (string)preg_replace('/[^0-9]/', '', $order->phone),
             ],
-            'pickup_warehouse_id' => (string)$warehouse->nimbus_id,
-            'package_weight'   => (int)$request->input('weight', 500),
-            'package_length'   => (int)$request->input('length', 10),
-            'package_breadth'  => (int)$request->input('breadth', 10),
-            'package_height'   => (int)$request->input('height', 10),
-            'order_items'      => array_map(function ($item) {
+
+            // ── Pickup (Warehouse — full details required) ──
+            'pickup' => [
+                'warehouse_name' => $warehouse->name,
+                'name'           => $warehouse->contact_person ?? $warehouse->name,
+                'address'        => $warehouse->address,
+                'address_2'      => $warehouse->address_2 ?? '',
+                'city'           => $warehouse->city,
+                'state'          => $warehouse->state,
+                'pincode'        => (string)$warehouse->pincode,
+                'phone'          => (string)preg_replace('/[^0-9]/', '', $warehouse->phone ?? ''),
+                'gst_number'     => $warehouse->gst_number ?? '',
+            ],
+
+            // ── Order Items ──
+            'order_items' => array_map(function ($item) {
                 return [
                     'name'  => $item['name'] ?: 'Product',
                     'qty'   => (int)$item['qty'],
                     'price' => (float)$item['price'],
-                    'sku'   => $item['sku'] ?? 'SKU'
+                    'sku'   => $item['sku'] ?? 'SKU',
                 ];
             }, $items),
         ];
+
+        \Illuminate\Support\Facades\Log::info('NimbusPost Final Payload:', $payload);
+
+
 
         $response = $nimbus->createShipment($payload);
 

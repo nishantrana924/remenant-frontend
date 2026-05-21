@@ -42,7 +42,9 @@
             success: (res) => {
                 this.couriers = res.data;
                 if(this.couriers.length > 0) {
-                    this.shippingConfig.courier_id = this.couriers[0].id; // Nimbus uses 'id' not 'courier_id'
+                    this.shippingConfig.courier_id = this.couriers[0].id;
+                    console.log('Auto-selected courier:', this.couriers[0]);
+                    console.log('courier_id set to:', this.shippingConfig.courier_id);
                 }
                 this.fetchingRates = false;
             },
@@ -55,6 +57,7 @@
     },
 
     confirmShipment(btn) {
+        console.log('Dispatching with shippingConfig:', JSON.parse(JSON.stringify(this.shippingConfig)));
         if(!this.shippingConfig.courier_id) return window.toast('Please select a courier', 'error');
         
         window.fastSubmit(`/admin/orders/${this.shippingConfig.id}/ship-to-nimbuspost`, {

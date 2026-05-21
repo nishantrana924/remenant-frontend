@@ -10,7 +10,7 @@ use App\Models\ShippingLog;
 
 class NimbusPostService
 {
-    protected $baseUrl = 'https://ship.nimbuspost.com/api';
+    protected $baseUrl = 'https://api.nimbuspost.com/v1';
 
     /**
      * Get authentication token from NimbusPost
@@ -22,29 +22,52 @@ class NimbusPostService
         }
 
         $token = Cache::get('nimbuspost_token');
+
+        // Use cached token if available (any non-empty string is valid)
         if ($token && !$forceRefresh) {
             return $token;
         }
 
-        $email = config('services.nimbuspost.email');
+        // Clear stale/invalid token and fetch fresh
+        Cache::forget('nimbuspost_token');
+
+        $email    = config('services.nimbuspost.email');
         $password = config('services.nimbuspost.password');
 
-        // Always try login first to get the latest JWT token
-        if ($email && $password && !str_contains($email, 'your_email')) {
-            $response = Http::post($this->baseUrl . '/users/login', [
-                'email'    => $email,
-                'password' => $password,
-            ]);
-
-            if ($response->successful() && isset($response['data'])) {
-                $token = $response['data'];
-                Cache::put('nimbuspost_token', $token, 7200); // 2 hours (JWT expires in ~3h)
-                return $token;
-            }
+        if (empty($email) || empty($password)) {
+            Log::error('NimbusPost: Email/Password not configured in .env');
+            return null;
         }
 
-        // Fallback to static API Key if login fails
-        return config('services.nimbuspost.api_key');
+        Log::info('NimbusPost: Attempting login with email: ' . $email);
+
+        try {
+            $response = Http::timeout(15)
+                ->withHeaders(['Content-Type' => 'application/json', 'Accept' => 'application/json'])
+                ->post('https://api.nimbuspost.com/v1/users/login', [
+                    'email'    => $email,
+                    'password' => $password,
+                ]);
+
+            Log::info('NimbusPost Login Response:', [
+                'status' => $response->status(),
+                'body'   => $response->json()
+            ]);
+
+            if ($response->successful() && !empty($response['data'])) {
+                $token = $response['data'];
+                Cache::put('nimbuspost_token', $token, 7200);
+                Log::info('NimbusPost: Login successful. Token cached.');
+                return $token;
+            }
+
+            Log::error('NimbusPost: Login failed.', ['response' => $response->json()]);
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('NimbusPost: Login exception: ' . $e->getMessage());
+            return null;
+        }
     }
 
     private function getMockToken()
@@ -55,56 +78,86 @@ class NimbusPostService
     }
 
     /**
-     * Helper to make authorized requests
+     * Helper to make authorized requests using raw cURL
+     * (Bypasses Laravel HTTP client / Guzzle Bearer token parsing issues)
      */
     protected function request($method, $endpoint, $data = [])
     {
         try {
-            $token  = $this->getToken();
-            $apiKey = config('services.nimbuspost.api_key');
+            $token = $this->getToken();
+
+            if (!$token) {
+                Log::error('NimbusPost: No valid auth token available.');
+                return [
+                    'status'  => false,
+                    'message' => 'NimbusPost authentication failed. Check NIMBUSPOST_EMAIL and NIMBUSPOST_PASSWORD in .env.'
+                ];
+            }
+
+            $url     = $this->baseUrl . $endpoint;
+            $method  = strtoupper($method);
+
+            Log::info('NimbusPost cURL Request:', ['method' => $method, 'url' => $url]);
 
             $headers = [
-                'Accept'       => 'application/json',
-                'Content-Type' => 'application/json',
+                'Authorization: Bearer ' . $token,
+                'Content-Type: application/json',
+                'Accept: application/json',
             ];
 
-            // NimbusPost requires BOTH headers for most endpoints
-            if ($apiKey) $headers['NP-API-KEY']     = $apiKey;
-            if ($token)  $headers['Authorization']   = 'Bearer ' . $token;
+            $ch = curl_init();
 
-            $url = $this->baseUrl . $endpoint;
-            Log::info('NimbusPost Request:', ['method' => $method, 'url' => $url, 'data' => $data]);
+            curl_setopt_array($ch, [
+                CURLOPT_URL            => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT        => 30,
+                CURLOPT_HTTPHEADER     => $headers,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_SSL_VERIFYHOST => 2,
+            ]);
 
-            // Prevent Laravel from adding charset=utf-8 which breaks Nimbus API
-            $request = Http::timeout(30)->withHeaders($headers);
-
-            if (strtolower($method) === 'get') {
-                $response = $request->get($url, $data);
-            } else {
-                $response = $request->send($method, $url, [
-                    'body' => json_encode($data)
-                ]);
+            if ($method === 'GET' && !empty($data)) {
+                curl_setopt($ch, CURLOPT_URL, $url . '?' . http_build_query($data));
+            } elseif ($method !== 'GET') {
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
             }
 
-            $resData = $response->json();
+            $rawResponse = curl_exec($ch);
+            $httpCode    = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError   = curl_error($ch);
+            curl_close($ch);
 
-            if (!$response->successful()) {
-                Log::error('NimbusPost API Error:', [
-                    'endpoint' => $endpoint,
-                    'status' => $response->status(),
-                    'response' => $resData
-                ]);
+            if ($curlError) {
+                Log::error('NimbusPost cURL Error:', ['error' => $curlError]);
+                return ['status' => false, 'message' => 'cURL Error: ' . $curlError];
             }
 
-            // Always log for our audit logs
-            $this->logActivity($endpoint, $data, $resData, $response->successful() && ($resData['status'] ?? true), $headers);
+            $resData = json_decode($rawResponse, true);
+            $success = $httpCode >= 200 && $httpCode < 300 && ($resData['status'] ?? true);
+
+            // Retry once on 401
+            if ($httpCode === 401) {
+                Log::warning('NimbusPost: 401, refreshing token...');
+                $token = $this->getToken(true);
+                if ($token) {
+                    return $this->request(strtolower($method), $endpoint, $data);
+                }
+            }
+
+            if (!$success) {
+                Log::error('NimbusPost API Error:', ['status' => $httpCode, 'response' => $resData]);
+            }
+
+            $this->logActivity($endpoint, $data, $resData, $success, ['Authorization' => 'Bearer [token]']);
 
             return $resData;
+
         } catch (\Exception $e) {
-            Log::critical('NimbusPost Service Exception:', ['message' => $e->getMessage()]);
-            $this->logActivity($endpoint, $data, ['error' => $e->getMessage()], false, $headers ?? []);
+            Log::critical('NimbusPost Exception:', ['message' => $e->getMessage()]);
+            $this->logActivity($endpoint, $data, ['error' => $e->getMessage()], false, []);
             return [
-                'status' => false,
+                'status'  => false,
                 'message' => 'Connection to logistics server failed. Please try again later.'
             ];
         }
@@ -121,7 +174,11 @@ class NimbusPostService
      */
     public function createShipment($payload)
     {
-        return $this->request('post', '/shipments/create', $payload);
+        // Ensure request_auto_pickup is 'yes' or 'no' string
+        if (isset($payload['request_auto_pickup'])) {
+            $payload['request_auto_pickup'] = $payload['request_auto_pickup'] ? 'yes' : 'no';
+        }
+        return $this->request('post', '/shipments', $payload);
     }
 
     /**
@@ -129,6 +186,10 @@ class NimbusPostService
      */
     public function createHyperlocalShipment($payload)
     {
+        // Ensure request_auto_pickup is 'yes' or 'no' string
+        if (isset($payload['request_auto_pickup'])) {
+            $payload['request_auto_pickup'] = $payload['request_auto_pickup'] ? 'yes' : 'no';
+        }
         return $this->request('post', '/shipments/hyperlocal', $payload);
     }
 
@@ -212,7 +273,7 @@ class NimbusPostService
 
     public function getCouriers()
     {
-        return $this->request('get', '/couriers');
+        return $this->request('get', '/courier');
     }
 
     /**
