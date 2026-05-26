@@ -6,6 +6,7 @@ use App\Http\Controllers\BaseController;
 use App\Services\OrderService;
 use App\Http\Requests\Admin\OrderRequest;
 use Illuminate\Http\Request;
+use App\Models\Order;
 
 class OrderController extends BaseController
 {
@@ -326,7 +327,7 @@ class OrderController extends BaseController
             return response()->json(['success' => false, 'message' => 'No active NimbusPost shipment found for this order.'], 422);
         }
 
-        $response = $nimbus->cancelShipment($shipment->nimbus_shipment_id);
+        $response = $nimbus->cancelShipment($shipment->nimbus_shipment_id, $shipment->awb_number);
 
         if (isset($response['status']) && $response['status'] === true) {
             $shipment->delete();
@@ -347,10 +348,17 @@ class OrderController extends BaseController
             return redirect()->back()->with('error', 'No active NimbusPost shipment found.');
         }
 
+        // ✅ Step 1: If label URL already exists in DB, use it directly (no API call needed)
+        if (!empty($shipment->label_url)) {
+            return redirect()->away($shipment->label_url);
+        }
+
+        // ✅ Step 2: Fallback - fetch label from NimbusPost API
         $response = $nimbus->generateLabel($shipment->nimbus_shipment_id);
 
         if (isset($response['status']) && $response['status'] === true && !empty($response['data'])) {
-            // Redirect to the label URL
+            // Save the label URL to DB so we don't need to call API again
+            $shipment->update(['label_url' => $response['data']]);
             return redirect()->away($response['data']);
         }
 

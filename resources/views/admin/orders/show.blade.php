@@ -241,6 +241,22 @@
                                 </button>
                             @endif
                         </div>
+
+                        {{-- Direct NimbusPost Label PDF Download --}}
+                        @if($item->shipment && $item->shipment->label_url)
+                        <a href="{{ $item->shipment->label_url }}" target="_blank"
+                           class="w-full flex items-center justify-center gap-2 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl py-3 text-[9px] font-bold uppercase tracking-widest hover:bg-emerald-100 transition-all">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                            Download NimbusPost Label PDF
+                        </a>
+                        @endif
+
+                        {{-- Tax Invoice Download --}}
+                        <a href="{{ route('admin.orders.invoice', $item->id) }}" target="_blank"
+                           class="w-full flex items-center justify-center gap-2 bg-orange-50 text-orange-600 border border-orange-100 rounded-xl py-3 text-[9px] font-bold uppercase tracking-widest hover:bg-orange-100 transition-all">
+                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                            Download Tax Invoice
+                        </a>
                     </div>
                 </div>
             </div>

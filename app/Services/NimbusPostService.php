@@ -83,27 +83,38 @@ class NimbusPostService
      */
     protected function request($method, $endpoint, $data = [])
     {
+
         try {
-            $token = $this->getToken();
-
-            if (!$token) {
-                Log::error('NimbusPost: No valid auth token available.');
-                return [
-                    'status'  => false,
-                    'message' => 'NimbusPost authentication failed. Check NIMBUSPOST_EMAIL and NIMBUSPOST_PASSWORD in .env.'
-                ];
-            }
-
             $url     = $this->baseUrl . $endpoint;
             $method  = strtoupper($method);
 
             Log::info('NimbusPost cURL Request:', ['method' => $method, 'url' => $url]);
 
-            $headers = [
-                'Authorization: Bearer ' . $token,
-                'Content-Type: application/json',
-                'Accept: application/json',
-            ];
+            // Use both Authorization: Bearer AND NP-API-KEY for /shipments/label
+            if ($endpoint === '/shipments/label') {
+                $token = $this->getToken();
+                $apiKey = config('services.nimbuspost.api_key');
+                $headers = [
+                    'NP-API-KEY: ' . $apiKey,
+                    'Authorization: Bearer ' . $token,
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                ];
+            } else {
+                $token = $this->getToken();
+                if (!$token) {
+                    Log::error('NimbusPost: No valid auth token available.');
+                    return [
+                        'status'  => false,
+                        'message' => 'NimbusPost authentication failed. Check NIMBUSPOST_EMAIL and NIMBUSPOST_PASSWORD in .env.'
+                    ];
+                }
+                $headers = [
+                    'Authorization: Bearer ' . $token,
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                ];
+            }
 
             $ch = curl_init();
 
@@ -116,10 +127,12 @@ class NimbusPostService
                 CURLOPT_SSL_VERIFYHOST => 2,
             ]);
 
+
             if ($method === 'GET' && !empty($data)) {
                 curl_setopt($ch, CURLOPT_URL, $url . '?' . http_build_query($data));
             } elseif ($method !== 'GET') {
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+                // Always send JSON body
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
             }
 
@@ -149,7 +162,15 @@ class NimbusPostService
                 Log::error('NimbusPost API Error:', ['status' => $httpCode, 'response' => $resData]);
             }
 
-            $this->logActivity($endpoint, $data, $resData, $success, ['Authorization' => 'Bearer [token]']);
+            // Log headers used
+            if ($endpoint === '/shipments/label') {
+                $this->logActivity($endpoint, $data, $resData, $success, [
+                    'NP-API-KEY' => $apiKey ?? '',
+                    'Authorization' => 'Bearer [token]'
+                ]);
+            } else {
+                $this->logActivity($endpoint, $data, $resData, $success, ['Authorization' => 'Bearer [token]']);
+            }
 
             return $resData;
 
@@ -216,9 +237,12 @@ class NimbusPostService
     /**
      * Cancel a shipment
      */
-    public function cancelShipment($shipmentId)
+    public function cancelShipment($shipmentId, $awb)
     {
-        return $this->request('post', '/shipments/cancel', ['id' => (int)$shipmentId]);
+        return $this->request('post', '/shipments/cancel', [
+            'id' => (int)$shipmentId,
+            'awb' => $awb,
+        ]);
     }
 
     /**

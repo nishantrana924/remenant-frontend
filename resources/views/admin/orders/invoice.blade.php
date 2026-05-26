@@ -10,209 +10,413 @@
     ];
     $warehouse = \App\Models\Warehouse::where('is_default', true)->first() ?? \App\Models\Warehouse::first();
     
-    $displayInvoiceNumber = $invoiceSettings['prefix'] 
-        ? rtrim($invoiceSettings['prefix'], '-') . '-' . str_pad($order->id, 5, '0', STR_PAD_LEFT) 
-        : str_pad($order->id, 5, '0', STR_PAD_LEFT);
+    // Warehouse details
+    $wName = ($warehouse && $warehouse->name && $warehouse->name !== 'N/A') ? $warehouse->name : 'Tech-Connect Retail Private Limited';
+    $wContact = ($warehouse && $warehouse->contact_person && $warehouse->contact_person !== 'N/A') ? $warehouse->contact_person : 'Warehouse Manager';
+    $wPhone = ($warehouse && $warehouse->phone && $warehouse->phone !== '0000000000') ? $warehouse->phone : '7567776796';
+    $wAddress = ($warehouse && $warehouse->address && $warehouse->address !== 'N/A') ? $warehouse->address : '224 Ambika Pinnacle Mall Lajamani Chowk Mota Varachha';
+    $wAddress2 = ($warehouse && $warehouse->address_2 && $warehouse->address_2 !== 'N/A') ? $warehouse->address_2 : '';
+    $wCity = ($warehouse && $warehouse->city && $warehouse->city !== 'N/A') ? $warehouse->city : 'Surat';
+    $wState = ($warehouse && $warehouse->state && $warehouse->state !== 'N/A') ? $warehouse->state : 'Gujarat';
+    $wPincode = ($warehouse && $warehouse->pincode && $warehouse->pincode !== '000000') ? $warehouse->pincode : '394101';
+    $wGst = ($warehouse && $warehouse->gst_number && $warehouse->gst_number !== 'N/A' && $warehouse->gst_number !== '') ? $warehouse->gst_number : '24CBUPT5159C1Z8';
+    
+    // Address format
+    $fullWarehouseAddress = trim($wAddress . ' ' . $wAddress2) . ', ' . $wCity . ', ' . $wState . ' - ' . $wPincode;
+    
+    // State tax determination
+    $customerState = trim(strtolower($order->state));
+    $warehouseStateLower = trim(strtolower($wState));
+    $isIntraState = str_contains($customerState, $warehouseStateLower) || str_contains($warehouseStateLower, $customerState);
+    
+    // Platform fee details
+    $hasPlatformFee = ($order->total_amount - ($order->shipping_charge ?? 0)) >= 10.00;
+    $platformFee = $hasPlatformFee ? 7.00 : 0.00;
+    
+    $orderDate = $order->created_at->format('d-m-Y');
+    
+    // Items subtotal
+    $itemsSubtotalOriginal = $order->orderItems->sum(fn($item) => $item->price * $item->quantity);
+    
+    // Realistic Document Invoice numbers
+    $prodInvoiceNo = 'FAFO7Z' . date('y', strtotime($order->created_at)) . str_pad($order->id, 8, '0', STR_PAD_LEFT);
 @endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tax Invoice - #{{ $displayInvoiceNumber }}</title>
+    <title>Tax Invoice - #{{ $prodInvoiceNo }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         @media print {
-            .no-print { display: none; }
-            body { padding: 0; background: white; }
-            .invoice-box { border: none; box-shadow: none; width: 100%; margin: 0 !important; padding: 0 !important; }
-            @page { margin: 0; }
+            .no-print { display: none !important; }
+            body { padding: 0 !important; margin: 0 !important; background: white; color: black; }
+            .invoice-page { 
+                border: none !important; 
+                box-shadow: none !important; 
+                width: 100% !important; 
+                margin: 0 !important; 
+                padding: 4mm 6mm !important; 
+                min-height: auto !important;
+            }
+            @page { 
+                size: A4;
+                margin: 6mm 8mm; 
+            }
+            .table-cell {
+                padding: 3px 5px !important;
+                font-size: 9px !important;
+            }
+            .block-margin {
+                margin-bottom: 6px !important;
+            }
+            .block-padding {
+                padding-bottom: 6px !important;
+            }
+            .title-section {
+                margin-bottom: 8px !important;
+            }
+            .logo-img {
+                height: 24px !important;
+            }
         }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
         }
-        .invoice-box {
+        .invoice-page {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            margin: 40px auto;
-        }
-        
-        /* A4 Specific */
-        .size-a4 {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
             max-width: 800px;
-            padding: 40px;
+            padding: 24px;
+            min-height: 980px;
         }
-
-        /* Thermal Specific (4x6 approx) */
-        .size-thermal {
-            max-width: 400px;
-            padding: 20px;
-            font-size: 12px;
-            border-radius: 0;
-            margin: 0 auto;
+        .table-cell {
+            padding: 6px 8px;
+            font-size: 11px;
+            line-height: 1.2;
         }
-        .size-thermal h1 { font-size: 24px; }
-        .size-thermal .text-4xl { font-size: 24px; }
-        .size-thermal .text-2xl { font-size: 18px; }
-        .size-thermal .mt-20 { margin-top: 20px; }
+        .block-margin {
+            margin-bottom: 12px;
+        }
+        .block-padding {
+            padding-bottom: 12px;
+        }
+        .title-section {
+            margin-bottom: 16px;
+        }
+        .logo-img {
+            height: 32px;
+        }
     </style>
 </head>
-<body>
-    <div class="no-print fixed top-6 right-6 flex gap-3">
-        <button onclick="window.print()" class="bg-orange-600 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-orange-700 transition-all flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<body class="text-slate-800 text-[11px]">
+
+    <!-- Actions Panel -->
+    <div class="no-print fixed top-6 right-6 flex gap-3 z-50">
+        <button onclick="window.print()" class="bg-orange-600 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-orange-700 transition-all flex items-center gap-2 text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
             Print Invoice
         </button>
-        <button onclick="window.close()" class="bg-white text-slate-600 border border-slate-200 px-6 py-2 rounded-full font-bold shadow-sm hover:bg-slate-50 transition-all">Close</button>
+        <button onclick="window.close()" class="bg-white text-slate-600 border border-slate-200 px-6 py-2 rounded-full font-bold shadow-sm hover:bg-slate-50 transition-all text-sm">Close</button>
     </div>
 
-    <div class="invoice-box {{ $invoiceSettings['page_size'] == 'Thermal' ? 'size-thermal' : 'size-a4' }}">
-        <!-- Header -->
-        <div class="flex justify-between items-start border-b-2 border-orange-600 pb-8 mb-8">
-            <div>
-                @if($invoiceSettings['logo'])
-                    <img src="{{ Storage::url($invoiceSettings['logo']) }}" class="h-12 w-auto mb-4">
-                @endif
+    <!-- ================= CONSOLIDATED SINGLE-PAGE INVOICE ================= -->
+    <div class="invoice-page flex flex-col justify-between">
+        <div>
+            <!-- Header E. & O.E -->
+            <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-2 text-[9px] text-slate-400 font-semibold uppercase tracking-wider">
+                <span>E. & O.E.</span>
+                <span>Page 1 of 1</span>
+            </div>
 
-                @if($invoiceSettings['show_company'] == '1')
-                    <h1 class="text-4xl font-extrabold text-slate-900 tracking-tighter uppercase">{{ $invoiceSettings['company_name'] }}</h1>
-                    <p class="text-xs font-bold text-orange-600 uppercase tracking-widest mt-1">Authorized Seller</p>
-                @endif
+            <!-- Title & Warranty Note -->
+            <div class="flex justify-between items-start title-section">
+                <div>
+                    <h1 class="text-lg font-bold uppercase tracking-tight text-slate-900 leading-none">Tax Invoice</h1>
+                    <p class="text-[8px] text-slate-500 font-bold mt-0.5 leading-tight">*Keep this invoice and manufacturer box for warranty purposes.</p>
+                </div>
+                <div class="text-right">
+                    @if($invoiceSettings['logo'])
+                        <img src="{{ Storage::url($invoiceSettings['logo']) }}" class="logo-img w-auto ml-auto mb-1">
+                    @endif
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ $invoiceSettings['company_name'] }}</p>
+                </div>
+            </div>
 
-                <div class="mt-6 text-sm text-slate-500 leading-relaxed">
+            <!-- Sold By & Addresses -->
+            <div class="grid grid-cols-2 gap-4 text-[10px] block-margin border-b border-slate-100 block-padding">
+                <div>
+                    <p class="font-extrabold uppercase text-[8px] text-slate-400 tracking-wider mb-0.5">Sold By:</p>
+                    <p class="font-bold text-slate-950 text-xs leading-none">{{ $wName }}</p>
+                    <p class="text-slate-600 mt-0.5 leading-tight">{{ $fullWarehouseAddress }}</p>
+                    <div class="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-slate-500 text-[9px]">
+                        <p><span class="font-bold text-slate-700">PAN:</span> AAICA4872D</p>
+                        <p><span class="font-bold text-slate-700">CIN:</span> U52100HR2010PTC068415</p>
+                        <p><span class="font-bold text-slate-700">GSTIN:</span> <span class="text-slate-950 font-bold">{{ $wGst }}</span></p>
+                    </div>
+                </div>
+                <div class="bg-slate-50/50 p-2.5 rounded-lg border border-slate-100">
+                    <div class="grid grid-cols-2 gap-x-2 gap-y-1.5 text-[9px]">
+                        <div>
+                            <p class="text-slate-400 font-bold uppercase text-[8px] tracking-wider leading-none">Invoice Number:</p>
+                            <p class="font-bold text-slate-950 text-xs mt-0.5">#{{ $prodInvoiceNo }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 font-bold uppercase text-[8px] tracking-wider leading-none">Order ID:</p>
+                            <p class="font-bold text-slate-950 text-xs mt-0.5">{{ $order->order_number }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 font-bold uppercase text-[8px] tracking-wider leading-none">Invoice Date:</p>
+                            <p class="font-bold text-slate-800 mt-0.5">{{ $orderDate }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 font-bold uppercase text-[8px] tracking-wider leading-none">Order Date:</p>
+                            <p class="font-bold text-slate-800 mt-0.5">{{ $orderDate }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ship To & Bill To -->
+            <div class="grid grid-cols-2 gap-4 text-[10px] block-margin">
+                <div class="border border-slate-100 p-2.5 rounded-lg">
+                    <p class="font-extrabold text-slate-400 uppercase text-[8px] tracking-wider mb-1 leading-none">Ship To:</p>
+                    <p class="font-bold text-slate-950 text-[11px] leading-tight">{{ $order->customer_name }}</p>
+                    <p class="text-slate-600 mt-0.5 leading-tight">
+                        {{ $order->address }}<br>
+                        @if($order->landmark) {{ $order->landmark }}, @endif
+                        {{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}
+                    </p>
+                    <p class="font-bold text-slate-800 mt-1 text-[9px]">Phone: {{ $order->phone }}</p>
+                </div>
+                <div class="border border-slate-100 p-2.5 rounded-lg">
+                    <p class="font-extrabold text-slate-400 uppercase text-[8px] tracking-wider mb-1 leading-none">Bill To:</p>
+                    <p class="font-bold text-slate-950 text-[11px] leading-tight">{{ $order->customer_name }}</p>
+                    <p class="text-slate-600 mt-0.5 leading-tight">
+                        {{ $order->address }}<br>
+                        @if($order->landmark) {{ $order->landmark }}, @endif
+                        {{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}
+                    </p>
+                    <p class="font-bold text-slate-800 mt-1 text-[9px]">Phone: {{ $order->phone }}</p>
+                </div>
+            </div>
+
+            <!-- Product Items Table -->
+            <table class="w-full text-left border-collapse border border-slate-200 block-margin">
+                <thead>
+                    <tr class="bg-slate-50 text-[8px] font-bold text-slate-500 uppercase border-b border-slate-200 tracking-wider">
+                        <th class="table-cell border-r border-slate-200 w-[45%]">Product Details / Description</th>
+                        <th class="table-cell border-r border-slate-200 text-center w-[8%]">Qty</th>
+                        <th class="table-cell border-r border-slate-200 text-right w-[11%]">Gross Amt</th>
+                        <th class="table-cell border-r border-slate-200 text-right w-[11%]">Discounts</th>
+                        <th class="table-cell border-r border-slate-200 text-right w-[11%]">Taxable Val</th>
+                        <th class="table-cell border-r border-slate-200 text-center w-[12%]">GST</th>
+                        <th class="table-cell text-right w-[12%]">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
                     @php
-                        $wName = ($warehouse && $warehouse->name && $warehouse->name !== 'N/A') ? $warehouse->name : 'Remenant Official Store';
-                        $wContact = ($warehouse && $warehouse->contact_person && $warehouse->contact_person !== 'N/A') ? $warehouse->contact_person : 'Warehouse Manager';
-                        $wPhone = ($warehouse && $warehouse->phone && $warehouse->phone !== '0000000000') ? $warehouse->phone : '9876543210';
-                        $wAddress = ($warehouse && $warehouse->address && $warehouse->address !== 'N/A') ? $warehouse->address : '123 Tech Park, Silicon Valley';
-                        $wAddress2 = ($warehouse && $warehouse->address_2 && $warehouse->address_2 !== 'N/A') ? $warehouse->address_2 : '';
-                        $wCity = ($warehouse && $warehouse->city && $warehouse->city !== 'N/A') ? $warehouse->city : 'Pune';
-                        $wState = ($warehouse && $warehouse->state && $warehouse->state !== 'N/A') ? $warehouse->state : 'Maharashtra';
-                        $wPincode = ($warehouse && $warehouse->pincode && $warehouse->pincode !== '000000') ? $warehouse->pincode : '411001';
-                        $wGst = ($warehouse && $warehouse->gst_number && $warehouse->gst_number !== 'N/A' && $warehouse->gst_number !== '') ? $warehouse->gst_number : '27AAAAA0000A1Z5';
+                        $grandGrossAmt = 0;
+                        $grandDiscountAmt = 0;
+                        $grandTaxableAmt = 0;
+                        $grandTaxAmt = 0;
+                        $grandInvoiceTotal = 0;
                     @endphp
-
-                    <p class="font-bold text-slate-900">{{ $wContact }} ({{ $wPhone }})</p>
-                    <p>{{ trim($wAddress . ' ' . $wAddress2) }}</p>
-                    <p>{{ $wCity }}, {{ $wState }} - {{ $wPincode }}</p>
-                    @if($wGst)
-                        <p class="mt-2"><span class="font-bold text-slate-400 uppercase text-[10px]">GSTIN:</span> <span class="font-bold text-slate-900">{{ $wGst }}</span></p>
+                    
+                    {{-- 1. Product Rows --}}
+                    @foreach($order->orderItems as $item)
+                        @php
+                            $hsn = $item->product->hsn_code ?? '64041110';
+                            $title = $item->product->title ?? $item->product->name ?? 'Product';
+                            $gstRate = 18.0; 
+                            if (str_contains(strtolower($title), 'shoes') || str_contains(strtolower($title), 'running') || str_starts_with($hsn, '64')) {
+                                $gstRate = ($item->price < 1000) ? 5.0 : 12.0;
+                            }
+                            
+                            $grossAmt = $item->price * $item->quantity;
+                            
+                            // Pro-rate discount + platform fee share
+                            $proportion = ($itemsSubtotalOriginal > 0) ? ($grossAmt / $itemsSubtotalOriginal) : 0;
+                            $itemCouponDiscount = $proportion * $order->discount_amount;
+                            $itemPlatformFeeShare = $proportion * $platformFee;
+                            $totalItemDiscount = $itemCouponDiscount + $itemPlatformFeeShare;
+                            
+                            $netItemTotal = $grossAmt - $totalItemDiscount;
+                            $taxableVal = $netItemTotal / (1 + ($gstRate / 100));
+                            $taxAmt = $netItemTotal - $taxableVal;
+                            
+                            // Accumulators
+                            $grandGrossAmt += $grossAmt;
+                            $grandDiscountAmt += $totalItemDiscount;
+                            $grandTaxableAmt += $taxableVal;
+                            $grandTaxAmt += $taxAmt;
+                            $grandInvoiceTotal += $netItemTotal;
+                        @endphp
+                        <tr>
+                            <td class="table-cell border-r border-slate-200 py-1.5">
+                                <p class="font-bold text-slate-900 leading-tight">{{ $title }}</p>
+                                <p class="text-[8px] text-slate-400 font-semibold uppercase mt-0.5 leading-none">
+                                    HSN/SAC: {{ $hsn }} 
+                                    @if($item->sku) | SKU: {{ $item->sku }} @endif
+                                    @if($item->variant_name) | Variant: {{ $item->variant_name }} @endif
+                                </p>
+                            </td>
+                            <td class="table-cell border-r border-slate-200 text-center font-semibold text-slate-900">{{ $item->quantity }}</td>
+                            <td class="table-cell border-r border-slate-200 text-right font-semibold text-slate-900">₹{{ number_format($grossAmt, 2) }}</td>
+                            <td class="table-cell border-r border-slate-200 text-right font-semibold text-rose-600">-₹{{ number_format($totalItemDiscount, 2) }}</td>
+                            <td class="table-cell border-r border-slate-200 text-right font-semibold text-slate-950">₹{{ number_format($taxableVal, 2) }}</td>
+                            <td class="table-cell border-r border-slate-200 text-center font-bold text-slate-700 leading-tight">
+                                @if($isIntraState)
+                                    CGST: {{ $gstRate / 2 }}%<br>SGST: {{ $gstRate / 2 }}%
+                                @else
+                                    IGST: {{ $gstRate }}%
+                                @endif
+                            </td>
+                            <td class="table-cell text-right font-bold text-slate-950">₹{{ number_format($netItemTotal, 2) }}</td>
+                        </tr>
+                    @endforeach
+                    
+                    {{-- 2. Platform Fee Row --}}
+                    @if($platformFee > 0)
+                        @php
+                            $feeGstRate = 18.0;
+                            $feeTaxable = $platformFee / (1 + ($feeGstRate / 100));
+                            $feeTaxAmt = $platformFee - $feeTaxable;
+                            
+                            $grandGrossAmt += $platformFee;
+                            $grandTaxableAmt += $feeTaxable;
+                            $grandTaxAmt += $feeTaxAmt;
+                            $grandInvoiceTotal += $platformFee;
+                        @endphp
+                        <tr>
+                            <td class="table-cell border-r border-slate-200 py-1.5">
+                                <p class="font-bold text-slate-900 leading-tight text-slate-800">Platform Facilitation Fee</p>
+                                <p class="text-[8px] text-slate-400 font-semibold uppercase mt-0.5 leading-none">SAC: 998599 | Sold By: Remenant Internet</p>
+                            </td>
+                            <td class="table-cell border-r border-slate-200 text-center font-semibold text-slate-900">1</td>
+                            <td class="table-cell border-r border-slate-200 text-right font-semibold text-slate-900">₹{{ number_format($platformFee, 2) }}</td>
+                            <td class="table-cell border-r border-slate-200 text-right font-semibold text-rose-600">₹0.00</td>
+                            <td class="table-cell border-r border-slate-200 text-right font-semibold text-slate-950">₹{{ number_format($feeTaxable, 2) }}</td>
+                            <td class="table-cell border-r border-slate-200 text-center font-bold text-slate-700 leading-tight">
+                                @if($isIntraState)
+                                    CGST: 9.0%<br>SGST: 9.0%
+                                @else
+                                    IGST: 18.0%
+                                @endif
+                            </td>
+                            <td class="table-cell text-right font-bold text-slate-950">₹{{ number_format($platformFee, 2) }}</td>
+                        </tr>
                     @endif
                     
-                    @if($invoiceSettings['page_size'] != 'Thermal' && is_array($invoiceSettings['custom_fields']))
-                        @foreach($invoiceSettings['custom_fields'] as $field)
-                            <p><span class="font-bold text-slate-400 uppercase text-[10px]">{{ $field['key'] }}:</span> {{ $field['value'] }}</p>
-                        @endforeach
+                    {{-- 3. Shipping / GT Charges Row --}}
+                    @if($order->shipping_charge > 0)
+                        @php
+                            $shipGross = $order->shipping_charge;
+                            $shipTaxable = $shipGross; // 0% GST
+                            $shipTaxAmt = 0.00;
+                            
+                            $grandGrossAmt += $shipGross;
+                            $grandTaxableAmt += $shipTaxable;
+                            $grandTaxAmt += $shipTaxAmt;
+                            $grandInvoiceTotal += $shipGross;
+                        @endphp
+                        <tr>
+                            <td class="table-cell border-r border-slate-200 py-1.5">
+                                <p class="font-bold text-slate-900 leading-tight">GT Charges (Transport Charges)</p>
+                                <p class="text-[8px] text-slate-400 font-semibold uppercase mt-0.5 leading-none">SAC: 996511 | Carrier: Instakart Services</p>
+                            </td>
+                            <td class="table-cell border-r border-slate-200 text-center font-semibold text-slate-900">1</td>
+                            <td class="table-cell border-r border-slate-200 text-right font-semibold text-slate-900">₹{{ number_format($shipGross, 2) }}</td>
+                            <td class="table-cell border-r border-slate-200 text-right font-semibold text-rose-600">₹0.00</td>
+                            <td class="table-cell border-r border-slate-200 text-right font-semibold text-slate-950">₹{{ number_format($shipTaxable, 2) }}</td>
+                            <td class="table-cell border-r border-slate-200 text-center font-bold text-slate-700 leading-tight">
+                                GST: 0.0%
+                            </td>
+                            <td class="table-cell text-right font-bold text-slate-950">₹{{ number_format($shipGross, 2) }}</td>
+                        </tr>
                     @endif
-                </div>
-            </div>
-            <div class="text-right">
-                <h2 class="text-2xl font-bold text-orange-600 uppercase">Tax Invoice</h2>
-                <div class="mt-4 text-sm text-slate-500">
-                    <p><span class="font-bold text-slate-400 uppercase text-[10px]">Invoice No:</span> <span class="text-slate-900 font-bold">#{{ $displayInvoiceNumber }}</span></p>
-                    <p><span class="font-bold text-slate-400 uppercase text-[10px]">Date:</span> <span class="text-slate-900 font-bold">{{ $order->created_at->format('d M, Y') }}</span></p>
-                    <p><span class="font-bold text-slate-400 uppercase text-[10px]">Order ID:</span> <span class="text-slate-900 font-bold">{{ $order->id }}</span></p>
-                </div>
-            </div>
-        </div>
 
-        <!-- Addresses -->
-        <div class="grid grid-cols-2 gap-12 mb-12 {{ $invoiceSettings['page_size'] == 'Thermal' ? 'gap-4 mb-4' : '' }}">
-            <div>
-                <h3 class="text-[10px] font-bold text-orange-600 uppercase tracking-[0.2em] mb-3">Bill To</h3>
-                <div class="text-sm text-slate-600 space-y-1">
-                    <p class="text-lg font-bold text-slate-900">{{ $order->customer_name }}</p>
-                    <p>{{ $order->phone }}</p>
-                    <p>{{ $order->address }}</p>
-                    <p>{{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}</p>
-                </div>
-            </div>
-            <div>
-                <h3 class="text-[10px] font-bold text-orange-600 uppercase tracking-[0.2em] mb-3">Ship To</h3>
-                <div class="text-sm text-slate-600 space-y-1">
-                    <p class="text-lg font-bold text-slate-900">{{ $order->customer_name }}</p>
-                    <p>{{ $order->address }}</p>
-                    <p>{{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}</p>
-                    <p class="pt-2 font-bold text-slate-900">Phone: {{ $order->phone }}</p>
-                </div>
-            </div>
-        </div>
+                    <!-- Totals Row -->
+                    <tr class="bg-slate-50 font-bold text-slate-950 border-t border-slate-200">
+                        <td class="table-cell border-r border-slate-200">Total</td>
+                        <td class="table-cell border-r border-slate-200 text-center">-</td>
+                        <td class="table-cell border-r border-slate-200 text-right">₹{{ number_format($grandGrossAmt, 2) }}</td>
+                        <td class="table-cell border-r border-slate-200 text-right text-rose-600">-₹{{ number_format($order->discount_amount + $platformFee, 2) }}</td>
+                        <td class="table-cell border-r border-slate-200 text-right">₹{{ number_format($grandTaxableAmt, 2) }}</td>
+                        <td class="table-cell border-r border-slate-200 text-center text-[8px] text-slate-400 leading-none">Tax Total:<br>₹{{ number_format($grandTaxAmt, 2) }}</td>
+                        <td class="table-cell text-right text-orange-600 text-xs">₹{{ number_format($grandInvoiceTotal, 2) }}</td>
+                    </tr>
+                </tbody>
+            </table>
 
-        <!-- Table -->
-        <table class="w-full text-left mb-12 {{ $invoiceSettings['page_size'] == 'Thermal' ? 'mb-4' : '' }}">
-            <thead>
-                <tr class="border-b-2 border-orange-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                    <th class="py-4">Item Details</th>
-                    <th class="py-4 text-center">Qty</th>
-                    <th class="py-4 text-right">Total</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-50">
-                @foreach($order->orderItems as $item)
-                <tr>
-                    <td class="py-6 {{ $invoiceSettings['page_size'] == 'Thermal' ? 'py-2' : '' }} flex items-center gap-4">
-                        @if($item->product && $item->product->image_url)
-                            <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" class="h-12 w-12 object-cover rounded-md shadow-sm border border-slate-100">
+            <!-- Grand Total Summary Box -->
+            <div class="flex justify-end block-margin">
+                <div class="w-64 bg-slate-50/50 border border-slate-200 p-2.5 rounded-lg space-y-1 text-[10px]">
+                    <div class="flex justify-between text-slate-500 font-medium">
+                        <span>Gross Amount</span>
+                        <span class="text-slate-900 font-bold">₹{{ number_format($grandGrossAmt, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between text-slate-500 font-medium">
+                        <span>Discounts & Promos</span>
+                        <span class="text-rose-600 font-bold">-₹{{ number_format($order->discount_amount + $platformFee, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between text-slate-500 font-medium">
+                        <span>Taxable Value</span>
+                        <span class="text-slate-900 font-bold">₹{{ number_format($grandTaxableAmt, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between text-slate-500 font-medium">
+                        @if($isIntraState)
+                            <span>CGST + SGST</span>
+                        @else
+                            <span>IGST (Integrated Tax)</span>
                         @endif
-                        <div>
-                            <p class="font-bold text-slate-900 uppercase text-sm">{{ $item->product->name ?? 'Unknown Product' }}</p>
-                            @if($item->variant_name)
-                            <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Variant: {{ $item->variant_name }}</p>
-                            @endif
-                        </div>
-                    </td>
-                    <td class="py-6 text-center text-sm text-slate-900 font-bold {{ $invoiceSettings['page_size'] == 'Thermal' ? 'py-2' : '' }}">{{ $item->quantity }}</td>
-                    <td class="py-6 text-right text-sm text-slate-900 font-bold {{ $invoiceSettings['page_size'] == 'Thermal' ? 'py-2' : '' }}">₹{{ number_format($item->price * $item->quantity, 2) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <!-- Totals -->
-        <div class="flex justify-end">
-            <div class="w-72 space-y-3">
-                <div class="flex justify-between text-sm">
-                    <span class="text-slate-400 font-bold uppercase text-[10px]">Subtotal</span>
-                    <span class="text-slate-900 font-bold">₹{{ number_format($order->total_amount - $order->shipping_charge + $order->discount_amount, 2) }}</span>
-                </div>
-                @if($order->discount_amount > 0)
-                <div class="flex justify-between text-sm">
-                    <span class="text-slate-400 font-bold uppercase text-[10px]">Discount</span>
-                    <span class="text-rose-600 font-bold">-₹{{ number_format($order->discount_amount, 2) }}</span>
-                </div>
-                @endif
-                <div class="flex justify-between text-sm">
-                    <span class="text-slate-400 font-bold uppercase text-[10px]">Shipping</span>
-                    <span class="text-slate-900 font-bold">₹{{ number_format($order->shipping_charge, 2) }}</span>
-                </div>
-                <div class="pt-3 border-t-2 border-orange-600 flex justify-between">
-                    <span class="text-slate-900 font-bold uppercase text-xs">Total Amount</span>
-                    <span class="text-2xl font-bold text-orange-600 tracking-tighter">₹{{ number_format($order->total_amount, 2) }}</span>
+                        <span class="text-slate-900 font-bold">₹{{ number_format($grandTaxAmt, 2) }}</span>
+                    </div>
+                    <div class="pt-1.5 border-t border-slate-200 flex justify-between items-center text-xs font-extrabold text-slate-950">
+                        <span>Grand Total</span>
+                        <span class="text-orange-600 text-sm">₹{{ number_format($grandInvoiceTotal, 2) }}</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Signature -->
-        @if($invoiceSettings['signature'])
-        <div class="mt-12 flex justify-end">
-            <div class="text-center">
-                <img src="{{ Storage::url($invoiceSettings['signature']) }}" class="h-16 w-auto mx-auto mb-2">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-t border-slate-100 pt-2">Authorized Signature</p>
+        <!-- Footer Signatures & Policies -->
+        <div>
+            <div class="grid grid-cols-2 gap-4 items-end border-t border-slate-100 pt-3">
+                <div class="text-[8px] text-slate-500 leading-normal border-r border-slate-100 pr-3">
+                    <p class="font-bold text-slate-700 uppercase mb-0.5 leading-none">Returns Policy:</p>
+                    At {{ $invoiceSettings['company_name'] }} we try to deliver perfectly each and every time. But in the off-chance that you need to return the item, please do so with the original Brand box/price tag, original packing and invoice without which it will be really difficult for us to act on your request. Please help us in helping you. Terms and conditions apply.
+                </div>
+                <div class="text-right">
+                    <p class="text-[9px] font-bold text-slate-900 mb-1 uppercase leading-none">{{ $wName }}</p>
+                    <img src="{{ $invoiceSettings['signature'] ? Storage::url($invoiceSettings['signature']) : asset('images/logo/sign.png') }}" class="h-8 w-auto ml-auto mb-0.5">
+                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-wider leading-none">Authorized Signatory</p>
+                </div>
             </div>
-        </div>
-        @endif
 
-        <!-- Footer -->
-        <div class="mt-20 pt-12 border-t border-slate-100 text-center {{ $invoiceSettings['page_size'] == 'Thermal' ? 'mt-8 pt-4' : '' }}">
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Thank you for choosing Remenant Official</p>
-            <p class="text-[10px] text-slate-300 mt-2 uppercase tracking-tighter italic">This is a computer generated invoice and does not require a physical signature.</p>
+            <!-- Regd Office Address -->
+            <div class="mt-4 pt-3 border-t border-slate-100 text-center text-[8px] text-slate-400 leading-none">
+                <p>Regd. office: {{ $wName }}, {{ $fullWarehouseAddress }}</p>
+                <p class="mt-1 tracking-wider text-[8px] italic leading-none">This is a computer generated tax invoice. No physical signature required. Platform facilitation fee represents services rendered by platform owner.</p>
+            </div>
         </div>
     </div>
+
+    <script>
+        // Auto print preview
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.print();
+            }, 800);
+        });
+    </script>
 </body>
 </html>
