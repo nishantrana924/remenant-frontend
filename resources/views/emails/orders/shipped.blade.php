@@ -7,19 +7,19 @@
     <p class="p">Great news, {{ $order->customer_name }}!</p>
     <p class="p">Your order <strong>#{{ $order->order_number }}</strong> has been shipped and is currently in transit. Get ready to experience the Remenant standard.</p>
 
-    <div class="order-summary" style="background-color: #f0f9ff; border: 1px solid #bae6fd;">
+    <div class="order-summary" style="background-color: #fff1e8; border: 1px solid #ffddc5; padding: 25px;">
         <div style="display: flex; align-items: center; gap: 15px;">
             <div style="font-size: 24px;">🚚</div>
             <div>
-                <h2 style="font-size: 10px; font-weight: 900; color: #0369a1; text-transform: uppercase; letter-spacing: 2px; margin: 0;">Tracking Information</h2>
-                <p style="font-size: 14px; font-weight: 800; color: #0f172a; margin: 5px 0 0 0;">{{ $order->courier_name ?? 'Standard Shipping' }} • {{ $order->tracking_id ?? 'Tracking ID Pending' }}</p>
+                <h2 style="font-size: 10px; font-weight: 900; color: #ea5f06; text-transform: uppercase; letter-spacing: 2px; margin: 0;">Tracking Information</h2>
+                <p style="font-size: 14px; font-weight: 800; color: #111827; margin: 5px 0 0 0;">{{ $order->courier_name ?? 'Standard Shipping' }} • {{ $order->tracking_id ?? 'Tracking ID Pending' }}</p>
             </div>
         </div>
     </div>
 
     <div style="text-align: center; margin: 40px 0;">
         <p class="p" style="font-size: 14px;">Use the button below for live status updates on your delivery.</p>
-        <a href="{{ $order->tracking_url ?? route('order.track', ['order_number' => $order->order_number]) }}" class="btn" style="background-color: #0f172a;">Track Live Status</a>
+        <a href="{{ $order->tracking_url ?? route('order.track', ['order_number' => $order->order_number]) }}" class="btn">Track Live Status</a>
     </div>
 
     <div class="order-summary">

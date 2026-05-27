@@ -12,7 +12,7 @@
             <div style="font-size: 28px;">🎉</div>
             <div>
                 <h2 style="font-size: 10px; font-weight: 900; color: #047857; text-transform: uppercase; letter-spacing: 2px; margin: 0;">Successful Delivery</h2>
-                <p style="font-size: 13px; font-weight: 700; color: #0f172a; margin: 5px 0 0 0;">Delivered via {{ $order->courier_name ?? 'Logistics Partner' }}</p>
+                <p style="font-size: 13px; font-weight: 700; color: #111827; margin: 5px 0 0 0;">Delivered via {{ $order->courier_name ?? 'Logistics Partner' }}</p>
             </div>
         </div>
     </div>
@@ -22,10 +22,10 @@
         @foreach($order->orderItems as $item)
         <div style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between;">
             <div>
-                <span style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase;">{{ $item->product->title ?? 'Product' }}</span>
+                <span style="font-size: 12px; font-weight: 800; color: #111827; text-transform: uppercase;">{{ $item->product->title ?? 'Product' }}</span>
                 <div style="font-size: 10px; color: #94a3b8; margin-top: 2px;">QTY: {{ $item->quantity }}</div>
             </div>
-            <div style="font-size: 12px; font-weight: 800; color: #0f172a;">₹{{ number_format($item->price * $item->quantity) }}</div>
+            <div style="font-size: 12px; font-weight: 800; color: #111827;">₹{{ number_format($item->price * $item->quantity) }}</div>
         </div>
         @endforeach
     </div>
