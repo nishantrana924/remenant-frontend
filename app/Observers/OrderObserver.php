@@ -52,21 +52,21 @@ class OrderObserver
         }
 
         // Send Shipped Email
-        if ($order->isDirty('delivery_status') && $order->delivery_status === 'shipped') {
+        if (($order->isDirty('delivery_status') && $order->delivery_status === 'shipped') || ($order->isDirty('status') && $order->status === 'shipped')) {
             try {
                \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderShipped($order));
-           } catch (\Exception $e) {
+            } catch (\Exception $e) {
                Log::error("Failed to send order shipped email for #{$order->order_number}: " . $e->getMessage());
-           }
+            }
         }
 
         // Send Delivered Email
-        if ($order->isDirty('delivery_status') && $order->delivery_status === 'delivered') {
+        if (($order->isDirty('delivery_status') && $order->delivery_status === 'delivered') || ($order->isDirty('status') && $order->status === 'delivered')) {
             try {
                \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderDelivered($order));
-           } catch (\Exception $e) {
+            } catch (\Exception $e) {
                Log::error("Failed to send order delivered email for #{$order->order_number}: " . $e->getMessage());
-           }
+            }
         }
 
         // Restock when order is 'cancelled'

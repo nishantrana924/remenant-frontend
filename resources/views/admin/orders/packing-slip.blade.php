@@ -12,11 +12,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        @verbatim
         @media print {
             .no-print { display: none; }
             body { padding: 0; background: white; }
             .slip-box { border: none; box-shadow: none; width: 100%; margin: 0; padding: 0; }
         }
+        @endverbatim
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
@@ -145,5 +147,12 @@
             </div>
         </div>
     </div>
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.print();
+            }, 800);
+        });
+    </script>
 </body>
 </html>

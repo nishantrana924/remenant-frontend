@@ -814,8 +814,17 @@ function productSystem() {
             this.formData.highlights_list.splice(index, 1);
         },
         removeExistingGalleryImage(path) {
-            this.formData.removed_gallery_images.push(path);
-            this.$nextTick(() => lucide.createIcons());
+            confirmAction('Remove Image?', 'This image will be removed from the product gallery.', () => {
+                this.formData.removed_gallery_images.push(path);
+                this.formData.existing_gallery_count--;
+                const pond = FilePond.find(document.querySelector('.filepond-gallery'));
+                const pondFilesCount = pond ? pond.getFiles().length : 0;
+                const total = this.formData.existing_gallery_count + pondFilesCount;
+                const badge = document.getElementById('gallery-count');
+                if (badge) badge.innerText = total + '/4 Active';
+                this.$nextTick(() => lucide.createIcons());
+                toast('Image marked for deletion');
+            });
         },
         openIconPicker(index) { this.pickerMode = 'benefit'; this.currentBenefitIndex = index; this.showIconPicker = true; },
         openTrustIconPicker(index) { this.pickerMode = 'trust'; this.currentBenefitIndex = index; this.showIconPicker = true; },
@@ -831,13 +840,6 @@ function productSystem() {
             }
             this.showIconPicker = false;
             this.$nextTick(() => refreshIcons());
-        },
-        removeExistingGalleryImage(path, index) {
-            confirmAction('Remove Image?', 'This image will be permanently deleted from the product gallery.', () => {
-                this.deleted_gallery.push(path);
-                this.formData.existing_gallery.splice(index, 1);
-                toast('Image marked for deletion');
-            });
         },
         initFilePond() {
             FilePond.registerPlugin(

@@ -348,18 +348,18 @@ class OrderController extends BaseController
             return redirect()->back()->with('error', 'No active NimbusPost shipment found.');
         }
 
-        // ✅ Step 1: If label URL already exists in DB, use it directly (no API call needed)
-        if (!empty($shipment->label_url)) {
-            return redirect()->away($shipment->label_url);
-        }
-
-        // ✅ Step 2: Fallback - fetch label from NimbusPost API
+        // ✅ Step 1: Fetch fresh label URL from NimbusPost API (S3 links expire after a while)
         $response = $nimbus->generateLabel($shipment->nimbus_shipment_id);
 
         if (isset($response['status']) && $response['status'] === true && !empty($response['data'])) {
-            // Save the label URL to DB so we don't need to call API again
+            // Save/update the fresh label URL to DB
             $shipment->update(['label_url' => $response['data']]);
             return redirect()->away($response['data']);
+        }
+
+        // ✅ Step 2: Fallback - if API call failed, try the cached label_url from DB as a last resort
+        if (!empty($shipment->label_url)) {
+            return redirect()->away($shipment->label_url);
         }
 
         return redirect()->back()->with('error', 'Failed to generate label: ' . ($response['message'] ?? 'Unknown Error'));

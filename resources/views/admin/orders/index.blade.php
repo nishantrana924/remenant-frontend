@@ -10,6 +10,17 @@
     activeStatus: 'all',
     dateFilter: '',
 
+    init() {
+        this.$watch('showCourierModal', value => this.toggleScroll());
+    },
+
+    toggleScroll() {
+        const mc = document.getElementById('main-content');
+        if (mc) {
+            mc.style.overflow = this.showCourierModal ? 'hidden' : '';
+        }
+    },
+
     toggleAll() {
         if (this.selectedItems.length === this.allItems.length) {
             this.selectedItems = [];
@@ -55,13 +66,16 @@
     },
 
     showCourierModal: false,
-    shippingConfig: { id: null, weight: 500, length: 10, breadth: 10, height: 10, courier_id: '' },
+    shippingConfig: { id: null, weight: 250, length: 17, breadth: 10, height: 5, courier_id: '' },
     couriers: [],
     fetchingRates: false,
 
     openCourierSelection(orderId) {
         this.shippingConfig.id = orderId;
-        this.shippingConfig.weight = 500;
+        this.shippingConfig.weight = 250;
+        this.shippingConfig.length = 17;
+        this.shippingConfig.breadth = 10;
+        this.shippingConfig.height = 5;
         this.shippingConfig.courier_id = '';
         this.couriers = [];
         this.showCourierModal = true;
@@ -82,7 +96,7 @@
             success: (res) => {
                 this.couriers = res.data;
                 if(this.couriers.length > 0) {
-                    this.shippingConfig.courier_id = this.couriers[0].courier_id;
+                    this.shippingConfig.courier_id = this.couriers[0].id;
                 }
                 this.fetchingRates = false;
             },
@@ -411,8 +425,8 @@
     <div x-show="showDrawer" @click="showDrawer = false" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[140]" x-cloak></div>
 
     <!-- Courier Selection Modal -->
-    <template x-if="showCourierModal">
-        <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <template x-teleport="body">
+        <div x-show="showCourierModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showCourierModal = false"></div>
             <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl p-8 overflow-hidden flex flex-col max-h-[90vh]">
                 <div class="flex items-center justify-between mb-6 shrink-0">
@@ -466,18 +480,18 @@
                         </h4>
                         
                         <div class="space-y-2">
-                            <template x-for="c in couriers" :key="c.courier_id">
+                            <template x-for="c in couriers" :key="c.id">
                                 <label class="relative flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all group"
-                                       :class="shippingConfig.courier_id == c.courier_id ? 'border-orange-500 bg-orange-50/50' : 'border-slate-100 hover:border-orange-200 bg-white'">
+                                       :class="shippingConfig.courier_id == c.id ? 'border-orange-500 bg-orange-50/50' : 'border-slate-100 hover:border-orange-200 bg-white'">
                                     <div class="flex items-center gap-4">
-                                        <input type="radio" name="courier" :value="c.courier_id" x-model="shippingConfig.courier_id" class="h-4 w-4 text-orange-500 border-slate-300 focus:ring-orange-500">
+                                        <input type="radio" name="courier" :value="c.id" x-model="shippingConfig.courier_id" class="h-4 w-4 text-orange-500 border-slate-300 focus:ring-orange-500">
                                         <div>
-                                            <p class="text-xs font-black text-slate-900 uppercase" x-text="c.courier_name"></p>
-                                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">ETA: <span x-text="c.expected_delivery || 'N/A'"></span></p>
+                                            <p class="text-xs font-black text-slate-900 uppercase" x-text="c.name"></p>
+                                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">ETA: <span x-text="c.edd || 'N/A'"></span></p>
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-sm font-black text-emerald-600">₹<span x-text="c.total_charges || c.rate"></span></p>
+                                        <p class="text-sm font-black text-emerald-600">₹<span x-text="c.total_charges"></span></p>
                                         <p class="text-[8px] font-bold text-slate-400 uppercase">Shipping Charge</p>
                                     </div>
                                 </label>

@@ -50,6 +50,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        @verbatim
         @media print {
             .no-print { display: none !important; }
             body { padding: 0 !important; margin: 0 !important; background: white; color: black; }
@@ -82,6 +83,7 @@
                 height: 24px !important;
             }
         }
+        @endverbatim
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f1f5f9;

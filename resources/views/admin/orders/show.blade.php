@@ -6,10 +6,22 @@
     newStatus: '{{ $item->status }}',
     statusMsg: '',
     showCourierModal: false,
-    shippingConfig: { id: {{ $item->id }}, weight: 500, length: 10, breadth: 10, height: 10, courier_id: '' },
+    shippingConfig: { id: {{ $item->id }}, weight: 250, length: 17, breadth: 10, height: 5, courier_id: '' },
     couriers: [],
     fetchingRates: false,
     
+    init() {
+        this.$watch('showCourierModal', value => this.toggleScroll());
+        this.$watch('showStatusModal', value => this.toggleScroll());
+    },
+
+    toggleScroll() {
+        const mc = document.getElementById('main-content');
+        if (mc) {
+            mc.style.overflow = (this.showCourierModal || this.showStatusModal) ? 'hidden' : '';
+        }
+    },
+
     updateStatus() {
         fastSubmit('{{ route('admin.orders.update-status', $item->id) }}', {
             data: { status: this.newStatus, message: this.statusMsg },
@@ -21,10 +33,17 @@
     },
 
     openCourierSelection() {
-        this.shippingConfig.weight = 500;
+        this.shippingConfig.weight = 250;
+        this.shippingConfig.length = 17;
+        this.shippingConfig.breadth = 10;
+        this.shippingConfig.height = 5;
         this.shippingConfig.courier_id = '';
         this.couriers = [];
         this.showCourierModal = true;
+    },
+
+    closeCourierModal() {
+        this.showCourierModal = false;
     },
 
     fetchRates() {
@@ -66,7 +85,7 @@
             button: btn,
             success: (res) => {
                 window.toast(res.message);
-                this.showCourierModal = false;
+                this.closeCourierModal();
                 setTimeout(() => location.reload(), 1000);
             },
             error: (err) => {
@@ -94,7 +113,7 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.orders.packing-slip', $item->id) }}" target="_blank" class="saas-btn-secondary py-2.5">
+            <a href="{{ ($item->shipment && $item->shipment->nimbus_shipment_id) ? route('admin.orders.nimbus-label', $item->id) : route('admin.orders.packing-slip', $item->id) }}" target="_blank" class="saas-btn-secondary py-2.5">
                 <i data-lucide="printer" class="w-3.5 h-3.5"></i>
                 Packing Slip
             </a>
@@ -257,6 +276,13 @@
                             <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
                             Download Tax Invoice
                         </a>
+
+                        {{-- Packing Slip Download --}}
+                        <a href="{{ route('admin.orders.packing-slip', $item->id) }}" target="_blank"
+                           class="w-full flex items-center justify-center gap-2 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl py-3 text-[9px] font-bold uppercase tracking-widest hover:bg-slate-100 transition-all">
+                            <i data-lucide="package" class="w-3.5 h-3.5"></i>
+                            Download Packing Slip
+                        </a>
                     </div>
                 </div>
             </div>
@@ -369,8 +395,8 @@
     </div>
 
     <!-- Status Update Modal -->
-    <template x-if="showStatusModal">
-        <div class="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+    <template x-teleport="body">
+        <div x-show="showStatusModal" x-cloak class="fixed inset-0 z-[1000] flex items-center justify-center p-4">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showStatusModal = false"></div>
             <div class="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 overflow-hidden">
                 <div class="flex items-center justify-between mb-8">
@@ -405,19 +431,19 @@
     </template>
 
     <!-- Courier Selection Modal -->
-    <template x-if="showCourierModal">
-        <div class="fixed inset-0 z-[1000] flex items-center justify-center p-4 mt-12 sm:mt-8">
-            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showCourierModal = false"></div>
-            <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl p-8 overflow-hidden flex flex-col max-h-[80vh]">
+    <template x-teleport="body">
+        <div x-show="showCourierModal" x-cloak class="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="closeCourierModal()"></div>
+            <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl p-8 flex flex-col" style="max-height: 90vh; overflow-y: auto;">
                 <div class="flex items-center justify-between mb-5 shrink-0">
                     <div>
                         <h3 class="text-lg font-black text-slate-900 uppercase tracking-tight">Ship Order</h3>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Select Courier & Generate Label</p>
                     </div>
-                    <button @click="showCourierModal = false" class="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    <button @click="closeCourierModal()" class="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all"><i data-lucide="x" class="w-4 h-4"></i></button>
                 </div>
                 
-                <div class="overflow-y-auto min-h-0 pr-2 space-y-6 flex-1">
+                <div class="space-y-6 flex-1">
                     <!-- Step 1: Package Details -->
                     <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
                         <div class="flex items-center justify-between mb-4">
@@ -460,8 +486,6 @@
                         </h4>
                         
                         <div class="space-y-2">
-
-
                             <template x-for="c in couriers" :key="c.id">
                                 <label class="relative flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all"
                                        :class="shippingConfig.courier_id == c.id ? 'border-orange-500 bg-orange-50/50' : 'border-slate-100 hover:border-orange-200 bg-white'">
