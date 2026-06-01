@@ -782,183 +782,186 @@
                 <div class="flex items-center gap-3 px-2"><div class="h-2 w-2 rounded-full bg-orange-500 animate-pulse"></div><span class="text-xs font-bold uppercase tracking-widest">Unsaved Changes</span></div>
                 <div class="flex items-center gap-2"><button @click="resetChanges()" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition-colors">Discard</button><button @click="save()" class="px-6 py-2 bg-orange-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-orange-600 transition-all">Save Changes</button></div>
             </div>
-        </div>
-    </div>
-
     <!-- Icon Picker Modal -->
-    <div x-show="showIconPicker" 
-         x-cloak         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         class="fixed inset-0 z-[120] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" 
-         @click.self="showIconPicker = false">
-        <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <div>
-                    <h3 class="text-xl font-black text-slate-900">Choose Icon</h3>
-                    <p class="text-xs text-slate-500 mt-1">Select a visual for this quality pledge</p>
+    <template x-teleport="body">
+        <div x-show="showIconPicker" 
+             x-cloak         x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             class="fixed inset-0 z-[120] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" 
+             @click.self="showIconPicker = false">
+            <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+                <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                    <div>
+                        <h3 class="text-xl font-black text-slate-900">Choose Icon</h3>
+                        <p class="text-xs text-slate-500 mt-1">Select a visual for this quality pledge</p>
+                    </div>
+                    <button @click="showIconPicker = false" class="h-10 w-10 rounded-full hover:bg-white flex items-center justify-center text-slate-400 transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
-                <button @click="showIconPicker = false" class="h-10 w-10 rounded-full hover:bg-white flex items-center justify-center text-slate-400 transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-8">
-                <!-- Search / Manual Entry -->
-                <div class="mb-8 relative">
-                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                    <input type="text" 
-                           x-model="iconSearch" 
-                           @input="$nextTick(() => lucide.createIcons())"
-                           class="w-full h-14 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 focus:bg-white transition-all font-bold text-sm" 
-                           placeholder="Search or enter custom icon name (e.g. heart-pulse)">
-                </div>
+                <div class="flex-1 overflow-y-auto p-8">
+                    <!-- Search / Manual Entry -->
+                    <div class="mb-8 relative">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                        <input type="text" 
+                               x-model="iconSearch" 
+                               @input="$nextTick(() => lucide.createIcons())"
+                               class="w-full h-14 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 focus:bg-white transition-all font-bold text-sm" 
+                               placeholder="Search or enter custom icon name (e.g. heart-pulse)">
+                    </div>
 
-                <div class="grid grid-cols-4 sm:grid-cols-6 gap-4">
-                    <!-- Dynamic Search Filter -->
-                    <template x-for="icon in filteredIcons" :key="icon">
-                        <button type="button" 
-                                @click="selectFeatureIcon(icon)"
-                                class="aspect-square rounded-2xl border-2 border-slate-50 flex flex-col items-center justify-center gap-2 hover:border-orange-500 hover:bg-orange-50 transition-all group">
-                            <i :data-lucide="icon" class="w-6 h-6 text-slate-400 group-hover:text-orange-500"></i>
-                            <span class="text-[8px] font-black uppercase text-slate-300 group-hover:text-orange-400" x-text="icon"></span>
-                        </button>
-                    </template>
-                    
-                    <!-- Custom Icon Option -->
-                    <div x-show="iconSearch && !filteredIcons.includes(iconSearch)" class="col-span-full mt-4">
-                        <button type="button" 
-                                @click="selectFeatureIcon(iconSearch)"
-                                class="w-full p-4 bg-orange-50 border-2 border-dashed border-orange-200 rounded-2xl flex items-center justify-center gap-3 text-orange-600 font-bold text-xs uppercase tracking-widest hover:bg-orange-100 transition-all">
-                            <i :data-lucide="iconSearch" class="w-5 h-5"></i>
-                            Use Custom Icon: "<span x-text="iconSearch"></span>"
-                        </button>
+                    <div class="grid grid-cols-4 sm:grid-cols-6 gap-4">
+                        <!-- Dynamic Search Filter -->
+                        <template x-for="icon in filteredIcons" :key="icon">
+                            <button type="button" 
+                                    @click="selectFeatureIcon(icon)"
+                                    class="aspect-square rounded-2xl border-2 border-slate-50 flex flex-col items-center justify-center gap-2 hover:border-orange-500 hover:bg-orange-50 transition-all group">
+                                <i :data-lucide="icon" class="w-6 h-6 text-slate-400 group-hover:text-orange-500"></i>
+                                <span class="text-[8px] font-black uppercase text-slate-300 group-hover:text-orange-400" x-text="icon"></span>
+                            </button>
+                        </template>
+                        
+                        <!-- Custom Icon Option -->
+                        <div x-show="iconSearch && !filteredIcons.includes(iconSearch)" class="col-span-full mt-4">
+                            <button type="button" 
+                                    @click="selectFeatureIcon(iconSearch)"
+                                    class="w-full p-4 bg-orange-50 border-2 border-dashed border-orange-200 rounded-2xl flex items-center justify-center gap-3 text-orange-600 font-bold text-xs uppercase tracking-widest hover:bg-orange-100 transition-all">
+                                <i :data-lucide="iconSearch" class="w-5 h-5"></i>
+                                Use Custom Icon: "<span x-text="iconSearch"></span>"
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Powered by Lucide</p>
-                <a href="https://lucide.dev/icons" target="_blank" class="text-[10px] font-black text-orange-500 hover:underline uppercase tracking-widest flex items-center gap-1">
-                    View More on Lucide <i data-lucide="external-link" class="w-3 h-3"></i>
-                </a>
+                <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Powered by Lucide</p>
+                    <a href="https://lucide.dev/icons" target="_blank" class="text-[10px] font-black text-orange-500 hover:underline uppercase tracking-widest flex items-center gap-1">
+                        View More on Lucide <i data-lucide="external-link" class="w-3 h-3"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 
     <!-- Media Library Modal -->
-    <div x-show="showMediaLibrary" 
-         x-cloak         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         class="fixed inset-0 z-[120] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" 
-         @click.self="showMediaLibrary = false">
-        <div class="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <div>
-                    <h3 class="text-xl font-black text-slate-900">Media Library</h3>
-                    <p class="text-xs text-slate-500 mt-1">Select an existing image from your uploads</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button @click="openMediaLibrary(mediaTargetPath, mediaTargetKey)" class="h-10 w-10 rounded-full hover:bg-white flex items-center justify-center text-slate-400 transition-all"><i data-lucide="refresh-cw" class="w-4 h-4" :class="isLoadingMedia ? 'animate-spin' : ''"></i></button>
-                    <button @click="showMediaLibrary = false" class="h-10 w-10 rounded-full hover:bg-white flex items-center justify-center text-slate-400 transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
-                </div>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto p-8">
-                <div x-show="isLoadingMedia" class="flex flex-col items-center justify-center py-20 space-y-4">
-                    <div class="h-12 w-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading Media...</p>
-                </div>
-
-                <div x-show="!isLoadingMedia && mediaFiles.length === 0" class="flex flex-col items-center justify-center py-20 text-center">
-                    <div class="h-20 w-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-4">
-                        <i data-lucide="image-off" class="w-10 h-10 text-slate-200"></i>
+    <template x-teleport="body">
+        <div x-show="showMediaLibrary" 
+             x-cloak         x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             class="fixed inset-0 z-[120] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" 
+             @click.self="showMediaLibrary = false">
+            <div class="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+                <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                    <div>
+                        <h3 class="text-xl font-black text-slate-900">Media Library</h3>
+                        <p class="text-xs text-slate-500 mt-1">Select an existing image from your uploads</p>
                     </div>
-                    <h4 class="text-slate-900 font-bold">No Media Found</h4>
-                    <p class="text-xs text-slate-500 mt-1">Upload some images first to see them here.</p>
+                    <div class="flex items-center gap-3">
+                        <button @click="openMediaLibrary(mediaTargetPath, mediaTargetKey)" class="h-10 w-10 rounded-full hover:bg-white flex items-center justify-center text-slate-400 transition-all"><i data-lucide="refresh-cw" class="w-4 h-4" :class="isLoadingMedia ? 'animate-spin' : ''"></i></button>
+                        <button @click="showMediaLibrary = false" class="h-10 w-10 rounded-full hover:bg-white flex items-center justify-center text-slate-400 transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    </div>
                 </div>
+                
+                <div class="flex-1 overflow-y-auto p-8">
+                    <div x-show="isLoadingMedia" class="flex flex-col items-center justify-center py-20 space-y-4">
+                        <div class="h-12 w-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading Media...</p>
+                    </div>
 
-                <div x-show="!isLoadingMedia && mediaFiles.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    <template x-for="file in mediaFiles" :key="file.path">
-                        <div class="group relative aspect-square rounded-2xl overflow-hidden border-2 border-slate-50 hover:border-orange-500 transition-all cursor-pointer bg-slate-50"
-                             @click="selectMedia(file.path)">
-                            <img :src="file.url" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
-                                <i data-lucide="check-circle" class="w-8 h-8 text-white"></i>
-                            </div>
-                            <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
-                                <p class="text-[8px] text-white font-bold truncate" x-text="file.name"></p>
-                                <p class="text-[7px] text-white/60" x-text="file.size"></p>
-                            </div>
+                    <div x-show="!isLoadingMedia && mediaFiles.length === 0" class="flex flex-col items-center justify-center py-20 text-center">
+                        <div class="h-20 w-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-4">
+                            <i data-lucide="image-off" class="w-10 h-10 text-slate-200"></i>
                         </div>
-                    </template>
+                        <h4 class="text-slate-900 font-bold">No Media Found</h4>
+                        <p class="text-xs text-slate-500 mt-1">Upload some images first to see them here.</p>
+                    </div>
+
+                    <div x-show="!isLoadingMedia && mediaFiles.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <template x-for="file in mediaFiles" :key="file.path">
+                            <div class="group relative aspect-square rounded-2xl overflow-hidden border-2 border-slate-50 hover:border-orange-500 transition-all cursor-pointer bg-slate-50"
+                                 @click="selectMedia(file.path)">
+                                <img :src="file.url" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
+                                    <i data-lucide="check-circle" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
+                                    <p class="text-[8px] text-white font-bold truncate" x-text="file.name"></p>
+                                    <p class="text-[7px] text-white/60" x-text="file.size"></p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest" x-text="mediaFiles.length + ' Images Available'"></p>
-                <button @click="triggerUpload('library-upload')" class="saas-btn-primary !py-2 !px-4 text-[10px] uppercase tracking-widest">
-                    <i data-lucide="upload" class="w-3 h-3"></i> Upload New
-                </button>
-                <input type="file" id="library-upload" class="hidden" @change="handleFileUpload($event, mediaTargetPath, mediaTargetKey); showMediaLibrary = false;">
+                
+                <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest" x-text="mediaFiles.length + ' Images Available'"></p>
+                    <button @click="triggerUpload('library-upload')" class="saas-btn-primary !py-2 !px-4 text-[10px] uppercase tracking-widest">
+                        <i data-lucide="upload" class="w-3 h-3"></i> Upload New
+                    </button>
+                    <input type="file" id="library-upload" class="hidden" @change="handleFileUpload($event, mediaTargetPath, mediaTargetKey); showMediaLibrary = false;">
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 
     <!-- Global Preview Engine -->
     <x-admin.preview-modal :route="route('admin.about.preview')" preview-url="remenant.com/about" />
 
     <!-- Version History Modal -->
-    <div x-show="showHistory" 
-         x-cloak         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         class="fixed inset-0 z-[120] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" 
-         @click.self="showHistory = false">
-        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <div>
-                    <h3 class="text-xl font-black text-slate-900">Version History</h3>
-                    <p class="text-xs text-slate-500 mt-1">Rollback to a previous state of this page</p>
-                </div>
-                <button @click="showHistory = false" class="h-10 w-10 rounded-full hover:bg-white flex items-center justify-center text-slate-400 transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto p-4 space-y-2">
-                <template x-for="version in versions" :key="version.id">
-                    <div class="p-6 rounded-3xl border border-slate-100 hover:border-orange-200 hover:bg-orange-50/30 transition-all group flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="h-12 w-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-orange-500 group-hover:border-orange-200 transition-all shadow-sm">
-                                <i data-lucide="history" class="w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <p class="text-sm font-black text-slate-900" x-text="new Date(version.created_at).toLocaleString()"></p>
-                                    <span class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-slate-100 text-slate-500" x-text="version.status"></span>
-                                </div>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5" x-text="'Modified by ' + (version.user ? version.user.name : 'Unknown')"></p>
-                                <p class="text-[10px] text-orange-500 font-black mt-1" x-text="version.version_note || 'Manual Save'"></p>
-                            </div>
-                        </div>
-                        <button @click="restoreVersion(version.id)" 
-                                :disabled="isRestoring"
-                                class="saas-btn-secondary !py-2 !px-4 text-[10px] uppercase tracking-widest hover:!bg-orange-500 hover:!text-white transition-all">
-                            <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Restore
-                        </button>
+    <template x-teleport="body">
+        <div x-show="showHistory" 
+             x-cloak         x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             class="fixed inset-0 z-[120] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" 
+             @click.self="showHistory = false">
+            <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+                <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                    <div>
+                        <h3 class="text-xl font-black text-slate-900">Version History</h3>
+                        <p class="text-xs text-slate-500 mt-1">Rollback to a previous state of this page</p>
                     </div>
-                </template>
+                    <button @click="showHistory = false" class="h-10 w-10 rounded-full hover:bg-white flex items-center justify-center text-slate-400 transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
                 
-                <div x-show="versions.length === 0" class="flex flex-col items-center justify-center py-20 text-center">
-                    <div class="h-20 w-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-4">
-                        <i data-lucide="history" class="w-10 h-10 text-slate-200"></i>
+                <div class="flex-1 overflow-y-auto p-4 space-y-2">
+                    <template x-for="version in versions" :key="version.id">
+                        <div class="p-6 rounded-3xl border border-slate-100 hover:border-orange-200 hover:bg-orange-50/30 transition-all group flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="h-12 w-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-orange-500 group-hover:border-orange-200 transition-all shadow-sm">
+                                    <i data-lucide="history" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-sm font-black text-slate-900" x-text="new Date(version.created_at).toLocaleString()"></p>
+                                        <span class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-slate-100 text-slate-500" x-text="version.status"></span>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5" x-text="'Modified by ' + (version.user ? version.user.name : 'Unknown')"></p>
+                                    <p class="text-[10px] text-orange-500 font-black mt-1" x-text="version.version_note || 'Manual Save'"></p>
+                                </div>
+                            </div>
+                            <button @click="restoreVersion(version.id)" 
+                                    :disabled="isRestoring"
+                                    class="saas-btn-secondary !py-2 !px-4 text-[10px] uppercase tracking-widest hover:!bg-orange-500 hover:!text-white transition-all">
+                                <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Restore
+                            </button>
+                        </div>
+                    </template>
+                    
+                    <div x-show="versions.length === 0" class="flex flex-col items-center justify-center py-20 text-center">
+                        <div class="h-20 w-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-4">
+                            <i data-lucide="history" class="w-10 h-10 text-slate-200"></i>
+                        </div>
+                        <h4 class="text-slate-900 font-bold">No History Available</h4>
+                        <p class="text-xs text-slate-500 mt-1">Versions will appear here as you save changes.</p>
                     </div>
-                    <h4 class="text-slate-900 font-bold">No History Available</h4>
-                    <p class="text-xs text-slate-500 mt-1">Versions will appear here as you save changes.</p>
                 </div>
-            </div>
-            
-            <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Showing last 10 versions</p>
+                
+                <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-center">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Showing last 10 versions</p>
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 </div>
 
 <style>

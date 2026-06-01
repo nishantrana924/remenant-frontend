@@ -2,7 +2,7 @@
 
 @section('content')
 <style>[x-cloak] { display: none !important; }</style>
-<div x-data="productSystem()" class="pb-24" x-cloak>
+<div x-data="productSystem()" class="pb-24" x-cloak @delete-category-event.window="deleteCategory($event.detail.id, $event.detail.name)">
     <!-- Top Action Bar -->
     <div class="flex items-center justify-between mb-8">
         <div class="flex items-center gap-4">
@@ -383,9 +383,16 @@
                             </div>
                             <div class="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-2 scrollbar-hide" id="category-list">
                                 @foreach(\App\Models\Category::all() as $category)
-                                    <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all cursor-pointer group">
-                                        <input type="checkbox" name="categories[]" value="{{ $category->id }}" x-model="formData.categories" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
-                                        <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">{{ $category->name }}</span>
+                                    <label class="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all cursor-pointer group">
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" name="categories[]" value="{{ $category->id }}" x-model="formData.categories" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
+                                            <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">{{ $category->name }}</span>
+                                        </div>
+                                        <button type="button" 
+                                                @click.stop.prevent="deleteCategory({{ $category->id }}, '{{ addslashes($category->name) }}')" 
+                                                class="opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 rounded-full hover:bg-rose-50 text-slate-300 hover:text-rose-500 flex items-center justify-center">
+                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                        </button>
                                     </label>
                                 @endforeach
                             </div>
@@ -544,61 +551,63 @@
     <x-admin.preview-modal :route="route('admin.products.preview')" preview-url="remenant.com/product/preview" />
 
     <!-- Icon Picker Modal -->
-    <div x-show="showIconPicker" 
-         x-cloak         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         class="fixed inset-0 z-[120] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" 
-         @click.self="showIconPicker = false">
-        <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <div>
-                    <h3 class="text-xl font-black text-slate-900">Choose Icon</h3>
-                    <p class="text-xs text-slate-500 mt-1">Select a visual for this product benefit</p>
+    <template x-teleport="body">
+        <div x-show="showIconPicker" 
+             x-cloak         x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             class="fixed inset-0 z-[120] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" 
+             @click.self="showIconPicker = false">
+            <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+                <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                    <div>
+                        <h3 class="text-xl font-black text-slate-900">Choose Icon</h3>
+                        <p class="text-xs text-slate-500 mt-1">Select a visual for this product benefit</p>
+                    </div>
+                    <button @click="showIconPicker = false" class="h-10 w-10 rounded-full hover:bg-white flex items-center justify-center text-slate-400 transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
-                <button @click="showIconPicker = false" class="h-10 w-10 rounded-full hover:bg-white flex items-center justify-center text-slate-400 transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-8 scrollbar-hide">
-                <!-- Search / Manual Entry -->
-                <div class="mb-8 relative">
-                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                    <input type="text" 
-                           x-model="iconSearch" 
-                           @input="$nextTick(() => lucide.createIcons())"
-                           class="w-full h-14 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 focus:bg-white transition-all font-bold text-sm" 
-                           placeholder="Search or enter custom icon name (e.g. heart-pulse)">
-                </div>
+                <div class="flex-1 overflow-y-auto p-8 scrollbar-hide">
+                    <!-- Search / Manual Entry -->
+                    <div class="mb-8 relative">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                        <input type="text" 
+                               x-model="iconSearch" 
+                               @input="$nextTick(() => lucide.createIcons())"
+                               class="w-full h-14 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 focus:bg-white transition-all font-bold text-sm" 
+                               placeholder="Search or enter custom icon name (e.g. heart-pulse)">
+                    </div>
 
-                <div class="grid grid-cols-4 sm:grid-cols-6 gap-4">
-                    <!-- Dynamic Search Filter -->
-                    <template x-for="icon in filteredIcons" :key="icon">
-                        <button type="button" 
-                                @click="selectIcon(icon)"
-                                class="aspect-square rounded-2xl border-2 border-slate-50 flex flex-col items-center justify-center gap-2 hover:border-orange-500 hover:bg-orange-50 transition-all group">
-                            <i :data-lucide="icon" class="w-6 h-6 text-slate-400 group-hover:text-orange-500"></i>
-                            <span class="text-[8px] font-black uppercase text-slate-300 group-hover:text-orange-400" x-text="icon"></span>
-                        </button>
-                    </template>
-                    
-                    <!-- Custom Icon Option -->
-                    <div x-show="iconSearch && !filteredIcons.includes(iconSearch)" class="col-span-full mt-4">
-                        <button type="button" 
-                                @click="selectIcon(iconSearch)"
-                                class="w-full p-4 bg-orange-50 border-2 border-dashed border-orange-200 rounded-2xl flex items-center justify-center gap-3 text-orange-600 font-bold text-xs uppercase tracking-widest hover:bg-orange-100 transition-all">
-                            <i :data-lucide="iconSearch" class="w-5 h-5"></i>
-                            Use Custom Icon: "<span x-text="iconSearch"></span>"
-                        </button>
+                    <div class="grid grid-cols-4 sm:grid-cols-6 gap-4">
+                        <!-- Dynamic Search Filter -->
+                        <template x-for="icon in filteredIcons" :key="icon">
+                            <button type="button" 
+                                    @click="selectIcon(icon)"
+                                    class="aspect-square rounded-2xl border-2 border-slate-50 flex flex-col items-center justify-center gap-2 hover:border-orange-500 hover:bg-orange-50 transition-all group">
+                                <i :data-lucide="icon" class="w-6 h-6 text-slate-400 group-hover:text-orange-500"></i>
+                                <span class="text-[8px] font-black uppercase text-slate-300 group-hover:text-orange-400" x-text="icon"></span>
+                            </button>
+                        </template>
+                        
+                        <!-- Custom Icon Option -->
+                        <div x-show="iconSearch && !filteredIcons.includes(iconSearch)" class="col-span-full mt-4">
+                            <button type="button" 
+                                    @click="selectIcon(iconSearch)"
+                                    class="w-full p-4 bg-orange-50 border-2 border-dashed border-orange-200 rounded-2xl flex items-center justify-center gap-3 text-orange-600 font-bold text-xs uppercase tracking-widest hover:bg-orange-100 transition-all">
+                                <i :data-lucide="iconSearch" class="w-5 h-5"></i>
+                                Use Custom Icon: "<span x-text="iconSearch"></span>"
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Powered by Lucide</p>
-                <a href="https://lucide.dev/icons" target="_blank" class="text-[10px] font-black text-orange-500 hover:underline uppercase tracking-widest flex items-center gap-1">
-                    View More on Lucide <i data-lucide="external-link" class="w-3 h-3"></i>
-                </a>
+                <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Powered by Lucide</p>
+                    <a href="https://lucide.dev/icons" target="_blank" class="text-[10px] font-black text-orange-500 hover:underline uppercase tracking-widest flex items-center gap-1">
+                        View More on Lucide <i data-lucide="external-link" class="w-3 h-3"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 </div>
 
 <script>
@@ -610,6 +619,7 @@ function productSystem() {
         iconSearch: '',
         newNutrientLabel: '',
         currentBenefitIndex: null,
+        newCategoryName: '',
         imagePreview: null,
         hasDraft: false,
         get filteredIcons() {
@@ -883,7 +893,8 @@ function productSystem() {
         removeTrustSignal(index) { this.formData.trust_signals.splice(index, 1); },
         addBenefit() { this.formData.benefits.push({icon: 'star', title: '', desc: ''}); this.$nextTick(() => lucide.createIcons()); },
         removeBenefit(index) { this.formData.benefits.splice(index, 1); },
-        async quickAddCategory() {
+        async quickAddCategory(event) {
+            if (!this.newCategoryName) return;
             const btn = event.currentTarget;
             const originalContent = btn.innerHTML;
             btn.disabled = true;
@@ -903,23 +914,66 @@ function productSystem() {
                 if (data.success) {
                     const list = document.getElementById('category-list');
                     const label = document.createElement('label');
-                    label.className = 'flex items-center gap-3 p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all cursor-pointer group';
+                    label.className = 'flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all cursor-pointer group';
                     label.innerHTML = `
-                        <input type="checkbox" name="categories[]" value="${data.category.id}" checked class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
-                        <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">${data.category.name}</span>
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" name="categories[]" value="${data.category.id}" checked class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
+                            <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">${data.category.name}</span>
+                        </div>
+                        <button type="button" 
+                                onclick="window.dispatchEvent(new CustomEvent('delete-category-event', { detail: { id: ${data.category.id}, name: '${data.category.name.replace(/'/g, "\\'")}' } }))" 
+                                class="opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 rounded-full hover:bg-rose-50 text-slate-300 hover:text-rose-500 flex items-center justify-center">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
                     `;
                     list.appendChild(label);
+                    this.formData.categories.push(String(data.category.id));
                     this.newCategoryName = '';
                 } else {
-                    alert(data.message || 'Error adding category');
+                    toast(data.message || 'Error adding category', 'error');
                 }
             } catch (error) {
                 console.error(error);
+                toast('Failed to add category', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalContent;
                 refreshIcons();
             }
+        },
+        async deleteCategory(id, name) {
+            confirmAction('Delete Category?', `Are you sure you want to delete category "${name}"? This will remove it from all products.`, async () => {
+                try {
+                    const response = await fetch(`/admin/categories/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ _method: 'DELETE' })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        toast(data.message || 'Category deleted successfully');
+                        this.formData.categories = this.formData.categories.filter(c => c != id);
+                        
+                        const list = document.getElementById('category-list');
+                        if (list) {
+                            const checkbox = list.querySelector(`input[value="${id}"]`);
+                            if (checkbox) {
+                                const label = checkbox.closest('label');
+                                if (label) label.remove();
+                            }
+                        }
+                    } else {
+                        toast(data.message || 'Error deleting category', 'error');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    toast('Failed to delete category', 'error');
+                }
+            });
         },
         submitForm(event) {
             // Sync all CKEditors back to their respective textareas

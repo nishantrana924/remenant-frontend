@@ -60,6 +60,14 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
+        
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Category deleted successfully.'
+            ]);
+        }
+        
         return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully.');
     }
 }

@@ -4,7 +4,7 @@
 <div class="min-h-screen flex flex-col">
     <div class="flex-1">
         <style>[x-cloak] { display: none !important; }</style>
-        <div x-data="productSystem()" class="pb-24" x-cloak>
+        <div x-data="productSystem()" class="pb-24" x-cloak @delete-category-event.window="deleteCategory($event.detail.id, $event.detail.name)">
     <!-- Top Action Bar -->
     <div class="flex items-center justify-between mb-8">
         <div class="flex items-center gap-4">
@@ -386,9 +386,16 @@
                             </div>
                             <div class="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-2 scrollbar-hide" id="category-list">
                                 @foreach(\App\Models\Category::all() as $category)
-                                    <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all cursor-pointer group">
-                                        <input type="checkbox" name="categories[]" value="{{ $category->id }}" x-model="formData.categories" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
-                                        <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">{{ $category->name }}</span>
+                                    <label class="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all cursor-pointer group">
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" name="categories[]" value="{{ $category->id }}" x-model="formData.categories" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
+                                            <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">{{ $category->name }}</span>
+                                        </div>
+                                        <button type="button" 
+                                                @click.stop.prevent="deleteCategory({{ $category->id }}, '{{ addslashes($category->name) }}')" 
+                                                class="opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 rounded-full hover:bg-rose-50 text-slate-300 hover:text-rose-500 flex items-center justify-center">
+                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                        </button>
                                     </label>
                                 @endforeach
                             </div>
@@ -575,94 +582,98 @@
     <x-admin.preview-modal :route="route('admin.products.preview')" preview-url="remenant.com/product/preview" />
 
     <!-- Inventory History Modal -->
-    <div x-show="showInventoryHistory" x-cloak class="fixed inset-0 z-[130] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" @click.self="showInventoryHistory = false">
-        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50 text-slate-900">
-                <div class="flex items-center gap-3">
-                    <div class="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-orange-500"><i data-lucide="history" class="w-5 h-5"></i></div>
-                    <div>
-                        <h3 class="text-xl font-black">Inventory Log</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Audit Trail for {{ $item->title }}</p>
+    <template x-teleport="body">
+        <div x-show="showInventoryHistory" x-cloak class="fixed inset-0 z-[130] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" @click.self="showInventoryHistory = false">
+            <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+                <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50 text-slate-900">
+                    <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-orange-500"><i data-lucide="history" class="w-5 h-5"></i></div>
+                        <div>
+                            <h3 class="text-xl font-black">Inventory Log</h3>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Audit Trail for {{ $item->title }}</p>
+                        </div>
                     </div>
+                    <button @click="showInventoryHistory = false" class="h-10 w-10 rounded-full hover:bg-slate-200 flex items-center justify-center transition-all"><i data-lucide="x" class="w-5 h-5 text-slate-400"></i></button>
                 </div>
-                <button @click="showInventoryHistory = false" class="h-10 w-10 rounded-full hover:bg-slate-200 flex items-center justify-center transition-all"><i data-lucide="x" class="w-5 h-5 text-slate-400"></i></button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-8">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100">
-                            <th class="pb-4">Date & Time</th>
-                            <th class="pb-4">Admin</th>
-                            <th class="pb-4">Movement</th>
-                            <th class="pb-4">Balance</th>
-                            <th class="pb-4">Reason</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-50">
-                        @forelse($item->inventoryLogs as $log)
-                            <tr class="group hover:bg-slate-50 transition-all">
-                                <td class="py-4">
-                                    <p class="text-xs font-bold text-slate-900">{{ $log->created_at->format('M d, Y') }}</p>
-                                    <p class="text-[9px] text-slate-400 font-medium">{{ $log->created_at->format('h:i A') }}</p>
-                                </td>
-                                <td class="py-4">
-                                    <div class="flex items-center gap-2">
-                                        <div class="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center text-[8px] font-black text-orange-600">{{ substr($log->user->name ?? 'A', 0, 1) }}</div>
-                                        <span class="text-[10px] font-bold text-slate-600">{{ $log->user->name ?? 'System' }}</span>
-                                    </div>
-                                </td>
-                                <td class="py-4">
-                                    <span class="px-2 py-1 rounded-md text-[10px] font-black {{ $log->change_amount >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }}">
-                                        {{ $log->change_amount >= 0 ? '+' : '' }}{{ $log->change_amount }}
-                                    </span>
-                                </td>
-                                <td class="py-4 font-black text-slate-900 text-xs">{{ $log->new_stock }}</td>
-                                <td class="py-4">
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ str_replace('_', ' ', $log->reason) }}</span>
-                                </td>
+                <div class="flex-1 overflow-y-auto p-8">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100">
+                                <th class="pb-4">Date & Time</th>
+                                <th class="pb-4">Admin</th>
+                                <th class="pb-4">Movement</th>
+                                <th class="pb-4">Balance</th>
+                                <th class="pb-4">Reason</th>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="py-12 text-center">
-                                    <div class="flex flex-col items-center gap-3">
-                                        <div class="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-300"><i data-lucide="info" class="w-6 h-6"></i></div>
-                                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">No inventory movements recorded yet</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            <div class="p-6 bg-slate-50 border-t border-slate-100 text-center">
-                <p class="text-[10px] text-slate-400 font-medium italic">All stock movements are automatically tracked for compliance.</p>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            @forelse($item->inventoryLogs as $log)
+                                <tr class="group hover:bg-slate-50 transition-all">
+                                    <td class="py-4">
+                                        <p class="text-xs font-bold text-slate-900">{{ $log->created_at->format('M d, Y') }}</p>
+                                        <p class="text-[9px] text-slate-400 font-medium">{{ $log->created_at->format('h:i A') }}</p>
+                                    </td>
+                                    <td class="py-4">
+                                        <div class="flex items-center gap-2">
+                                            <div class="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center text-[8px] font-black text-orange-600">{{ substr($log->user->name ?? 'A', 0, 1) }}</div>
+                                            <span class="text-[10px] font-bold text-slate-600">{{ $log->user->name ?? 'System' }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="px-2 py-1 rounded-md text-[10px] font-black {{ $log->change_amount >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }}">
+                                            {{ $log->change_amount >= 0 ? '+' : '' }}{{ $log->change_amount }}
+                                        </span>
+                                    </td>
+                                    <td class="py-4 font-black text-slate-900 text-xs">{{ $log->new_stock }}</td>
+                                    <td class="py-4">
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ str_replace('_', ' ', $log->reason) }}</span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="py-12 text-center">
+                                        <div class="flex flex-col items-center gap-3">
+                                            <div class="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-300"><i data-lucide="info" class="w-6 h-6"></i></div>
+                                            <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">No inventory movements recorded yet</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-6 bg-slate-50 border-t border-slate-100 text-center">
+                    <p class="text-[10px] text-slate-400 font-medium italic">All stock movements are automatically tracked for compliance.</p>
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 
     <!-- Icon Picker Modal -->
-    <div x-show="showIconPicker" x-cloak class="fixed inset-0 z-[120] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" @click.self="showIconPicker = false">
-        <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50 text-slate-900">
-                <h3 class="text-xl font-black">Choose Icon</h3>
-                <button @click="showIconPicker = false" type="button"><i data-lucide="x" class="w-5 h-5 text-slate-400"></i></button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-8 scrollbar-hide">
-                <div class="mb-8 relative">
-                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                    <input type="text" x-model="iconSearch" class="w-full h-14 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 focus:bg-white transition-all font-bold text-sm" placeholder="Search icons...">
+    <template x-teleport="body">
+        <div x-show="showIconPicker" x-cloak class="fixed inset-0 z-[120] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6" @click.self="showIconPicker = false">
+            <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+                <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50 text-slate-900">
+                    <h3 class="text-xl font-black">Choose Icon</h3>
+                    <button @click="showIconPicker = false" type="button"><i data-lucide="x" class="w-5 h-5 text-slate-400"></i></button>
                 </div>
-                <div class="grid grid-cols-4 sm:grid-cols-6 gap-4">
-                    <template x-for="icon in filteredIcons" :key="icon">
-                        <button type="button" @click="selectIcon(icon)" class="aspect-square rounded-2xl border-2 border-slate-50 flex flex-col items-center justify-center gap-2 hover:border-orange-500 hover:bg-orange-50 transition-all group">
-                            <i :data-lucide="icon" class="w-6 h-6 text-slate-400 group-hover:text-orange-500"></i>
-                            <span class="text-[8px] font-black uppercase text-slate-300 group-hover:text-orange-400" x-text="icon"></span>
-                        </button>
-                    </template>
+                <div class="flex-1 overflow-y-auto p-8 scrollbar-hide">
+                    <div class="mb-8 relative">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                        <input type="text" x-model="iconSearch" class="w-full h-14 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 focus:bg-white transition-all font-bold text-sm" placeholder="Search icons...">
+                    </div>
+                    <div class="grid grid-cols-4 sm:grid-cols-6 gap-4">
+                        <template x-for="icon in filteredIcons" :key="icon">
+                            <button type="button" @click="selectIcon(icon)" class="aspect-square rounded-2xl border-2 border-slate-50 flex flex-col items-center justify-center gap-2 hover:border-orange-500 hover:bg-orange-50 transition-all group">
+                                <i :data-lucide="icon" class="w-6 h-6 text-slate-400 group-hover:text-orange-500"></i>
+                                <span class="text-[8px] font-black uppercase text-slate-300 group-hover:text-orange-400" x-text="icon"></span>
+                            </button>
+                        </template>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </template>
     </div>
 </div>
 
@@ -888,23 +899,66 @@ function productSystem() {
                 if (data.success) {
                     const list = document.getElementById('category-list');
                     const label = document.createElement('label');
-                    label.className = 'flex items-center gap-3 p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all cursor-pointer group';
+                    label.className = 'flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-all cursor-pointer group';
                     label.innerHTML = `
-                        <input type="checkbox" name="categories[]" value="${data.category.id}" checked class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
-                        <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">${data.category.name}</span>
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" name="categories[]" value="${data.category.id}" checked class="w-5 h-5 rounded-lg border-2 border-slate-200 text-orange-500 focus:ring-orange-500 transition-all">
+                            <span class="text-sm font-bold text-slate-600 group-hover:text-slate-900">${data.category.name}</span>
+                        </div>
+                        <button type="button" 
+                                onclick="window.dispatchEvent(new CustomEvent('delete-category-event', { detail: { id: ${data.category.id}, name: '${data.category.name.replace(/'/g, "\\'")}' } }))" 
+                                class="opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 rounded-full hover:bg-rose-50 text-slate-300 hover:text-rose-500 flex items-center justify-center">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
                     `;
                     list.appendChild(label);
+                    this.formData.categories.push(String(data.category.id));
                     this.newCategoryName = '';
                 } else {
-                    alert(data.message || 'Error adding category');
+                    toast(data.message || 'Error adding category', 'error');
                 }
             } catch (error) {
                 console.error(error);
+                toast('Failed to add category', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalContent;
                 refreshIcons();
             }
+        },
+        async deleteCategory(id, name) {
+            confirmAction('Delete Category?', `Are you sure you want to delete category "${name}"? This will remove it from all products.`, async () => {
+                try {
+                    const response = await fetch(`/admin/categories/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ _method: 'DELETE' })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        toast(data.message || 'Category deleted successfully');
+                        this.formData.categories = this.formData.categories.filter(c => c != id);
+                        
+                        const list = document.getElementById('category-list');
+                        if (list) {
+                            const checkbox = list.querySelector(`input[value="${id}"]`);
+                            if (checkbox) {
+                                const label = checkbox.closest('label');
+                                if (label) label.remove();
+                            }
+                        }
+                    } else {
+                        toast(data.message || 'Error deleting category', 'error');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    toast('Failed to delete category', 'error');
+                }
+            });
         },
         submitForm(event) {
             // Sync all CKEditors back to their respective textareas
