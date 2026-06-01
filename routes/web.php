@@ -103,9 +103,11 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('shipping', [\App\Http\Controllers\Admin\ShippingController::class, 'index'])->name('shipping.index');
     Route::get('refunds', [\App\Http\Controllers\Admin\RefundController::class, 'index'])->name('refunds.index');
     Route::get('admins', [\App\Http\Controllers\Admin\UserController::class, 'admins'])->name('admins.index');
+    Route::post('admins', [\App\Http\Controllers\Admin\UserController::class, 'storeAdmin'])->name('admins.store');
     Route::resource('customers', \App\Http\Controllers\Admin\UserController::class);
     Route::post('customers/{id}/update-role', [\App\Http\Controllers\Admin\UserController::class, 'updateRole'])->name('customers.update-role');
     Route::post('customers/{id}/restore', [\App\Http\Controllers\Admin\UserController::class, 'restore'])->name('customers.restore');
+    Route::delete('customers/{id}/force-delete', [\App\Http\Controllers\Admin\UserController::class, 'forceDelete'])->name('customers.force-delete');
     
     // Reviews Management
     Route::post('reviews/bulk-action', [\App\Http\Controllers\Admin\ReviewController::class, 'bulkAction'])->name('reviews.bulk-action');

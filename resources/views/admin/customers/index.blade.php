@@ -86,9 +86,37 @@
                         </td>
                         <td class="px-8 py-6 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <a href="{{ route('admin.customers.show', $user->id) }}" class="h-8 w-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-orange-500 hover:border-orange-200 transition-all shadow-sm">
+                                <a href="{{ route('admin.customers.show', $user->id) }}" class="h-8 w-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-orange-500 hover:border-orange-200 transition-all shadow-sm" title="View Customer Details">
                                     <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                                 </a>
+
+                                @if($user->deleted_at)
+                                    <!-- Restore Button -->
+                                    <form action="{{ route('admin.customers.restore', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('Restore this user account?')">
+                                        @csrf
+                                        <button type="submit" class="h-8 w-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-emerald-500 hover:bg-emerald-50 hover:border-emerald-200 transition-all shadow-sm" title="Restore Account">
+                                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </form>
+
+                                    <!-- Permanent Delete Button -->
+                                    <form action="{{ route('admin.customers.force-delete', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('Permanently delete this user account? This cannot be undone.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="h-8 w-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-all shadow-sm" title="Permanently Delete">
+                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <!-- Deactivate Button -->
+                                    <form action="{{ route('admin.customers.destroy', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('Deactivate this user account?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="h-8 w-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all shadow-sm" title="Deactivate Account">
+                                            <i data-lucide="user-x" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
