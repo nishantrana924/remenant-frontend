@@ -102,6 +102,10 @@
                 <div class="mt-4 text-sm font-bold text-black">
                     <a href="mailto:support@remenant.in" class="hover:underline">support@remenant.in</a>
                 </div>
+                <div class="mt-4 text-sm font-bold text-black">
+                    <span class="block text-[10px] uppercase text-[color:var(--text-primary)]/70 tracking-wider mb-0.5">Business Inquiries</span>
+                    <a href="mailto:info@remenanthealth.com" class="hover:underline">info@remenanthealth.com</a>
+                </div>
             </div>
         </div>
 

@@ -90,7 +90,7 @@
                             </h2>
                             <div class="space-y-4 sm:space-y-6 text-sm sm:text-lg leading-relaxed text-gray-600 font-medium">
                                 <p>To complete your return, we require a receipt or proof of purchase. Please do not send your purchase back to the manufacturer without first contacting us.</p>
-                                <p>Contact our support team at support@remenanthealth.com with your order number to initiate the process.</p>
+                                <p>Contact our support team at support@remenant.in with your order number to initiate the process.</p>
                             </div>
                         </div>
 
@@ -113,7 +113,7 @@
                                 Exchanges
                             </h2>
                             <div class="space-y-4 sm:space-y-6 text-sm sm:text-lg leading-relaxed text-gray-600 font-medium">
-                                <p>We only replace items if they are defective or damaged. If you need to exchange it for the same item, send us an email at support@remenanthealth.com.</p>
+                                <p>We only replace items if they are defective or damaged. If you need to exchange it for the same item, send us an email at support@remenant.in.</p>
                             </div>
                         </div>
 

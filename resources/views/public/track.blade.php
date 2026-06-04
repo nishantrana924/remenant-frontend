@@ -215,7 +215,7 @@
                 </div>
             </div>
             <div class="flex gap-4">
-                <a href="mailto:help@remenant.com" class="px-6 py-2 border border-blue-600 text-blue-600 text-sm font-bold rounded-sm hover:bg-blue-50 transition-all">Email Us</a>
+                <a href="mailto:support@remenant.in" class="px-6 py-2 border border-blue-600 text-blue-600 text-sm font-bold rounded-sm hover:bg-blue-50 transition-all">Email Us</a>
                 <a href="#" class="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-sm hover:bg-blue-700 transition-all">Call Support</a>
             </div>
         </div>

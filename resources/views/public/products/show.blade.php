@@ -680,9 +680,9 @@
                             </div>
                             
                             <div class="relative">
-                                <p id="long-description-text" class="text-base sm:text-lg leading-relaxed text-gray-600 font-medium line-clamp-6 transition-all duration-500">
-                                    {{ $product->long_description }}
-                                </p>
+                                <div id="long-description-text" class="text-base sm:text-lg leading-relaxed text-gray-600 font-medium line-clamp-6 transition-all duration-500 prose prose-sm max-w-none">
+                                    {!! $product->long_description !!}
+                                </div>
                                 <button type="button" 
                                         id="long-desc-read-more"
                                         onclick="toggleLongDescription()"
@@ -742,7 +742,7 @@
                                 </div>
                                 <div class="pt-6 border-t border-black/5">
                                     <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Customer Support</span>
-                                    <p class="mt-2 text-lg font-semibold text-orange-600">care@remenanthealth.com</p>
+                                    <p class="mt-2 text-lg font-semibold text-orange-600">support@remenant.in</p>
                                 </div>
                                 <div class="inline-flex items-center gap-3 rounded-xl bg-emerald-50 px-5 py-2.5 ring-1 ring-emerald-500/10">
                                     <i data-lucide="shield-check" class="h-5 w-5 text-emerald-600"></i>
