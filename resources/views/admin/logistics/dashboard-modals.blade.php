@@ -29,7 +29,7 @@
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Payment Mode</label>
                     <select name="payment_type" class="w-full bg-slate-50 border-slate-100 rounded-xl px-4 py-2.5 text-sm font-bold">
                         <option value="prepaid">Prepaid</option>
-                        <option value="cod">Cash on Delivery (COD)</option>
+
                     </select>
                 </div>
                 <input type="hidden" name="order_amount" value="1000">

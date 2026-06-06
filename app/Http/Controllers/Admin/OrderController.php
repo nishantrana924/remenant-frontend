@@ -152,7 +152,7 @@ class OrderController extends BaseController
         $payload = [
             'origin'        => (string)$warehouse->pincode,
             'destination'   => (string)$order->pincode,
-            'payment_type'  => $order->payment_method === 'cod' ? 'cod' : 'prepaid',
+            'payment_type'  => 'prepaid',
             'order_amount'  => (float)$order->total_amount,
             'weight'        => (int)$request->weight,
             'length'        => (int)$request->length,
@@ -219,7 +219,7 @@ class OrderController extends BaseController
         $payload = [
             // ── Order Info (TOP LEVEL per NimbusPost docs) ──
             'order_number'      => (string)$order->order_number,
-            'payment_type'      => $order->payment_method === 'cod' ? 'cod' : 'prepaid',
+            'payment_type'      => 'prepaid',
             'order_amount'      => (float)$order->total_amount,
             'courier_id'        => (int)$courierId,   // MUST be top-level
 

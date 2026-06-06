@@ -173,7 +173,7 @@ class CheckoutController extends Controller
             'coupon_discount_value' => $coupon ? $coupon->value : null,
             'status' => 'pending',
             'payment_status' => 'unpaid',
-            'payment_method' => $request->payment_method, // prepaid or cod
+            'payment_method' => 'razorpay',
             'customer_name' => $request->first_name . ' ' . $request->last_name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -195,16 +195,6 @@ class CheckoutController extends Controller
             ]);
         }
 
-        // Clear cart ONLY if COD
-        if ($order->payment_method === 'cod' && !$request->has('buy_now_product_id')) {
-            session()->forget('cart');
-        }
-
-        // If COD, go straight to success
-        if ($order->payment_method === 'cod') {
-            $order->update(['status' => 'processing']);
-            return redirect()->route('checkout.success', ['order' => $order->order_number])->with('success', 'Order placed successfully! (COD)');
-        }
 
         return redirect()->route('checkout.payment', $order->order_number);
     }
@@ -287,7 +277,7 @@ class CheckoutController extends Controller
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-        if ($order->payment_method !== 'cod' && $order->payment_status !== 'paid') {
+        if ($order->payment_status !== 'paid') {
             return redirect()->route('checkout.payment', $order->order_number)->with('error', 'Payment is pending for this order.');
         }
 

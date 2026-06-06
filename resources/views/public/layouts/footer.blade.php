@@ -137,16 +137,6 @@
                     <span class="text-[8px] font-bold uppercase tracking-wider">Net Banking</span>
                 </div>
                 <div
-                    class="flex h-9 items-center justify-center rounded-lg bg-white px-4 shadow-sm ring-1 ring-black/[0.06] gap-2 transition hover:shadow-md text-black/70">
-                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="1" y="3" width="15" height="13" />
-                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                        <circle cx="5.5" cy="18.5" r="2.5" />
-                        <circle cx="18.5" cy="18.5" r="2.5" />
-                    </svg>
-                    <span class="text-[8px] font-bold uppercase tracking-wider">Cash On Delivery</span>
-                </div>
             </div>
         </div>
 

@@ -163,31 +163,7 @@
                             </div>
                         </section>
 
-                        <!-- Payment Method -->
-                        <section>
-                            <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                                03. Payment Method
-                            </h2>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <label class="relative flex items-center gap-3 p-5 rounded-2xl border-2 border-slate-50 cursor-pointer hover:border-orange-500/20 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/30 transition-all group">
-                                    <input type="radio" name="payment_method" value="prepaid" class="h-4 w-4 text-orange-500 border-slate-200 focus:ring-orange-500" checked>
-                                    <div class="flex-1">
-                                        <span class="block text-xs font-black text-slate-900 uppercase tracking-tight">Online Payment</span>
-                                        <span class="block text-[10px] font-bold text-slate-400 uppercase mt-0.5">UPI, Cards, NetBanking</span>
-                                    </div>
-                                    <i data-lucide="shield-check" class="h-4 w-4 text-emerald-500 opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></i>
-                                </label>
-                                <label class="relative flex items-center gap-3 p-5 rounded-2xl border-2 border-slate-50 cursor-pointer hover:border-orange-500/20 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/30 transition-all group">
-                                    <input type="radio" name="payment_method" value="cod" class="h-4 w-4 text-orange-500 border-slate-200 focus:ring-orange-500">
-                                    <div class="flex-1">
-                                        <span class="block text-xs font-black text-slate-900 uppercase tracking-tight">Cash on Delivery</span>
-                                        <span class="block text-[10px] font-bold text-slate-400 uppercase mt-0.5">Pay at your doorstep</span>
-                                    </div>
-                                    <i data-lucide="hand-coins" class="h-4 w-4 text-slate-400 opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></i>
-                                </label>
-                            </div>
-                        </section>
+
                     </div>
 
                     <button type="submit" id="checkout-btn" class="w-full rounded-2xl bg-slate-900 py-4 text-sm font-black text-white uppercase tracking-[0.2em] shadow-xl hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3">

@@ -5,10 +5,10 @@
 @section('content')
 <!-- Flush Edge-to-Edge Container -->
 <div class="w-full bg-[#F1F3F6] pt-0 dashboard-root">
-    <div class="w-full flex flex-col md:flex-row min-h-screen pt-0">
+    <div class="w-full flex flex-col md:flex-row md:items-start min-h-screen pt-0">
         
         <!-- Sidebar (Premium SaaS Style) -->
-        <div class="w-full md:w-[260px] bg-white border-r border-slate-200 shrink-0 min-h-[calc(100vh-80px)] flex flex-col">
+        <div class="w-full md:w-[260px] bg-white border-b md:border-b-0 md:border-r border-slate-200 shrink-0 md:min-h-[calc(100vh-80px)] md:h-[calc(100vh-80px)] md:sticky md:top-[80px] overflow-y-auto flex flex-col">
             <!-- Profile Block -->
             <div class="p-6 flex items-center gap-4 border-b border-slate-100">
                 <div class="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 shrink-0 overflow-hidden border border-slate-200">
@@ -45,18 +45,6 @@
                     </button>
                 </div>
 
-                <!-- Group: Billing -->
-                <div class="space-y-2">
-                    <h3 class="text-xs font-semibold text-slate-400 px-3 mb-3 uppercase tracking-wider">Billing</h3>
-                    <button onclick="switchTab('giftcards', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'giftcards' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all">
-                        <i data-lucide="gift" class="h-4 w-4" stroke-width="1.5"></i>
-                        <span class="text-sm font-medium">Gift Cards</span>
-                    </button>
-                    <button onclick="switchTab('payments', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'payments' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all">
-                        <i data-lucide="credit-card" class="h-4 w-4" stroke-width="1.5"></i>
-                        <span class="text-sm font-medium">Saved UPI</span>
-                    </button>
-                </div>
             </div>
 
             <!-- Sign Out -->
@@ -135,7 +123,7 @@
                 <div class="px-4 sm:px-8 max-w-5xl mx-auto space-y-8 mt-8">
                     @forelse($orders as $order)
                         @php
-                            $isPaid = $order->payment_status === 'paid' || $order->payment_method === 'cod';
+                            $isPaid = $order->payment_status === 'paid';
                             $isFailed = $order->payment_status === 'failed';
                             $isDelivered = strtolower($order->delivery_status) === 'delivered';
                             $isShipped = strtolower($order->delivery_status) === 'shipped';
@@ -169,7 +157,7 @@
                         <div class="rounded-2xl border {{ $cardClasses }} overflow-hidden">
                             <!-- Header -->
                             <div class="bg-slate-50/50 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 gap-4">
-                                <div class="flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
+                                <div class="flex flex-wrap items-center gap-4 md:gap-8 text-sm">
                                     <div class="flex flex-col">
                                         <span class="font-medium text-slate-500 text-xs">Order Placed</span>
                                         <span class="font-semibold text-slate-900">{{ $order->created_at->format('d M Y') }}</span>
@@ -261,7 +249,6 @@
                         {{ $orders->appends(request()->query())->links() }}
                     </div>
                     @endif
-                    </div>
 
                     @if($cancelledOrders->count() > 0)
                         <div class="mt-16 mb-8 flex items-center justify-between">
@@ -273,7 +260,7 @@
                                 @php
                                     $firstItem = $order->orderItems->first();
                                     $additionalCount = $order->orderItems->count() - 1;
-                                    $productImage = $firstItem && $firstItem->product ? \App\Helpers\ImageHelper::getUrl($firstItem->product->image, 'images/products') : 'https://ui-avatars.com/api/?name=P&background=f8fafc&color=64748b';
+                                    $productImage = $firstItem && $firstItem->product ? \App\Helpers\ImageHelper::getUrl($firstItem->product->image, 'products') : 'https://ui-avatars.com/api/?name=P&background=f8fafc&color=64748b';
                                     $productName = $firstItem && $firstItem->product ? $firstItem->product->title : 'Unknown Product';
                                     
                                     $isPendingReview = $order->status === 'cancellation_requested';
@@ -283,7 +270,7 @@
                                 <div class="rounded-2xl border border-rose-100 bg-white overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
                                     <!-- Header -->
                                     <div class="bg-slate-50/50 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 gap-4">
-                                        <div class="flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
+                                        <div class="flex flex-wrap items-center gap-4 md:gap-8 text-sm">
                                             <div class="flex flex-col">
                                                 <span class="font-medium text-slate-500 text-xs">Cancelled On</span>
                                                 <span class="font-semibold text-slate-900">{{ $order->cancelled_at ? \Carbon\Carbon::parse($order->cancelled_at)->format('d M Y') : $order->updated_at->format('d M Y') }}</span>
@@ -320,7 +307,7 @@
                                                     <p class="text-xs font-medium text-slate-600 mt-2 bg-slate-50 inline-block px-2.5 py-1 rounded-md border border-slate-200">+ {{ $additionalCount }} More Items</p>
                                                 @endif
                                                 
-                                                <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-100 inline-flex flex-col gap-1.5">
+                                                <div class="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col gap-1.5 w-full">
                                                     <p class="text-xs font-medium text-slate-600">
                                                         <span class="font-semibold text-slate-800">Reason:</span> {{ $order->cancellation_reason ?? 'Customer Request' }}
                                                     </p>
@@ -344,6 +331,18 @@
                                                             @endif
                                                         </div>
                                                     @endif
+                                                </div>
+                                            </div>
+
+                                            <!-- Actions -->
+                                            <div class="shrink-0 flex flex-col justify-end gap-3 w-full md:w-48 mt-4 md:mt-0">
+                                                <div class="flex items-center justify-between mt-auto pt-4 md:pt-0 px-1 border-t md:border-t-0 border-slate-100">
+                                                    <a href="{{ route('order.invoice', ['order' => $order->order_number]) }}" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5">
+                                                        <i data-lucide="download" class="h-3.5 w-3.5"></i> Invoice
+                                                    </a>
+                                                    <a href="https://wa.me/919876543210?text=Help with Order #{{ $order->order_number }}" target="_blank" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5">
+                                                        <i data-lucide="life-buoy" class="h-3.5 w-3.5"></i> Help
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -516,117 +515,7 @@
                 </div>
             </div>
 
-            <!-- SECTION: GIFTCARDS -->
-            <div id="section-giftcards" class="tab-section {{ $activeTab !== 'giftcards' ? 'hidden' : '' }} p-6 md:p-10 transition-all duration-300 w-full">
-                <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900 mb-8">Gift Card Portfolio</h3>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-                    <!-- Balance Card -->
-                    <div class="lg:col-span-2 bg-slate-900 p-10 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-orange-500/20 to-transparent"></div>
-                        <div class="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-2">Available Balance</p>
-                                <h4 class="text-5xl font-black tracking-tight">₹0.00</h4>
-                            </div>
-                            <div class="flex items-center gap-6 mt-12">
-                                <div class="flex items-center gap-2">
-                                    <div class="h-2 w-2 rounded-full bg-emerald-500"></div>
-                                    <span class="text-[9px] font-black uppercase tracking-widest text-white/60">Active Wallet</span>
-                                </div>
-                                <button class="text-[9px] font-black uppercase tracking-widest text-orange-400 hover:text-orange-300 transition-all">Add Credits</button>
-                            </div>
-                        </div>
-                        <i data-lucide="gift" class="absolute -right-8 -bottom-8 h-48 w-48 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-700"></i>
-                    </div>
 
-                    <!-- Redemption Form -->
-                    <div class="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100">
-                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
-                            <i data-lucide="ticket" class="h-4 w-4 text-orange-500"></i>
-                            Redeem Code
-                        </h4>
-                        <div class="space-y-4">
-                            <div class="space-y-2">
-                                <input type="text" placeholder="XXXX-XXXX-XXXX" class="w-full bg-white border border-slate-200 px-6 py-4 text-xs font-black outline-none rounded-xl focus:ring-2 focus:ring-orange-500/10 text-center tracking-[0.2em] uppercase">
-                            </div>
-                            <button class="w-full bg-orange-600 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-orange-700 transition-all rounded-xl shadow-lg shadow-orange-100">Apply to Balance</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Transaction Table -->
-                <div class="border border-slate-50 rounded-2xl overflow-hidden">
-                    <div class="bg-slate-50 px-8 py-4 border-b border-slate-100 flex items-center justify-between">
-                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Transaction History</h4>
-                        <span class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">No recent activity</span>
-                    </div>
-                    <div class="p-12 text-center bg-white">
-                        <div class="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="refresh-ccw" class="h-6 w-6 text-slate-200"></i>
-                        </div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Your transactions will appear here</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION: SAVED UPI -->
-            <div id="section-payments" class="tab-section {{ $activeTab !== 'payments' ? 'hidden' : '' }} p-6 md:p-10 transition-all duration-300 w-full">
-                <div class="flex items-center justify-between mb-10">
-                    <div>
-                        <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900">Saved UPI Methods</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">One-click secure payments</p>
-                    </div>
-                    <button class="bg-indigo-600 text-white px-6 py-3 text-[9px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-100">
-                        <i data-lucide="plus" class="h-3 w-3"></i> Add New VPA
-                    </button>
-                </div>
-
-                <div class="space-y-4 max-w-2xl">
-                    <!-- UPI Item: Google Pay -->
-                    <div class="flex items-center gap-6 p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-indigo-100 transition-all group">
-                        <div class="h-14 w-14 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0">
-                            <i data-lucide="smartphone" class="h-6 w-6 text-indigo-500"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3">
-                                <h4 class="text-xs font-black text-slate-800 uppercase tracking-tight">Google Pay / GPay</h4>
-                                <span class="bg-emerald-50 text-emerald-600 text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest">Verified</span>
-                            </div>
-                            <p class="text-[11px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">prashant@okaxis</p>
-                        </div>
-                        <button class="text-slate-300 hover:text-rose-500 transition-colors">
-                            <i data-lucide="trash-2" class="h-4 w-4"></i>
-                        </button>
-                    </div>
-
-                    <!-- UPI Item: PhonePe -->
-                    <div class="flex items-center gap-6 p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-indigo-100 transition-all group">
-                        <div class="h-14 w-14 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0">
-                            <i data-lucide="zap" class="h-6 w-6 text-purple-500"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3">
-                                <h4 class="text-xs font-black text-slate-800 uppercase tracking-tight">PhonePe</h4>
-                                <span class="bg-emerald-50 text-emerald-600 text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest">Verified</span>
-                            </div>
-                            <p class="text-[11px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">9876543210@ybl</p>
-                        </div>
-                        <button class="text-slate-300 hover:text-rose-500 transition-colors">
-                            <i data-lucide="trash-2" class="h-4 w-4"></i>
-                        </button>
-                    </div>
-
-                    <!-- Add New UI Suggestion -->
-                    <div class="p-12 border-2 border-dashed border-slate-100 rounded-[2.5rem] text-center flex flex-col items-center justify-center bg-slate-50/20 mt-8">
-                        <div class="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center mb-4">
-                            <i data-lucide="shield-check" class="h-6 w-6 text-slate-200"></i>
-                        </div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Secure UPI Storage</p>
-                        <p class="text-[9px] font-medium text-slate-300 uppercase tracking-[0.2em]">All payment methods are encrypted and 100% secure</p>
-                    </div>
-                </div>
-            </div>
 
         </div>
 

@@ -42,12 +42,12 @@ class DashboardController extends Controller
         $orderStats = [
             'total' => (clone $ordersQuery)->count(),
             'active' => (clone $ordersQuery)->where(function($q) {
-                $q->where('payment_status', 'paid')->orWhere('payment_method', 'cod');
+                $q->where('payment_status', 'paid');
             })->where(function($q) {
                 $q->whereNull('delivery_status')->orWhere('delivery_status', '!=', 'Delivered');
             })->count(),
             'delivered' => (clone $ordersQuery)->where('delivery_status', 'Delivered')->count(),
-            'pending' => (clone $ordersQuery)->where('payment_status', '!=', 'paid')->where('payment_method', '!=', 'cod')->count(),
+            'pending' => (clone $ordersQuery)->where('payment_status', '!=', 'paid')->count(),
         ];
 
         $orders = (clone $ordersQuery)->whereNotIn('status', ['cancelled', 'cancellation_requested'])
@@ -61,7 +61,14 @@ class DashboardController extends Controller
             ->paginate(10, ['*'], 'cancelled_page');
         
         $addresses = $user->addresses()->latest()->get();
+        
+        $allowedTabs = ['orders', 'profile', 'addresses'];
         $activeTab = $request->get('tab', 'orders');
+        
+        if (!in_array($activeTab, $allowedTabs)) {
+            $activeTab = 'orders';
+        }
+
         return view('public.dashboard', compact('orders', 'cancelledOrders', 'orderStats', 'user', 'activeTab', 'addresses'));
     }
 

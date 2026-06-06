@@ -31,7 +31,7 @@ class ShippingController extends Controller
             'delivered' => Shipment::where('status', 'delivered')->count(),
             'rto' => Shipment::where('status', 'rto')->count(),
             'total_revenue' => Order::where('payment_status', 'paid')->sum('total_amount'),
-            'cod_collection' => Order::where('payment_method', 'cod')->sum('total_amount'),
+            'cod_collection' => 0,
         ];
 
         $recent_shipments = Shipment::with('order')->latest()->limit(10)->get();
@@ -140,7 +140,7 @@ class ShippingController extends Controller
         $payload = [
             'order' => [
                 'order_number' => (string)$order->order_number,
-                'payment_type' => $order->payment_method === 'cod' ? 'cod' : 'prepaid',
+                'payment_type' => 'prepaid',
                 'total' => (float)$order->total_amount,
             ],
             'consignee' => [
