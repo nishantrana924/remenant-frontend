@@ -225,10 +225,17 @@
                 <input type="text" x-model="search" placeholder="Search Order #, Name, or Email..." class="saas-input pl-12">
             </div>
             <div class="flex items-center gap-2">
-                <div class="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-sm overflow-x-auto whitespace-nowrap scrollbar-hide">
                     <button @click="activeStatus = 'all'" :class="activeStatus === 'all' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all">All</button>
                     <button @click="activeStatus = 'pending'" :class="activeStatus === 'pending' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all">Pending</button>
                     <button @click="activeStatus = 'shipped'" :class="activeStatus === 'shipped' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all">Shipped</button>
+                    <button @click="activeStatus = 'cancellation_requested'" :class="activeStatus === 'cancellation_requested' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all">Cancel Req</button>
+                    <button @click="activeStatus = 'cancelled'" :class="activeStatus === 'cancelled' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all">Cancelled</button>
+                    <div class="w-px h-4 bg-slate-200 mx-1"></div>
+                    <button @click="activeStatus = 'refund_pending'" :class="activeStatus === 'refund_pending' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all hover:bg-rose-50 hover:text-rose-600">Ref: Pending</button>
+                    <button @click="activeStatus = 'refund_processing'" :class="activeStatus === 'refund_processing' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all hover:bg-rose-50 hover:text-rose-600">Ref: Processing</button>
+                    <button @click="activeStatus = 'refund_completed'" :class="activeStatus === 'refund_completed' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all hover:bg-emerald-50 hover:text-emerald-600">Ref: Completed</button>
+                    <button @click="activeStatus = 'refund_failed'" :class="activeStatus === 'refund_failed' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all hover:bg-rose-50 hover:text-rose-600">Ref: Failed</button>
                 </div>
                 <div class="relative">
                     <i data-lucide="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
@@ -261,7 +268,7 @@
                     @foreach($items as $item)
                     <tr class="transition-all cursor-pointer group" 
                         :class="selectedItems.includes({{ $item->id }}) ? 'bg-orange-50/70' : 'hover:bg-orange-50/30'"
-                        x-show="(!search || '{{ strtolower($item->order_number ?? $item->id) }}'.includes(search.toLowerCase()) || '{{ strtolower($item->customer_name ?? $item->user->name ?? 'Guest') }}'.includes(search.toLowerCase())) && (activeStatus === 'all' || '{{ $item->status }}' === activeStatus) && (!dateFilter || '{{ $item->created_at->format('Y-m-d') }}' === dateFilter)"
+                        x-show="(!search || '{{ strtolower($item->order_number ?? $item->id) }}'.includes(search.toLowerCase()) || '{{ strtolower($item->customer_name ?? $item->user->name ?? 'Guest') }}'.includes(search.toLowerCase())) && (activeStatus === 'all' || (activeStatus.startsWith('refund_') ? '{{ $item->refund_status }}' === activeStatus.replace('refund_', '') : '{{ $item->status }}' === activeStatus)) && (!dateFilter || '{{ $item->created_at->format('Y-m-d') }}' === dateFilter)"
                         @click.self="selectedOrder = {{ $item->toJson() }}; showDrawer = true">
                         <td class="text-center" @click.stop>
                             <input type="checkbox" x-model="selectedItems" value="{{ $item->id }}" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
@@ -407,14 +414,90 @@
                     <template x-if="selectedOrder && selectedOrder.status === 'pending'">
                         <button @click="updateStatus(selectedOrder.id, { status: 'processing', delivery_status: 'packed' })" class="saas-btn-primary w-full py-4 text-xs font-bold tracking-[0.2em] uppercase">Approve Order</button>
                     </template>
+                    <template x-if="selectedOrder && selectedOrder.status === 'cancellation_requested'">
+                        <div class="grid grid-cols-2 gap-3">
+                            <button @click="window.fastSubmit(`/admin/orders/${selectedOrder.id}/approve-cancellation`, { method: 'POST', success: (res) => { window.toast(res.message); setTimeout(() => location.reload(), 1000); }})" class="w-full py-4 bg-rose-600 text-white rounded-2xl text-[10px] font-bold tracking-[0.1em] uppercase shadow-lg shadow-rose-100 hover:bg-rose-700 transition-all">Approve Cancellation</button>
+                            <button @click="window.fastSubmit(`/admin/orders/${selectedOrder.id}/reject-cancellation`, { method: 'POST', success: (res) => { window.toast(res.message); setTimeout(() => location.reload(), 1000); }})" class="w-full py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl text-[10px] font-bold tracking-[0.1em] uppercase hover:bg-slate-50 transition-all">Reject Cancellation</button>
+                        </div>
+                    </template>
                     <template x-if="selectedOrder && (selectedOrder.status === 'processing' || selectedOrder.status === 'packed')">
-                        <button @click="openCourierSelection(selectedOrder.id)" class="w-full py-4 bg-orange-600 text-white rounded-2xl text-xs font-bold tracking-[0.2em] uppercase shadow-lg shadow-orange-100">Select Courier & Ship</button>
+                        <button @click="openCourierSelection(selectedOrder.id)" class="w-full py-4 bg-orange-600 text-white rounded-2xl text-xs font-bold tracking-[0.2em] uppercase shadow-lg shadow-orange-100 hover:bg-orange-700 transition-all">Select Courier & Ship</button>
                     </template>
                     <template x-if="selectedOrder && selectedOrder.status === 'shipped'">
-                        <button @click="updateStatus(selectedOrder.id, { status: 'delivered', delivery_status: 'delivered' })" class="w-full py-4 bg-emerald-500 text-white rounded-2xl text-xs font-bold tracking-[0.2em] uppercase shadow-lg shadow-emerald-100">Confirm Delivery</button>
+                        <button @click="updateStatus(selectedOrder.id, { status: 'delivered', delivery_status: 'delivered' })" class="w-full py-4 bg-emerald-500 text-white rounded-2xl text-xs font-bold tracking-[0.2em] uppercase shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all">Confirm Delivery</button>
                     </template>
                 </div>
             </div>
+
+            <!-- Cancellation Info Card -->
+            <template x-if="selectedOrder && (selectedOrder.status === 'cancelled' || selectedOrder.status === 'cancellation_requested')">
+                <div class="space-y-4">
+                    <h4 class="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Cancellation Details</h4>
+                    <div class="bg-rose-50 rounded-2xl p-6 border border-rose-100">
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-[9px] font-bold text-rose-400 uppercase">Reason</p>
+                                <p class="text-xs font-bold text-rose-900" x-text="selectedOrder.cancellation_reason || 'N/A'"></p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-[9px] font-bold text-rose-400 uppercase">Cancelled By</p>
+                                    <p class="text-xs font-bold text-rose-900" x-text="selectedOrder.cancelled_by || '-'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-rose-400 uppercase">Cancelled At</p>
+                                    <p class="text-xs font-bold text-rose-900" x-text="selectedOrder.cancelled_at ? new Date(selectedOrder.cancelled_at).toLocaleString() : '-'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-rose-400 uppercase">Refund Status</p>
+                                    <p class="text-xs font-bold uppercase tracking-widest" :class="selectedOrder.refund_status === 'completed' ? 'text-emerald-600' : 'text-orange-600'" x-text="selectedOrder.refund_status || 'N/A'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-rose-400 uppercase">Refund Amount</p>
+                                    <p class="text-xs font-bold text-slate-800" x-text="selectedOrder.refund_amount ? '₹' + selectedOrder.refund_amount : 'N/A'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-rose-400 uppercase">Razorpay Refund ID</p>
+                                    <p class="text-[10px] font-mono text-slate-600 break-all" x-text="selectedOrder.razorpay_refund_id || 'N/A'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-rose-400 uppercase">Refund ARN</p>
+                                    <p class="text-[10px] font-mono text-slate-600 break-all" x-text="selectedOrder.refund_arn || 'N/A'"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Coupon Info Card -->
+            <template x-if="selectedOrder && selectedOrder.coupon_code">
+                <div class="space-y-4">
+                    <h4 class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Coupon & Discounts</h4>
+                    <div class="bg-emerald-50 rounded-2xl p-6 border border-emerald-100">
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-[9px] font-bold text-emerald-600 uppercase">Coupon Code</p>
+                                    <p class="text-xs font-bold text-emerald-900 font-mono" x-text="selectedOrder.coupon_code"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-emerald-600 uppercase">Type & Value</p>
+                                    <p class="text-xs font-bold text-emerald-900" x-text="(selectedOrder.coupon_discount_type === 'percentage' ? selectedOrder.coupon_discount_value + '%' : '₹' + selectedOrder.coupon_discount_value) + ' (' + selectedOrder.coupon_discount_type + ')'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-emerald-600 uppercase">Discount Amount</p>
+                                    <p class="text-xs font-bold text-emerald-900" x-text="'₹' + selectedOrder.discount_amount"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-emerald-600 uppercase">Subtotal / Final</p>
+                                    <p class="text-xs font-bold text-emerald-900" x-text="'₹' + (selectedOrder.subtotal || '-') + ' / ₹' + selectedOrder.total_amount"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
 
             <!-- Detailed Link -->
             <a :href="'/admin/orders/' + (selectedOrder ? selectedOrder.id : '')" class="block w-full py-4 border-2 border-slate-100 rounded-2xl text-center text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] hover:bg-slate-50 transition-all">View Full Details</a>

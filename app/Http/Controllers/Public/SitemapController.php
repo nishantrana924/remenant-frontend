@@ -14,18 +14,18 @@ class SitemapController extends Controller
      */
     public function index(): Response
     {
-        $products = Product::where('status', 1)->latest()->get();
-        $categories = Category::all();
+        $products = Product::where('status', 'published')->latest()->cursor();
+        $categories = Category::cursor();
 
         $staticPages = [
             route('home'),
             route('products.index'),
             route('about'),
             route('contact'),
-            route('legal.show', 'terms-and-conditions'),
-            route('legal.show', 'privacy-policy'),
-            route('legal.show', 'shipping-policy'),
-            route('legal.show', 'refund-policy'),
+            route('terms'),
+            route('privacy'),
+            route('shipping'),
+            route('refund'),
         ];
 
         return response()->view('public.sitemap', [

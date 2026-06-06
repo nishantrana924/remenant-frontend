@@ -367,13 +367,20 @@
             <div class="flex justify-end block-margin">
                 <div class="w-64 bg-slate-50/50 border border-slate-200 p-2.5 rounded-lg space-y-1 text-[10px]">
                     <div class="flex justify-between text-slate-500 font-medium">
-                        <span>Gross Amount</span>
-                        <span class="text-slate-900 font-bold">₹{{ number_format($grandGrossAmt, 2) }}</span>
+                        <span>Subtotal</span>
+                        <span class="text-slate-900 font-bold">₹{{ number_format($order->subtotal ?? $grandGrossAmt, 2) }}</span>
                     </div>
+                    @if($order->coupon_code)
+                    <div class="flex justify-between text-slate-500 font-medium">
+                        <span>Coupon ({{ $order->coupon_code }})</span>
+                        <span class="text-rose-600 font-bold">-₹{{ number_format($order->discount_amount, 2) }}</span>
+                    </div>
+                    @else
                     <div class="flex justify-between text-slate-500 font-medium">
                         <span>Discounts & Promos</span>
                         <span class="text-rose-600 font-bold">-₹{{ number_format($order->discount_amount + $platformFee, 2) }}</span>
                     </div>
+                    @endif
                     <div class="flex justify-between text-slate-500 font-medium">
                         <span>Taxable Value</span>
                         <span class="text-slate-900 font-bold">₹{{ number_format($grandTaxableAmt, 2) }}</span>

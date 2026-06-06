@@ -37,10 +37,32 @@ class DashboardController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        $orders = \App\Models\Order::where('user_id', $user->id)->latest()->get();
+        $ordersQuery = \App\Models\Order::where('user_id', $user->id);
+
+        $orderStats = [
+            'total' => (clone $ordersQuery)->count(),
+            'active' => (clone $ordersQuery)->where(function($q) {
+                $q->where('payment_status', 'paid')->orWhere('payment_method', 'cod');
+            })->where(function($q) {
+                $q->whereNull('delivery_status')->orWhere('delivery_status', '!=', 'Delivered');
+            })->count(),
+            'delivered' => (clone $ordersQuery)->where('delivery_status', 'Delivered')->count(),
+            'pending' => (clone $ordersQuery)->where('payment_status', '!=', 'paid')->where('payment_method', '!=', 'cod')->count(),
+        ];
+
+        $orders = (clone $ordersQuery)->whereNotIn('status', ['cancelled', 'cancellation_requested'])
+            ->with(['orderItems.product:id,title,slug,image'])
+            ->latest()
+            ->paginate(10, ['*'], 'orders_page');
+
+        $cancelledOrders = (clone $ordersQuery)->whereIn('status', ['cancelled', 'cancellation_requested'])
+            ->with(['orderItems.product:id,title,slug,image'])
+            ->latest()
+            ->paginate(10, ['*'], 'cancelled_page');
+        
         $addresses = $user->addresses()->latest()->get();
         $activeTab = $request->get('tab', 'orders');
-        return view('public.dashboard', compact('orders', 'user', 'activeTab', 'addresses'));
+        return view('public.dashboard', compact('orders', 'cancelledOrders', 'orderStats', 'user', 'activeTab', 'addresses'));
     }
 
     /**
@@ -90,7 +112,7 @@ class DashboardController extends Controller
             ->get();
 
         // 4. Revenue by Category
-        $categoryRevenue = \App\Models\Category::all()->map(function($cat) {
+        $categoryRevenue = \App\Models\Category::lazy()->map(function($cat) {
             $revenue = \App\Models\OrderItem::whereHas('product.categories', function($q) use ($cat) {
                 $q->where('categories.id', $cat->id);
             })->sum(\DB::raw('quantity * price'));
@@ -106,5 +128,87 @@ class DashboardController extends Controller
         $recent_logs = \App\Models\InventoryLog::with(['product', 'user'])->latest()->take(8)->get();
 
         return view('admin.dashboard', compact('stats', 'recent_orders', 'chartData', 'topProducts', 'categoryRevenue', 'recent_logs'));
+    }
+
+    /**
+     * Cancel an order.
+     */
+    public function cancelOrder(Request $request, \App\Models\Order $order)
+    {
+        // 1. Validate reason
+        $request->validate([
+            'cancellation_reason' => 'required|string|max:500'
+        ]);
+
+        // 2. Authorization
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // 3. Database Transaction & Pessimistic Locking
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($order, $request) {
+                // Lock the order
+                $order = \App\Models\Order::where('id', $order->id)->lockForUpdate()->first();
+
+                // 4. Validate Status Matrix
+                $blockedStatuses = ['shipped', 'out_for_delivery', 'delivered', 'returned', 'cancelled'];
+                if (in_array(strtolower($order->delivery_status ?? ''), $blockedStatuses) || in_array(strtolower($order->status), $blockedStatuses)) {
+                    throw new \Exception('This order cannot be cancelled in its current state.');
+                }
+
+                // Verify it's not already being refunded
+                if (in_array($order->refund_status, ['processing', 'completed'])) {
+                    throw new \Exception('Refund already initiated or completed.');
+                }
+
+                // Packed orders require admin review instead of direct cancellation
+                if (strtolower($order->delivery_status ?? '') === 'packed') {
+                    $order->update([
+                        'status' => 'cancellation_requested',
+                        'cancellation_reason' => $request->cancellation_reason,
+                    ]);
+                    $order->logStatus("Cancellation requested by customer. Reason: " . $request->cancellation_reason, auth()->id());
+                    return; // Stop here, admin will review
+                }
+
+                // 5. Update Order Status
+                $order->update([
+                    'status' => 'cancelled',
+                    'cancelled_at' => now(),
+                    'cancelled_by' => 'customer',
+                    'cancellation_reason' => $request->cancellation_reason,
+                ]);
+
+                if ($order->payment_status === 'paid') {
+                    $order->update(['refund_status' => 'pending']);
+                }
+
+                // 6. Restore Inventory
+                // REMOVED: Stock restoration is now handled natively and securely by OrderObserver@updated
+                // to prevent ghost inventory creation.
+
+                // 7. Log Timeline
+                $order->logStatus("Order cancelled by customer. Reason: " . $request->cancellation_reason, auth()->id());
+                if ($order->payment_status === 'paid') {
+                    $order->logStatus("Refund initiated.", auth()->id());
+                }
+            });
+
+            // 8. Dispatch Refund Job (Outside transaction to prevent API calls holding DB locks)
+            $order->refresh();
+            if ($order->payment_status === 'paid' && $order->status === 'cancelled') {
+                \App\Jobs\ProcessOrderRefundJob::dispatch($order->id);
+            }
+
+            $message = $order->status === 'cancellation_requested' 
+                ? 'Cancellation requested. An admin will review since the order is already packed.'
+                : 'Order cancelled successfully.';
+
+            return back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 }

@@ -4,9 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\PurifiesHtml;
+
 class Review extends Model
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use \Illuminate\Database\Eloquent\Factories\HasFactory, PurifiesHtml;
+
+    public $htmlPurifiable = ['comment'];
 
     protected $fillable = [
         'product_id',

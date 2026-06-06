@@ -393,4 +393,58 @@ class OrderController extends BaseController
 
         return response()->json(['success' => false, 'message' => 'Failed to request pickup: ' . ($response['message'] ?? 'Unknown Error')], 500);
     }
+
+    public function approveCancellation($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->status !== 'cancellation_requested') {
+            return response()->json(['success' => false, 'message' => 'Order is not pending cancellation.'], 400);
+        }
+
+        \DB::transaction(function () use ($order) {
+            // Lock order
+            $order = Order::where('id', $order->id)->lockForUpdate()->first();
+
+            $order->status = 'cancelled';
+            $order->delivery_status = 'cancelled';
+            $order->refund_status = 'pending';
+            $order->cancelled_at = now();
+            $order->cancelled_by = auth()->user()->name . ' (Admin)';
+            $order->save();
+
+            // Log timeline
+            $order->logStatus("Cancellation Approved by Admin.");
+            
+            // Dispatch refund job
+            \App\Jobs\ProcessOrderRefundJob::dispatch($order->id);
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cancellation approved successfully.'
+        ]);
+    }
+
+    public function rejectCancellation($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->status !== 'cancellation_requested') {
+            return response()->json(['success' => false, 'message' => 'Order is not pending cancellation.'], 400);
+        }
+
+        // Revert back to packed
+        $order->status = 'packed';
+        $order->delivery_status = 'packed';
+        $order->cancellation_reason = null;
+        $order->save();
+
+        $order->logStatus("Cancellation Rejected by Admin. Order resumed.");
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cancellation rejected successfully.'
+        ]);
+    }
 }

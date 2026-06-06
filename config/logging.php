@@ -127,6 +127,27 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'security' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/security.log'),
+            'level' => 'debug',
+            'replace_placeholders' => true,
+        ],
+
+        'nimbus_security' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/nimbus_security.log'),
+            'level' => 'debug',
+            'replace_placeholders' => true,
+        ],
+
+        'upload_security' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/upload_security.log'),
+            'level' => 'debug',
+            'replace_placeholders' => true,
+        ],
+
     ],
 
 ];

@@ -14,7 +14,7 @@ class OrderObserver
     public function created(Order $order): void
     {
         try {
-            \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderPlaced($order));
+            \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\OrderPlaced($order));
         } catch (\Exception $e) {
             Log::error("Failed to send order placed email for #{$order->order_number}: " . $e->getMessage());
         }
@@ -36,7 +36,7 @@ class OrderObserver
 
             // Send Order Confirmed Email
             try {
-                \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderConfirmed($order));
+                \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\OrderConfirmed($order));
             } catch (\Exception $e) {
                 Log::error("Failed to send order confirmed email for #{$order->order_number}: " . $e->getMessage());
             }
@@ -45,7 +45,7 @@ class OrderObserver
         // Send Shipment Booked / AWB Assigned Email
         if ($order->isDirty('tracking_id') && !empty($order->tracking_id)) {
             try {
-                \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\ShipmentBooked($order));
+                \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\ShipmentBooked($order));
             } catch (\Exception $e) {
                 Log::error("Failed to send shipment booked email for #{$order->order_number}: " . $e->getMessage());
             }
@@ -54,7 +54,7 @@ class OrderObserver
         // Send Shipped Email
         if (($order->isDirty('delivery_status') && $order->delivery_status === 'shipped') || ($order->isDirty('status') && $order->status === 'shipped')) {
             try {
-               \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderShipped($order));
+               \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\OrderShipped($order));
             } catch (\Exception $e) {
                Log::error("Failed to send order shipped email for #{$order->order_number}: " . $e->getMessage());
             }
@@ -63,7 +63,7 @@ class OrderObserver
         // Send Delivered Email
         if (($order->isDirty('delivery_status') && $order->delivery_status === 'delivered') || ($order->isDirty('status') && $order->status === 'delivered')) {
             try {
-               \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderDelivered($order));
+               \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\OrderDelivered($order));
             } catch (\Exception $e) {
                Log::error("Failed to send order delivered email for #{$order->order_number}: " . $e->getMessage());
             }
@@ -71,16 +71,20 @@ class OrderObserver
 
         // Restock when order is 'cancelled'
         if ($order->isDirty('status') && $order->status === 'cancelled') {
-            foreach ($order->orderItems as $item) {
-                $product = $item->product;
-                if ($product) {
-                    $this->restoreProductStock($product, $item->quantity, $order);
+            // SECURITY PATCH: Only restore if stock was actually deducted!
+            $previousStatus = $order->getOriginal('status');
+            if (in_array($previousStatus, ['processing', 'shipped', 'delivered'])) {
+                foreach ($order->orderItems as $item) {
+                    $product = $item->product;
+                    if ($product) {
+                        $this->restoreProductStock($product, $item->quantity, $order);
+                    }
                 }
             }
 
             // Send Order Cancelled Email
             try {
-               \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderCancelled($order));
+               \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\OrderCancelled($order));
            } catch (\Exception $e) {
                Log::error("Failed to send order cancelled email for #{$order->order_number}: " . $e->getMessage());
            }

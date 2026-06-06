@@ -251,6 +251,8 @@
                     </a>
                 </div>
             @endif
+        </div>
+
         <!-- Mobile search bar (Sticky) -->
         <div class="sm:hidden public-mobile-search px-4 pb-4 -mt-1 {{ $isAuthPage || request()->routeIs('products.show', 'cart', 'dashboard', 'my-orders') ? 'hidden' : '' }}"
             data-mobile-search>

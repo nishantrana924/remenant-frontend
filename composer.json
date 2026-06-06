@@ -10,7 +10,8 @@
         "laravel/framework": "^12.0",
         "laravel/octane": "^2.17",
         "laravel/tinker": "^2.10.1",
-        "razorpay/razorpay": "^2.9",
+        "mews/purifier": "^3.4",
+        "razorpay/razorpay": "^2.9.2",
         "spatie/laravel-image-optimizer": "^1.8",
         "webstronauts/unpoly": "^3.0"
     },

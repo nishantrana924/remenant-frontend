@@ -38,12 +38,14 @@ return [
     'razorpay' => [
         'key_id' => env('RAZORPAY_KEY_ID'),
         'key_secret' => env('RAZORPAY_KEY_SECRET'),
+        'webhook_secret' => env('RAZORPAY_WEBHOOK_SECRET'),
     ],
 
     'nimbuspost' => [
         'email' => env('NIMBUSPOST_EMAIL'),
         'password' => env('NIMBUSPOST_PASSWORD'),
         'api_key' => env('NIMBUSPOST_API_KEY'),
+        'webhook_secret' => env('NIMBUSPOST_WEBHOOK_SECRET'),
     ],
 
 ];

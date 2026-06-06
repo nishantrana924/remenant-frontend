@@ -13,11 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             \App\Http\Middleware\HandleUnpolyRequests::class,
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
         
-        // Exclude NimbusPost webhook from CSRF verification
+        // Exclude NimbusPost and Razorpay webhooks from CSRF verification
         $middleware->validateCsrfTokens(except: [
             'webhooks/nimbuspost',
+            'webhooks/razorpay',
         ]);
         
         $middleware->alias([

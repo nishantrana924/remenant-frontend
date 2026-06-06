@@ -17,6 +17,6 @@
     },
     "dependencies": {
         "@tailwindcss/forms": "^0.5.9",
-        "axios": "^1.16.0"
+        "axios": "^1.7.4"
     }
 }

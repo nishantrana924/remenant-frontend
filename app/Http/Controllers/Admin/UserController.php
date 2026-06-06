@@ -13,14 +13,14 @@ class UserController extends Controller
     {
         // withTrashed() ensures soft-deleted users still appear in the admin list
         // Filter for role_id 2 (Regular Customers)
-        $items = User::where('role_id', 2)->withTrashed()->with('orders')->latest()->get();
+        $items = User::where('role_id', 2)->withTrashed()->with('orders')->latest()->paginate(50);
         return view('admin.customers.index', compact('items'));
     }
 
     public function admins()
     {
         // Filter for role_id 1 (Administrators)
-        $items = User::where('role_id', 1)->withTrashed()->with('orders')->latest()->get();
+        $items = User::where('role_id', 1)->withTrashed()->with('orders')->latest()->paginate(50);
         return view('admin.admins.index', compact('items'));
     }
 

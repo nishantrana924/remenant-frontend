@@ -5,9 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\PurifiesHtml;
+
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, PurifiesHtml;
+
+    public $htmlPurifiable = [
+        'description',
+        'long_description',
+        'specs',
+        'nutrition_description',
+        'brand_info',
+        'benefits_title',
+        'benefits_subtitle'
+    ];
 
     protected $guarded = [];
 

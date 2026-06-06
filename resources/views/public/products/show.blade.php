@@ -7,6 +7,7 @@
         'keywords' => $product->meta_keywords ?? '',
         'image' => \App\Helpers\ImageHelper::getUrl($product->image, 'images/products'),
         'og_type' => 'product',
+        'canonical' => url()->current(),
     ]);
 
     seo()->addSchema('Product', [
@@ -30,6 +31,29 @@
             '@type' => 'AggregateRating',
             'ratingValue' => $product->rating ?? 4.5,
             'reviewCount' => $product->reviews ?? 10
+        ]
+    ]);
+
+    seo()->addSchema('BreadcrumbList', [
+        'itemListElement' => [
+            [
+                '@type' => 'ListItem',
+                'position' => 1,
+                'name' => 'Home',
+                'item' => url('/')
+            ],
+            [
+                '@type' => 'ListItem',
+                'position' => 2,
+                'name' => 'Products',
+                'item' => route('products.index')
+            ],
+            [
+                '@type' => 'ListItem',
+                'position' => 3,
+                'name' => $product->title,
+                'item' => request()->url()
+            ]
         ]
     ]);
 @endphp

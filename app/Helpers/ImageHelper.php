@@ -24,7 +24,7 @@ class ImageHelper
             mkdir($uploadPath, 0777, true);
         }
         
-        $filename = time() . '-' . \Illuminate\Support\Str::random(10) . '.webp';
+        $filename = bin2hex(random_bytes(16)) . '.webp';
         $fullPath = $uploadPath . '/' . $filename;
 
         // Convert to WebP using GD

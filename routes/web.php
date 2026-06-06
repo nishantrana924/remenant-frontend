@@ -11,19 +11,22 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NimbusWebhookController;
 
 // ─── NimbusPost Webhook (CSRF-exempt, no auth required) ───────────────────────
-Route::post('/webhooks/nimbuspost', [NimbusWebhookController::class, 'handle'])->name('webhooks.nimbuspost');
+Route::post('/webhooks/nimbuspost', [NimbusWebhookController::class, 'handle'])
+    ->middleware(\App\Http\Middleware\RateLimitNimbusWebhooks::class)
+    ->name('webhooks.nimbuspost');
 // ──────────────────────────────────────────────────────────────────────────────
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/sitemap.xml', [\App\Http\Controllers\Public\SitemapController::class, 'index']);
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout')->middleware('auth');
-Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store')->middleware('auth');
+Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store')->middleware(['auth', 'throttle:10,1']);
 Route::get('/checkout/payment/{order}', [CheckoutController::class, 'payment'])->name('checkout.payment')->middleware('auth');
-Route::post('/checkout/payment/{order}/mock', [CheckoutController::class, 'mockPayment'])->name('checkout.payment.mock')->middleware('auth');
-Route::post('/checkout/payment/verify', [CheckoutController::class, 'verifyPayment'])->name('checkout.payment.verify')->middleware('auth');
-Route::get('/track-order/{order_number?}', [CheckoutController::class, 'track'])->name('order.track');
+Route::post('/webhooks/razorpay', [\App\Http\Controllers\RazorpayWebhookController::class, 'handle'])->name('webhooks.razorpay');
+Route::post('/checkout/payment/verify', [CheckoutController::class, 'verifyPayment'])->name('checkout.payment.verify')->middleware(['auth', 'throttle:10,1']);
+Route::get('/track-order/{order_number?}', [CheckoutController::class, 'track'])->name('order.track')->middleware('auth');
 Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success')->middleware('auth');
-Route::get('/order/{order}/invoice', [CheckoutController::class, 'invoice'])->name('order.invoice');
+Route::get('/order/{order}/invoice', [CheckoutController::class, 'invoice'])->name('order.invoice')->middleware('auth');
+Route::post('/order/{order}/reorder', [CheckoutController::class, 'reorder'])->name('order.reorder')->middleware('auth');
 
 
 Route::get('/about', [\App\Http\Controllers\Public\AboutController::class, 'index'])->name('about');
@@ -43,7 +46,7 @@ Route::patch('/cart/update', [CartController::class, 'update'])->name('cart.upda
 Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/search-suggestions', [ProductController::class, 'searchSuggestions'])->name('products.search-suggestions');
+Route::get('/products/search-suggestions', [ProductController::class, 'searchSuggestions'])->name('products.search-suggestions')->middleware('throttle:30,1');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/product/{slug}/reviews', [ProductController::class, 'reviews'])->name('products.reviews');
 Route::post('/product/{id}/reviews', [ProductController::class, 'storeReview'])->name('products.reviews.store');
@@ -65,6 +68,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('dashboard');
     Route::get('/my-orders', [DashboardController::class, 'user'])
         ->name('my-orders');
+    Route::post('/orders/{order}/cancel', [DashboardController::class, 'cancelOrder'])
+        ->name('order.cancel');
 
     Route::get('/profile', function() { return redirect()->route('my-orders', ['tab' => 'profile']); })->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -100,6 +105,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('orders/{id}/packing-slip', [\App\Http\Controllers\Admin\OrderController::class, 'generatePackingSlip'])->name('orders.packing-slip');
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
     Route::post('orders/{id}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::post('orders/{id}/approve-cancellation', [\App\Http\Controllers\Admin\OrderController::class, 'approveCancellation'])->name('orders.approve-cancellation');
+    Route::post('orders/{id}/reject-cancellation', [\App\Http\Controllers\Admin\OrderController::class, 'rejectCancellation'])->name('orders.reject-cancellation');
     Route::get('shipping', [\App\Http\Controllers\Admin\ShippingController::class, 'index'])->name('shipping.index');
     Route::get('refunds', [\App\Http\Controllers\Admin\RefundController::class, 'index'])->name('refunds.index');
     Route::get('admins', [\App\Http\Controllers\Admin\UserController::class, 'admins'])->name('admins.index');

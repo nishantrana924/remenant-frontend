@@ -7,197 +7,466 @@
 <div class="w-full bg-[#F1F3F6] pt-0 dashboard-root">
     <div class="w-full flex flex-col md:flex-row min-h-screen pt-0">
         
-        <!-- Sidebar (Fixed Style) -->
-        <div class="w-full md:w-[260px] bg-white border-r border-slate-200 shrink-0 min-h-[calc(100vh-80px)]">
+        <!-- Sidebar (Premium SaaS Style) -->
+        <div class="w-full md:w-[260px] bg-white border-r border-slate-200 shrink-0 min-h-[calc(100vh-80px)] flex flex-col">
             <!-- Profile Block -->
-            <div class="p-6 border-b border-slate-100 flex items-center gap-3 bg-slate-50/20">
-                <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 shrink-0">
-                    <i data-lucide="user" class="h-5 w-5"></i>
+            <div class="p-6 flex items-center gap-4 border-b border-slate-100">
+                <div class="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 shrink-0 overflow-hidden border border-slate-200">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=f8fafc&color=64748b" alt="Avatar" class="h-full w-full object-cover">
                 </div>
                 <div class="min-w-0">
-                    <p class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Logged in as</p>
-                    <h2 class="text-xs font-black text-slate-900 truncate uppercase">{{ auth()->user()->name }}</h2>
+                    <h2 class="text-sm font-semibold text-slate-900 truncate">{{ auth()->user()->name }}</h2>
+                    <p class="text-xs font-medium text-slate-500 truncate">{{ auth()->user()->email ?? 'Customer Account' }}</p>
                 </div>
             </div>
 
             <!-- Navigation Switcher -->
-            <div class="flex flex-col" id="dashboard-nav">
-                <button onclick="switchTab('orders', this)" class="nav-link px-6 py-4 flex items-center gap-4 {{ $activeTab === 'orders' ? 'active bg-orange-50 text-orange-600 border-r-4 border-orange-500' : '' }} transition-all">
-                    <i data-lucide="shopping-bag" class="h-4 w-4"></i>
-                    <span class="text-[11px] font-black uppercase tracking-widest text-left">My Orders</span>
-                </button>
+            <div class="flex-1 px-4 py-6 space-y-8" id="dashboard-nav">
                 
-                <div class="border-b border-slate-50">
-                    <div class="px-6 py-4 flex items-center gap-4 text-slate-400">
-                        <i data-lucide="user-cog" class="h-4 w-4"></i>
-                        <span class="text-[11px] font-black uppercase tracking-widest text-slate-900">Settings</span>
-                    </div>
-                    <div class="pb-2">
-                        <button onclick="switchTab('profile', this)" class="nav-link block w-full text-left px-14 py-2 text-[10px] font-bold {{ $activeTab === 'profile' ? 'active text-orange-500' : 'text-slate-500' }} hover:text-orange-500 transition-all uppercase">Profile Information</button>
-                        <button onclick="switchTab('addresses', this)" class="nav-link block w-full text-left px-14 py-2 text-[10px] font-bold {{ $activeTab === 'addresses' ? 'active text-orange-500' : 'text-slate-500' }} hover:text-orange-500 transition-all uppercase">My Addresses</button>
-                    </div>
+                <!-- Group: Shopping -->
+                <div class="space-y-2">
+                    <h3 class="text-xs font-semibold text-slate-400 px-3 mb-3 uppercase tracking-wider">Shopping</h3>
+                    <button onclick="switchTab('orders', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'orders' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all">
+                        <i data-lucide="shopping-bag" class="h-4 w-4" stroke-width="1.5"></i>
+                        <span class="text-sm font-medium">My Orders</span>
+                    </button>
+                </div>
+                
+                <!-- Group: Account -->
+                <div class="space-y-2">
+                    <h3 class="text-xs font-semibold text-slate-400 px-3 mb-3 uppercase tracking-wider">Account</h3>
+                    <button onclick="switchTab('profile', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'profile' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all">
+                        <i data-lucide="user-cog" class="h-4 w-4" stroke-width="1.5"></i>
+                        <span class="text-sm font-medium">Profile Info</span>
+                    </button>
+                    <button onclick="switchTab('addresses', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'addresses' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all">
+                        <i data-lucide="map-pin" class="h-4 w-4" stroke-width="1.5"></i>
+                        <span class="text-sm font-medium">Addresses</span>
+                    </button>
                 </div>
 
-                <div class="border-b border-slate-50">
-                    <div class="px-6 py-4 flex items-center gap-4 text-slate-400">
-                        <i data-lucide="wallet" class="h-4 w-4"></i>
-                        <span class="text-[11px] font-black uppercase tracking-widest text-slate-900">Wallet</span>
-                    </div>
-                    <div class="pb-2">
-                        <button onclick="switchTab('giftcards', this)" class="nav-link block w-full text-left px-14 py-2 text-[10px] font-bold {{ $activeTab === 'giftcards' ? 'active text-orange-500' : 'text-slate-500' }} hover:text-orange-500 transition-all uppercase">Gift Cards</button>
-                        <button onclick="switchTab('payments', this)" class="nav-link block w-full text-left px-14 py-2 text-[10px] font-bold {{ $activeTab === 'payments' ? 'active text-orange-500' : 'text-slate-500' }} hover:text-orange-500 transition-all uppercase">Saved UPI</button>
-                    </div>
+                <!-- Group: Billing -->
+                <div class="space-y-2">
+                    <h3 class="text-xs font-semibold text-slate-400 px-3 mb-3 uppercase tracking-wider">Billing</h3>
+                    <button onclick="switchTab('giftcards', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'giftcards' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all">
+                        <i data-lucide="gift" class="h-4 w-4" stroke-width="1.5"></i>
+                        <span class="text-sm font-medium">Gift Cards</span>
+                    </button>
+                    <button onclick="switchTab('payments', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'payments' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all">
+                        <i data-lucide="credit-card" class="h-4 w-4" stroke-width="1.5"></i>
+                        <span class="text-sm font-medium">Saved UPI</span>
+                    </button>
                 </div>
+            </div>
 
-                <div class="p-6 mt-auto">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="flex items-center gap-4 text-rose-500 hover:opacity-80 transition-all w-full text-left">
-                            <i data-lucide="log-out" class="h-4 w-4"></i>
-                            <span class="text-[11px] font-black uppercase tracking-widest">Sign Out</span>
-                        </button>
-                    </form>
-                </div>
+            <!-- Sign Out -->
+            <div class="p-6 border-t border-slate-100">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="flex items-center gap-3 text-slate-500 hover:text-rose-600 hover:bg-rose-50 px-3 py-2.5 rounded-lg transition-all w-full text-left">
+                        <i data-lucide="log-out" class="h-4 w-4" stroke-width="1.5"></i>
+                        <span class="text-sm font-medium">Sign Out</span>
+                    </button>
+                </form>
             </div>
         </div>
 
         <!-- Content Area -->
-        <div class="flex-1 bg-white min-h-[calc(100vh-80px)] relative overflow-hidden">
+        <div class="flex-1 bg-white min-h-[calc(100vh-80px)] relative min-w-0">
             
             <!-- SECTION: ORDERS -->
-            <div id="section-orders" class="tab-section {{ $activeTab !== 'orders' ? 'hidden' : '' }} transition-all duration-300">
-                <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white sticky top-[72px] lg:top-[80px] z-10">
-                    <h3 class="text-lg font-black uppercase tracking-tighter text-slate-900">Order Intelligence</h3>
-                </div>
-                <div class="divide-y divide-slate-50 bg-white">
-                    @forelse($orders as $order)
-                    <div class="px-4 sm:px-6 py-6 md:px-10 hover:bg-slate-50 transition-all group">
-                        <div class="flex flex-col md:flex-row items-center gap-6 md:gap-10">
-                            <div class="h-14 w-14 bg-white p-2 flex items-center justify-center border border-slate-100 rounded-lg shrink-0">
-                                <i data-lucide="package" class="h-7 w-7 text-slate-200"></i>
+            <div id="section-orders" class="tab-section {{ $activeTab !== 'orders' ? 'hidden' : '' }} transition-all duration-300 bg-slate-50/50 min-h-screen pb-12">
+                <!-- Top KPI Dashboard -->
+                <div class="px-4 sm:px-8 pt-10 pb-6 border-b border-slate-200/60 bg-white">
+                    <h3 class="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 mb-8">My Orders</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+                            <div class="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
+                                <i data-lucide="shopping-bag" class="h-5 w-5 text-slate-500" stroke-width="1.5"></i>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center justify-between gap-4 mb-1">
-                                    <h4 class="text-[12px] font-black text-slate-900 uppercase">Order #{{ $order->order_number }}</h4>
-                                    <span class="text-xs font-black text-slate-900">₹{{ number_format($order->total_amount) }}</span>
-                                </div>
-                                <div class="flex items-center gap-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                                    <span>{{ $order->created_at->format('M d, Y') }}</span>
-                                    <span class="h-3 w-px bg-slate-200"></span>
-                                    <span class="text-emerald-600 font-black">{{ strtoupper($order->payment_status) }}</span>
+                            <div>
+                                <p class="text-sm font-medium text-slate-500">Total Orders</p>
+                                <div class="flex items-baseline gap-2 mt-0.5">
+                                    <span class="text-2xl font-semibold text-slate-900">{{ $orderStats['total'] ?? 0 }}</span>
+                                    <span class="text-xs font-medium text-slate-400">Lifetime</span>
                                 </div>
                             </div>
-                            <div class="w-full md:w-48 flex flex-col md:items-end gap-1.5 shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-slate-50">
-                                <span class="text-[9px] font-black text-orange-500 bg-orange-50 px-3 py-1 rounded-full uppercase">
-                                    {{ $order->delivery_status ?? 'Processing' }}
-                                </span>
-                                <div class="flex items-center gap-3 mt-1">
-                                    <a href="{{ route('order.track', ['order_number' => $order->order_number]) }}" class="text-[9px] font-black text-slate-400 hover:text-orange-500 uppercase flex items-center gap-1">
-                                        <i data-lucide="navigation" class="h-2.5 w-2.5"></i> Track
-                                    </a>
-                                    <span class="h-2 w-px bg-slate-200"></span>
-                                    <a href="#" class="text-[9px] font-black text-slate-400 hover:text-slate-900 uppercase flex items-center gap-1">
-                                        <i data-lucide="download" class="h-2.5 w-2.5"></i> Invoice
-                                    </a>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+                            <div class="h-12 w-12 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                                <i data-lucide="package" class="h-5 w-5 text-emerald-500" stroke-width="1.5"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-slate-500">Active</p>
+                                <div class="flex items-baseline gap-2 mt-0.5">
+                                    <span class="text-2xl font-semibold text-slate-900">{{ $orderStats['active'] ?? 0 }}</span>
+                                    <span class="text-xs font-medium text-slate-400">In Progress</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+                            <div class="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                                <i data-lucide="package-check" class="h-5 w-5 text-blue-500" stroke-width="1.5"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-slate-500">Delivered</p>
+                                <div class="flex items-baseline gap-2 mt-0.5">
+                                    <span class="text-2xl font-semibold text-slate-900">{{ $orderStats['delivered'] ?? 0 }}</span>
+                                    <span class="text-xs font-medium text-slate-400">History</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+                            <div class="h-12 w-12 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+                                <i data-lucide="clock" class="h-5 w-5 text-orange-500" stroke-width="1.5"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-slate-500">Pending</p>
+                                <div class="flex items-baseline gap-2 mt-0.5">
+                                    <span class="text-2xl font-semibold text-slate-900">{{ $orderStats['pending'] ?? 0 }}</span>
+                                    <span class="text-xs font-medium text-slate-400">Action Required</span>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Orders List -->
+                <div class="px-4 sm:px-8 max-w-5xl mx-auto space-y-8 mt-8">
+                    @forelse($orders as $order)
+                        @php
+                            $isPaid = $order->payment_status === 'paid' || $order->payment_method === 'cod';
+                            $isFailed = $order->payment_status === 'failed';
+                            $isDelivered = strtolower($order->delivery_status) === 'delivered';
+                            $isShipped = strtolower($order->delivery_status) === 'shipped';
+                            $canCancel = !in_array(strtolower($order->delivery_status ?? ''), ['shipped', 'out_for_delivery', 'delivered', 'returned']) && !in_array(strtolower($order->status), ['shipped', 'out_for_delivery', 'delivered', 'returned', 'cancelled', 'cancellation_requested']);
+                            
+                            $firstItem = $order->orderItems->first();
+                            $additionalCount = $order->orderItems->count() - 1;
+                            $productImage = $firstItem && $firstItem->product ? \App\Helpers\ImageHelper::getUrl($firstItem->product->image, 'images/products') : 'https://ui-avatars.com/api/?name=P&background=f8fafc&color=64748b';
+                            $productName = $firstItem && $firstItem->product ? $firstItem->product->title : 'Unknown Product';
+                            
+                            // Determine Border & Background Classes
+                            if($isFailed) {
+                                $cardClasses = "border-rose-100 bg-white";
+                                $badgeClass = "bg-rose-50 text-rose-600 border border-rose-100";
+                                $badgeIcon = "x-circle";
+                                $badgeText = "Payment Failed";
+                            } elseif(!$isPaid) {
+                                $cardClasses = "border-orange-200 bg-white shadow-sm shadow-orange-500/5";
+                                $badgeClass = "bg-orange-50 text-orange-600 border border-orange-100";
+                                $badgeIcon = "alert-circle";
+                                $badgeText = "Pending Payment";
+                            } else {
+                                $cardClasses = "border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow";
+                                $badgeClass = "bg-emerald-50 text-emerald-600 border border-emerald-100";
+                                $badgeIcon = "check-circle-2";
+                                $badgeText = "Confirmed";
+                            }
+                        @endphp
+                        
+                        <!-- Order Card -->
+                        <div class="rounded-2xl border {{ $cardClasses }} overflow-hidden">
+                            <!-- Header -->
+                            <div class="bg-slate-50/50 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 gap-4">
+                                <div class="flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-slate-500 text-xs">Order Placed</span>
+                                        <span class="font-semibold text-slate-900">{{ $order->created_at->format('d M Y') }}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-slate-500 text-xs">Total Amount</span>
+                                        <span class="font-semibold text-slate-900">₹{{ number_format($order->total_amount) }}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-slate-500 text-xs">Order Number</span>
+                                        <span class="font-semibold text-slate-900">#{{ $order->order_number }}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 {{ $badgeClass }}">
+                                        <i data-lucide="{{ $badgeIcon }}" class="h-3.5 w-3.5" stroke-width="2"></i> {{ $badgeText }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Body -->
+                            <div class="p-6">
+                                <div class="flex flex-col md:flex-row gap-6">
+                                    <!-- Image -->
+                                    <div class="shrink-0 h-24 w-24 bg-slate-50 rounded-xl overflow-hidden border border-slate-100">
+                                        <img src="{{ $productImage }}" alt="{{ $productName }}" class="h-full w-full object-cover">
+                                    </div>
+                                    
+                                    <!-- Product Details -->
+                                    <div class="flex-1">
+                                        <h4 class="text-base font-semibold text-slate-900 leading-tight">{{ $productName }}</h4>
+                                        <p class="text-sm font-normal text-slate-500 mt-1">Qty: {{ $firstItem->quantity ?? 1 }}</p>
+                                        @if($additionalCount > 0)
+                                            <p class="text-xs font-medium text-slate-600 mt-2 bg-slate-50 inline-block px-2.5 py-1 rounded-md border border-slate-200">+ {{ $additionalCount }} More Items</p>
+                                        @endif
+                                        <p class="text-sm font-medium text-slate-800 mt-4">
+                                            @if($isDelivered)
+                                                <span class="flex items-center gap-1.5 text-slate-600"><i data-lucide="package-check" class="h-4 w-4 text-emerald-500"></i> Delivered on {{ \Carbon\Carbon::parse($order->updated_at)->format('d M Y') }}</span>
+                                            @elseif($isPaid)
+                                                Expected Delivery: <span class="font-semibold text-emerald-600">{{ \Carbon\Carbon::parse($order->created_at)->addDays(3)->format('d M Y') }}</span>
+                                            @else
+                                                <span class="text-orange-600">Awaiting Payment Completion</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                    
+                                    <!-- Actions -->
+                                    <div class="shrink-0 flex flex-col gap-3 w-full md:w-48 mt-4 md:mt-0">
+                                        @if($isPaid)
+                                            <a href="{{ route('order.track', ['order_number' => $order->order_number]) }}" class="w-full text-center bg-orange-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-orange-700 hover:shadow-lg shadow-orange-500/20 transition-all">Track Order</a>
+                                            <form action="{{ route('order.reorder', ['order' => $order->order_number]) }}" method="POST" class="w-full">
+                                                @csrf
+                                                <button type="submit" class="w-full bg-white border border-slate-200 text-slate-700 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-slate-300 transition-all">Buy Again</button>
+                                            </form>
+                                        @else
+                                            <a href="{{ route('checkout.payment', ['order' => $order->order_number]) }}" class="w-full text-center bg-orange-600 text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-orange-700 hover:shadow-lg shadow-orange-500/20 transition-all">Complete Payment</a>
+                                        @endif
+                                        
+                                        @if($canCancel)
+                                            <button type="button" onclick="openCancelModal('{{ $order->id }}', '{{ $order->order_number }}', '{{ $isPaid ? '1' : '0' }}')" class="w-full bg-white border border-slate-200 text-slate-600 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 hover:text-rose-600 hover:border-rose-200 transition-all">Cancel Order</button>
+                                        @endif
+                                        <div class="flex items-center justify-between mt-1 px-1">
+                                            <a href="{{ route('order.invoice', ['order' => $order->order_number]) }}" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5">
+                                                <i data-lucide="download" class="h-3.5 w-3.5"></i> Invoice
+                                            </a>
+                                            <a href="https://wa.me/919876543210?text=Help with Order #{{ $order->order_number }}" target="_blank" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5">
+                                                <i data-lucide="life-buoy" class="h-3.5 w-3.5"></i> Help
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     @empty
-                    <div class="py-32 text-center"><i data-lucide="package-x" class="h-10 w-10 text-slate-100 mx-auto mb-4"></i><p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">No history found</p></div>
+                        <!-- Empty State -->
+                        <div class="py-20 px-6 text-center border border-dashed border-slate-200 rounded-2xl bg-white shadow-sm">
+                            <div class="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-5 border border-slate-100">
+                                <i data-lucide="shopping-bag" class="h-8 w-8 text-slate-400" stroke-width="1.5"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-slate-900 mb-2">No Orders Yet</h3>
+                            <p class="text-sm font-normal text-slate-500 mb-8 max-w-sm mx-auto">You haven't placed any orders. Discover our premium collection and start your journey.</p>
+                            <a href="{{ route('products.index') }}" class="inline-flex items-center justify-center bg-orange-600 text-white px-8 py-3 rounded-xl text-sm font-medium hover:bg-orange-700 hover:shadow-lg shadow-orange-500/20 transition-all">Browse Products</a>
+                        </div>
                     @endforelse
+                    
+                    <!-- Pagination -->
+                    @if(method_exists($orders, 'links') && $orders->hasPages())
+                    <div class="mt-12">
+                        {{ $orders->appends(request()->query())->links() }}
+                    </div>
+                    @endif
+                    </div>
+
+                    @if($cancelledOrders->count() > 0)
+                        <div class="mt-16 mb-8 flex items-center justify-between">
+                            <h3 class="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900">Cancelled Orders</h3>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            @foreach($cancelledOrders as $order)
+                                @php
+                                    $firstItem = $order->orderItems->first();
+                                    $additionalCount = $order->orderItems->count() - 1;
+                                    $productImage = $firstItem && $firstItem->product ? \App\Helpers\ImageHelper::getUrl($firstItem->product->image, 'images/products') : 'https://ui-avatars.com/api/?name=P&background=f8fafc&color=64748b';
+                                    $productName = $firstItem && $firstItem->product ? $firstItem->product->title : 'Unknown Product';
+                                    
+                                    $isPendingReview = $order->status === 'cancellation_requested';
+                                    $badgeText = $isPendingReview ? 'Cancellation Pending' : 'Cancelled';
+                                @endphp
+                                
+                                <div class="rounded-2xl border border-rose-100 bg-white overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+                                    <!-- Header -->
+                                    <div class="bg-slate-50/50 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 gap-4">
+                                        <div class="flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
+                                            <div class="flex flex-col">
+                                                <span class="font-medium text-slate-500 text-xs">Cancelled On</span>
+                                                <span class="font-semibold text-slate-900">{{ $order->cancelled_at ? \Carbon\Carbon::parse($order->cancelled_at)->format('d M Y') : $order->updated_at->format('d M Y') }}</span>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span class="font-medium text-slate-500 text-xs">Total Amount</span>
+                                                <span class="font-semibold text-slate-900">₹{{ number_format($order->total_amount) }}</span>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span class="font-medium text-slate-500 text-xs">Order Number</span>
+                                                <span class="font-semibold text-slate-900">#{{ $order->order_number }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 bg-rose-50 text-rose-600 border border-rose-100">
+                                                <i data-lucide="{{ $isPendingReview ? 'clock' : 'x-circle' }}" class="h-3.5 w-3.5" stroke-width="2"></i> {{ $badgeText }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Body -->
+                                    <div class="p-6">
+                                        <div class="flex flex-col md:flex-row gap-6">
+                                            <!-- Image -->
+                                            <div class="shrink-0 h-24 w-24 bg-slate-50 rounded-xl overflow-hidden border border-slate-100 grayscale opacity-70">
+                                                <img src="{{ $productImage }}" alt="{{ $productName }}" class="h-full w-full object-cover">
+                                            </div>
+                                            
+                                            <!-- Product Details -->
+                                            <div class="flex-1">
+                                                <h4 class="text-base font-semibold text-slate-900 leading-tight">{{ $productName }}</h4>
+                                                <p class="text-sm font-normal text-slate-500 mt-1">Qty: {{ $firstItem->quantity ?? 1 }}</p>
+                                                @if($additionalCount > 0)
+                                                    <p class="text-xs font-medium text-slate-600 mt-2 bg-slate-50 inline-block px-2.5 py-1 rounded-md border border-slate-200">+ {{ $additionalCount }} More Items</p>
+                                                @endif
+                                                
+                                                <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-100 inline-flex flex-col gap-1.5">
+                                                    <p class="text-xs font-medium text-slate-600">
+                                                        <span class="font-semibold text-slate-800">Reason:</span> {{ $order->cancellation_reason ?? 'Customer Request' }}
+                                                    </p>
+                                                    @if($order->payment_status === 'paid' || $order->refund_status !== 'none')
+                                                        <div class="mt-2 space-y-1">
+                                                            <p class="text-xs font-medium text-slate-600 flex items-center gap-1.5">
+                                                                <span class="font-semibold text-slate-800">Refund Status:</span> 
+                                                                <span class="{{ $order->refund_status === 'completed' ? 'text-emerald-600' : ($order->refund_status === 'failed' ? 'text-rose-600' : 'text-orange-600') }} font-bold uppercase tracking-wider text-[10px]">{{ $order->refund_status }}</span>
+                                                            </p>
+                                                            @if($order->refund_amount)
+                                                                <p class="text-xs font-medium text-slate-600 flex items-center gap-1.5">
+                                                                    <span class="font-semibold text-slate-800">Refund Amount:</span> 
+                                                                    <span>₹{{ number_format($order->refund_amount) }}</span>
+                                                                </p>
+                                                            @endif
+                                                            @if($order->razorpay_refund_id)
+                                                                <p class="text-xs font-medium text-slate-600 flex items-center gap-1.5">
+                                                                    <span class="font-semibold text-slate-800">Refund Reference:</span> 
+                                                                    <span class="font-mono text-[10px] bg-slate-100 px-1.5 py-0.5 rounded">{{ $order->razorpay_refund_id }}</span>
+                                                                </p>
+                                                            @endif
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        <!-- Pagination -->
+                        @if(method_exists($cancelledOrders, 'links') && $cancelledOrders->hasPages())
+                        <div class="mt-8">
+                            {{ $cancelledOrders->appends(request()->query())->links() }}
+                        </div>
+                        @endif
+                    @endif
                 </div>
             </div>
 
             <!-- SECTION: PROFILE -->
-            <div id="section-profile" class="tab-section {{ $activeTab !== 'profile' ? 'hidden' : '' }} p-10 transition-all duration-300">
-                <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900 mb-8">Profile Intelligence</h3>
-                <form method="post" action="{{ route('profile.update') }}" class="max-w-xl space-y-6">
-                    @csrf @method('patch')
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Full Name</label>
-                        <input type="text" name="name" value="{{ $user->name }}" class="w-full bg-[#F1F3F6] border-none px-6 py-3 text-xs font-bold outline-none rounded-sm focus:ring-1 focus:ring-orange-500/20">
+            <div id="section-profile" class="tab-section {{ $activeTab !== 'profile' ? 'hidden' : '' }} bg-slate-50 min-h-[calc(100vh-80px)] transition-all duration-300 p-8 sm:p-12 lg:p-16 w-full">
+                <div class="w-full">
+                    <!-- Header -->
+                    <div class="mb-10">
+                        <h3 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">Profile Information</h3>
+                        <p class="text-sm text-slate-500 mt-2">Manage your personal details and account settings</p>
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Address</label>
-                        <input type="email" name="email" value="{{ $user->email }}" class="w-full bg-[#F1F3F6] border-none px-6 py-3 text-xs font-bold outline-none rounded-sm focus:ring-1 focus:ring-orange-500/20">
-                    </div>
-                    <div class="pt-4 flex items-center justify-between">
-                        <button type="submit" class="bg-orange-600 text-white px-10 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-orange-700 transition-all rounded-xl shadow-lg shadow-orange-100">Save Changes</button>
-                    </div>
-                </form>
 
-                <div class="h-px bg-slate-50 my-12"></div>
-
-                <!-- SUBSECTION: PASSWORD -->
-                <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900 mb-8">Security & Password</h3>
-                <form method="post" action="{{ route('password.update') }}" class="max-w-xl space-y-6">
-                    @csrf @method('put')
-                    
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Password</label>
-                        <div class="relative">
-                            <input type="password" name="current_password" class="password-input w-full bg-[#F1F3F6] border-none px-6 py-3 text-xs font-bold outline-none rounded-sm focus:ring-1 focus:ring-orange-500/20">
-                            <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                                <i data-lucide="eye" class="h-4 w-4 eye-icon"></i>
-                                <i data-lucide="eye-off" class="h-4 w-4 eye-off-icon hidden"></i>
-                            </button>
+                    <div class="space-y-8">
+                        <!-- Profile Form Card -->
+                        <div class="bg-white rounded-[20px] shadow-sm border border-slate-200/60 p-8">
+                            <form method="post" action="{{ route('profile.update') }}" class="space-y-6">
+                                @csrf @method('patch')
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-2.5">
+                                        <label class="text-[13px] font-semibold text-slate-700 block">Full Name</label>
+                                        <input type="text" name="name" value="{{ $user->name }}" class="w-full bg-transparent border border-slate-200 px-4 h-11 text-sm font-medium text-slate-900 outline-none rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all">
+                                    </div>
+                                    <div class="space-y-2.5">
+                                        <label class="text-[13px] font-semibold text-slate-700 block">Email Address</label>
+                                        <input type="email" name="email" value="{{ $user->email }}" class="w-full bg-transparent border border-slate-200 px-4 h-11 text-sm font-medium text-slate-900 outline-none rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all">
+                                    </div>
+                                </div>
+                                <div class="pt-4">
+                                    <button type="submit" class="bg-[#0f172a] text-white px-6 h-11 text-sm font-medium hover:bg-slate-800 transition-all rounded-xl shadow-sm">Save Changes</button>
+                                </div>
+                            </form>
                         </div>
-                    </div>
 
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">New Password</label>
-                            <button type="button" onclick="openForgotPasswordFlow('{{ auth()->user()->email }}')" class="text-[9px] font-black text-orange-500 uppercase tracking-widest hover:underline">Forgot Password?</button>
+                        <!-- Security & Password Card -->
+                        <div class="bg-white rounded-[20px] shadow-sm border border-slate-200/60 p-8">
+                            <h4 class="text-xl font-bold text-slate-900 mb-8">Security & Password</h4>
+                            <form method="post" action="{{ route('password.update') }}" class="space-y-6">
+                                @csrf @method('put')
+                                
+                                <div class="space-y-2.5 max-w-full md:max-w-[calc(50%-12px)]">
+                                    <label class="text-[13px] font-semibold text-slate-700 block">Current Password</label>
+                                    <div class="relative">
+                                        <input type="password" name="current_password" class="password-input w-full bg-transparent border border-slate-200 px-4 h-11 text-sm font-medium text-slate-900 outline-none rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all">
+                                        <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                            <i data-lucide="eye" class="h-4 w-4 eye-icon"></i>
+                                            <i data-lucide="eye-off" class="h-4 w-4 eye-off-icon hidden"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                    <div class="space-y-2.5">
+                                        <div class="flex items-center justify-between">
+                                            <label class="text-[13px] font-semibold text-slate-700 block">New Password</label>
+                                            <button type="button" onclick="openForgotPasswordFlow('{{ auth()->user()->email }}')" class="text-[13px] font-semibold text-orange-600 hover:text-orange-700 hover:underline">Forgot Password?</button>
+                                        </div>
+                                        <div class="relative">
+                                            <input type="password" name="password" class="password-input w-full bg-transparent border border-slate-200 px-4 h-11 text-sm font-medium text-slate-900 outline-none rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all">
+                                            <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                                <i data-lucide="eye" class="h-4 w-4 eye-icon"></i>
+                                                <i data-lucide="eye-off" class="h-4 w-4 eye-off-icon hidden"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-2.5">
+                                        <label class="text-[13px] font-semibold text-slate-700 block">Confirm New Password</label>
+                                        <div class="relative">
+                                            <input type="password" name="password_confirmation" class="password-input w-full bg-transparent border border-slate-200 px-4 h-11 text-sm font-medium text-slate-900 outline-none rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all">
+                                            <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                                <i data-lucide="eye" class="h-4 w-4 eye-icon"></i>
+                                                <i data-lucide="eye-off" class="h-4 w-4 eye-off-icon hidden"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-4">
+                                    <button type="submit" class="bg-[#0f172a] text-white px-6 h-11 text-sm font-medium hover:bg-slate-800 transition-all rounded-xl shadow-sm">Update Password</button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="relative">
-                            <input type="password" name="password" class="password-input w-full bg-[#F1F3F6] border-none px-6 py-3 text-xs font-bold outline-none rounded-sm focus:ring-1 focus:ring-orange-500/20">
-                            <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                                <i data-lucide="eye" class="h-4 w-4 eye-icon"></i>
-                                <i data-lucide="eye-off" class="h-4 w-4 eye-off-icon hidden"></i>
-                            </button>
-                        </div>
-                    </div>
 
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Confirm New Password</label>
-                        <div class="relative">
-                            <input type="password" name="password_confirmation" class="password-input w-full bg-[#F1F3F6] border-none px-6 py-3 text-xs font-bold outline-none rounded-sm focus:ring-1 focus:ring-orange-500/20">
-                            <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                                <i data-lucide="eye" class="h-4 w-4 eye-icon"></i>
-                                <i data-lucide="eye-off" class="h-4 w-4 eye-off-icon hidden"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="pt-4">
-                        <button type="submit" class="bg-orange-600 text-white px-10 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-orange-700 transition-all rounded-xl shadow-lg shadow-orange-100">Update Password</button>
-                    </div>
-                </form>
-
-                <div class="h-px bg-slate-50 my-12"></div>                <!-- SUBSECTION: DEACTIVATE ACCOUNT -->
-                <div class="mt-12 bg-rose-50/30 border border-rose-100 p-8 rounded-2xl relative overflow-hidden group">
-                    <div class="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:scale-110 transition-transform duration-700">
-                        <i data-lucide="user-x" class="h-48 w-48 text-rose-900"></i>
-                    </div>
-                    <div class="relative z-10">
-                        <h3 class="text-lg font-black uppercase tracking-tight text-rose-600 mb-2">Deactivate Account</h3>
-                        <p class="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-8 leading-relaxed max-w-md">Your account will be hidden and you will be logged out. All your data and order history is preserved. You can reactivate instantly by logging back in.</p>
-                        
-                        <form method="post" action="{{ route('profile.destroy') }}" class="flex flex-col md:flex-row items-end gap-4">
-                            @csrf @method('delete')
-                            <div class="w-full md:w-80 space-y-2">
-                                <label class="text-[9px] font-black text-rose-300 uppercase tracking-widest ml-1">Confirm with Password</label>
-                                <input type="password" name="password" placeholder="••••••••" class="password-input w-full bg-white border border-rose-100 px-6 py-3 text-xs font-bold outline-none rounded-xl focus:ring-2 focus:ring-rose-500/10">
+                        <!-- Deactivate Account -->
+                        <div class="bg-white rounded-[20px] shadow-sm border border-rose-100 p-8 relative overflow-hidden group">
+                            <div class="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:scale-110 transition-transform duration-700">
+                                <i data-lucide="user-x" class="h-48 w-48 text-rose-900"></i>
                             </div>
-                            <button type="submit" class="w-full md:w-auto bg-rose-600 text-white px-8 py-3.5 text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all rounded-xl shadow-lg shadow-rose-100">Deactivate Now</button>
-                        </form>
+                            <div class="relative z-10">
+                                <h4 class="text-xl font-bold text-rose-600 mb-3">Deactivate Account</h4>
+                                <p class="text-sm text-slate-500 mb-8 max-w-xl leading-relaxed">Your account will be hidden and you will be logged out. All your data and order history is preserved. You can reactivate instantly by logging back in.</p>
+                                
+                                <form method="post" action="{{ route('profile.destroy') }}" class="flex flex-col sm:flex-row items-end gap-4">
+                                    @csrf @method('delete')
+                                    <div class="w-full sm:w-80 space-y-2.5">
+                                        <label class="text-[13px] font-semibold text-slate-700 block">Confirm with Password</label>
+                                        <input type="password" name="password" placeholder="••••••••" class="password-input w-full bg-slate-50/50 border border-slate-200 px-4 h-11 text-sm font-medium text-slate-900 outline-none rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all">
+                                    </div>
+                                    <button type="submit" class="w-full sm:w-auto bg-rose-600 text-white px-8 h-11 text-sm font-medium hover:bg-rose-700 transition-all rounded-xl shadow-sm">Deactivate Now</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- SECTION: ADDRESSES -->
-            <div id="section-addresses" class="tab-section {{ $activeTab !== 'addresses' ? 'hidden' : '' }} p-6 md:p-10 transition-all duration-300">
+            <div id="section-addresses" class="tab-section {{ $activeTab !== 'addresses' ? 'hidden' : '' }} p-6 md:p-10 transition-all duration-300 w-full">
                 <div class="flex items-center justify-between mb-10">
                     <div>
                         <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900">Manage Addresses</h3>
@@ -248,7 +517,7 @@
             </div>
 
             <!-- SECTION: GIFTCARDS -->
-            <div id="section-giftcards" class="tab-section {{ $activeTab !== 'giftcards' ? 'hidden' : '' }} p-6 md:p-10 transition-all duration-300">
+            <div id="section-giftcards" class="tab-section {{ $activeTab !== 'giftcards' ? 'hidden' : '' }} p-6 md:p-10 transition-all duration-300 w-full">
                 <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900 mb-8">Gift Card Portfolio</h3>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
@@ -302,7 +571,7 @@
             </div>
 
             <!-- SECTION: SAVED UPI -->
-            <div id="section-payments" class="tab-section {{ $activeTab !== 'payments' ? 'hidden' : '' }} p-6 md:p-10 transition-all duration-300">
+            <div id="section-payments" class="tab-section {{ $activeTab !== 'payments' ? 'hidden' : '' }} p-6 md:p-10 transition-all duration-300 w-full">
                 <div class="flex items-center justify-between mb-10">
                     <div>
                         <h3 class="text-xl font-black uppercase tracking-tighter text-slate-900">Saved UPI Methods</h3>
@@ -656,6 +925,86 @@
             showToast('Failed to update default address', 'error');
         }
     }
+
+    function openCancelModal(orderId, orderNumber, isPaid) {
+        document.getElementById('cancel-modal').classList.remove('hidden');
+        document.getElementById('cancel-modal').classList.add('flex');
+        
+        // Set form action
+        const form = document.getElementById('cancel-form');
+        form.action = `/orders/${orderId}/cancel`;
+        
+        document.getElementById('modal-order-number').innerText = orderNumber;
+        
+        // Show refund notice if paid
+        const refundNotice = document.getElementById('refund-notice');
+        if (isPaid === '1') {
+            refundNotice.classList.remove('hidden');
+        } else {
+            refundNotice.classList.add('hidden');
+        }
+    }
+
+    function closeCancelModal() {
+        document.getElementById('cancel-modal').classList.add('hidden');
+        document.getElementById('cancel-modal').classList.remove('flex');
+    }
+    
+    // Form Validation for checkbox
+    document.getElementById('cancel-form').addEventListener('submit', function(e) {
+        const checkbox = document.getElementById('confirm-cancel-checkbox');
+        if (!checkbox.checked) {
+            e.preventDefault();
+            alert('Please confirm that you want to cancel this order.');
+        }
+    });
 </script>
+
+<!-- Cancel Order Modal -->
+<div id="cancel-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative" @click.outside="closeCancelModal()">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-900">Cancel Order #<span id="modal-order-number"></span></h3>
+            <button type="button" onclick="closeCancelModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <i data-lucide="x" class="h-5 w-5"></i>
+            </button>
+        </div>
+        
+        <form id="cancel-form" method="POST" action="">
+            @csrf
+            <div class="p-6 space-y-5">
+                <div>
+                    <label for="cancellation_reason" class="block text-sm font-medium text-slate-700 mb-1.5">Why are you cancelling?</label>
+                    <select name="cancellation_reason" id="cancellation_reason" required class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                        <option value="">Select a reason...</option>
+                        <option value="Changed my mind">I changed my mind</option>
+                        <option value="Found a better price elsewhere">Found a better price elsewhere</option>
+                        <option value="Ordered by mistake">Ordered by mistake</option>
+                        <option value="Delivery is taking too long">Delivery is taking too long</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div id="refund-notice" class="hidden bg-orange-50 border border-orange-100 rounded-xl p-4 flex gap-3">
+                    <i data-lucide="info" class="h-5 w-5 text-orange-600 shrink-0"></i>
+                    <div>
+                        <h4 class="text-sm font-semibold text-orange-800">Refund Information</h4>
+                        <p class="text-xs text-orange-700 mt-1 leading-relaxed">Since you have already paid for this order, a refund will be initiated automatically. Please allow 5-7 business days for the amount to reflect in your original payment method.</p>
+                    </div>
+                </div>
+
+                <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                    <input type="checkbox" id="confirm-cancel-checkbox" class="mt-0.5 rounded border-slate-300 text-rose-600 focus:ring-rose-500">
+                    <span class="text-sm text-slate-700 leading-snug">I understand that cancelling this order is permanent and cannot be undone.</span>
+                </label>
+            </div>
+            
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeCancelModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Go Back</button>
+                <button type="submit" class="px-6 py-2.5 bg-rose-600 text-white text-sm font-semibold rounded-xl hover:bg-rose-700 transition-colors shadow-sm shadow-rose-500/20">Confirm Cancellation</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endpush
 @endsection

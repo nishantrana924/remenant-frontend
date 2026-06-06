@@ -11,22 +11,44 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        // Get active sliders from DB
-        $sliders = Slider::where('status', 1)->orderBy('id', 'desc')->get();
+        $ttl = config('cache.homepage_ttl', 3600);
+
+        $sliders = \Illuminate\Support\Facades\Cache::remember('home.sliders', $ttl, function() {
+            return Slider::where('status', 1)->orderBy('id', 'desc')->get();
+        });
         
-        $productController = new ProductController();
-        $allProducts = $productController->index($request)->getData()['products'];
-            
-        $featuredProducts = $allProducts->take(8);
-        $products = $allProducts;
-        $combos = Product::whereIn('product_type', ['combo', 'both'])->where('status', 'published')->get();
+        $featuredProducts = \Illuminate\Support\Facades\Cache::remember('home.featured_products', $ttl, function() {
+            return Product::with('categories')
+                ->where('status', 'published')
+                ->latest()
+                ->take(8)
+                ->get();
+        });
+
+        $products = \Illuminate\Support\Facades\Cache::remember('home.products', $ttl, function() {
+            return Product::with('categories')
+                ->where('status', 'published')
+                ->latest()
+                ->take(12)
+                ->get();
+        });
+
+        $combos = \Illuminate\Support\Facades\Cache::remember('home.combos', $ttl, function() {
+            return Product::with('categories')
+                ->whereIn('product_type', ['combo', 'both'])
+                ->where('status', 'published')
+                ->take(8)
+                ->get();
+        });
         
-        // Fetch featured reviews for homepage
-        $featuredReviews = \App\Models\Review::with('user')
-            ->where('is_featured', true)
-            ->where('status', 'approved')
-            ->latest()
-            ->get();
+        $featuredReviews = \Illuminate\Support\Facades\Cache::remember('home.featured_reviews', $ttl, function() {
+            return \App\Models\Review::with('user')
+                ->where('is_featured', true)
+                ->where('status', 'approved')
+                ->latest()
+                ->take(5)
+                ->get();
+        });
         
         return view('public.home', compact('sliders', 'featuredProducts', 'products', 'combos', 'featuredReviews'));
     }
