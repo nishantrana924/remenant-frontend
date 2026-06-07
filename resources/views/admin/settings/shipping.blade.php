@@ -36,6 +36,7 @@
                     <i data-lucide="truck" class="w-4 h-4"></i>
                 </div>
                 <div>
+
                     <h3 class="text-sm font-bold text-slate-900 uppercase tracking-widest">Delivery Charges</h3>
                     <p class="text-[9px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">Configure when to charge shipping and how much</p>
                 </div>
