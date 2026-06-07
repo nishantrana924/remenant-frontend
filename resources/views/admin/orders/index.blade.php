@@ -6,6 +6,7 @@
     selectedOrder: null,
     showDrawer: false,
     selectedItems: [],
+    maxBulk: 20,
     allItems: @js($items->pluck('id')),
     activeStatus: 'all',
     dateFilter: '',
@@ -29,10 +30,13 @@
     },
 
     toggleAll() {
-        if (this.selectedItems.length === this.allItems.length) {
+        if (this.selectedItems.length === Math.min(this.allItems.length, this.maxBulk)) {
             this.selectedItems = [];
         } else {
-            this.selectedItems = [...this.allItems];
+            this.selectedItems = this.allItems.slice(0, this.maxBulk);
+            if (this.allItems.length > this.maxBulk) {
+                window.toast(`Only first ${this.maxBulk} orders selected. Max bulk limit is ${this.maxBulk}.`, 'info');
+            }
         }
     },
 
@@ -243,25 +247,36 @@
         </div>
         <div class="flex items-center gap-3">
             <template x-if="selectedItems.length > 0">
-                <div class="flex items-center gap-2">
-                    <button @click="openBulkShipModal()" class="saas-btn-secondary !text-blue-600 !border-blue-100 hover:!bg-blue-50 py-2 px-4 text-xs font-bold flex items-center gap-2" title="Manual Courier & Ship">
-                        <i data-lucide="rocket" class="w-3 h-3"></i>
-                        Bulk Ship
-                    </button>
-                    <button @click="bulkCancelShipment()" class="saas-btn-secondary !text-rose-600 !border-rose-100 hover:!bg-rose-50 py-2 px-4 text-xs font-bold flex items-center gap-2" title="Cancel Shipments">
-                        <i data-lucide="x-circle" class="w-3 h-3"></i>
-                        Bulk Cancel
-                    </button>
-                    <button @click="schedulePickupBulk()" class="saas-btn-secondary !text-indigo-600 !border-indigo-100 hover:!bg-indigo-50 py-2 px-4 text-xs font-bold flex items-center gap-2">
-                        <i data-lucide="truck" class="w-3 h-3"></i>
-                        Schedule Pickup
-                    </button>
-                    <button @click="bulkAction('approve', { status: 'processing', delivery_status: 'packed' })" class="saas-btn-secondary !text-orange-600 !border-orange-100 hover:!bg-orange-50 py-2 px-4 text-xs font-bold">
-                        Approve Selected
-                    </button>
-                    <button @click="bulkAction('delete')" class="saas-btn-secondary !text-rose-500 !border-rose-100 hover:!bg-rose-50 py-2 px-4 text-xs font-bold">
-                        Delete
-                    </button>
+                <div class="flex flex-col gap-2">
+                    {{-- Selection Info Banner --}}
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-orange-50 rounded-xl border border-orange-100">
+                        <i data-lucide="check-square" class="w-3.5 h-3.5 text-orange-500 shrink-0"></i>
+                        <span class="text-[10px] font-bold text-orange-600" x-text="selectedItems.length + ' selected'"></span>
+                        <span class="text-[10px] text-slate-400">•</span>
+                        <span class="text-[10px] font-medium text-slate-500">Max <span class="font-bold text-orange-600" x-text="maxBulk"></span> orders per bulk action</span>
+                        <button @click="selectedItems = []" class="ml-1 text-slate-300 hover:text-rose-500 transition-colors" title="Clear selection">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                    {{-- Bulk Action Buttons --}}
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <button @click="openBulkShipModal()" class="saas-btn-secondary !text-blue-600 !border-blue-100 hover:!bg-blue-50 py-2 px-3 text-xs font-bold flex items-center gap-1.5" title="Manual Courier & Ship">
+                            <i data-lucide="rocket" class="w-3.5 h-3.5"></i>
+                            Bulk Ship
+                        </button>
+                        <button @click="bulkAction('approve', { status: 'processing', delivery_status: 'packed' })" class="saas-btn-secondary !text-emerald-600 !border-emerald-100 hover:!bg-emerald-50 py-2 px-3 text-xs font-bold flex items-center gap-1.5">
+                            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                            Approve
+                        </button>
+                        <button @click="bulkCancelShipment()" class="saas-btn-secondary !text-rose-600 !border-rose-100 hover:!bg-rose-50 py-2 px-3 text-xs font-bold flex items-center gap-1.5" title="Cancel Shipments on NimbusPost">
+                            <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
+                            Cancel Shipment
+                        </button>
+                        <button @click="bulkAction('delete')" class="saas-btn-secondary !text-slate-500 !border-slate-200 hover:!bg-rose-50 hover:!text-rose-600 hover:!border-rose-100 py-2 px-3 text-xs font-bold flex items-center gap-1.5">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            Delete
+                        </button>
+                    </div>
                 </div>
             </template>
             <div class="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
@@ -357,7 +372,21 @@
                         x-show="(!search || '{{ strtolower($item->order_number ?? $item->id) }}'.includes(search.toLowerCase()) || '{{ strtolower($item->customer_name ?? $item->user->name ?? 'Guest') }}'.includes(search.toLowerCase())) && (activeStatus === 'all' || (activeStatus.startsWith('refund_') ? '{{ $item->refund_status }}' === activeStatus.replace('refund_', '') : '{{ $item->status }}' === activeStatus)) && (!dateFilter || '{{ $item->created_at->format('Y-m-d') }}' === dateFilter)"
                         @click.self="selectedOrder = {{ $item->append('calculated_dimensions')->toJson() }}; showDrawer = true">
                         <td class="text-center" @click.stop>
-                            <input type="checkbox" x-model="selectedItems" value="{{ $item->id }}" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
+                            <input type="checkbox" 
+                                :checked="selectedItems.includes({{ $item->id }})"
+                                @change="
+                                    if ($event.target.checked) {
+                                        if (selectedItems.length >= maxBulk) {
+                                            $event.target.checked = false;
+                                            window.toast('Maximum ' + maxBulk + ' orders can be selected at once.', 'error');
+                                        } else {
+                                            selectedItems = [...selectedItems, {{ $item->id }}];
+                                        }
+                                    } else {
+                                        selectedItems = selectedItems.filter(id => id !== {{ $item->id }});
+                                    }
+                                "
+                                class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
                         </td>
                         <td @click="selectedOrder = {{ $item->append('calculated_dimensions')->toJson() }}; showDrawer = true">
                             <div class="flex flex-col">
