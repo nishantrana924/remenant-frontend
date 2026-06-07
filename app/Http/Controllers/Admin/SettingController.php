@@ -56,4 +56,27 @@ class SettingController extends Controller
 
         return redirect()->back()->with('success', 'Invoice settings updated successfully.');
     }
+
+    public function shipping()
+    {
+        $settings = [
+            'shipping_charge'         => (int) SiteSetting::getValue('shipping_charge', 99),
+            'free_shipping_threshold' => (int) SiteSetting::getValue('free_shipping_threshold', 449),
+        ];
+
+        return view('admin.settings.shipping', compact('settings'));
+    }
+
+    public function updateShipping(Request $request)
+    {
+        $request->validate([
+            'shipping_charge'         => 'required|integer|min:0',
+            'free_shipping_threshold' => 'required|integer|min:0',
+        ]);
+
+        SiteSetting::setValue('shipping_charge', $request->shipping_charge);
+        SiteSetting::setValue('free_shipping_threshold', $request->free_shipping_threshold);
+
+        return redirect()->back()->with('success', 'Shipping settings updated successfully.');
+    }
 }

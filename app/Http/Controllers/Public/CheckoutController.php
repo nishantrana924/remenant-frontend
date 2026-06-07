@@ -53,7 +53,9 @@ class CheckoutController extends Controller
         }
 
         $subtotal = collect($items)->sum(fn($item) => $item['price'] * $item['quantity']);
-        $shipping = 0; // Temporarily commented for testing: $subtotal > 999 ? 0 : 99;
+        $shippingCharge     = (int) \App\Models\SiteSetting::getValue('shipping_charge', 99);
+        $freeThreshold      = (int) \App\Models\SiteSetting::getValue('free_shipping_threshold', 449);
+        $shipping = $subtotal > $freeThreshold ? 0 : $shippingCharge;
         $total = $subtotal + $shipping;
 
         $addresses = auth()->check() ? auth()->user()->addresses : [];
@@ -113,7 +115,9 @@ class CheckoutController extends Controller
         });
 
         $subtotal = collect($items)->sum(fn($item) => $item['price'] * $item['quantity']);
-        $shipping = 0; // Temporarily commented for testing: $subtotal > 999 ? 0 : 99;
+        $shippingCharge     = (int) \App\Models\SiteSetting::getValue('shipping_charge', 99);
+        $freeThreshold      = (int) \App\Models\SiteSetting::getValue('free_shipping_threshold', 449);
+        $shipping = $subtotal > $freeThreshold ? 0 : $shippingCharge;
         
         // Handle Coupon with strict validation
         $discount = 0;

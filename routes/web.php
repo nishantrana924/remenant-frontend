@@ -195,6 +195,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     // Settings
     Route::get('settings/invoice', [\App\Http\Controllers\Admin\SettingController::class, 'invoice'])->name('settings.invoice');
     Route::post('settings/invoice', [\App\Http\Controllers\Admin\SettingController::class, 'updateInvoice'])->name('settings.invoice.update');
+    Route::get('settings/shipping', [\App\Http\Controllers\Admin\SettingController::class, 'shipping'])->name('settings.shipping');
+    Route::post('settings/shipping', [\App\Http\Controllers\Admin\SettingController::class, 'updateShipping'])->name('settings.shipping.update');
 });
 
 require __DIR__.'/auth.php';

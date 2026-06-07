@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.NProgress) NProgress.start();
         var url = event.target.pathname;
         if (url.indexOf('/admin') === 0 || url.indexOf('/dashboard') === 0) {
-            event.options.target = '#main-content, #admin-nav, #admin-header-stats';
-            event.options.fallback = '#main-content';
+            event.renderOptions.target = '#main-content, #admin-nav, #admin-header-stats';
+            event.renderOptions.fallback = '#main-content';
         }
     });
 
