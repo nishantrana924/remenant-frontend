@@ -90,31 +90,21 @@ class NimbusPostService
 
             Log::info('NimbusPost cURL Request:', ['method' => $method, 'url' => $url]);
 
-            // Use both Authorization: Bearer AND NP-API-KEY for /shipments/label
-            if ($endpoint === '/shipments/label') {
-                $token = $this->getToken();
-                $apiKey = config('services.nimbuspost.api_key');
-                $headers = [
-                    'NP-API-KEY: ' . $apiKey,
-                    'Authorization: Bearer ' . $token,
-                    'Content-Type: application/json',
-                    'Accept: application/json',
-                ];
-            } else {
-                $token = $this->getToken();
-                if (!$token) {
-                    Log::error('NimbusPost: No valid auth token available.');
-                    return [
-                        'status'  => false,
-                        'message' => 'NimbusPost authentication failed. Check NIMBUSPOST_EMAIL and NIMBUSPOST_PASSWORD in .env.'
-                    ];
-                }
-                $headers = [
-                    'Authorization: Bearer ' . $token,
-                    'Content-Type: application/json',
-                    'Accept: application/json',
+            // Use standard headers for all requests
+            $token = trim($this->getToken());
+            if (!$token) {
+                Log::error('NimbusPost: No valid auth token available.');
+                return [
+                    'status'  => false,
+                    'message' => 'NimbusPost authentication failed. Check NIMBUSPOST_EMAIL and NIMBUSPOST_PASSWORD in .env.'
                 ];
             }
+            
+            $headers = [
+                'Authorization: Bearer ' . $token,
+                'Content-Type: application/json',
+                'Accept: application/json',
+            ];
 
             $ch = curl_init();
 
@@ -163,14 +153,7 @@ class NimbusPostService
             }
 
             // Log headers used
-            if ($endpoint === '/shipments/label') {
-                $this->logActivity($endpoint, $data, $resData, $success, [
-                    'NP-API-KEY' => $apiKey ?? '',
-                    'Authorization' => 'Bearer [token]'
-                ]);
-            } else {
-                $this->logActivity($endpoint, $data, $resData, $success, ['Authorization' => 'Bearer [token]']);
-            }
+            $this->logActivity($endpoint, $data, $resData, $success, ['Authorization' => 'Bearer [token]']);
 
             return $resData;
 

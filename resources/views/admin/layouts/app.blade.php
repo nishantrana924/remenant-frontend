@@ -63,6 +63,7 @@
             <main id="main-content" class="flex-1 p-4 sm:p-6 overflow-y-auto" up-main>
                 <div class="min-h-[70vh]">
                     @yield('content')
+                    {{ $slot ?? '' }}
                 </div>
                 @include('admin.layouts.footer')
             </main>

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NimbusWebhookController;
 
 // ─── NimbusPost Webhook (CSRF-exempt, no auth required) ───────────────────────
+// ─── NimbusPost Webhook (CSRF-exempt, no auth required) ───────────────────────
 Route::post('/webhooks/nimbuspost', [NimbusWebhookController::class, 'handle'])
     ->middleware(\App\Http\Middleware\RateLimitNimbusWebhooks::class)
     ->name('webhooks.nimbuspost');
@@ -96,6 +97,11 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::patch('sliders/{slider}/toggle-status', [\App\Http\Controllers\Admin\SliderController::class, 'toggleStatus'])->name('sliders.toggle-status');
     Route::post('orders/bulk-update-status', [\App\Http\Controllers\Admin\OrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
     Route::post('orders/bulk-delete', [\App\Http\Controllers\Admin\OrderController::class, 'bulkDestroy'])->name('orders.bulk-delete');
+    Route::post('orders/bulk-ship-to-nimbuspost', [\App\Http\Controllers\Admin\OrderController::class, 'bulkShipToNimbusPost'])->name('orders.bulk-ship-to-nimbuspost');
+    Route::post('orders/bulk-cancel-nimbuspost', [\App\Http\Controllers\Admin\OrderController::class, 'bulkCancelNimbusPost'])->name('orders.bulk-cancel-nimbuspost');
+    Route::get('orders/fetch-couriers', [\App\Http\Controllers\Admin\OrderController::class, 'fetchCouriers'])->name('orders.fetch-couriers');
+    Route::get('orders/bulk-packing-slips', [\App\Http\Controllers\Admin\OrderController::class, 'bulkPackingSlips'])->name('orders.bulk-packing-slips');
+    Route::get('orders/bulk-shipping-labels', [\App\Http\Controllers\Admin\OrderController::class, 'bulkShippingLabels'])->name('orders.bulk-shipping-labels');
     Route::post('orders/{id}/ship-to-nimbuspost', [\App\Http\Controllers\Admin\OrderController::class, 'shipToNimbusPost'])->name('orders.ship-to-nimbuspost');
     Route::post('orders/{id}/nimbuspost-rates', [\App\Http\Controllers\Admin\OrderController::class, 'fetchNimbusRates'])->name('orders.nimbuspost-rates');
     Route::post('orders/{id}/cancel-nimbuspost', [\App\Http\Controllers\Admin\OrderController::class, 'cancelNimbusPost'])->name('orders.cancel-nimbuspost');
@@ -191,4 +197,4 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('settings/invoice', [\App\Http\Controllers\Admin\SettingController::class, 'updateInvoice'])->name('settings.invoice.update');
 });
 
-require __DIR__.'/auth.php'; 
+require __DIR__.'/auth.php';

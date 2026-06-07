@@ -56,6 +56,9 @@
                             "image": "{{ asset('images/logo/remenant-health-logo.png') }}",
                             "order_id": "{{ $razorpay_order_id }}",
                             "handler": function (response){
+                                // Update Alpine step to show processing spinner
+                                document.querySelector('[x-data]').__x.$data.step = 'processing';
+
                                 var form = document.createElement('form');
                                 form.method = 'POST';
                                 form.action = "{{ route('checkout.payment.verify') }}";

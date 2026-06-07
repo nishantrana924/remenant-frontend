@@ -230,6 +230,15 @@
                             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Courier Partner</p>
                             <p class="text-sm font-bold text-slate-900 uppercase tracking-tight">{{ $item->courier_name ?? 'Not Assigned' }}</p>
                         </div>
+                        @if(isset($shippingCharges) && $shippingCharges !== 'N/A')
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Billed Courier Charge</p>
+                            <p class="text-sm font-black text-emerald-600 uppercase tracking-tight flex items-center gap-2">
+                                ₹{{ is_numeric($shippingCharges) ? number_format($shippingCharges, 2) : $shippingCharges }}
+                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                            </p>
+                        </div>
+                        @endif
                         <div>
                             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tracking ID</p>
                             <div class="flex items-center gap-2">
