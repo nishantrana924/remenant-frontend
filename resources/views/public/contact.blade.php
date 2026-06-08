@@ -78,20 +78,36 @@
                         <h2 class="text-3xl font-semibold italic text-[#074D3D] tracking-tight mb-10 relative">Drop us a
                             Line</h2>
 
-                        <form action="#" class="space-y-8 relative">
+                        @if(session('success'))
+                            <div class="mb-6 rounded-2xl bg-green-50 p-4 text-sm font-bold text-green-800 border border-green-200">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                        @if($errors->any())
+                            <div class="mb-6 rounded-2xl bg-red-50 p-4 text-sm font-bold text-red-800 border border-red-200">
+                                <ul class="list-disc pl-5">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <form action="{{ route('contact.store') }}" method="POST" class="space-y-8 relative">
+                            @csrf
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
                                     <label
                                         class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2.5 ml-1">Your
                                         Name</label>
-                                    <input type="text" placeholder="Enter Your Name"
+                                    <input type="text" name="name" placeholder="Enter Your Name" required
                                         class="w-full rounded-2xl border border-gray-100 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-900 focus:border-[var(--primary)] focus:bg-white focus:ring-0 transition-all outline-none">
                                 </div>
                                 <div>
                                     <label
                                         class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2.5 ml-1">Email
                                         Address</label>
-                                    <input type="email" placeholder="Enter Your Email Address"
+                                    <input type="email" name="email" placeholder="Enter Your Email Address" required
                                         class="w-full rounded-2xl border border-gray-100 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-900 focus:border-[var(--primary)] focus:bg-white focus:ring-0 transition-all outline-none">
                                 </div>
                             </div>
@@ -101,7 +117,7 @@
                                     <label
                                         class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2.5 ml-1">Phone
                                         Number</label>
-                                    <input type="text" placeholder="Enter Your Phone Number"
+                                    <input type="text" name="phone" placeholder="Enter Your Phone Number"
                                         class="w-full rounded-2xl border border-gray-100 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-900 focus:border-[var(--primary)] focus:bg-white focus:ring-0 transition-all outline-none">
                                 </div>
                                 <div>
@@ -109,7 +125,7 @@
                                         class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2.5 ml-1">I'm
                                         asking about</label>
                                     <div class="relative">
-                                        <select
+                                        <select name="subject"
                                             class="w-full rounded-2xl border border-gray-100 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-900 focus:border-[var(--primary)] focus:bg-white focus:ring-0 transition-all outline-none appearance-none">
                                             <option>General Support</option>
                                             <option>Order Tracking & Status</option>
@@ -130,7 +146,7 @@
                                 <label
                                     class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2.5 ml-1">Your
                                     Message</label>
-                                <textarea rows="4" placeholder="How can we help you?"
+                                <textarea name="message" rows="4" placeholder="How can we help you?" required
                                     class="w-full rounded-2xl border border-gray-100 bg-gray-50/50 px-6 py-4 text-sm font-bold text-gray-900 focus:border-[var(--primary)] focus:bg-white focus:ring-0 transition-all outline-none resize-none"></textarea>
                             </div>
 

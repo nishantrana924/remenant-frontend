@@ -170,89 +170,12 @@
                         </div>
                     </div>
 
-                    <!-- Load More (Placeholder) -->
-                    @if(count($products) > 9)
-                        <div class="mt-20 flex justify-center">
-                            <button type="button" class="rounded-full bg-white px-10 py-5 text-sm font-black uppercase tracking-widest text-gray-900 shadow-xl ring-1 ring-black/5 hover:bg-gray-50 transition active:scale-95">
-                                Load More Products
-                            </button>
-                        </div>
-                    @endif
+
                 </div>
             </div>
         </section>
 
-        @if(isset($combos) && $combos->isNotEmpty())
-        <!-- Full Width Combo Offers Section -->
-        <section class="mx-auto max-w-[1600px] px-4 py-24 sm:px-6 lg:px-12 border-t border-black/5">
-            <div class="flex items-center justify-between mb-12">
-                <h2 class="text-3xl font-bold italic text-[color:var(--text-primary)]">Special Combo Offers</h2>
-                <div class="flex items-center gap-3">
-                    <button type="button" data-combo-prev class="h-12 w-12 rounded-full bg-white shadow-sm ring-1 ring-black/5 flex items-center justify-center hover:bg-gray-50 transition active:scale-95">
-                        <i data-lucide="chevron-left" class="h-6 w-6"></i>
-                    </button>
-                    <button type="button" data-combo-next class="h-12 w-12 rounded-full bg-white shadow-sm ring-1 ring-black/5 flex items-center justify-center hover:bg-gray-50 transition active:scale-95">
-                        <i data-lucide="chevron-right" class="h-6 w-6"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="combo-carousel owl-carousel owl-theme" data-items-count="{{ count($combos) }}">
-                @foreach ($combos as $combo)
-                    <div class="item h-full">
-                        @php
-                            $discount = (int) round((1 - ($combo->price / max(1, $combo->mrp))) * 100);
-                        @endphp
-                        <div class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5">
-                            <a href="{{ route('products.show', $combo->slug) }}" class="absolute inset-0 z-[5]"></a>
 
-                            <div class="relative aspect-square overflow-hidden bg-[var(--bg-section)]">
-                                <img src="{{ \App\Helpers\ImageHelper::getUrl($combo->image, 'images/products') }}" 
-                                     alt="{{ $combo->title }}"
-                                     class="h-full w-full object-contain transition duration-500 group-hover:scale-105" 
-                                     onerror="this.src='{{ \App\Helpers\ImageHelper::getUrl('products/remenant-product1.jpg', 'images') }}'"
-                                     loading="lazy">
-                                 @if(isset($discount) && $discount > 0)
-                                     <div class="absolute left-3 top-3 rounded-full bg-[var(--primary)] px-3 py-1 text-xs font-extrabold text-white">
-                                         -{{ $discount }}%
-                                     </div>
-                                 @endif
-                             </div>
-
-                            <div class="flex flex-1 flex-col p-4">
-                                <p class="text-xs font-bold tracking-wide text-[color:var(--primary)] uppercase">
-                                    {{ $combo->tagline }}</p>
-                                <h3 class="mt-1 text-[color:var(--text-primary)] font-semibold truncate">
-                                    {{ $combo->title }}</h3>
-
-                                <div class="mt-3 flex items-center justify-between gap-3">
-                                    <div class="flex items-baseline gap-2">
-                                        <p class="text-base font-semibold text-[color:var(--primary)] tracking-tighter">
-                                            ₹{{ number_format($combo->price) }}</p>
-                                        <p class="text-xs font-medium text-[color:var(--text-muted)] line-through">
-                                            ₹{{ number_format($combo->mrp) }}</p>
-                                    </div>
-                                    <div class="flex items-center gap-1 rounded-full bg-black/5 px-2 py-1 text-xs font-semibold text-[color:var(--text-secondary)]">
-                                        <i data-lucide="star" class="h-4 w-4 fill-[color:var(--primary)] text-[color:var(--primary)]"></i>
-                                        {{ number_format($combo->rating, 1) }} ({{ number_format($combo->reviews) }})
-                                    </div>
-                                </div>
-
-                                <div class="mt-auto pt-3 relative z-10">
-                                    <form action="{{ route('cart.add', $combo->id) }}" method="POST" data-ajax="true">
-                                        @csrf
-                                        <button type="submit" class="w-full text-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-extrabold text-white hover:opacity-95 transition">
-                                            Add to cart
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </section>
-        @endif
 
         <!-- Newsletter Section -->
         <section class="bg-white py-24 border-t border-black/5">
@@ -324,6 +247,16 @@
             if (el.checked) {
                 document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = false);
                 filterProducts();
+            }
+        }
+
+        function loadMoreProducts() {
+            document.querySelectorAll('.extra-product').forEach(el => {
+                el.classList.remove('hidden');
+            });
+            const loadMoreBtn = document.getElementById('load-more-container');
+            if (loadMoreBtn) {
+                loadMoreBtn.classList.add('hidden');
             }
         }
 

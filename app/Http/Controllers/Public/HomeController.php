@@ -19,7 +19,9 @@ class HomeController extends Controller
         
         $featuredProducts = \Illuminate\Support\Facades\Cache::remember('home.featured_products', $ttl, function() {
             return Product::with('categories')
+                ->whereIn('product_type', ['single', 'both'])
                 ->where('status', 'published')
+                ->orderByRaw("FIELD(product_type, 'single', 'both')")
                 ->latest()
                 ->take(8)
                 ->get();
@@ -27,7 +29,9 @@ class HomeController extends Controller
 
         $products = \Illuminate\Support\Facades\Cache::remember('home.products', $ttl, function() {
             return Product::with('categories')
+                ->whereIn('product_type', ['single', 'both'])
                 ->where('status', 'published')
+                ->orderByRaw("FIELD(product_type, 'single', 'both')")
                 ->latest()
                 ->take(12)
                 ->get();
@@ -37,6 +41,7 @@ class HomeController extends Controller
             return Product::with('categories')
                 ->whereIn('product_type', ['combo', 'both'])
                 ->where('status', 'published')
+                ->orderByRaw("FIELD(product_type, 'combo', 'both')")
                 ->take(8)
                 ->get();
         });

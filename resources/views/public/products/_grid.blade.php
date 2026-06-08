@@ -3,7 +3,7 @@
         @php
             $discount = (int) round((1 - ($product->price / max(1, $product->mrp))) * 100);
         @endphp
-        <div class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5">
+        <div class="product-card group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/5 {{ $loop->index >= 12 ? 'hidden extra-product' : '' }}">
             <a href="{{ route('products.show', $product->slug) }}" class="absolute inset-0 z-[5]"></a>
 
             <div class="relative aspect-square overflow-hidden bg-[var(--bg-section)]">
@@ -56,11 +56,19 @@
 </div>
 
 @if(count($products) == 0)
-    <div class="py-20 text-center">
+    <div class="py-20 text-center w-full col-span-full">
         <div class="inline-flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 mb-6">
             <i data-lucide="search-x" class="h-10 w-10 text-gray-300"></i>
         </div>
         <h3 class="text-xl font-bold text-gray-900 mb-2">No products found</h3>
         <p class="text-gray-500">Try adjusting your filters to find what you're looking for.</p>
+    </div>
+@endif
+
+@if(count($products) > 12)
+    <div id="load-more-container" class="mt-12 flex justify-center w-full col-span-full pb-10">
+        <button type="button" onclick="loadMoreProducts()" class="rounded-full bg-white px-10 py-5 text-sm font-black uppercase tracking-widest text-gray-900 shadow-xl ring-1 ring-black/5 hover:bg-gray-50 transition active:scale-95">
+            Load More Products
+        </button>
     </div>
 @endif

@@ -34,6 +34,7 @@ Route::get('/about', [\App\Http\Controllers\Public\AboutController::class, 'inde
 Route::get('/contact', function () { 
     return view('public.contact');
 })->name('contact');
+Route::post('/contact', [\App\Http\Controllers\Public\ContactController::class, 'store'])->name('contact.store')->middleware('throttle:5,1');
 
 Route::get('/terms-and-conditions', [\App\Http\Controllers\Public\LegalPageController::class, 'show'])->defaults('slug', 'terms-and-conditions')->name('terms');
 Route::get('/privacy-policy', [\App\Http\Controllers\Public\LegalPageController::class, 'show'])->defaults('slug', 'privacy-policy')->name('privacy');
@@ -140,6 +141,11 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('legal', [\App\Http\Controllers\Admin\LegalPageController::class, 'index'])->name('legal.index');
     Route::get('legal/{id}/edit', [\App\Http\Controllers\Admin\LegalPageController::class, 'edit'])->name('legal.edit');
     Route::put('legal/{id}', [\App\Http\Controllers\Admin\LegalPageController::class, 'update'])->name('legal.update');
+
+    // Contact Messages
+    Route::get('contact-messages', [\App\Http\Controllers\Admin\ContactMessageController::class, 'index'])->name('contact-messages.index');
+    Route::get('contact-messages/{id}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'show'])->name('contact-messages.show');
+    Route::delete('contact-messages/{id}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'destroy'])->name('contact-messages.destroy');
 
     // Editor Upload
     Route::post('editor-upload', [\App\Http\Controllers\Admin\UploadController::class, 'editorUpload'])->name('editor.upload');

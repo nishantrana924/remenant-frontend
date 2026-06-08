@@ -61,6 +61,11 @@
                 <span class="sidebar-text">Customers</span>
             </a>
 
+            <a href="{{ route('admin.contact-messages.index') }}" class="nav-item {{ request()->routeIs('admin.contact-messages.*') ? 'active-nav-item' : '' }}" up-alias="/admin/contact-messages*" up-target="#main-content, #admin-nav">
+                <i data-lucide="mail-search" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Messages</span>
+            </a>
+
             <div class="pt-4 pb-2">
                 <p class="sidebar-text px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Marketing</p>
             </div>

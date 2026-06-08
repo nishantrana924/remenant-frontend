@@ -88,7 +88,7 @@
 .testimonial-carousel:not(.owl-loaded) {
     display: grid !important;
     grid-template-columns: repeat(1, 1fr);
-    gap: 24px;
+    gap: 16px;
     overflow: hidden;
     min-height: 250px;
 }
@@ -202,17 +202,24 @@
     min-height: 100%;
 }
 
+/* Let the owl carousel items be natural height */
 .testimonial-carousel .owl-stage {
     display: flex;
 }
 
 .testimonial-carousel .owl-item {
     display: flex;
-    height: auto;
+}
+
+.testimonial-carousel .item {
+    width: 100%;
+    display: flex;
 }
 
 .testimonial-card {
-    min-height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 

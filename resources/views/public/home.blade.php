@@ -480,50 +480,49 @@
         <div class="section-decor bottom-40 left-[10%] text-5xl opacity-10 animate-float" style="animation-delay: 4.5s;">🍉
         </div>
         <div class="section-decor top-40 right-1/4 text-4xl opacity-5 animate-float" style="animation-delay: 2.5s;">🍋</div>
-        <div class="mx-auto max-w-[1600px] px-4 py-20 sm:px-6 lg:px-12">
-            <div class="text-left mb-10">
+        <div class="mx-auto max-w-[1600px] px-4 py-12 sm:py-16 sm:px-6 lg:px-12">
+            <div class="text-left mb-4 sm:mb-8">
                 <h2 class="section-heading">Community Stories</h2>
                 <p class="section-subtitle !ml-0">Join thousands who have made Remenant a part of
                     their daily ritual.</p>
             </div>
 
-            <div class="mt-16 testimonial-carousel owl-carousel owl-theme">
+            <div class="mt-8 testimonial-carousel owl-carousel owl-theme">
                 @forelse ($featuredReviews ?? [] as $testimonial)
                     <div class="item">
-                        <div
-                            class="testimonial-card rounded-[2.5rem] bg-white p-7 sm:p-10 shadow-xl shadow-gray-100/50 ring-1 ring-black/[0.02] flex flex-col relative overflow-hidden group h-full">
-                            <!-- Quote Mark -->
-                            <div
-                                class="absolute -right-4 -top-4 opacity-[0.03] transform rotate-12 transition-transform group-hover:rotate-0 duration-700">
-                                <i data-lucide="quote" class="h-32 w-32 text-black"></i>
+                        <div class="testimonial-card group relative bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-lg shadow-gray-200/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full">
+                            <!-- Background Quote Icon -->
+                            <div class="absolute top-6 right-6 text-orange-500/10 group-hover:text-orange-500/20 transition-colors duration-300">
+                                <i data-lucide="quote" class="w-16 h-16 transform rotate-3"></i>
                             </div>
 
-                            <div class="flex gap-1 text-orange-400">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    <i data-lucide="star" class="h-4 w-4 {{ $i <= $testimonial->rating ? 'fill-current' : 'text-gray-200' }}"></i>
-                                @endfor
-                            </div>
-
-                            <div class="mt-6 sm:mt-8 flex-1">
-                                <p class="text-lg sm:text-xl font-semibold leading-relaxed text-gray-900">
-                                    "{{ $testimonial->comment }}"</p>
-                            </div>
-
-                            <div class="mt-8 sm:mt-10 flex items-center gap-3 sm:gap-4">
-                                <div
-                                    class="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-full bg-gradient-to-br from-[var(--primary)] to-orange-400 flex items-center justify-center font-black text-white text-lg sm:text-xl shadow-lg">
-                                    {{ substr($testimonial->user->name ?? 'G', 0, 1) }}
-                                </div>
-                                <div>
-                                    <h4
-                                        class="text-sm sm:text-base font-bold text-gray-900 leading-none flex items-center gap-2">
-                                        {{ $testimonial->user->name ?? 'Verified User' }}
-                                        <i data-lucide="check-circle-2"
-                                            class="h-3 w-4 sm:h-4 sm:w-4 text-blue-500 fill-blue-50"></i>
-                                    </h4>
-                                    <p class="mt-1.5 text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-widest">
-                                        {{ $testimonial->location ?? 'Verified Buyer' }}
+                            <!-- Content -->
+                            <div class="relative z-10 flex-1 flex flex-col">
+                                <!-- Stars & Review Text -->
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-1 mb-4 text-orange-400">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            <i data-lucide="star" class="w-4 h-4 {{ $i <= $testimonial->rating ? 'fill-current' : 'text-gray-200' }}"></i>
+                                        @endfor
+                                    </div>
+                                    <p class="text-gray-800 text-base sm:text-lg font-semibold leading-relaxed">
+                                        "{{ $testimonial->comment }}"
                                     </p>
+                                </div>
+
+                                <!-- User Info -->
+                                <div class="flex items-center gap-4 mt-8">
+                                    <div class="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-lg shrink-0">
+                                        {{ substr($testimonial->user->name ?? 'G', 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900 text-base">
+                                            {{ $testimonial->user->name ?? 'Verified User' }}
+                                        </h4>
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mt-1">
+                                            {{ $testimonial->location ?? 'Delhi' }} • Verified
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -538,22 +537,39 @@
                     @endphp
                     @foreach ($fallbackTestimonials as $testimonial)
                         <div class="item">
-                            <div class="testimonial-card rounded-[2.5rem] bg-white p-7 sm:p-10 shadow-xl shadow-gray-100/50 ring-1 ring-black/[0.02] flex flex-col relative overflow-hidden h-full">
-                                <div class="flex gap-1 text-orange-400">
-                                    @for ($i = 0; $i < $testimonial['rating']; $i++)
-                                        <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                                    @endfor
+                            <div class="testimonial-card group relative bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-lg shadow-gray-200/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full">
+                                <!-- Background Quote Icon -->
+                                <div class="absolute top-6 right-6 text-orange-500/10 group-hover:text-orange-500/20 transition-colors duration-300">
+                                    <i data-lucide="quote" class="w-16 h-16 transform rotate-3"></i>
                                 </div>
-                                <div class="mt-6 sm:mt-8 flex-1">
-                                    <p class="text-lg sm:text-xl font-semibold leading-relaxed text-gray-900">"{{ $testimonial['text'] }}"</p>
-                                </div>
-                                <div class="mt-8 sm:mt-10 flex items-center gap-3 sm:gap-4">
-                                    <div class="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-full bg-gradient-to-br from-[var(--primary)] to-orange-400 flex items-center justify-center font-black text-white text-lg sm:text-xl shadow-lg">
-                                        {{ substr($testimonial['name'], 0, 1) }}
+
+                                <!-- Content -->
+                                <div class="relative z-10 flex-1 flex flex-col">
+                                    <!-- Stars & Review Text -->
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-1 mb-4 text-orange-400">
+                                            @for ($i = 0; $i < $testimonial['rating']; $i++)
+                                                <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                            @endfor
+                                        </div>
+                                        <p class="text-gray-800 text-base sm:text-lg font-semibold leading-relaxed">
+                                            "{{ $testimonial['text'] }}"
+                                        </p>
                                     </div>
-                                    <div>
-                                        <h4 class="text-sm sm:text-base font-bold text-gray-900 leading-none">{{ $testimonial['name'] }}</h4>
-                                        <p class="mt-1.5 text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-widest">{{ $testimonial['location'] }} • Verified</p>
+
+                                    <!-- User Info -->
+                                    <div class="flex items-center gap-4 mt-8">
+                                        <div class="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-lg shrink-0">
+                                            {{ substr($testimonial['name'], 0, 1) }}
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-gray-900 text-base">
+                                                {{ $testimonial['name'] }}
+                                            </h4>
+                                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mt-1">
+                                                {{ $testimonial['location'] }} • Verified
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

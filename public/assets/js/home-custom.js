@@ -63,7 +63,7 @@ function initHomeSliders() {
         if ($testi.length && !$testi.hasClass('owl-loaded')) {
             $testi.owlCarousel({
                 items: 1,
-                margin: 20,
+                margin: 16,
                 loop: true,
                 autoplay: true,
                 autoplayTimeout: 4000,
@@ -72,9 +72,9 @@ function initHomeSliders() {
                 dots: false,
                 smartSpeed: 800,
                 responsive: {
-                    0: { items: 1, stagePadding: 30, margin: 16 },
-                    768: { items: 2, stagePadding: 0, margin: 20 },
-                    1024: { items: 3, stagePadding: 0, margin: 20 }
+                    0: { items: 1, stagePadding: 30, margin: 10 },
+                    768: { items: 2, stagePadding: 0, margin: 16 },
+                    1024: { items: 3, stagePadding: 0, margin: 16 }
                 }
             });
             $testi.addClass('owl-loaded');
