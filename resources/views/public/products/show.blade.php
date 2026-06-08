@@ -155,14 +155,14 @@
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 items-start">
                 
                 <!-- Left: Product Images (Sticky on Desktop) -->
-                <div class="lg:sticky lg:top-24 lg:self-start">
-                    <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-4">
+                <div class="lg:sticky lg:top-[80px] lg:self-start mt-0">
+                    <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-4 m-0">
                         <div class="hidden sm:flex gap-3 sm:gap-4 overflow-x-auto lg:order-first lg:flex-col lg:overflow-y-auto lg:max-h-[620px] lg:w-24 lg:shrink-0 no-scrollbar product-other-images">
                             @foreach($galleryImages as $index => $img)
                                 <button type="button" 
                                         data-index="{{ $index }}"
                                         class="product-other-image-thumb relative aspect-square w-20 sm:w-24 shrink-0 overflow-hidden rounded-2xl bg-white border-2 transition-colors duration-200 shadow-sm {{ $index === 0 ? 'border-[var(--primary)]' : 'border-transparent hover:border-[var(--primary)]/70' }}">
-                                    <img src="{{ \App\Helpers\ImageHelper::getUrl($img, 'images/products') }}" alt="Product other image" class="h-full w-full object-contain">
+                                    <img src="{{ \App\Helpers\ImageHelper::getUrl($img, 'images/products') }}" alt="Product other image" class="h-full w-full object-cover">
                                 </button>
                             @endforeach
                         </div>
@@ -184,7 +184,7 @@
                                          width="1200"
                                          height="1200"
                                          alt="{{ $product->title }}" 
-                                         class="h-full w-full object-contain select-none opacity-0 transition-opacity duration-500 relative z-10"
+                                         class="h-full w-full object-cover select-none opacity-0 transition-opacity duration-500 relative z-10"
                                          onload="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove(); this.parentElement.classList.remove('bg-gray-100')"
                                          onerror="this.classList.remove('opacity-0'); if(this.previousElementSibling) this.previousElementSibling.remove();">
                                 </div>
@@ -1479,6 +1479,10 @@
         window.applyCoupon = function() {
             const code = $('#coupon-input').val().trim();
             if (!code) return;
+            
+            // Hide previous error
+            $('#coupon-error').addClass('hidden').text('');
+            
             $.ajax({
                 url: '{{ route("coupons.apply") }}',
                 method: 'POST',
@@ -1489,6 +1493,13 @@
                     $('#coupon-message').removeClass('hidden');
                     $('#coupon-input').parent().addClass('hidden');
                     $('.current-price-text').text('₹' + res.new_total.toLocaleString());
+                },
+                error: function(xhr) {
+                    let msg = 'Invalid coupon code.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    $('#coupon-error').text(msg).removeClass('hidden');
                 }
             });
         };
@@ -1497,6 +1508,7 @@
             $('#coupon-message').addClass('hidden');
             $('#coupon-input').val('').parent().removeClass('hidden');
             $('.current-price-text').text('₹' + originalPrice.toLocaleString());
+            $('#coupon-error').addClass('hidden').text('');
         };
 
         // Review Modal Logic
