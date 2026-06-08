@@ -40,7 +40,7 @@
 
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Company Name</label>
-                        <input type="text" name="invoice_company_name" value="{{ SiteSetting::getValue('invoice_company_name', 'REMENANT') }}" class="w-full bg-slate-50 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all" placeholder="e.g. REMENANT">
+                        <input type="text" name="invoice_company_name" value="{{ \App\Models\SiteSetting::getValue('invoice_company_name', 'REMENANT') }}" class="w-full bg-slate-50 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all" placeholder="e.g. REMENANT">
                         <p class="text-[9px] text-slate-400 mt-2 font-medium">Shown at the top of every invoice.</p>
                     </div>
 

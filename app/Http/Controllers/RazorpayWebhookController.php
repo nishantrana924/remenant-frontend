@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use Razorpay\Api\Api;
 use Razorpay\Api\Errors\SignatureVerificationError;
+use App\Mail\PaymentRefundInitiated;
 
 class RazorpayWebhookController extends Controller
 {
@@ -130,7 +131,7 @@ class RazorpayWebhookController extends Controller
                     }
 
                     if ($outOfStock) {
-                        // 1. Mark as cancelled gracefully
+                        // Mark as cancelled with paid status
                         $order->update([
                             'payment_status' => 'paid',
                             'razorpay_payment_id' => $payment['id'],
@@ -139,18 +140,47 @@ class RazorpayWebhookController extends Controller
                             'refund_status' => 'pending'
                         ]);
 
-                        // 2. Dispatch the Refund Queue
-                        if (class_exists(\App\Jobs\ProcessOrderRefundJob::class)) {
-                            \App\Jobs\ProcessOrderRefundJob::dispatch($order->id);
+                        // Trigger actual Razorpay Refund via API
+                        try {
+                            $refundApi = new Api(
+                                config('services.razorpay.key_id'),
+                                config('services.razorpay.key_secret')
+                            );
+                            $refund = $refundApi->payment->fetch($payment['id'])->refund([
+                                'amount' => $payment['amount'], // Full refund in paise
+                                'speed' => 'optimum',
+                                'notes' => [
+                                    'reason' => 'Out of stock - auto refund',
+                                    'order_number' => $order->order_number,
+                                ]
+                            ]);
+
+                            $order->update([
+                                'refund_status' => 'initiated',
+                                'razorpay_refund_id' => $refund['id'] ?? null,
+                            ]);
+
+                            Log::info("Razorpay Refund Initiated for Order {$order->order_number}. Refund ID: " . ($refund['id'] ?? 'N/A'));
+                        } catch (\Exception $refundEx) {
+                            Log::alert("CRITICAL: Razorpay Refund FAILED for Order {$order->order_number}: " . $refundEx->getMessage());
+                            // Keep refund_status as 'pending' so admin can manually process
                         }
 
-                        // 3. Log the timeline
+                        // Send refund notification email to customer
+                        try {
+                            \Illuminate\Support\Facades\Mail::to($order->email)
+                                ->queue(new PaymentRefundInitiated($order));
+                        } catch (\Exception $mailEx) {
+                            Log::error("Failed to send refund email for Order {$order->order_number}: " . $mailEx->getMessage());
+                        }
+
+                        // Log the timeline
                         if (method_exists($order, 'logStatus')) {
-                            $order->logStatus("System cancelled: Item went out of stock during payment processing. Refund initiated.", null);
+                            $order->logStatus("System cancelled: Item went out of stock during payment. Refund initiated via Razorpay.", null);
                         }
 
                         Log::alert("CRITICAL: Order {$order->order_number} cancelled due to stock race condition. Refund initiated.");
-                        return; // Exit transaction natively without triggering OrderObserver's 'processing' event
+                        return;
                     }
 
                     // 8. Process valid payment (sufficient stock)

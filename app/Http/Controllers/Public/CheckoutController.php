@@ -53,7 +53,9 @@ class CheckoutController extends Controller
         }
 
         $subtotal = collect($items)->sum(fn($item) => $item['price'] * $item['quantity']);
-        $shipping = $subtotal > 999 ? 0 : 99;
+        $shippingCharge     = (int) \App\Models\SiteSetting::getValue('shipping_charge', 99);
+        $freeThreshold      = (int) \App\Models\SiteSetting::getValue('free_shipping_threshold', 449);
+        $shipping = $subtotal > $freeThreshold ? 0 : $shippingCharge;
         $total = $subtotal + $shipping;
 
         $addresses = auth()->check() ? auth()->user()->addresses : [];
@@ -113,7 +115,9 @@ class CheckoutController extends Controller
         });
 
         $subtotal = collect($items)->sum(fn($item) => $item['price'] * $item['quantity']);
-        $shipping = $subtotal > 999 ? 0 : 99;
+        $shippingCharge     = (int) \App\Models\SiteSetting::getValue('shipping_charge', 99);
+        $freeThreshold      = (int) \App\Models\SiteSetting::getValue('free_shipping_threshold', 449);
+        $shipping = $subtotal > $freeThreshold ? 0 : $shippingCharge;
         
         // Handle Coupon with strict validation
         $discount = 0;
@@ -263,6 +267,18 @@ class CheckoutController extends Controller
         if ($success === true) {
             session()->forget('cart');
             $order = \App\Models\Order::where('razorpay_order_id', $input['razorpay_order_id'])->first();
+            
+            // Wait up to 3 seconds for webhook to process the order
+            if ($order) {
+                $attempts = 0;
+                while ($order->payment_status !== 'paid' && $attempts < 3) {
+                    sleep(1);
+                    $order->refresh();
+                    $attempts++;
+                }
+                session(['payment_verified_for_order' => $order->order_number]);
+            }
+
             // Status update happens in RazorpayWebhookController securely.
             return redirect()->route('checkout.success', ['order' => $order->order_number])->with('success', 'Payment Successful! Awaiting confirmation.');
         } else {
@@ -277,8 +293,21 @@ class CheckoutController extends Controller
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-        if ($order->payment_status !== 'paid') {
+        // Wait up to 3 seconds in case webhook is delayed
+        $attempts = 0;
+        while ($order->payment_status !== 'paid' && $attempts < 3) {
+            sleep(1);
+            $order->refresh();
+            $attempts++;
+        }
+
+        if ($order->payment_status !== 'paid' && session('payment_verified_for_order') !== $orderNumber) {
             return redirect()->route('checkout.payment', $order->order_number)->with('error', 'Payment is pending for this order.');
+        }
+        
+        // If still unpaid but session is verified, visual override
+        if ($order->payment_status !== 'paid') {
+            $order->payment_status = 'paid';
         }
 
         return view('public.success', compact('order'));

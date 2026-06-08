@@ -40,6 +40,9 @@ class OrderObserver
             } catch (\Exception $e) {
                 Log::error("Failed to send order confirmed email for #{$order->order_number}: " . $e->getMessage());
             }
+
+            // Phase 2: Warehouse Automation Integration
+            $this->processWarehouseAutomation($order);
         }
 
         // Send Shipment Booked / AWB Assigned Email
@@ -88,6 +91,15 @@ class OrderObserver
            } catch (\Exception $e) {
                Log::error("Failed to send order cancelled email for #{$order->order_number}: " . $e->getMessage());
            }
+
+            // If payment was already captured via Razorpay, send refund notification
+            if ($order->payment_status === 'paid' && $order->payment_method === 'razorpay') {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\PaymentRefundInitiated($order));
+                } catch (\Exception $e) {
+                    Log::error("Failed to send refund initiated email for #{$order->order_number}: " . $e->getMessage());
+                }
+            }
         }
     }
 
@@ -145,6 +157,66 @@ class OrderObserver
                     $itemQty = $comboItem->quantity * $quantity;
                     $this->restoreProductStock($linkedProduct, $itemQty, $order);
                 }
+            }
+        }
+    }
+
+    /**
+     * Executes the Smart Warehouse Engine via isolation and delegation.
+     */
+    protected function processWarehouseAutomation(Order $order): void
+    {
+        $mode = config('warehouse.automation_mode', 'disabled');
+
+        if ($mode === 'disabled') {
+            return;
+        }
+
+        try {
+            $auditService = app(\App\Services\Warehouse\WarehouseAuditService::class);
+            $batchingService = app(\App\Services\Warehouse\BatchingService::class);
+
+            // 1. Idempotency Protection
+            if ($order->requires_manual_review) {
+                $auditService->log(null, 'observer_skipped', "Order already under manual review", null, $order->id);
+                return;
+            }
+            if (in_array($order->status, ['completed', 'cancelled'])) {
+                $auditService->log(null, 'observer_skipped', "Order is completed or cancelled", null, $order->id);
+                return;
+            }
+            if ($order->warehouseBatches()->where('status', '!=', 'completed')->exists()) {
+                $auditService->log(null, 'observer_skipped', "Order already assigned to an active batch", null, $order->id);
+                return;
+            }
+
+            // 2. Manual Review Routing
+            if (empty($order->shipping_address_id)) {
+                $reason = "Invalid or missing shipping address.";
+                $order->update(['requires_manual_review' => true, 'manual_review_reason' => $reason]);
+                $auditService->log(null, 'manual_review_routed', $reason, null, $order->id);
+                return;
+            }
+
+            // 3. Delegate to BatchingService (calculates packaging, generates batch, assigns courier)
+            // In 'parallel' mode, these batches and assignments are created but the external queue jobs will ignore them.
+            // In 'enabled' mode, full execution flows downstream.
+            $batchingService->assignToBatch($order);
+
+        } catch (\Exception $e) {
+            // Failure Isolation: Never break customer order approval
+            Log::error("Warehouse Observer Exception for Order #{$order->id}: " . $e->getMessage());
+            
+            try {
+                app(\App\Services\Warehouse\WarehouseAuditService::class)->log(
+                    userId: null, 
+                    action: 'observer_failure', 
+                    description: "Exception isolated: " . substr($e->getMessage(), 0, 255), 
+                    batchId: null, 
+                    orderId: $order->id
+                );
+            } catch (\Exception $inner) {
+                // If DB is completely unreachable, fail silently to protect checkout
             }
         }
     }

@@ -41,6 +41,7 @@
                 <span class="sidebar-text">Logistics</span>
             </a>
 
+
             <a href="{{ route('admin.refunds.index') }}" class="nav-item {{ request()->routeIs('admin.refunds.*') ? 'active-nav-item' : '' }}" up-alias="/admin/refunds*" up-target="#main-content, #admin-nav">
                 <i data-lucide="rotate-ccw" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Refunds</span>
@@ -96,6 +97,20 @@
             <a href="{{ route('admin.legal.index') }}" class="nav-item {{ request()->routeIs('admin.legal.*') ? 'active-nav-item' : '' }}" up-alias="/admin/legal*" up-target="#main-content, #admin-nav">
                 <i data-lucide="shield" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Legal Pages</span>
+            </a>
+
+            <div class="pt-4 pb-2">
+                <p class="sidebar-text px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Settings</p>
+            </div>
+
+            <a href="{{ route('admin.settings.shipping') }}" class="nav-item {{ request()->is('admin/settings/shipping*') ? 'active-nav-item' : '' }}" up-alias="/admin/settings/shipping*" up-target="#main-content, #admin-nav">
+                <i data-lucide="package" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Shipping</span>
+            </a>
+
+            <a href="{{ route('admin.settings.invoice') }}" class="nav-item {{ request()->is('admin/settings/invoice*') ? 'active-nav-item' : '' }}" up-alias="/admin/settings/invoice*" up-target="#main-content, #admin-nav">
+                <i data-lucide="file-text" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">Invoice</span>
             </a>
         </nav>
 

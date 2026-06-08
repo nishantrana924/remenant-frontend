@@ -6,9 +6,17 @@
     selectedOrder: null,
     showDrawer: false,
     selectedItems: [],
+    maxBulk: 20,
     allItems: @js($items->pluck('id')),
     activeStatus: 'all',
     dateFilter: '',
+
+    showBulkShipModal: false,
+    bulkCouriers: [],
+    bulkPackagingWeight: 30,
+    bulkSelectedCourier: '',
+    showBulkSummaryModal: false,
+    bulkSummary: {},
 
     init() {
         this.$watch('showCourierModal', value => this.toggleScroll());
@@ -22,10 +30,13 @@
     },
 
     toggleAll() {
-        if (this.selectedItems.length === this.allItems.length) {
+        if (this.selectedItems.length === Math.min(this.allItems.length, this.maxBulk)) {
             this.selectedItems = [];
         } else {
-            this.selectedItems = [...this.allItems];
+            this.selectedItems = this.allItems.slice(0, this.maxBulk);
+            if (this.allItems.length > this.maxBulk) {
+                window.toast(`Only first ${this.maxBulk} orders selected. Max bulk limit is ${this.maxBulk}.`, 'info');
+            }
         }
     },
 
@@ -70,12 +81,12 @@
     couriers: [],
     fetchingRates: false,
 
-    openCourierSelection(orderId) {
+    openCourierSelection(orderId, dims = null) {
         this.shippingConfig.id = orderId;
-        this.shippingConfig.weight = 250;
-        this.shippingConfig.length = 17;
-        this.shippingConfig.breadth = 10;
-        this.shippingConfig.height = 5;
+        this.shippingConfig.weight = dims && dims.weight ? dims.weight : 250;
+        this.shippingConfig.length = dims && dims.length ? dims.length : 17;
+        this.shippingConfig.breadth = dims && dims.breadth ? dims.breadth : 10;
+        this.shippingConfig.height = dims && dims.height ? dims.height : 5;
         this.shippingConfig.courier_id = '';
         this.couriers = [];
         this.showCourierModal = true;
@@ -151,7 +162,78 @@
                     setTimeout(() => location.reload(), 1000);
                 },
                 error: (err) => {
-                    window.toast(err.message || 'Failed to schedule pickup', 'error');
+                    const msg = err.response && err.response.data && err.response.data.message ? err.response.data.message : (err.message || 'Failed to schedule pickup');
+                    window.toast(msg, 'error');
+                }
+            });
+        });
+    },
+
+    async openBulkShipModal() {
+        this.showBulkShipModal = true;
+        if (this.bulkCouriers.length === 0) {
+            try {
+                const response = await axios.get('{{ route("admin.orders.fetch-couriers") }}');
+                if (response.data && response.data.success) {
+                    this.bulkCouriers = response.data.couriers;
+                }
+            } catch (e) {
+                window.toast('Failed to fetch couriers', 'error');
+            }
+        }
+    },
+
+    async bulkShip() {
+        if (!this.bulkSelectedCourier) {
+            window.toast('Please select a courier first', 'error');
+            return;
+        }
+
+        window.fastSubmit('{{ route("admin.orders.bulk-ship-to-nimbuspost") }}', {
+            method: 'POST',
+            data: { 
+                ids: this.selectedItems, 
+                courier_id: this.bulkSelectedCourier, 
+                packaging_weight: this.bulkPackagingWeight 
+            },
+            success: (res) => {
+                this.showBulkShipModal = false;
+                this.bulkSummary = {
+                    total: res.total || 0,
+                    successful: res.successful || 0,
+                    failed: res.failed || 0,
+                    errors: res.errors || [],
+                    ids: this.selectedItems.join(',')
+                };
+                this.showBulkSummaryModal = true;
+                this.selectedItems = [];
+            },
+            error: (err) => {
+                const msg = err.response && err.response.data && err.response.data.message ? err.response.data.message : (err.message || 'Failed to bulk ship');
+                window.toast(msg, 'error');
+            }
+        });
+    },
+
+    async bulkCancelShipment() {
+        window.confirmAction('Bulk Cancel Shipments?', `This will cancel ${this.selectedItems.length} shipments on NimbusPost. Are you sure?`, async () => {
+            window.fastSubmit('{{ route("admin.orders.bulk-cancel-nimbuspost") }}', {
+                method: 'POST',
+                data: { ids: this.selectedItems },
+                success: (res) => {
+                    this.bulkSummary = {
+                        total: res.total || 0,
+                        successful: res.successful || 0,
+                        failed: res.failed || 0,
+                        errors: res.errors || [],
+                        ids: '' // We don't need bulk label download for cancel
+                    };
+                    this.showBulkSummaryModal = true;
+                    this.selectedItems = [];
+                },
+                error: (err) => {
+                    const msg = err.response && err.response.data && err.response.data.message ? err.response.data.message : (err.message || 'Failed to bulk cancel shipments');
+                    window.toast(msg, 'error');
                 }
             });
         });
@@ -165,17 +247,36 @@
         </div>
         <div class="flex items-center gap-3">
             <template x-if="selectedItems.length > 0">
-                <div class="flex items-center gap-2">
-                    <button @click="schedulePickupBulk()" class="saas-btn-secondary !text-blue-600 !border-blue-100 hover:!bg-blue-50 py-2 px-4 text-xs font-bold flex items-center gap-2">
-                        <i data-lucide="truck" class="w-3 h-3"></i>
-                        Schedule Pickup
-                    </button>
-                    <button @click="bulkAction('approve', { status: 'processing', delivery_status: 'packed' })" class="saas-btn-secondary !text-orange-600 !border-orange-100 hover:!bg-orange-50 py-2 px-4 text-xs font-bold">
-                        Approve Selected
-                    </button>
-                    <button @click="bulkAction('delete')" class="saas-btn-secondary !text-rose-500 !border-rose-100 hover:!bg-rose-50 py-2 px-4 text-xs font-bold">
-                        Delete
-                    </button>
+                <div class="flex flex-col gap-2">
+                    {{-- Selection Info Banner --}}
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-orange-50 rounded-xl border border-orange-100">
+                        <i data-lucide="check-square" class="w-3.5 h-3.5 text-orange-500 shrink-0"></i>
+                        <span class="text-[10px] font-bold text-orange-600" x-text="selectedItems.length + ' selected'"></span>
+                        <span class="text-[10px] text-slate-400">•</span>
+                        <span class="text-[10px] font-medium text-slate-500">Max <span class="font-bold text-orange-600" x-text="maxBulk"></span> orders per bulk action</span>
+                        <button @click="selectedItems = []" class="ml-1 text-slate-300 hover:text-rose-500 transition-colors" title="Clear selection">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                    {{-- Bulk Action Buttons --}}
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <button @click="openBulkShipModal()" class="saas-btn-secondary !text-blue-600 !border-blue-100 hover:!bg-blue-50 py-2 px-3 text-xs font-bold flex items-center gap-1.5" title="Manual Courier & Ship">
+                            <i data-lucide="rocket" class="w-3.5 h-3.5"></i>
+                            Bulk Ship
+                        </button>
+                        <button @click="bulkAction('approve', { status: 'processing', delivery_status: 'packed' })" class="saas-btn-secondary !text-emerald-600 !border-emerald-100 hover:!bg-emerald-50 py-2 px-3 text-xs font-bold flex items-center gap-1.5">
+                            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                            Approve
+                        </button>
+                        <button @click="bulkCancelShipment()" class="saas-btn-secondary !text-rose-600 !border-rose-100 hover:!bg-rose-50 py-2 px-3 text-xs font-bold flex items-center gap-1.5" title="Cancel Shipments on NimbusPost">
+                            <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
+                            Cancel Shipment
+                        </button>
+                        <button @click="bulkAction('delete')" class="saas-btn-secondary !text-slate-500 !border-slate-200 hover:!bg-rose-50 hover:!text-rose-600 hover:!border-rose-100 py-2 px-3 text-xs font-bold flex items-center gap-1.5">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            Delete
+                        </button>
+                    </div>
                 </div>
             </template>
             <div class="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
@@ -269,17 +370,31 @@
                     <tr class="transition-all cursor-pointer group" 
                         :class="selectedItems.includes({{ $item->id }}) ? 'bg-orange-50/70' : 'hover:bg-orange-50/30'"
                         x-show="(!search || '{{ strtolower($item->order_number ?? $item->id) }}'.includes(search.toLowerCase()) || '{{ strtolower($item->customer_name ?? $item->user->name ?? 'Guest') }}'.includes(search.toLowerCase())) && (activeStatus === 'all' || (activeStatus.startsWith('refund_') ? '{{ $item->refund_status }}' === activeStatus.replace('refund_', '') : '{{ $item->status }}' === activeStatus)) && (!dateFilter || '{{ $item->created_at->format('Y-m-d') }}' === dateFilter)"
-                        @click.self="selectedOrder = {{ $item->toJson() }}; showDrawer = true">
+                        @click.self="selectedOrder = {{ $item->append('calculated_dimensions')->toJson() }}; showDrawer = true">
                         <td class="text-center" @click.stop>
-                            <input type="checkbox" x-model="selectedItems" value="{{ $item->id }}" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
+                            <input type="checkbox" 
+                                :checked="selectedItems.includes({{ $item->id }})"
+                                @change="
+                                    if ($event.target.checked) {
+                                        if (selectedItems.length >= maxBulk) {
+                                            $event.target.checked = false;
+                                            window.toast('Maximum ' + maxBulk + ' orders can be selected at once.', 'error');
+                                        } else {
+                                            selectedItems = [...selectedItems, {{ $item->id }}];
+                                        }
+                                    } else {
+                                        selectedItems = selectedItems.filter(id => id !== {{ $item->id }});
+                                    }
+                                "
+                                class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
                         </td>
-                        <td @click="selectedOrder = {{ $item->toJson() }}; showDrawer = true">
+                        <td @click="selectedOrder = {{ $item->append('calculated_dimensions')->toJson() }}; showDrawer = true">
                             <div class="flex flex-col">
                                 <span class="font-bold text-slate-900 text-sm">#{{ $item->order_number ?? $item->id }}</span>
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ $item->created_at->format('M d, h:i A') }}</span>
                             </div>
                         </td>
-                        <td @click="selectedOrder = {{ $item->toJson() }}; showDrawer = true">
+                        <td @click="selectedOrder = {{ $item->append('calculated_dimensions')->toJson() }}; showDrawer = true">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 uppercase">
                                     {{ substr($item->customer_name ?? $item->user->name ?? 'G', 0, 1) }}
@@ -290,7 +405,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td @click="selectedOrder = {{ $item->toJson() }}; showDrawer = true">
+                        <td @click="selectedOrder = {{ $item->append('calculated_dimensions')->toJson() }}; showDrawer = true">
                             <span class="font-bold text-slate-900 text-sm">₹{{ number_format($item->total_amount) }}</span>
                         </td>
                         <td>
@@ -329,7 +444,7 @@
                                             </button>
                                         </div>
                                     @else
-                                        <button @click="openCourierSelection({{ $item->id }})" class="h-8 px-3 rounded-lg bg-orange-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-orange-700 transition-all flex items-center gap-2" title="Select courier & generate shipment">
+                                        <button @click="openCourierSelection({{ $item->id }}, {{ json_encode($item->calculated_dimensions) }})" class="h-8 px-3 rounded-lg bg-orange-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-orange-700 transition-all flex items-center gap-2" title="Select courier & generate shipment">
                                             <i data-lucide="rocket" class="w-3 h-3"></i>
                                             NimbusPost
                                         </button>
@@ -421,7 +536,7 @@
                         </div>
                     </template>
                     <template x-if="selectedOrder && (selectedOrder.status === 'processing' || selectedOrder.status === 'packed')">
-                        <button @click="openCourierSelection(selectedOrder.id)" class="w-full py-4 bg-orange-600 text-white rounded-2xl text-xs font-bold tracking-[0.2em] uppercase shadow-lg shadow-orange-100 hover:bg-orange-700 transition-all">Select Courier & Ship</button>
+                        <button @click="openCourierSelection(selectedOrder.id, selectedOrder.calculated_dimensions)" class="w-full py-4 bg-orange-600 text-white rounded-2xl text-xs font-bold tracking-[0.2em] uppercase shadow-lg shadow-orange-100 hover:bg-orange-700 transition-all">Select Courier & Ship</button>
                     </template>
                     <template x-if="selectedOrder && selectedOrder.status === 'shipped'">
                         <button @click="updateStatus(selectedOrder.id, { status: 'delivered', delivery_status: 'delivered' })" class="w-full py-4 bg-emerald-500 text-white rounded-2xl text-xs font-bold tracking-[0.2em] uppercase shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all">Confirm Delivery</button>
@@ -592,5 +707,126 @@
             </div>
         </div>
     </template>
+    <!-- Bulk Ship Modal -->
+    <div x-show="showBulkShipModal" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" x-transition.opacity>
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl overflow-hidden" @click.away="showBulkShipModal = false" x-transition.scale.95>
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-slate-900">Bulk Shipping</h3>
+                    <p class="text-xs text-slate-500 font-medium">Configure shipment for <span x-text="selectedItems.length" class="text-orange-600 font-bold"></span> orders</p>
+                </div>
+                <button @click="showBulkShipModal = false" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Packaging Weight -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Packaging Weight (gm)</label>
+                    <input type="number" x-model="bulkPackagingWeight" class="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-orange-100 focus:border-orange-500 transition-all">
+                    <p class="text-[10px] text-slate-400 mt-1">This weight is added to the dynamic sum of each order's products.</p>
+                </div>
+
+                <!-- Courier Selection -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Select Courier</label>
+                    
+                    <template x-if="bulkCouriers.length === 0">
+                        <div class="h-10 flex items-center gap-2 text-sm text-slate-500">
+                            <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-orange-600"></i> Fetching couriers...
+                        </div>
+                    </template>
+                    
+                    <div class="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                        <template x-for="courier in bulkCouriers" :key="courier.id">
+                            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 cursor-pointer transition-all hover:border-orange-200"
+                                :class="bulkSelectedCourier == courier.id ? 'bg-orange-50/50 border-orange-500 ring-1 ring-orange-500' : 'bg-white'">
+                                <input type="radio" x-model="bulkSelectedCourier" :value="courier.id" class="text-orange-500 focus:ring-orange-500 border-slate-300">
+                                <div>
+                                    <p class="text-sm font-bold text-slate-900" x-text="courier.name"></p>
+                                </div>
+                            </label>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
+                <button @click="showBulkShipModal = false" class="flex-1 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition-all">Cancel</button>
+                <button @click="bulkShip()" class="flex-1 px-4 py-2.5 bg-orange-600 text-white text-sm font-bold rounded-xl hover:bg-orange-700 transition-all flex justify-center items-center gap-2">
+                    Generate AWBs
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Summary Modal -->
+    <div x-show="showBulkSummaryModal" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" x-transition.opacity>
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden" @click.away="showBulkSummaryModal = false" x-transition.scale.95>
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-slate-900">Bulk Shipping Completed</h3>
+                    <p class="text-xs text-slate-500 font-medium">Processed <span x-text="bulkSummary.total" class="font-bold"></span> orders</p>
+                </div>
+                <button @click="showBulkSummaryModal = false; location.reload()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Summary Stats -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl flex items-center gap-4">
+                        <div class="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Successful</p>
+                            <p class="text-2xl font-black text-emerald-700" x-text="bulkSummary.successful"></p>
+                        </div>
+                    </div>
+                    <div class="bg-red-50 border border-red-100 p-4 rounded-xl flex items-center gap-4">
+                        <div class="h-10 w-10 bg-red-100 rounded-full flex items-center justify-center text-red-600">
+                            <i data-lucide="x-circle" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-red-600 uppercase tracking-widest">Failed</p>
+                            <p class="text-2xl font-black text-red-700" x-text="bulkSummary.failed"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Report -->
+                <template x-if="bulkSummary.errors && bulkSummary.errors.length > 0">
+                    <div class="bg-red-50 border border-red-100 rounded-xl p-4">
+                        <h4 class="text-xs font-bold text-red-800 mb-2 flex items-center gap-2">
+                            <i data-lucide="alert-circle" class="w-4 h-4"></i> Failure Report
+                        </h4>
+                        <ul class="space-y-1 max-h-40 overflow-y-auto custom-scrollbar">
+                            <template x-for="error in bulkSummary.errors">
+                                <li class="text-xs text-red-600 font-medium" x-text="error"></li>
+                            </template>
+                        </ul>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
+                <template x-if="bulkSummary.successful > 0 && bulkSummary.ids !== ''">
+                    <a :href="'{{ route("admin.orders.bulk-packing-slips") }}?ids=' + bulkSummary.ids" target="_blank" class="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-50 transition-all flex justify-center items-center gap-2">
+                        <i data-lucide="printer" class="w-4 h-4 text-slate-400"></i> Packing Slips
+                    </a>
+                </template>
+                <template x-if="bulkSummary.successful > 0 && bulkSummary.ids !== ''">
+                    <a :href="'{{ route("admin.orders.bulk-shipping-labels") }}?ids=' + bulkSummary.ids" target="_blank" class="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-50 transition-all flex justify-center items-center gap-2">
+                        <i data-lucide="download" class="w-4 h-4 text-slate-400"></i> Shipping Labels
+                    </a>
+                </template>
+                <button @click="showBulkSummaryModal = false; location.reload()" class="flex-none px-6 py-3 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition-all">Done</button>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
