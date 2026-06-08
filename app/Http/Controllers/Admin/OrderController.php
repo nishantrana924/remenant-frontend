@@ -279,12 +279,12 @@ class OrderController extends BaseController
         try {
             $ratePayload = [
                 'origin' => $warehouse->pincode ?? '110020',
-                'destination' => $payload['consignee']['zipcode'],
+                'destination' => $payload['consignee']['pincode'],
                 'payment_type' => $payload['payment_type'],
                 'order_amount' => $payload['order_amount'],
                 'weight' => $payload['package_weight'],
                 'length' => $payload['package_length'],
-                'breadth' => $payload['package_width'],
+                'breadth' => $payload['package_breadth'],
                 'height' => $payload['package_height']
             ];
             $rates = $nimbus->getRates($ratePayload);
@@ -439,12 +439,12 @@ class OrderController extends BaseController
             try {
                 $ratePayload = [
                     'origin' => $warehouse->pincode ?? '110020',
-                    'destination' => $payload['consignee']['zipcode'],
+                    'destination' => $payload['consignee']['pincode'],
                     'payment_type' => $payload['payment_type'],
                     'order_amount' => $payload['order_amount'],
                     'weight' => $payload['package_weight'],
                     'length' => $payload['package_length'],
-                    'breadth' => $payload['package_width'],
+                    'breadth' => $payload['package_breadth'],
                     'height' => $payload['package_height']
                 ];
                 $rates = $nimbus->getRates($ratePayload);

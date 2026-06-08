@@ -23,7 +23,7 @@ class OrderObserver
     public function updated(Order $order): void
     {
         // Deduct stock when status changes to 'processing' (Confirmed)
-        if ($order->isDirty('status') && $order->status === 'processing') {
+        if (($order->isDirty('status') || $order->wasChanged('status')) && $order->status === 'processing') {
             foreach ($order->orderItems as $item) {
                 $product = $item->product;
                 if ($product) {
@@ -42,8 +42,28 @@ class OrderObserver
             $this->processWarehouseAutomation($order);
         }
 
+        // Send PaymentSuccessful email only when payment_status changes to paid
+        if ($order->wasChanged('payment_status') && $order->payment_status === 'paid') {
+            if ($order->status !== 'cancelled' && $order->status !== 'failed') {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\PaymentSuccessful($order));
+                } catch (\Exception $e) {
+                    Log::error("Failed to send payment successful email for #{$order->order_number}: " . $e->getMessage());
+                }
+            }
+        }
+
+        // Send refund notification only when refund_status changes to pending
+        if ($order->wasChanged('refund_status') && $order->refund_status === 'pending') {
+            try {
+                \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\PaymentRefundInitiated($order));
+            } catch (\Exception $e) {
+                Log::error("Failed to send refund initiated email for #{$order->order_number}: " . $e->getMessage());
+            }
+        }
+
         // Send Shipment Booked / AWB Assigned Email
-        if ($order->isDirty('tracking_id') && !empty($order->tracking_id)) {
+        if (($order->isDirty('tracking_id') || $order->wasChanged('tracking_id')) && !empty($order->tracking_id)) {
             try {
                 \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\ShipmentBooked($order));
             } catch (\Exception $e) {
@@ -52,7 +72,8 @@ class OrderObserver
         }
 
         // Send Shipped Email
-        if (($order->isDirty('delivery_status') && $order->delivery_status === 'shipped') || ($order->isDirty('status') && $order->status === 'shipped')) {
+        if ((($order->isDirty('delivery_status') || $order->wasChanged('delivery_status')) && $order->delivery_status === 'shipped') || 
+            (($order->isDirty('status') || $order->wasChanged('status')) && $order->status === 'shipped')) {
             try {
                \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\OrderShipped($order));
             } catch (\Exception $e) {
@@ -61,7 +82,8 @@ class OrderObserver
         }
 
         // Send Delivered Email
-        if (($order->isDirty('delivery_status') && $order->delivery_status === 'delivered') || ($order->isDirty('status') && $order->status === 'delivered')) {
+        if ((($order->isDirty('delivery_status') || $order->wasChanged('delivery_status')) && $order->delivery_status === 'delivered') || 
+            (($order->isDirty('status') || $order->wasChanged('status')) && $order->status === 'delivered')) {
             try {
                \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\OrderDelivered($order));
             } catch (\Exception $e) {
@@ -70,7 +92,7 @@ class OrderObserver
         }
 
         // Restock when order is 'cancelled'
-        if ($order->isDirty('status') && in_array($order->status, ['cancelled', 'cancellation_requested'])) {
+        if (($order->isDirty('status') || $order->wasChanged('status')) && in_array($order->status, ['cancelled', 'cancellation_requested'])) {
             
             if ($order->status === 'cancelled') {
                 // SECURITY PATCH: Only restore if stock was actually deducted!
@@ -87,18 +109,9 @@ class OrderObserver
 
             // Send Order Cancelled Email
             try {
-               \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\OrderCancelled($order));
-           } catch (\Exception $e) {
-               Log::error("Failed to send order cancelled email for #{$order->order_number}: " . $e->getMessage());
-           }
-
-            // If payment was already captured via Razorpay, send refund notification
-            if ($order->status === 'cancelled' && $order->payment_status === 'paid' && $order->payment_method === 'razorpay') {
-                try {
-                    \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\PaymentRefundInitiated($order));
-                } catch (\Exception $e) {
-                    Log::error("Failed to send refund initiated email for #{$order->order_number}: " . $e->getMessage());
-                }
+                \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\OrderCancelled($order));
+            } catch (\Exception $e) {
+                Log::error("Failed to send order cancelled email for #{$order->order_number}: " . $e->getMessage());
             }
         }
     }

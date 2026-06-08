@@ -94,24 +94,106 @@ class RazorpayWebhookController extends Controller
                         return;
                     }
 
+                    // 3.5. Handle Cancelled or Failed Orders (Autorefund immediately)
+                    if (in_array($order->status, ['cancelled', 'failed'])) {
+                        Log::info("Razorpay Webhook: Order {$order->order_number} is already {$order->status}. Refunding.");
+
+                        if (empty($order->razorpay_refund_id)) {
+                            $order->update([
+                                'payment_status' => 'paid',
+                                'paid_at' => now(),
+                                'razorpay_payment_id' => $payment['id'],
+                                'refund_status' => 'pending',
+                                'refund_requested_at' => now(),
+                            ]);
+
+                            try {
+                                $refundApi = new Api(
+                                    config('services.razorpay.key_id'),
+                                    config('services.razorpay.key_secret')
+                                );
+                                $refund = $refundApi->payment->fetch($payment['id'])->refund([
+                                    'amount' => $payment['amount'],
+                                    'speed' => 'optimum',
+                                    'notes' => [
+                                        'reason' => 'Order cancelled/failed - auto refund',
+                                        'order_number' => $order->order_number,
+                                    ]
+                                ]);
+
+                                $order->update([
+                                    'refund_status' => 'initiated',
+                                    'razorpay_refund_id' => $refund['id'] ?? null,
+                                    'refund_processed_at' => now(),
+                                ]);
+
+                                Log::info("Razorpay Webhook: Refund initiated for cancelled/failed Order {$order->order_number}. Refund ID: " . ($refund['id'] ?? 'N/A'));
+                            } catch (\Exception $refundEx) {
+                                Log::alert("CRITICAL: Razorpay Webhook Refund FAILED for cancelled/failed Order {$order->order_number}: " . $refundEx->getMessage());
+                            }
+
+                            if (method_exists($order, 'logStatus')) {
+                                $order->logStatus("System refunded: Payment received for an order that was already cancelled or failed. Refund initiated.", null);
+                            }
+                        }
+                        return;
+                    }
+
                     // 4. Verify Amount Matches
                     $expectedAmount = (int) round($order->total_amount * 100);
                     $actualAmount = (int) $payment['amount'];
+                    $amountMismatch = $actualAmount !== $expectedAmount;
+                    $currencyMismatch = ($payment['currency'] ?? '') !== 'INR';
 
-                    if ($actualAmount !== $expectedAmount) {
-                        Log::alert("[SECURITY] Razorpay Webhook: Amount mismatch for order {$order->order_number}.", [
-                            'expected' => $expectedAmount,
-                            'actual' => $actualAmount
-                        ]);
-                        abort(400, 'Amount mismatch');
-                    }
-
-                    // 5. Verify Currency Matches
-                    if (($payment['currency'] ?? '') !== 'INR') {
-                        Log::alert("[SECURITY] Razorpay Webhook: Currency mismatch for order {$order->order_number}.", [
+                    if ($amountMismatch || $currencyMismatch) {
+                        Log::alert("[SECURITY] Razorpay Webhook: Payment validation mismatch for Order {$order->order_number}.", [
+                            'expected_amount' => $expectedAmount,
+                            'actual_amount' => $actualAmount,
                             'currency' => $payment['currency'] ?? 'UNKNOWN'
                         ]);
-                        abort(400, 'Currency mismatch');
+
+                        if (empty($order->razorpay_refund_id)) {
+                            $order->update([
+                                'status' => 'failed',
+                                'payment_status' => 'paid',
+                                'paid_at' => now(),
+                                'razorpay_payment_id' => $payment['id'],
+                                'refund_status' => 'pending',
+                                'refund_requested_at' => now(),
+                                'cancellation_reason' => 'Security: Payment validation mismatch (amount/currency)',
+                            ]);
+
+                            try {
+                                $refundApi = new Api(
+                                    config('services.razorpay.key_id'),
+                                    config('services.razorpay.key_secret')
+                                );
+                                $refund = $refundApi->payment->fetch($payment['id'])->refund([
+                                    'amount' => $payment['amount'],
+                                    'speed' => 'optimum',
+                                    'notes' => [
+                                        'reason' => 'Security validation mismatch - auto refund',
+                                        'order_number' => $order->order_number,
+                                    ]
+                                ]);
+
+                                $order->update([
+                                    'refund_status' => 'initiated',
+                                    'razorpay_refund_id' => $refund['id'] ?? null,
+                                    'refund_processed_at' => now(),
+                                ]);
+
+                                Log::info("Razorpay Webhook: Refund initiated for mismatch on Order {$order->order_number}. Refund ID: " . ($refund['id'] ?? 'N/A'));
+                            } catch (\Exception $refundEx) {
+                                Log::alert("CRITICAL: Razorpay Webhook Refund FAILED for mismatched Order {$order->order_number}: " . $refundEx->getMessage());
+                            }
+
+                            if (method_exists($order, 'logStatus')) {
+                                $order->logStatus("Security Alert: Amount/Currency mismatch. Order marked failed. Refund initiated.", null);
+                            }
+                        }
+
+                        abort(400, 'Security validation mismatch');
                     }
 
                     // 6. Verify Captured Status
@@ -131,61 +213,58 @@ class RazorpayWebhookController extends Controller
                     }
 
                     if ($outOfStock) {
-                        // Mark as cancelled with paid status
-                        $order->update([
-                            'payment_status' => 'paid',
-                            'razorpay_payment_id' => $payment['id'],
-                            'status' => 'cancelled',
-                            'cancellation_reason' => 'System Auto-Cancel: Out of stock during fulfillment',
-                            'refund_status' => 'pending'
-                        ]);
-
-                        // Trigger actual Razorpay Refund via API
-                        try {
-                            $refundApi = new Api(
-                                config('services.razorpay.key_id'),
-                                config('services.razorpay.key_secret')
-                            );
-                            $refund = $refundApi->payment->fetch($payment['id'])->refund([
-                                'amount' => $payment['amount'], // Full refund in paise
-                                'speed' => 'optimum',
-                                'notes' => [
-                                    'reason' => 'Out of stock - auto refund',
-                                    'order_number' => $order->order_number,
-                                ]
-                            ]);
-
+                        if (empty($order->razorpay_refund_id)) {
+                            // Mark as cancelled with paid status
                             $order->update([
-                                'refund_status' => 'initiated',
-                                'razorpay_refund_id' => $refund['id'] ?? null,
+                                'payment_status' => 'paid',
+                                'paid_at' => now(),
+                                'razorpay_payment_id' => $payment['id'],
+                                'status' => 'cancelled',
+                                'cancellation_reason' => 'System Auto-Cancel: Out of stock during fulfillment',
+                                'refund_status' => 'pending',
+                                'refund_requested_at' => now(),
                             ]);
 
-                            Log::info("Razorpay Refund Initiated for Order {$order->order_number}. Refund ID: " . ($refund['id'] ?? 'N/A'));
-                        } catch (\Exception $refundEx) {
-                            Log::alert("CRITICAL: Razorpay Refund FAILED for Order {$order->order_number}: " . $refundEx->getMessage());
-                            // Keep refund_status as 'pending' so admin can manually process
-                        }
+                            // Trigger actual Razorpay Refund via API
+                            try {
+                                $refundApi = new Api(
+                                    config('services.razorpay.key_id'),
+                                    config('services.razorpay.key_secret')
+                                );
+                                $refund = $refundApi->payment->fetch($payment['id'])->refund([
+                                    'amount' => $payment['amount'], // Full refund in paise
+                                    'speed' => 'optimum',
+                                    'notes' => [
+                                        'reason' => 'Out of stock - auto refund',
+                                        'order_number' => $order->order_number,
+                                    ]
+                                ]);
 
-                        // Send refund notification email to customer
-                        try {
-                            \Illuminate\Support\Facades\Mail::to($order->email)
-                                ->queue(new PaymentRefundInitiated($order));
-                        } catch (\Exception $mailEx) {
-                            Log::error("Failed to send refund email for Order {$order->order_number}: " . $mailEx->getMessage());
-                        }
+                                $order->update([
+                                    'refund_status' => 'initiated',
+                                    'razorpay_refund_id' => $refund['id'] ?? null,
+                                    'refund_processed_at' => now(),
+                                ]);
 
-                        // Log the timeline
-                        if (method_exists($order, 'logStatus')) {
-                            $order->logStatus("System cancelled: Item went out of stock during payment. Refund initiated via Razorpay.", null);
-                        }
+                                Log::info("Razorpay Refund Initiated for Order {$order->order_number}. Refund ID: " . ($refund['id'] ?? 'N/A'));
+                            } catch (\Exception $refundEx) {
+                                Log::alert("CRITICAL: Razorpay Refund FAILED for Order {$order->order_number}: " . $refundEx->getMessage());
+                            }
 
-                        Log::alert("CRITICAL: Order {$order->order_number} cancelled due to stock race condition. Refund initiated.");
+                            // Log the timeline
+                            if (method_exists($order, 'logStatus')) {
+                                $order->logStatus("System cancelled: Item went out of stock during payment. Refund initiated via Razorpay.", null);
+                            }
+
+                            Log::alert("CRITICAL: Order {$order->order_number} cancelled due to stock race condition. Refund initiated.");
+                        }
                         return;
                     }
 
                     // 8. Process valid payment (sufficient stock)
                     $order->update([
                         'payment_status' => 'paid',
+                        'paid_at' => now(),
                         'razorpay_payment_id' => $payment['id'],
                         'status' => 'processing'
                     ]);

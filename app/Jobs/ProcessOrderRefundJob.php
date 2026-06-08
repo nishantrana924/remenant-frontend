@@ -16,6 +16,8 @@ class ProcessOrderRefundJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $afterCommit = true;
+
     protected $orderId;
 
     /**
@@ -35,8 +37,9 @@ class ProcessOrderRefundJob implements ShouldQueue
             \Illuminate\Support\Facades\DB::transaction(function () {
                 $order = Order::where('id', $this->orderId)->lockForUpdate()->first();
 
-                if (!$order || in_array($order->refund_status, ['processing', 'completed']) || $order->payment_status !== 'paid') {
-                    return; // Ensure idempotency
+                // 1. Verify razorpay_refund_id is empty and enforce refund_status idempotency
+                if (!$order || !empty($order->razorpay_refund_id) || in_array($order->refund_status, ['processing', 'completed']) || $order->payment_status !== 'paid') {
+                    return; // Ensure idempotency & prevent duplicate execution
                 }
 
                 $razorpayKey = config('services.razorpay.key_id');
@@ -54,22 +57,26 @@ class ProcessOrderRefundJob implements ShouldQueue
                     throw new \Exception("No payment transaction ID found for Order #{$order->order_number}");
                 }
 
+                // 2. Set status to processing and request time before executing API call (pessimistic lock state)
+                $order->update([
+                    'refund_status' => 'processing',
+                    'refund_requested_at' => $order->refund_requested_at ?? now(),
+                ]);
+
                 // Execute Refund API call
                 $refund = $api->payment->fetch($paymentId)->refund([
                     'amount' => $order->total_amount * 100 // Amount in paise
                 ]);
                 
                 $order->update([
-                    'refund_status' => 'processing',
                     'refund_amount' => $order->total_amount,
                     'razorpay_refund_id' => $refund->id,
+                    'refund_processed_at' => now(),
                 ]);
 
                 $order->logStatus("Refund initiated. Refund ID: {$refund->id}", 'system');
 
                 // If Razorpay returns status as processed immediately (sometimes it does, sometimes it's pending)
-                // For safety, we mark as completed if it doesn't explicitly throw an error, 
-                // but we should store the ARN if provided.
                 if (isset($refund->arn) || (isset($refund->status) && $refund->status === 'processed')) {
                     $order->update([
                         'refund_status' => 'completed',

@@ -23,8 +23,13 @@ class NimbusPostService
 
         $token = Cache::get('nimbuspost_token');
 
-        // Use cached token if available (any non-empty string is valid)
-        if ($token && !$forceRefresh) {
+        // Only trust the cached token if it looks like a valid JWT (starts with 'eyJ')
+        // A corrupt/stale/non-JWT value (e.g. a hash or garbage) causes the
+        // "Invalid key=value pair in Authorization header" error from NimbusPost.
+        $isValidJwt = $token && str_starts_with($token, 'eyJ');
+
+        // Use cached token if available and valid
+        if ($isValidJwt && !$forceRefresh) {
             return $token;
         }
 

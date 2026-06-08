@@ -253,8 +253,8 @@ class CheckoutController extends Controller
         if (empty($input['razorpay_payment_id']) === false) {
             try {
                 $attributes = [
-                    'razorpay_order_id' => $input['razorpay_order_id'],
-                    'razorpay_payment_id' => $input['razorpay_payment_id'],
+                    'razorpay_order_id'  => $input['razorpay_order_id'],
+                    'razorpay_payment_id'=> $input['razorpay_payment_id'],
                     'razorpay_signature' => $input['razorpay_signature']
                 ];
                 $api->utility->verifyPaymentSignature($attributes);
@@ -262,28 +262,83 @@ class CheckoutController extends Controller
                 $success = false;
                 $error = 'Razorpay Error : ' . $e->getMessage();
             }
+        } else {
+            $success = false;
+            $error = 'Payment ID missing.';
         }
 
         if ($success === true) {
             session()->forget('cart');
+
             $order = \App\Models\Order::where('razorpay_order_id', $input['razorpay_order_id'])->first();
-            
-            // Wait up to 3 seconds for webhook to process the order
-            if ($order) {
-                $attempts = 0;
-                while ($order->payment_status !== 'paid' && $attempts < 3) {
-                    sleep(1);
-                    $order->refresh();
-                    $attempts++;
+
+            if ($order && $order->payment_status !== 'paid') {
+                // 1. If order is already cancelled or failed, mark paid, set refund_status to pending and dispatch refund job
+                if (in_array($order->status, ['cancelled', 'failed'])) {
+                    $order->update([
+                        'payment_status'      => 'paid',
+                        'paid_at'             => now(),
+                        'razorpay_payment_id' => $input['razorpay_payment_id'],
+                        'razorpay_signature'  => $input['razorpay_signature'],
+                        'refund_status'       => 'pending',
+                        'refund_requested_at' => now(),
+                    ]);
+
+                    \App\Jobs\ProcessOrderRefundJob::dispatch($order->id);
+
+                    Log::info('verifyPayment: Cancelled/failed Order ' . $order->order_number . ' paid. Refund job dispatched.');
+                } else {
+                    // 2. Pre-flight stock check before marking processing
+                    $outOfStock = false;
+                    foreach ($order->orderItems as $item) {
+                        $product = \App\Models\Product::find($item->product_id);
+                        if (!$product || $product->stock < $item->quantity) {
+                            $outOfStock = true;
+                            break;
+                        }
+                    }
+
+                    if ($outOfStock) {
+                        $order->update([
+                            'payment_status'      => 'paid',
+                            'paid_at'             => now(),
+                            'razorpay_payment_id' => $input['razorpay_payment_id'],
+                            'razorpay_signature'  => $input['razorpay_signature'],
+                            'status'              => 'cancelled',
+                            'cancellation_reason' => 'System Auto-Cancel: Out of stock during verification',
+                            'refund_status'       => 'pending',
+                            'refund_requested_at' => now(),
+                        ]);
+
+                        \App\Jobs\ProcessOrderRefundJob::dispatch($order->id);
+
+                        Log::warn('verifyPayment: Order ' . $order->order_number . ' paid but out of stock. Refund job dispatched.');
+                    } else {
+                        // Normal successful flow
+                        $order->update([
+                            'payment_status'      => 'paid',
+                            'paid_at'             => now(),
+                            'status'              => 'processing',
+                            'razorpay_payment_id' => $input['razorpay_payment_id'],
+                            'razorpay_signature'  => $input['razorpay_signature'],
+                        ]);
+
+                        Log::info('verifyPayment: Order ' . $order->order_number . ' marked paid via signature verification.');
+                    }
                 }
-                session(['payment_verified_for_order' => $order->order_number]);
             }
 
-            // Status update happens in RazorpayWebhookController securely.
-            return redirect()->route('checkout.success', ['order' => $order->order_number])->with('success', 'Payment Successful! Awaiting confirmation.');
-        } else {
-            return redirect()->route('checkout.payment', ['order' => $request->order_number])->with('error', $error);
+            if ($order) {
+                session(['payment_verified_for_order' => $order->order_number]);
+                return redirect()->route('checkout.success', ['order' => $order->order_number])
+                    ->with('success', 'Payment processed!');
+            }
+
+            return redirect()->route('home')->with('success', 'Payment received!');
         }
+
+        return redirect()->route('checkout.payment', ['order' => $request->order_number])
+            ->with('error', $error);
     }
 
     public function success($orderNumber)
@@ -293,22 +348,17 @@ class CheckoutController extends Controller
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-        // Wait up to 3 seconds in case webhook is delayed
-        $attempts = 0;
-        while ($order->payment_status !== 'paid' && $attempts < 3) {
-            sleep(1);
-            $order->refresh();
-            $attempts++;
+        // Refresh once to catch any late webhook/job updates
+        $order->refresh();
+
+        // If unpaid and no valid session flag, redirect back to payment page
+        if ($order->payment_status !== 'paid' && session('payment_verified_for_order') !== $orderNumber) {
+            return redirect()->route('checkout.payment', $order->order_number)
+                ->with('error', 'Payment not confirmed yet. Please complete payment.');
         }
 
-        if ($order->payment_status !== 'paid' && session('payment_verified_for_order') !== $orderNumber) {
-            return redirect()->route('checkout.payment', $order->order_number)->with('error', 'Payment is pending for this order.');
-        }
-        
-        // If still unpaid but session is verified, visual override
-        if ($order->payment_status !== 'paid') {
-            $order->payment_status = 'paid';
-        }
+        // Clear the session flag
+        session()->forget('payment_verified_for_order');
 
         return view('public.success', compact('order'));
     }
