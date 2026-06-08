@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Admin - {{ config('app.name', 'Laravel') }}</title>
+    <title>Admin - {{ config('app.name', 'Remenant Health') }}</title>
     <meta name="layout" content="admin">
     <link rel="icon" href="{{ asset('images/logo/remenant-health-favicon.jpg') }}" type="image/jpeg">
 

@@ -14,8 +14,12 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
+        $referer = $request->headers->get('referer');
+        if ($referer && $referer !== url()->current() && $referer !== route('login') && $referer !== route('register')) {
+            session(['url.intended' => $referer]);
+        }
         return view('auth.login');
     }
 
@@ -49,7 +53,11 @@ class AuthenticatedSessionController extends Controller
             }
         }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        if (auth()->user()->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->intended(route('home'));
     }
 
     /**

@@ -32,7 +32,7 @@ class SecurityHeaders
                 $connectSrc .= " wss://localhost:5173";
             }
             
-            $csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://badges.razorpay.com https://www.google-analytics.com https://ui-avatars.com; " . $connectSrc . "; frame-src 'self' https://api.razorpay.com; font-src 'self' https://fonts.gstatic.com data:;";
+            $csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://www.googletagmanager.com https://www.google-analytics.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; img-src 'self' data: https://badges.razorpay.com https://www.google-analytics.com https://ui-avatars.com; " . $connectSrc . "; frame-src 'self' https://api.razorpay.com; font-src 'self' https://fonts.gstatic.com data:;";
             
             $response->headers->set($cspHeader, $csp);
         }

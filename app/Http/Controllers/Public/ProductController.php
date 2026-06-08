@@ -181,7 +181,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'required|string|min:10',
+            'comment' => 'nullable|string',
             'images.*' => 'image|mimes:jpeg,png,jpg|max:5120'
         ]);
 
@@ -228,14 +228,15 @@ class ProductController extends Controller
 
     public function executeReviewCreation($productId, $userId, $rating, $comment, $imagePaths = [])
     {
-        return \App\Models\Review::create([
-            'product_id' => $productId,
-            'user_id' => $userId,
-            'rating' => $rating,
-            'comment' => $comment,
-            'images' => $imagePaths,
-            'status' => 'pending'
-        ]);
+        return \App\Models\Review::updateOrCreate(
+            ['product_id' => $productId, 'user_id' => $userId],
+            [
+                'rating' => $rating,
+                'comment' => $comment ?? null,
+                'images' => !empty($imagePaths) ? $imagePaths : null,
+                'status' => 'approved'
+            ]
+        );
     }
 
     public function searchSuggestions(Request $request)

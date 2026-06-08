@@ -34,7 +34,7 @@
     <div class="wrapper">
         <div class="header">
             <a href="{{ config('app.url') }}" style="text-decoration: none; display: inline-block;">
-                <img src="{{ \App\Helpers\ImageHelper::getUrl('logo/remenant-health-logo.png', 'images') }}" alt="REMENANT HEALTH" class="logo-img">
+                <img src="https://remenanthealth.com/images/logo/remenant-health-logo.png" alt="REMENANT HEALTH" class="logo-img">
             </a>
         </div>
         <div class="content">

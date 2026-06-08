@@ -5,12 +5,47 @@
 @section('content')
 <!-- Flush Edge-to-Edge Container -->
 <div class="w-full bg-[#F1F3F6] pt-0 dashboard-root">
-    <div class="w-full flex flex-col md:flex-row md:items-start min-h-screen pt-0">
+    <div class="w-full flex flex-col md:flex-row min-h-screen pt-0">
         
+        <!-- Mobile Navigation (Top) -->
+        <div class="md:hidden bg-white border-b border-slate-200 w-full flex flex-col shrink-0">
+            <!-- Mobile Profile Header -->
+            <div class="p-4 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 shrink-0 overflow-hidden border border-slate-200">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=f8fafc&color=64748b" alt="Avatar" class="h-full w-full object-cover">
+                    </div>
+                    <div class="min-w-0">
+                        <h2 class="text-sm font-semibold text-slate-900 truncate">{{ auth()->user()->name }}</h2>
+                        <p class="text-xs font-medium text-slate-500 truncate">{{ auth()->user()->email ?? 'Customer Account' }}</p>
+                    </div>
+                </div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="h-10 w-10 rounded-full flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors">
+                        <i data-lucide="log-out" class="h-5 w-5" stroke-width="1.5"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Mobile Horizontal Scroll Tabs -->
+            <div class="flex overflow-x-auto hide-scrollbar px-4 pt-1 gap-6 border-t border-slate-50">
+                <button onclick="switchTab('orders', this)" class="mobile-nav-link whitespace-nowrap pb-3 border-b-2 px-1 text-sm font-medium transition-colors {{ $activeTab === 'orders' ? 'border-orange-500 text-orange-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}" data-tab="orders">
+                    My Orders
+                </button>
+                <button onclick="switchTab('profile', this)" class="mobile-nav-link whitespace-nowrap pb-3 border-b-2 px-1 text-sm font-medium transition-colors {{ $activeTab === 'profile' ? 'border-orange-500 text-orange-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}" data-tab="profile">
+                    Profile Info
+                </button>
+                <button onclick="switchTab('addresses', this)" class="mobile-nav-link whitespace-nowrap pb-3 border-b-2 px-1 text-sm font-medium transition-colors {{ $activeTab === 'addresses' ? 'border-orange-500 text-orange-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}" data-tab="addresses">
+                    Addresses
+                </button>
+            </div>
+        </div>
+
         <!-- Sidebar (Premium SaaS Style) -->
-        <div class="w-full md:w-[260px] bg-white border-b md:border-b-0 md:border-r border-slate-200 shrink-0 md:min-h-[calc(100vh-80px)] md:h-[calc(100vh-80px)] md:sticky md:top-[80px] overflow-y-auto flex flex-col">
+        <div class="hidden md:flex w-[260px] bg-white border-r border-slate-200 shrink-0 flex-col">
             <!-- Profile Block -->
-            <div class="p-6 flex items-center gap-4 border-b border-slate-100">
+            <div class="p-5 flex items-center gap-4 border-b border-slate-100">
                 <div class="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 shrink-0 overflow-hidden border border-slate-200">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=f8fafc&color=64748b" alt="Avatar" class="h-full w-full object-cover">
                 </div>
@@ -21,25 +56,25 @@
             </div>
 
             <!-- Navigation Switcher -->
-            <div class="flex-1 px-4 py-6 space-y-8" id="dashboard-nav">
+            <div class="px-4 py-5 space-y-6 pb-2" id="dashboard-nav">
                 
                 <!-- Group: Shopping -->
-                <div class="space-y-2">
-                    <h3 class="text-xs font-semibold text-slate-400 px-3 mb-3 uppercase tracking-wider">Shopping</h3>
-                    <button onclick="switchTab('orders', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'orders' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all">
+                <div class="space-y-1.5">
+                    <h3 class="text-xs font-semibold text-slate-400 px-3 mb-2 uppercase tracking-wider">Shopping</h3>
+                    <button onclick="switchTab('orders', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'orders' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all" data-tab="orders">
                         <i data-lucide="shopping-bag" class="h-4 w-4" stroke-width="1.5"></i>
                         <span class="text-sm font-medium">My Orders</span>
                     </button>
                 </div>
                 
                 <!-- Group: Account -->
-                <div class="space-y-2">
-                    <h3 class="text-xs font-semibold text-slate-400 px-3 mb-3 uppercase tracking-wider">Account</h3>
-                    <button onclick="switchTab('profile', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'profile' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all">
+                <div class="space-y-1.5">
+                    <h3 class="text-xs font-semibold text-slate-400 px-3 mb-2 uppercase tracking-wider">Account</h3>
+                    <button onclick="switchTab('profile', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'profile' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all" data-tab="profile">
                         <i data-lucide="user-cog" class="h-4 w-4" stroke-width="1.5"></i>
                         <span class="text-sm font-medium">Profile Info</span>
                     </button>
-                    <button onclick="switchTab('addresses', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'addresses' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all">
+                    <button onclick="switchTab('addresses', this)" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg {{ $activeTab === 'addresses' ? 'active bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50' }} transition-all" data-tab="addresses">
                         <i data-lucide="map-pin" class="h-4 w-4" stroke-width="1.5"></i>
                         <span class="text-sm font-medium">Addresses</span>
                     </button>
@@ -48,7 +83,7 @@
             </div>
 
             <!-- Sign Out -->
-            <div class="p-6 border-t border-slate-100">
+            <div class="px-4 py-2 mt-2 mb-6">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="flex items-center gap-3 text-slate-500 hover:text-rose-600 hover:bg-rose-50 px-3 py-2.5 rounded-lg transition-all w-full text-left">
@@ -67,44 +102,44 @@
                 <!-- Top KPI Dashboard -->
                 <div class="px-4 sm:px-8 pt-10 pb-6 border-b border-slate-200/60 bg-white">
                     <h3 class="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 mb-8">My Orders</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-                            <div class="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
-                                <i data-lucide="shopping-bag" class="h-5 w-5 text-slate-500" stroke-width="1.5"></i>
+                    <div class="flex overflow-x-auto hide-scrollbar gap-4 md:grid md:grid-cols-4 md:gap-6 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+                        <div class="shrink-0 w-[160px] md:w-auto bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 md:gap-4 hover:shadow-md transition-shadow">
+                            <div class="h-10 w-10 md:h-12 md:w-12 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
+                                <i data-lucide="shopping-bag" class="h-4 w-4 md:h-5 md:w-5 text-slate-500" stroke-width="1.5"></i>
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-slate-500">Total Orders</p>
-                                <div class="flex items-baseline gap-2 mt-0.5">
-                                    <span class="text-2xl font-semibold text-slate-900">{{ $orderStats['total'] ?? 0 }}</span>
-                                    <span class="text-xs font-medium text-slate-400">Lifetime</span>
+                                <p class="text-xs md:text-sm font-medium text-slate-500">Total Orders</p>
+                                <div class="flex items-baseline gap-1 md:gap-2 mt-0.5">
+                                    <span class="text-xl md:text-2xl font-semibold text-slate-900">{{ $orderStats['total'] ?? 0 }}</span>
+                                    <span class="text-[10px] md:text-xs font-medium text-slate-400">Lifetime</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-                            <div class="h-12 w-12 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
-                                <i data-lucide="package" class="h-5 w-5 text-emerald-500" stroke-width="1.5"></i>
+                        <div class="shrink-0 w-[160px] md:w-auto bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 md:gap-4 hover:shadow-md transition-shadow">
+                            <div class="h-10 w-10 md:h-12 md:w-12 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                                <i data-lucide="package" class="h-4 w-4 md:h-5 md:w-5 text-emerald-500" stroke-width="1.5"></i>
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-slate-500">Active</p>
-                                <div class="flex items-baseline gap-2 mt-0.5">
-                                    <span class="text-2xl font-semibold text-slate-900">{{ $orderStats['active'] ?? 0 }}</span>
-                                    <span class="text-xs font-medium text-slate-400">In Progress</span>
+                                <p class="text-xs md:text-sm font-medium text-slate-500">Active</p>
+                                <div class="flex items-baseline gap-1 md:gap-2 mt-0.5">
+                                    <span class="text-xl md:text-2xl font-semibold text-slate-900">{{ $orderStats['active'] ?? 0 }}</span>
+                                    <span class="text-[10px] md:text-xs font-medium text-slate-400">In Progress</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-                            <div class="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                                <i data-lucide="package-check" class="h-5 w-5 text-blue-500" stroke-width="1.5"></i>
+                        <div class="shrink-0 w-[160px] md:w-auto bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 md:gap-4 hover:shadow-md transition-shadow">
+                            <div class="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                                <i data-lucide="package-check" class="h-4 w-4 md:h-5 md:w-5 text-blue-500" stroke-width="1.5"></i>
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-slate-500">Delivered</p>
-                                <div class="flex items-baseline gap-2 mt-0.5">
-                                    <span class="text-2xl font-semibold text-slate-900">{{ $orderStats['delivered'] ?? 0 }}</span>
-                                    <span class="text-xs font-medium text-slate-400">History</span>
+                                <p class="text-xs md:text-sm font-medium text-slate-500">Delivered</p>
+                                <div class="flex items-baseline gap-1 md:gap-2 mt-0.5">
+                                    <span class="text-xl md:text-2xl font-semibold text-slate-900">{{ $orderStats['delivered'] ?? 0 }}</span>
+                                    <span class="text-[10px] md:text-xs font-medium text-slate-400">History</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+                        <div class="shrink-0 w-[160px] md:w-auto bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 md:gap-4 hover:shadow-md transition-shadow">
                             <div class="h-12 w-12 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
                                 <i data-lucide="clock" class="h-5 w-5 text-orange-500" stroke-width="1.5"></i>
                             </div>
@@ -153,10 +188,10 @@
                             }
                         @endphp
                         
-                        <!-- Order Card -->
-                        <div class="rounded-2xl border {{ $cardClasses }} overflow-hidden">
+                        <!-- Desktop Order Card -->
+                        <div class="hidden md:block rounded-2xl border {{ $cardClasses }} overflow-hidden cursor-pointer hover:shadow-md transition-shadow group" onclick="window.location.href='{{ route('order.track', $order->order_number) }}'">
                             <!-- Header -->
-                            <div class="bg-slate-50/50 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 gap-4">
+                            <div class="bg-slate-50/50 group-hover:bg-slate-100/50 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 gap-4 transition-colors">
                                 <div class="flex flex-wrap items-center gap-4 md:gap-8 text-sm">
                                     <div class="flex flex-col">
                                         <span class="font-medium text-slate-500 text-xs">Order Placed</span>
@@ -188,16 +223,18 @@
                                     
                                     <!-- Product Details -->
                                     <div class="flex-1">
-                                        <h4 class="text-base font-semibold text-slate-900 leading-tight">{{ $productName }}</h4>
+                                        <h4 class="text-base font-semibold text-slate-900 leading-tight group-hover:text-orange-600 transition-colors">{{ $productName }}</h4>
                                         <p class="text-sm font-normal text-slate-500 mt-1">Qty: {{ $firstItem->quantity ?? 1 }}</p>
                                         @if($additionalCount > 0)
                                             <p class="text-xs font-medium text-slate-600 mt-2 bg-slate-50 inline-block px-2.5 py-1 rounded-md border border-slate-200">+ {{ $additionalCount }} More Items</p>
                                         @endif
                                         <p class="text-sm font-medium text-slate-800 mt-4">
                                             @if($isDelivered)
-                                                <span class="flex items-center gap-1.5 text-slate-600"><i data-lucide="package-check" class="h-4 w-4 text-emerald-500"></i> Delivered on {{ \Carbon\Carbon::parse($order->updated_at)->format('d M Y') }}</span>
-                                            @elseif($isPaid)
-                                                Expected Delivery: <span class="font-semibold text-emerald-600">{{ \Carbon\Carbon::parse($order->created_at)->addDays(3)->format('d M Y') }}</span>
+                                                <span class="flex items-center gap-1.5 text-slate-600"><i data-lucide="package-check" class="h-4 w-4 text-emerald-500"></i> Delivered on {{ $order->delivered_at ? \Carbon\Carbon::parse($order->delivered_at)->format('d M Y') : \Carbon\Carbon::parse($order->updated_at)->format('d M Y') }}</span>
+                                            @elseif($order->status === 'pending')
+                                                <span class="flex items-center gap-1.5 text-orange-600"><i data-lucide="clock" class="h-4 w-4"></i> Waiting for approval</span>
+                                            @elseif($isPaid || $order->payment_method === 'cash_on_delivery')
+                                                Expected Delivery: <span class="font-semibold text-emerald-600">{{ $order->estimated_delivery_date ? \Carbon\Carbon::parse($order->estimated_delivery_date)->format('d M Y') : '10-12 working days' }}</span>
                                             @else
                                                 <span class="text-orange-600">Awaiting Payment Completion</span>
                                             @endif
@@ -205,7 +242,7 @@
                                     </div>
                                     
                                     <!-- Actions -->
-                                    <div class="shrink-0 flex flex-col gap-3 w-full md:w-48 mt-4 md:mt-0">
+                                    <div class="shrink-0 flex flex-col gap-3 w-full md:w-48 mt-4 md:mt-0" onclick="event.stopPropagation()">
                                         @if($isPaid)
                                             <a href="{{ route('order.track', ['order_number' => $order->order_number]) }}" class="w-full text-center bg-orange-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-orange-700 hover:shadow-lg shadow-orange-500/20 transition-all">Track Order</a>
                                             <form action="{{ route('order.reorder', ['order' => $order->order_number]) }}" method="POST" class="w-full">
@@ -231,6 +268,55 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Mobile Order Card -->
+                        <a href="{{ route('order.track', $order->order_number) }}" class="block md:hidden rounded-2xl border {{ $cardClasses }} overflow-hidden p-4 bg-white shadow-sm mb-4 relative group">
+                             <div class="flex gap-4 pr-6">
+                                  <div class="shrink-0 h-20 w-20 bg-slate-50 rounded-xl overflow-hidden border border-slate-100">
+                                       <img src="{{ $productImage }}" alt="{{ $productName }}" class="h-full w-full object-cover">
+                                  </div>
+                                  <div class="flex-1 min-w-0 flex flex-col justify-center">
+                                       <h4 class="text-sm font-semibold text-slate-900 leading-tight truncate">{{ $productName }}</h4>
+                                       <p class="text-xs font-normal text-slate-500 mt-1">Qty: {{ $firstItem->quantity ?? 1 }}</p>
+                                       
+                                       @if($isDelivered)
+                                            <div class="mt-2 flex items-center gap-1.5 text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-md w-fit">
+                                                <i data-lucide="check-circle-2" class="h-3.5 w-3.5"></i>
+                                                <span>Delivered {{ $order->delivered_at ? 'on ' . \Carbon\Carbon::parse($order->delivered_at)->format('d M Y') : '' }}</span>
+                                            </div>
+                                        @elseif($order->status === 'pending')
+                                            <div class="mt-2 flex items-center gap-1.5 text-xs text-orange-600 font-semibold bg-orange-50 border border-orange-100 px-2.5 py-1 rounded-md w-fit">
+                                                <i data-lucide="clock" class="h-3.5 w-3.5"></i>
+                                                <span>Waiting for approval</span>
+                                            </div>
+                                        @else
+                                            <div class="mt-2 flex items-center gap-1.5 text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-md w-fit">
+                                                <i data-lucide="truck" class="h-3.5 w-3.5"></i>
+                                                <span>Expected Delivery: {{ $order->estimated_delivery_date ? \Carbon\Carbon::parse($order->estimated_delivery_date)->format('d M Y') : '10-12 working days' }}</span>
+                                            </div>
+                                        @endif
+
+                                       <!-- Rating Stars -->
+                                       @php
+                                            $existingReview = \App\Models\Review::where('product_id', $firstItem->product_id ?? 0)->where('user_id', auth()->id())->first();
+                                            $existingRating = $existingReview ? $existingReview->rating : 0;
+                                       @endphp
+                                       <div class="mt-2.5 flex items-center gap-1.5" id="mobile-rating-{{ $order->id }}">
+                                            @for($i=1; $i<=5; $i++)
+                                            <button type="button" onclick="saveMobileRating({{ $order->id }}, {{ $firstItem->product_id ?? 0 }}, {{ $i }})" class="{{ $i <= $existingRating ? 'text-amber-400' : 'text-slate-300' }} hover:text-amber-400 focus:outline-none transition-colors star-btn" data-val="{{ $i }}">
+                                                 <i data-lucide="star" class="h-4 w-4 fill-current" stroke-width="1.5"></i>
+                                            </button>
+                                            @endfor
+                                       </div>
+                                       
+                                       <!-- Write Review Link -->
+                                       <object><a href="{{ route('products.show', $firstItem->product->slug ?? '#') }}#reviews" class="text-xs font-semibold text-orange-600 hover:text-orange-700 mt-1.5 inline-block w-fit">Write a review</a></object>
+                                  </div>
+                             </div>
+                             <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300">
+                                 <i data-lucide="chevron-right" class="h-5 w-5"></i>
+                             </div>
+                        </a>
                     @empty
                         <!-- Empty State -->
                         <div class="py-20 px-6 text-center border border-dashed border-slate-200 rounded-2xl bg-white shadow-sm">
@@ -267,9 +353,10 @@
                                     $badgeText = $isPendingReview ? 'Cancellation Pending' : 'Cancelled';
                                 @endphp
                                 
-                                <div class="rounded-2xl border border-rose-100 bg-white overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+                                <!-- Desktop Cancelled Order Card -->
+                                <div class="hidden md:block rounded-2xl border border-rose-100 bg-white overflow-hidden opacity-80 hover:opacity-100 cursor-pointer hover:shadow-md transition-all group" onclick="window.location.href='{{ route('order.track', $order->order_number) }}'">
                                     <!-- Header -->
-                                    <div class="bg-slate-50/50 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 gap-4">
+                                    <div class="bg-slate-50/50 group-hover:bg-slate-100/50 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 gap-4 transition-colors">
                                         <div class="flex flex-wrap items-center gap-4 md:gap-8 text-sm">
                                             <div class="flex flex-col">
                                                 <span class="font-medium text-slate-500 text-xs">Cancelled On</span>
@@ -280,8 +367,24 @@
                                                 <span class="font-semibold text-slate-900">₹{{ number_format($order->total_amount) }}</span>
                                             </div>
                                             <div class="flex flex-col">
-                                                <span class="font-medium text-slate-500 text-xs">Order Number</span>
-                                                <span class="font-semibold text-slate-900">#{{ $order->order_number }}</span>
+                                                <span class="font-medium text-slate-500 text-xs">Refund Status</span>
+                                                @php
+                                                    $refundDesktopBadge = 'Not Processed';
+                                                    $refundDesktopColor = 'text-slate-500';
+                                                    if ($order->payment_status === 'paid') {
+                                                        if ($order->refund_status === 'completed') {
+                                                            $refundDesktopBadge = 'Refunded';
+                                                            $refundDesktopColor = 'text-emerald-600';
+                                                        } else {
+                                                            $refundDesktopBadge = 'Refund Pending';
+                                                            $refundDesktopColor = 'text-orange-600';
+                                                        }
+                                                    } else {
+                                                        $refundDesktopBadge = 'No Refund Required';
+                                                        $refundDesktopColor = 'text-slate-500';
+                                                    }
+                                                @endphp
+                                                <span class="font-bold {{ $refundDesktopColor }}">{{ $refundDesktopBadge }}</span>
                                             </div>
                                         </div>
                                         <div class="flex items-center">
@@ -295,13 +398,13 @@
                                     <div class="p-6">
                                         <div class="flex flex-col md:flex-row gap-6">
                                             <!-- Image -->
-                                            <div class="shrink-0 h-24 w-24 bg-slate-50 rounded-xl overflow-hidden border border-slate-100 grayscale opacity-70">
+                                            <div class="shrink-0 h-24 w-24 bg-slate-50 rounded-xl overflow-hidden border border-slate-100 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
                                                 <img src="{{ $productImage }}" alt="{{ $productName }}" class="h-full w-full object-cover">
                                             </div>
                                             
                                             <!-- Product Details -->
                                             <div class="flex-1">
-                                                <h4 class="text-base font-semibold text-slate-900 leading-tight">{{ $productName }}</h4>
+                                                <h4 class="text-base font-semibold text-slate-900 leading-tight group-hover:text-orange-600 transition-colors">{{ $productName }}</h4>
                                                 <p class="text-sm font-normal text-slate-500 mt-1">Qty: {{ $firstItem->quantity ?? 1 }}</p>
                                                 @if($additionalCount > 0)
                                                     <p class="text-xs font-medium text-slate-600 mt-2 bg-slate-50 inline-block px-2.5 py-1 rounded-md border border-slate-200">+ {{ $additionalCount }} More Items</p>
@@ -311,31 +414,14 @@
                                                     <p class="text-xs font-medium text-slate-600">
                                                         <span class="font-semibold text-slate-800">Reason:</span> {{ $order->cancellation_reason ?? 'Customer Request' }}
                                                     </p>
-                                                    @if($order->payment_status === 'paid' || $order->refund_status !== 'none')
-                                                        <div class="mt-2 space-y-1">
-                                                            <p class="text-xs font-medium text-slate-600 flex items-center gap-1.5">
-                                                                <span class="font-semibold text-slate-800">Refund Status:</span> 
-                                                                <span class="{{ $order->refund_status === 'completed' ? 'text-emerald-600' : ($order->refund_status === 'failed' ? 'text-rose-600' : 'text-orange-600') }} font-bold uppercase tracking-wider text-[10px]">{{ $order->refund_status }}</span>
-                                                            </p>
-                                                            @if($order->refund_amount)
-                                                                <p class="text-xs font-medium text-slate-600 flex items-center gap-1.5">
-                                                                    <span class="font-semibold text-slate-800">Refund Amount:</span> 
-                                                                    <span>₹{{ number_format($order->refund_amount) }}</span>
-                                                                </p>
-                                                            @endif
-                                                            @if($order->razorpay_refund_id)
-                                                                <p class="text-xs font-medium text-slate-600 flex items-center gap-1.5">
-                                                                    <span class="font-semibold text-slate-800">Refund Reference:</span> 
-                                                                    <span class="font-mono text-[10px] bg-slate-100 px-1.5 py-0.5 rounded">{{ $order->razorpay_refund_id }}</span>
-                                                                </p>
-                                                            @endif
-                                                        </div>
-                                                    @endif
                                                 </div>
                                             </div>
 
                                             <!-- Actions -->
                                             <div class="shrink-0 flex flex-col justify-end gap-3 w-full md:w-48 mt-4 md:mt-0">
+                                                <a href="{{ route('order.track', ['order_number' => $order->order_number]) }}" class="w-full flex items-center justify-center gap-2 bg-orange-50 text-orange-600 border border-orange-100 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-orange-100 transition-all">
+                                                    Track Progress <i data-lucide="chevron-right" class="h-4 w-4"></i>
+                                                </a>
                                                 <div class="flex items-center justify-between mt-auto pt-4 md:pt-0 px-1 border-t md:border-t-0 border-slate-100">
                                                     <a href="{{ route('order.invoice', ['order' => $order->order_number]) }}" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5">
                                                         <i data-lucide="download" class="h-3.5 w-3.5"></i> Invoice
@@ -348,6 +434,56 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Mobile Cancelled Order Card -->
+                                <a href="{{ route('order.track', $order->order_number) }}" class="block md:hidden rounded-2xl border border-rose-100 overflow-hidden p-4 bg-white shadow-sm mb-4 relative group opacity-90">
+                                    
+                                    <!-- Chevron Arrow -->
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 text-rose-200 group-hover:text-rose-400 transition-colors">
+                                        <i data-lucide="chevron-right" class="h-5 w-5"></i>
+                                    </div>
+
+                                    @php
+                                        $refundMobileBadge = 'Refund Not Processed';
+                                        $refundMobileColor = 'text-slate-500';
+                                        if ($order->payment_status === 'paid') {
+                                            if ($order->refund_status === 'completed') {
+                                                $refundMobileBadge = 'Refunded';
+                                                $refundMobileColor = 'text-emerald-600';
+                                            } else {
+                                                $refundMobileBadge = 'Refund Pending';
+                                                $refundMobileColor = 'text-orange-600';
+                                            }
+                                        } else {
+                                            $refundMobileBadge = 'No Refund Required';
+                                            $refundMobileColor = 'text-slate-500';
+                                        }
+                                    @endphp
+
+                                    <div class="flex items-start justify-between border-b border-rose-50 pb-3 mb-3 pr-6">
+                                        <div>
+                                            <p class="text-xs font-bold {{ $refundMobileColor }}">{{ $refundMobileBadge }}</p>
+                                            <p class="text-[10px] font-medium text-slate-400 mt-0.5">{{ $order->cancelled_at ? \Carbon\Carbon::parse($order->cancelled_at)->format('d M Y') : $order->updated_at->format('d M Y') }}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-sm font-bold text-slate-900">₹{{ number_format($order->total_amount) }}</p>
+                                            <span class="inline-flex mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100 items-center gap-1 whitespace-nowrap">
+                                                <i data-lucide="{{ $isPendingReview ? 'clock' : 'x-circle' }}" class="h-3 w-3"></i>
+                                                {{ $badgeText }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-3 pr-6">
+                                        <div class="h-12 w-12 shrink-0 bg-slate-50 rounded-lg overflow-hidden border border-slate-100 grayscale opacity-70">
+                                            <img src="{{ $productImage }}" alt="{{ $productName }}" class="h-full w-full object-cover">
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-semibold text-slate-900 truncate">{{ $productName }}</p>
+                                            <p class="text-xs text-slate-500 mt-0.5">Qty: {{ $firstItem->quantity ?? 1 }} @if($additionalCount > 0) <span class="font-medium text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded text-[10px]">+{{ $additionalCount }} more</span> @endif</p>
+                                        </div>
+                                    </div>
+                                </a>
                             @endforeach
                         </div>
                         
@@ -614,12 +750,53 @@
 
 <style>
     main { padding: 0 !important; margin: 0 !important; max-width: none !important; }
-    .nav-link.active { background: #FFF7ED; color: #F97316; border-right: 4px solid #F97316; }
-    .nav-link:not(.active) { color: #64748B; border-right: 4px solid transparent; }
+
 </style>
 
 @push('scripts')
 <script>
+    // Save Mobile Rating
+    window.saveMobileRating = async function(orderId, productId, rating) {
+        if (!productId) return;
+        
+        const container = document.getElementById('mobile-rating-' + orderId);
+        if (!container) return;
+        
+        // Update UI immediately for responsive feel
+        const stars = container.querySelectorAll('.star-btn');
+        stars.forEach(star => {
+            const val = parseInt(star.getAttribute('data-val'));
+            if (val <= rating) {
+                star.classList.remove('text-slate-300');
+                star.classList.add('text-amber-400');
+            } else {
+                star.classList.remove('text-amber-400');
+                star.classList.add('text-slate-300');
+            }
+        });
+
+        // Perform the AJAX request to save the rating
+        try {
+            const response = await fetch(`/product/${productId}/reviews`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ rating: rating })
+            });
+            const data = await response.json();
+            if(data.success) {
+                console.log(`Saved rating ${rating} for product ${productId} in order ${orderId}`);
+            } else if (data.requires_login) {
+                window.location.href = data.redirect;
+            }
+        } catch (error) {
+            console.error('Error saving rating:', error);
+        }
+    };
+
     // Tab Switching Logic
     window.switchTab = function(tabId, btn) {
         // Update URL without reload for persistence
@@ -636,17 +813,29 @@
         const target = document.getElementById('section-' + tabId);
         if (target) target.classList.remove('hidden');
 
-        // Update Nav Links
+        // Update Desktop Nav Links
         document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active', 'bg-orange-50', 'text-orange-600', 'border-r-4', 'border-orange-500');
-            link.classList.add('text-slate-500');
+            link.classList.remove('active', 'bg-orange-50', 'text-orange-600');
+            link.classList.add('text-slate-500', 'hover:bg-slate-50');
         });
 
-        // Activate clicked button
-        if (btn) {
-            btn.classList.add('active', 'bg-orange-50', 'text-orange-600', 'border-r-4', 'border-orange-500');
-            btn.classList.remove('text-slate-500');
-        }
+        // Activate matching desktop buttons
+        document.querySelectorAll(`.nav-link[data-tab="${tabId}"]`).forEach(btn => {
+            btn.classList.add('active', 'bg-orange-50', 'text-orange-600');
+            btn.classList.remove('text-slate-500', 'hover:bg-slate-50');
+        });
+
+        // Update Mobile Nav Links
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.classList.remove('border-orange-500', 'text-orange-600');
+            link.classList.add('border-transparent', 'text-slate-500');
+        });
+        
+        // Activate matching mobile buttons
+        document.querySelectorAll(`.mobile-nav-link[data-tab="${tabId}"]`).forEach(btn => {
+            btn.classList.add('border-orange-500', 'text-orange-600');
+            btn.classList.remove('border-transparent', 'text-slate-500');
+        });
 
         // Refresh icons in case new content appeared
         if (window.lucide) lucide.createIcons();
@@ -839,12 +1028,14 @@
         document.getElementById('cancel-modal').classList.remove('flex');
     }
     
-    // Form Validation for checkbox
-    document.getElementById('cancel-form').addEventListener('submit', function(e) {
-        const checkbox = document.getElementById('confirm-cancel-checkbox');
-        if (!checkbox.checked) {
-            e.preventDefault();
-            alert('Please confirm that you want to cancel this order.');
+    // Form Validation for checkbox (Using event delegation to survive dynamic DOM)
+    document.addEventListener('submit', function(e) {
+        if (e.target && e.target.id === 'cancel-form') {
+            const checkbox = document.getElementById('confirm-cancel-checkbox');
+            if (checkbox && !checkbox.checked) {
+                e.preventDefault();
+                alert('Please confirm that you want to cancel this order.');
+            }
         }
     });
 </script>

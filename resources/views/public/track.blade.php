@@ -73,10 +73,30 @@
                                 <span class="text-base font-bold text-gray-800">₹{{ number_format($order->total_amount) }}</span>
                             </div>
                         </div>
-                        <div class="mt-6">
-                            <a href="{{ route('order.invoice', $order->order_number) }}" target="_blank" class="w-full flex items-center justify-center gap-2 border border-blue-600 text-blue-600 py-2.5 rounded-sm text-xs font-bold hover:bg-blue-50 transition-all uppercase tracking-wider">
-                                <i data-lucide="download" class="h-3.5 w-3.5"></i> Download Invoice
-                            </a>
+                        <!-- Actions -->
+                        @php
+                            $isPaid = $order->payment_status === 'paid';
+                            $isDelivered = $order->delivery_status === 'Delivered';
+                            $isCancelled = in_array(strtolower($order->status), ['cancelled', 'cancellation_requested']) || in_array(strtolower($order->delivery_status), ['cancelled']);
+                            $canCancel = !$isDelivered && !$isCancelled;
+                        @endphp
+                        
+                        <div class="mt-6 flex flex-col gap-3">
+                            @if(!$isPaid && !$isCancelled)
+                                <a href="{{ route('checkout.payment', ['order' => $order->order_number]) }}" class="w-full text-center bg-orange-600 text-white px-6 py-3 rounded-sm text-sm font-bold hover:bg-orange-700 transition-all uppercase tracking-wider shadow-sm">
+                                    Pay Now
+                                </a>
+                            @endif
+
+                            @if($isPaid && !$isCancelled)
+                                <a href="{{ route('order.invoice', $order->order_number) }}" target="_blank" class="w-full flex items-center justify-center gap-2 border border-blue-600 text-blue-600 py-2.5 rounded-sm text-xs font-bold hover:bg-blue-50 transition-all uppercase tracking-wider">
+                                    <i data-lucide="download" class="h-3.5 w-3.5"></i> Download Invoice
+                                </a>
+                            @endif
+                            
+                            @if($canCancel)
+                                <button type="button" onclick="openCancelModal('{{ $order->id }}', '{{ $order->order_number }}', '{{ $isPaid ? '1' : '0' }}')" class="w-full bg-white border border-rose-200 text-rose-600 px-6 py-2.5 rounded-sm text-sm font-bold hover:bg-rose-50 hover:border-rose-300 transition-all uppercase tracking-wider">Cancel Order</button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -89,9 +109,7 @@
                         <div class="p-6 flex items-start gap-6 border-b">
                             <div class="h-20 w-20 bg-gray-50 rounded-md border p-1 flex-shrink-0">
                                 @php
-                                    $imagePath = $item->product->image 
-                                        ? (Str::startsWith($item->product->image, 'products/') ? asset('storage/' . $item->product->image) : asset('images/products/' . $item->product->image))
-                                        : asset('images/products/placeholder.jpg');
+                                    $imagePath = \App\Helpers\ImageHelper::getUrl($item->product->image, 'images/products');
                                 @endphp
                                 <img src="{{ $imagePath }}" alt="{{ $item->product->title }}" class="h-full w-full object-contain">
                             </div>
@@ -121,36 +139,64 @@
                         <!-- Timeline -->
                         <div class="p-6 sm:p-10">
                             @php
-                                $status = $order->delivery_status;
-                                $steps = [
-                                    ['label' => 'Order Placed', 'status' => 'placed', 'desc' => $order->created_at->format('d M, Y')],
-                                    ['label' => 'Packed', 'status' => 'packed', 'desc' => in_array($status, ['packed', 'shipped', 'delivered']) ? 'Ready for pickup' : 'Pending'],
-                                    ['label' => 'Shipped', 'status' => 'shipped', 'desc' => in_array($status, ['shipped', 'delivered']) ? ($order->courier_name ?? 'In Transit') : 'Awaiting dispatch'],
-                                    ['label' => 'Delivered', 'status' => 'delivered', 'desc' => ($status === 'delivered') ? 'Delivered successfully' : 'Expected delivery soon']
-                                ];
+                                $status = strtolower($order->delivery_status);
+                                $isOrderCancelled = in_array(strtolower($order->status), ['cancelled', 'cancellation_requested']) || $status === 'cancelled';
                                 
-                                $currentIndex = 0;
-                                if($status === 'packed') $currentIndex = 1;
-                                if($status === 'shipped') $currentIndex = 2;
-                                if($status === 'delivered') $currentIndex = 3;
+                                if ($isOrderCancelled) {
+                                    if (strtolower($order->payment_status) === 'paid') {
+                                        $steps = [
+                                            ['label' => 'Order Placed', 'status' => 'placed', 'desc' => $order->created_at->format('d M, Y')],
+                                            ['label' => 'Cancelled', 'status' => 'cancelled', 'desc' => $order->cancellation_reason ?: 'Cancelled by user'],
+                                            ['label' => 'Refund Process', 'status' => 'refund', 'desc' => strtolower($order->refund_status) === 'processed' ? 'Refund successful' : 'Processing Refund']
+                                        ];
+                                        $currentIndex = 1;
+                                        if (in_array(strtolower($order->refund_status), ['pending', 'initiated', 'processed'])) {
+                                            $currentIndex = 2;
+                                        }
+                                    } else {
+                                        $steps = [
+                                            ['label' => 'Order Placed', 'status' => 'placed', 'desc' => $order->created_at->format('d M, Y')],
+                                            ['label' => 'Cancelled', 'status' => 'cancelled', 'desc' => $order->cancellation_reason ?: 'Cancelled by user']
+                                        ];
+                                        $currentIndex = 1;
+                                    }
+                                } else {
+                                    $steps = [
+                                        ['label' => 'Order Placed', 'status' => 'placed', 'desc' => $order->created_at->format('d M, Y')],
+                                        ['label' => 'Packed', 'status' => 'packed', 'desc' => in_array($status, ['packed', 'shipped', 'delivered']) ? 'Ready for pickup' : 'Pending'],
+                                        ['label' => 'Shipped', 'status' => 'shipped', 'desc' => in_array($status, ['shipped', 'delivered']) ? ($order->courier_name ?? 'In Transit') : 'Awaiting dispatch'],
+                                        ['label' => 'Delivered', 'status' => 'delivered', 'desc' => ($status === 'delivered') ? 'Delivered successfully' : 'Expected delivery soon']
+                                    ];
+                                    
+                                    $currentIndex = 0;
+                                    if($status === 'packed') $currentIndex = 1;
+                                    if($status === 'shipped') $currentIndex = 2;
+                                    if($status === 'delivered') $currentIndex = 3;
+                                }
                             @endphp
 
                             <!-- Horizontal Timeline (Desktop) -->
                             <div class="hidden sm:block relative mb-12">
                                 <div class="absolute top-2.5 left-0 w-full h-1 bg-gray-100 -z-0">
-                                    <div class="h-full bg-green-500 transition-all duration-500" style="width: {{ ($currentIndex / (count($steps) - 1)) * 100 }}%"></div>
+                                    <div class="h-full {{ $isOrderCancelled ? 'bg-red-500' : 'bg-green-500' }} transition-all duration-500" style="width: {{ count($steps) > 1 ? ($currentIndex / (count($steps) - 1)) * 100 : 0 }}%"></div>
                                 </div>
                                 
                                 <div class="flex justify-between relative z-10">
                                     @foreach($steps as $index => $step)
                                         <div class="flex flex-col items-center">
-                                            <div class="h-6 w-6 rounded-full flex items-center justify-center {{ $index <= $currentIndex ? 'bg-green-500 text-white' : 'bg-gray-200 text-white' }} border-4 border-white ring-1 ring-gray-100">
-                                                @if($index <= $currentIndex)
-                                                    <i data-lucide="check" class="h-3 w-3 stroke-[4px]"></i>
+                                            @php
+                                                $isCompleted = $index <= $currentIndex;
+                                                $isCancelledStep = $isOrderCancelled;
+                                                $bgColor = $isCompleted ? ($isCancelledStep ? 'bg-red-500' : 'bg-green-500') : 'bg-gray-200';
+                                                $icon = $step['status'] === 'cancelled' ? 'x' : 'check';
+                                            @endphp
+                                            <div class="h-6 w-6 rounded-full flex items-center justify-center {{ $bgColor }} text-white border-4 border-white ring-1 ring-gray-100">
+                                                @if($isCompleted)
+                                                    <i data-lucide="{{ $icon }}" class="h-3 w-3 stroke-[4px]"></i>
                                                 @endif
                                             </div>
                                             <div class="mt-3 text-center">
-                                                <p class="text-xs font-bold {{ $index <= $currentIndex ? 'text-gray-800' : 'text-gray-400' }}">{{ $step['label'] }}</p>
+                                                <p class="text-xs font-bold {{ $isCompleted ? 'text-gray-800' : 'text-gray-400' }}">{{ $step['label'] }}</p>
                                                 <p class="text-[10px] text-gray-500 mt-1">{{ $step['desc'] }}</p>
                                             </div>
                                         </div>
@@ -161,18 +207,24 @@
                             <!-- Vertical Timeline (Mobile) -->
                             <div class="sm:hidden space-y-8 relative">
                                 <div class="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-100 -z-0">
-                                    <div class="w-full bg-green-500" style="height: {{ ($currentIndex / (count($steps) - 1)) * 100 }}%"></div>
+                                    <div class="w-full {{ $isOrderCancelled ? 'bg-red-500' : 'bg-green-500' }}" style="height: {{ count($steps) > 1 ? ($currentIndex / (count($steps) - 1)) * 100 : 0 }}%"></div>
                                 </div>
                                 
                                 @foreach($steps as $index => $step)
+                                    @php
+                                        $isCompleted = $index <= $currentIndex;
+                                        $isCancelledStep = $isOrderCancelled;
+                                        $bgColor = $isCompleted ? ($isCancelledStep ? 'bg-red-500' : 'bg-green-500') : 'bg-gray-200';
+                                        $icon = $step['status'] === 'cancelled' ? 'x' : 'check';
+                                    @endphp
                                     <div class="flex items-start gap-6 relative z-10">
-                                        <div class="h-6 w-6 rounded-full flex-shrink-0 flex items-center justify-center {{ $index <= $currentIndex ? 'bg-green-500 text-white' : 'bg-gray-200 text-white' }} border-4 border-white ring-1 ring-gray-100">
-                                            @if($index <= $currentIndex)
-                                                <i data-lucide="check" class="h-3 w-3 stroke-[4px]"></i>
+                                        <div class="h-6 w-6 rounded-full flex-shrink-0 flex items-center justify-center {{ $bgColor }} text-white border-4 border-white ring-1 ring-gray-100">
+                                            @if($isCompleted)
+                                                <i data-lucide="{{ $icon }}" class="h-3 w-3 stroke-[4px]"></i>
                                             @endif
                                         </div>
                                         <div class="pt-0.5">
-                                            <p class="text-sm font-bold {{ $index <= $currentIndex ? 'text-gray-800' : 'text-gray-400' }}">{{ $step['label'] }}</p>
+                                            <p class="text-sm font-bold {{ $isCompleted ? 'text-gray-800' : 'text-gray-400' }}">{{ $step['label'] }}</p>
                                             <p class="text-xs text-gray-500 mt-0.5">{{ $step['desc'] }}</p>
                                         </div>
                                     </div>
@@ -221,4 +273,90 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function openCancelModal(orderId, orderNumber, isPaid) {
+        document.getElementById('cancel-modal').classList.remove('hidden');
+        document.getElementById('cancel-modal').classList.add('flex');
+        
+        // Set form action
+        const form = document.getElementById('cancel-form');
+        form.action = `/orders/${orderId}/cancel`;
+        
+        document.getElementById('modal-order-number').innerText = orderNumber;
+        
+        // Show refund notice if paid
+        const refundNotice = document.getElementById('refund-notice');
+        if (isPaid === '1') {
+            refundNotice.classList.remove('hidden');
+        } else {
+            refundNotice.classList.add('hidden');
+        }
+    }
+
+    function closeCancelModal() {
+        document.getElementById('cancel-modal').classList.add('hidden');
+        document.getElementById('cancel-modal').classList.remove('flex');
+    }
+    
+    // Form Validation for checkbox
+    document.addEventListener('submit', function(e) {
+        if (e.target && e.target.id === 'cancel-form') {
+            const checkbox = document.getElementById('confirm-cancel-checkbox');
+            if (checkbox && !checkbox.checked) {
+                e.preventDefault();
+                alert('Please confirm that you want to cancel this order.');
+            }
+        }
+    });
+</script>
+
+<!-- Cancel Order Modal -->
+<div id="cancel-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-900">Cancel Order #<span id="modal-order-number"></span></h3>
+            <button type="button" onclick="closeCancelModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <i data-lucide="x" class="h-5 w-5"></i>
+            </button>
+        </div>
+        
+        <form id="cancel-form" method="POST" action="">
+            @csrf
+            <div class="p-6 space-y-5">
+                <div>
+                    <label for="cancellation_reason" class="block text-sm font-medium text-slate-700 mb-1.5">Why are you cancelling?</label>
+                    <select name="cancellation_reason" id="cancellation_reason" required class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                        <option value="">Select a reason...</option>
+                        <option value="Changed my mind">I changed my mind</option>
+                        <option value="Found a better price elsewhere">Found a better price elsewhere</option>
+                        <option value="Ordered by mistake">Ordered by mistake</option>
+                        <option value="Delivery is taking too long">Delivery is taking too long</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div id="refund-notice" class="hidden bg-orange-50 border border-orange-100 rounded-xl p-4 flex gap-3">
+                    <i data-lucide="info" class="h-5 w-5 text-orange-600 shrink-0"></i>
+                    <div>
+                        <h4 class="text-sm font-semibold text-orange-800">Refund Information</h4>
+                        <p class="text-xs text-orange-700 mt-1 leading-relaxed">Since you have already paid for this order, a refund will be initiated automatically. Please allow 5-7 business days for the amount to reflect in your original payment method.</p>
+                    </div>
+                </div>
+
+                <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                    <input type="checkbox" id="confirm-cancel-checkbox" class="mt-0.5 rounded border-slate-300 text-rose-600 focus:ring-rose-500">
+                    <span class="text-sm text-slate-700 leading-snug">I understand that cancelling this order is permanent and cannot be undone.</span>
+                </label>
+            </div>
+            
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeCancelModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Go Back</button>
+                <button type="submit" class="px-6 py-2.5 bg-rose-600 text-white text-sm font-semibold rounded-xl hover:bg-rose-700 transition-colors shadow-sm shadow-rose-500/20">Confirm Cancellation</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endpush
 @endsection

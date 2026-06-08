@@ -49,5 +49,20 @@ class Review extends Model
                 }
             }
         });
+
+        $syncProductStats = function ($review) {
+            $product = $review->product;
+            if ($product) {
+                $approvedCount = $product->reviews()->where('status', 'approved')->count();
+                $approvedAvg = $product->reviews()->where('status', 'approved')->avg('rating') ?: 0;
+                $product->update([
+                    'reviews' => $approvedCount,
+                    'rating' => round($approvedAvg, 1)
+                ]);
+            }
+        };
+
+        static::saved($syncProductStats);
+        static::deleted($syncProductStats);
     }
 }

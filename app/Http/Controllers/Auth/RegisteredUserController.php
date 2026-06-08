@@ -17,8 +17,12 @@ class RegisteredUserController extends Controller
     /**
      * Display the registration view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
+        $referer = $request->headers->get('referer');
+        if ($referer && $referer !== url()->current() && $referer !== route('login') && $referer !== route('register')) {
+            session(['url.intended' => $referer]);
+        }
         return view('auth.register');
     }
 
@@ -69,6 +73,10 @@ class RegisteredUserController extends Controller
             }
         }
 
-        return redirect(route('dashboard', absolute: false));
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->intended(route('home'));
     }
 }

@@ -14,10 +14,10 @@
                 <h2 style="font-size: 10px; font-weight: 900; color: #b91c1c; text-transform: uppercase; letter-spacing: 2px; margin: 0;">Cancellation Details</h2>
                 <p style="font-size: 13px; font-weight: 700; color: #111827; margin: 5px 0 0 0;">
                     Refund Status: 
-                    @if($order->payment_method === 'prepaid')
-                        Processing Refund
+                    @if($order->payment_status === 'paid')
+                        Refund Initiated (Online/Bank)
                     @else
-                        No Action Required (COD)
+                        No Payment Made
                     @endif
                 </p>
             </div>

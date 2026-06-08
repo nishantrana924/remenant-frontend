@@ -254,8 +254,8 @@
         </div>
 
         <!-- Mobile search bar (Sticky) -->
-        <div class="sm:hidden public-mobile-search px-4 pb-4 -mt-1 {{ $isAuthPage || request()->routeIs('products.show', 'cart', 'dashboard', 'my-orders') ? 'hidden' : '' }}"
-            data-mobile-search>
+        <div class="sm:hidden public-mobile-search mt-3 mb-1 transition-all duration-300 origin-top overflow-hidden {{ $isAuthPage || request()->routeIs('products.show', 'cart', 'dashboard', 'my-orders') ? 'hidden' : '' }}"
+            data-mobile-search id="mobile-search-container">
             <form action="{{ route('products.index') }}" method="GET" class="relative" data-search-form>
                 <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/80">
                     <i data-lucide="search" class="h-5 w-5"></i>
@@ -313,6 +313,27 @@
         initAccountDropdown();
         if (window.up) {
             up.on('up:fragment:inserted', initAccountDropdown);
+        }
+        
+        // Mobile Search Scroll Hide/Show
+        const mobileSearchContainer = document.getElementById('mobile-search-container');
+        if (mobileSearchContainer) {
+            window.addEventListener('scroll', function() {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop > 40) {
+                    mobileSearchContainer.style.maxHeight = '0px';
+                    mobileSearchContainer.style.opacity = '0';
+                    mobileSearchContainer.style.marginTop = '0px';
+                    mobileSearchContainer.style.marginBottom = '0px';
+                    mobileSearchContainer.style.pointerEvents = 'none';
+                } else {
+                    mobileSearchContainer.style.maxHeight = '100px';
+                    mobileSearchContainer.style.opacity = '1';
+                    mobileSearchContainer.style.marginTop = '0.75rem'; // mt-3
+                    mobileSearchContainer.style.marginBottom = '0.25rem'; // mb-1
+                    mobileSearchContainer.style.pointerEvents = 'auto';
+                }
+            });
         }
     })();
 </script>

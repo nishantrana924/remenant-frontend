@@ -73,14 +73,17 @@ class OrderObserver
         }
 
         // Restock when order is 'cancelled'
-        if ($order->isDirty('status') && $order->status === 'cancelled') {
-            // SECURITY PATCH: Only restore if stock was actually deducted!
-            $previousStatus = $order->getOriginal('status');
-            if (in_array($previousStatus, ['processing', 'shipped', 'delivered'])) {
-                foreach ($order->orderItems as $item) {
-                    $product = $item->product;
-                    if ($product) {
-                        $this->restoreProductStock($product, $item->quantity, $order);
+        if ($order->isDirty('status') && in_array($order->status, ['cancelled', 'cancellation_requested'])) {
+            
+            if ($order->status === 'cancelled') {
+                // SECURITY PATCH: Only restore if stock was actually deducted!
+                $previousStatus = $order->getOriginal('status');
+                if (in_array($previousStatus, ['processing', 'shipped', 'delivered'])) {
+                    foreach ($order->orderItems as $item) {
+                        $product = $item->product;
+                        if ($product) {
+                            $this->restoreProductStock($product, $item->quantity, $order);
+                        }
                     }
                 }
             }
@@ -93,7 +96,7 @@ class OrderObserver
            }
 
             // If payment was already captured via Razorpay, send refund notification
-            if ($order->payment_status === 'paid' && $order->payment_method === 'razorpay') {
+            if ($order->status === 'cancelled' && $order->payment_status === 'paid' && $order->payment_method === 'razorpay') {
                 try {
                     \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\PaymentRefundInitiated($order));
                 } catch (\Exception $e) {

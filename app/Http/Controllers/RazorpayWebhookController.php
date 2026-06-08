@@ -190,6 +190,14 @@ class RazorpayWebhookController extends Controller
                         'status' => 'processing'
                     ]);
 
+                    // Send Payment Successful / Bill Email
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($order->email)
+                            ->queue(new \App\Mail\PaymentSuccessful($order));
+                    } catch (\Exception $mailEx) {
+                        Log::error("Failed to send payment successful email for Order {$order->order_number}: " . $mailEx->getMessage());
+                    }
+
                     Log::info("Razorpay Webhook: Order {$order->order_number} successfully marked as paid and processing.");
                 });
             } catch (\Exception $e) {
