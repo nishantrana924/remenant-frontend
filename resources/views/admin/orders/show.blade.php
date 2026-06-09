@@ -270,9 +270,9 @@
                             @endif
                         </div>
 
-                        {{-- Direct NimbusPost Label PDF Download --}}
-                        @if($item->shipment && $item->shipment->label_url)
-                        <a href="{{ $item->shipment->label_url }}" target="_blank"
+                        {{-- Direct NimbusPost Label PDF Download (proxied through Laravel to avoid S3 AccessDenied) --}}
+                        @if($item->shipment && $item->shipment->nimbus_shipment_id)
+                        <a href="{{ route('admin.orders.nimbus-label', $item->id) }}" target="_blank"
                            class="w-full flex items-center justify-center gap-2 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl py-3 text-[9px] font-bold uppercase tracking-widest hover:bg-emerald-100 transition-all">
                             <i data-lucide="download" class="w-3.5 h-3.5"></i>
                             Download NimbusPost Label PDF
@@ -354,6 +354,42 @@
                     <div class="pt-4 border-t border-slate-50">
                         <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Transaction ID</p>
                         <p class="text-[10px] font-bold text-slate-600 tracking-tighter">{{ $item->payment_transaction_id }}</p>
+                    </div>
+                    @endif
+                    @if($item->refund_status && $item->refund_status !== 'none')
+                    <div class="pt-4 border-t border-slate-50 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Refund Status</span>
+                            <span class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest {{ $item->refund_status === 'completed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-orange-50 text-orange-600 border border-orange-100' }}">
+                                {{ $item->refund_status }}
+                            </span>
+                        </div>
+                        @if($item->refund_amount > 0)
+                        <div class="flex items-center justify-between">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Refund Amount</span>
+                            <span class="text-xs font-bold text-rose-600">₹{{ number_format($item->refund_amount) }}</span>
+                        </div>
+                        @endif
+                        @if($item->razorpay_refund_id)
+                        <div>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Razorpay Refund ID</p>
+                            <p class="text-[9px] font-mono text-slate-500 break-all">{{ $item->razorpay_refund_id }}</p>
+                        </div>
+                        @endif
+                        @if($item->refund_arn)
+                        <div>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Refund ARN</p>
+                            <p class="text-[9px] font-mono text-slate-500 break-all">{{ $item->refund_arn }}</p>
+                        </div>
+                        @endif
+                        
+                        @if(!in_array($item->refund_status, ['completed', 'failed']) && $item->razorpay_refund_id)
+                        <button @click="window.fastSubmit('{{ route('admin.orders.sync-refund', $item->id) }}', { method: 'POST', success: (res) => { window.toast(res.message); setTimeout(()=>location.reload(), 1000); }, error: (err) => window.toast(err.response?.data?.message || 'Failed to sync refund', 'error') })"
+                                class="w-full mt-2 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-100 rounded-xl text-[9px] font-black tracking-widest uppercase transition-all flex items-center justify-center gap-1.5">
+                            <i data-lucide="rotate-cw" class="w-3 h-3"></i>
+                            Sync Refund Status
+                        </button>
+                        @endif
                     </div>
                     @endif
                 </div>

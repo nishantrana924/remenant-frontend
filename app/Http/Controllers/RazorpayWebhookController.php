@@ -43,7 +43,14 @@ class RazorpayWebhookController extends Controller
         $event = $data['event'] ?? '';
 
         // Only process supported events
-        $supportedEvents = ['order.paid', 'payment.captured', 'payment.failed'];
+        $supportedEvents = [
+            'order.paid', 
+            'payment.captured', 
+            'payment.failed',
+            'refund.created',
+            'refund.processed',
+            'refund.failed'
+        ];
         if (!in_array($event, $supportedEvents)) {
             return response()->json(['status' => 'ignored']);
         }
@@ -293,6 +300,79 @@ class RazorpayWebhookController extends Controller
                 DB::table('orders')->where('razorpay_order_id', $razorpayOrderId)
                     ->where('payment_status', '!=', 'paid')
                     ->update(['status' => 'failed']);
+            }
+        } elseif (in_array($event, ['refund.processed', 'refund.created', 'refund.failed'])) {
+            $refund = $data['payload']['refund']['entity'] ?? null;
+            
+            if (!$refund) {
+                Log::alert('Razorpay Webhook: Malformed refund entity.', ['payload' => $data]);
+                return response()->json(['error' => 'Malformed payload'], 400);
+            }
+
+            $paymentId = $refund['payment_id'] ?? null;
+            $refundId = $refund['id'] ?? null;
+
+            try {
+                DB::transaction(function () use ($paymentId, $refundId, $refund, $event, $webhookId) {
+                    // Find the order by matching refund ID first, then payment transaction ID, then notes
+                    $order = Order::where('razorpay_refund_id', $refundId)
+                        ->orWhere('payment_transaction_id', $paymentId)
+                        ->orWhere('razorpay_payment_id', $paymentId)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (!$order && isset($refund['notes']['order_number'])) {
+                        $order = Order::where('order_number', $refund['notes']['order_number'])
+                            ->lockForUpdate()
+                            ->first();
+                    }
+
+                    if (!$order) {
+                        Log::warning("Razorpay Webhook: Order not found for refund. Refund ID: {$refundId}, Payment ID: {$paymentId}");
+                        return;
+                    }
+
+                    // Map order_number to webhook log for traceability
+                    DB::table('razorpay_webhooks')
+                        ->where('webhook_id', $webhookId)
+                        ->update(['order_number' => $order->order_number]);
+
+                    // Unidirectional State Guard: Don't allow downgrade from completed/processed state
+                    if ($order->refund_status === 'completed' && $event !== 'refund.processed') {
+                        Log::info("Razorpay Webhook: Order {$order->order_number} refund is already completed. Ignoring status transition to: {$event}");
+                        return;
+                    }
+
+                    $statusMap = [
+                        'refund.processed' => 'completed',
+                        'refund.created' => 'initiated',
+                        'refund.failed' => 'failed',
+                    ];
+
+                    $newRefundStatus = $statusMap[$event] ?? 'initiated';
+
+                    $updateData = [
+                        'refund_status' => $newRefundStatus,
+                        'razorpay_refund_id' => $refundId,
+                    ];
+
+                    if ($event === 'refund.processed') {
+                        $updateData['refund_amount'] = $refund['amount'] / 100; // paise to INR
+                        $updateData['refund_processed_at'] = now();
+                        if (isset($refund['acquirer_data']['arn'])) {
+                            $updateData['refund_arn'] = $refund['acquirer_data']['arn'];
+                        }
+                    }
+
+                    $order->update($updateData);
+
+                    if (method_exists($order, 'logStatus')) {
+                        $order->logStatus("Refund update from Razorpay Webhook: status is now {$newRefundStatus}. Refund ID: {$refundId}", null);
+                    }
+                });
+            } catch (\Exception $e) {
+                Log::error("Razorpay Webhook Refund Processing Failed for Refund ID {$refundId}: " . $e->getMessage());
+                return response()->json(['error' => 'Processing failed'], 500);
             }
         }
 

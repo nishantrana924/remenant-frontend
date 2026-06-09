@@ -9,5 +9,5 @@ Artisan::command('inspire', function () {
 
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('razorpay:verify-payments')->everyTenMinutes();
+Schedule::command('razorpay:verify-payments')->everyFifteenMinutes();
 

@@ -157,10 +157,14 @@
 
     @media (min-width: 1024px) {
         #admin-main-content {
-            margin-left: 15rem;
             transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        #admin-sidebar[data-collapsed="true"] ~ #admin-main-content {
+        #admin-sidebar[data-collapsed="false"] ~ div #admin-main-content,
+        #admin-sidebar[data-collapsed="false"] + #admin-main-content {
+            margin-left: 15rem;
+        }
+        #admin-sidebar[data-collapsed="true"] ~ div #admin-main-content,
+        #admin-sidebar[data-collapsed="true"] + #admin-main-content {
             margin-left: 4.5rem;
         }
     }
@@ -268,6 +272,9 @@
                 icon.setAttribute('data-lucide', 'chevron-right');
                 refreshIcons();
             }
+        } else if (window.innerWidth >= 1024) {
+            // Ensure default expanded state is applied
+            main.style.marginLeft = '15rem';
         }
 
         initSidebarTooltips();

@@ -65,7 +65,11 @@ class ProcessOrderRefundJob implements ShouldQueue
 
                 // Execute Refund API call
                 $refund = $api->payment->fetch($paymentId)->refund([
-                    'amount' => $order->total_amount * 100 // Amount in paise
+                    'amount' => $order->total_amount * 100, // Amount in paise
+                    'notes' => [
+                        'order_number' => $order->order_number,
+                        'order_id' => $order->id,
+                    ]
                 ]);
                 
                 $order->update([

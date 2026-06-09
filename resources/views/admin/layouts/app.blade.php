@@ -48,7 +48,7 @@
         @include('admin.layouts.sidebar')
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col h-full overflow-hidden relative" id="admin-main-content">
+        <div class="flex-1 flex flex-col h-full overflow-hidden relative lg:ml-60" id="admin-main-content">
             @include('admin.layouts.header')
 
             <!-- Page Loader (Limited to Content Area) -->
@@ -60,7 +60,7 @@
             </div>
 
             <!-- Page Content -->
-            <main id="main-content" class="flex-1 p-4 sm:p-6 overflow-y-auto" up-main>
+            <main id="main-content" class="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto" up-main>
                 <div class="min-h-[70vh]">
                     @yield('content')
                     {{ $slot ?? '' }}

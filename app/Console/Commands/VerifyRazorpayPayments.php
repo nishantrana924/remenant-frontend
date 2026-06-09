@@ -172,5 +172,74 @@ class VerifyRazorpayPayments extends Command
                 Log::error("VerifyRazorpayPayments: Failed checking Order #{$order->order_number}: " . $e->getMessage());
             }
         }
+
+        // 2. Reconcile Active/Pending Refunds
+        $refundOrders = Order::whereIn('refund_status', ['pending', 'initiated', 'processing'])
+            ->whereNotNull('razorpay_refund_id')
+            ->get();
+
+        if ($refundOrders->isNotEmpty()) {
+            $this->info("Checking {$refundOrders->count()} pending refunds...");
+            Log::info("VerifyRazorpayPayments: Checking {$refundOrders->count()} active refunds for reconciliation.");
+
+            foreach ($refundOrders as $order) {
+                try {
+                    $refund = $api->refund->fetch($order->razorpay_refund_id);
+                    if ($refund) {
+                        \DB::transaction(function () use ($order, $refund) {
+                            $order = Order::where('id', $order->id)->lockForUpdate()->first();
+
+                            // Unidirectional status transition guard
+                            if ($order->refund_status === 'completed' && $refund->status !== 'processed') {
+                                return;
+                            }
+
+                            $statusMap = [
+                                'processed' => 'completed',
+                                'pending' => 'initiated',
+                                'failed' => 'failed',
+                            ];
+
+                            $newRefundStatus = $statusMap[$refund->status] ?? 'initiated';
+
+                            $updateData = [
+                                'refund_status' => $newRefundStatus,
+                            ];
+
+                            if ($refund->status === 'processed') {
+                                $updateData['refund_amount'] = $refund->amount / 100;
+                                $updateData['refund_processed_at'] = now();
+                                if (isset($refund->acquirer_data) && isset($refund->acquirer_data->arn)) {
+                                    $updateData['refund_arn'] = $refund->acquirer_data->arn;
+                                }
+                            }
+
+                            $order->update($updateData);
+
+                            if (method_exists($order, 'logStatus')) {
+                                $order->logStatus("Refund reconciled via Cron: status is now {$newRefundStatus}. Refund ID: {$refund->id}", 'system');
+                            }
+                            
+                            $this->info("Reconciled Refund #{$order->razorpay_refund_id} to status: {$newRefundStatus}");
+                        });
+                    }
+                } catch (\Exception $e) {
+                    Log::error("VerifyRazorpayPayments: Failed reconciling refund for Order #{$order->order_number}: " . $e->getMessage());
+                }
+            }
+        }
+
+        // 3. Auto-Recover Stuck Refunds (pending status but no refund ID for > 20 mins)
+        $stuckRefundOrders = Order::where('refund_status', 'pending')
+            ->whereNull('razorpay_refund_id')
+            ->where('payment_status', 'paid')
+            ->where('updated_at', '<=', now()->subMinutes(20))
+            ->get();
+
+        foreach ($stuckRefundOrders as $stuckOrder) {
+            $this->info("Stuck refund detected for Order #{$stuckOrder->order_number}. Re-dispatching ProcessOrderRefundJob.");
+            Log::warning("VerifyRazorpayPayments: Stuck refund detected for Order #{$stuckOrder->order_number}. Re-dispatching ProcessOrderRefundJob.");
+            ProcessOrderRefundJob::dispatch($stuckOrder->id);
+        }
     }
 }
