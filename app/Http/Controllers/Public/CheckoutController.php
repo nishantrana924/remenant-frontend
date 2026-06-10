@@ -221,19 +221,42 @@ class CheckoutController extends Controller
 
         try {
             $api = new Api($razorpayKey, $razorpaySecret);
-            $razorpayOrder = $api->order->create([
-                'receipt'         => $order->order_number,
-                'amount'          => $order->total_amount * 100,
-                'currency'        => 'INR',
-                'payment_capture' => 1
-            ]);
 
-            $order->update(['razorpay_order_id' => $razorpayOrder['id']]);
+            // CRITICAL FIX: Reuse existing Razorpay order if it is still in 'created' state.
+            // Creating a new order every page load overwrites razorpay_order_id in the DB,
+            // causing verifyPayment() to fail the order lookup and leave the order as 'unpaid'.
+            $razorpayOrderId = null;
+
+            if (!empty($order->razorpay_order_id)) {
+                try {
+                    $existingOrder = $api->order->fetch($order->razorpay_order_id);
+                    if (($existingOrder['status'] ?? '') === 'created') {
+                        // Safe to reuse — no payment has been attempted yet
+                        $razorpayOrderId = $existingOrder['id'];
+                        Log::info('payment(): Reusing existing Razorpay order ' . $razorpayOrderId . ' for ' . $order->order_number);
+                    }
+                } catch (\Exception $fetchEx) {
+                    // Razorpay order not found or expired — fall through to create a new one
+                    Log::warning('payment(): Could not fetch existing Razorpay order ' . $order->razorpay_order_id . ': ' . $fetchEx->getMessage());
+                }
+            }
+
+            if (!$razorpayOrderId) {
+                $razorpayOrder = $api->order->create([
+                    'receipt'         => $order->order_number,
+                    'amount'          => $order->total_amount * 100,
+                    'currency'        => 'INR',
+                    'payment_capture' => 1
+                ]);
+                $razorpayOrderId = $razorpayOrder['id'];
+                $order->update(['razorpay_order_id' => $razorpayOrderId]);
+                Log::info('payment(): Created new Razorpay order ' . $razorpayOrderId . ' for ' . $order->order_number);
+            }
 
             return view('public.payment', [
-                'order' => $order,
-                'razorpay_order_id' => $razorpayOrder['id'],
-                'razorpay_key' => $razorpayKey
+                'order'            => $order,
+                'razorpay_order_id' => $razorpayOrderId,
+                'razorpay_key'     => $razorpayKey
             ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Razorpay Error: ' . $e->getMessage());
@@ -272,7 +295,18 @@ class CheckoutController extends Controller
             if ($success === true) {
                 session()->forget('cart');
 
+                // Primary lookup: by razorpay_order_id
                 $order = \App\Models\Order::where('razorpay_order_id', $input['razorpay_order_id'])->first();
+
+                // Fallback lookup: by order_number (posted from the form) in case razorpay_order_id was overwritten
+                if (!$order && !empty($input['order_number'])) {
+                    $order = \App\Models\Order::where('order_number', $input['order_number'])->first();
+                    if ($order) {
+                        // Reconcile the razorpay_order_id so it matches going forward
+                        $order->update(['razorpay_order_id' => $input['razorpay_order_id']]);
+                        Log::warning('verifyPayment: Used order_number fallback lookup for ' . $order->order_number . '. razorpay_order_id reconciled.');
+                    }
+                }
 
                 if ($order && $order->payment_status !== 'paid') {
                     // 1. If order is already cancelled or failed, mark paid, set refund_status to pending and dispatch refund job

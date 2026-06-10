@@ -56,8 +56,20 @@
                             "image": "{{ asset('images/logo/remenant-health-logo.png') }}",
                             "order_id": "{{ $razorpay_order_id }}",
                             "handler": function (response){
-                                // Update Alpine step to show processing spinner
-                                document.querySelector('[x-data]').__x.$data.step = 'processing';
+                                // Update Alpine step to show processing spinner safely
+                                var el = document.querySelector('[x-data]');
+                                if (el && el.__x && el.__x.$data) {
+                                    el.__x.$data.step = 'processing';
+                                } else if (window.Alpine) {
+                                    try {
+                                        window.Alpine.$data(el).step = 'processing';
+                                    } catch(e) {}
+                                } else {
+                                    var opt = document.querySelector('[x-show="step === \'options\'"]');
+                                    var prc = document.querySelector('[x-show="step === \'processing\'"]');
+                                    if (opt) opt.style.display = 'none';
+                                    if (prc) prc.style.display = 'block';
+                                }
 
                                 var form = document.createElement('form');
                                 form.method = 'POST';
@@ -112,3 +124,7 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+@endpush
