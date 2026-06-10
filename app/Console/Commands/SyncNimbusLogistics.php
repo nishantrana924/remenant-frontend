@@ -7,6 +7,7 @@ use App\Models\Shipment;
 use App\Models\Warehouse;
 use App\Models\Order;
 use App\Services\NimbusPostService;
+use App\Services\ShipmentStatusValidator;
 use Illuminate\Support\Facades\Log;
 
 class SyncNimbusLogistics extends Command
@@ -15,23 +16,18 @@ class SyncNimbusLogistics extends Command
     protected $description = 'Synchronize all data from NimbusPost (Statuses, NDRs, Warehouses)';
 
     protected $nimbus;
+    protected $validator;
 
-    public function __construct(NimbusPostService $nimbus)
+    public function __construct(NimbusPostService $nimbus, ShipmentStatusValidator $validator)
     {
         parent::__construct();
-        $this->nimbus = $nimbus;
+        $this->nimbus    = $nimbus;
+        $this->validator = $validator;
     }
 
     public function handle()
     {
         $type = $this->option('type');
-
-        /*
-        if ($type === 'all' || $type === 'warehouses') {
-            $this->info('Syncing Warehouses...');
-            $this->syncWarehouses();
-        }
-        */
 
         if ($type === 'all' || $type === 'status') {
             $this->info('Syncing Shipment Statuses...');
@@ -46,84 +42,116 @@ class SyncNimbusLogistics extends Command
         $this->info('Synchronization completed successfully!');
     }
 
-    protected function syncWarehouses()
-    {
-        $response = $this->nimbus->getWarehouses();
-        if ($response['status'] ?? false) {
-            foreach ($response['data'] ?? [] as $w) {
-                Warehouse::updateOrCreate(
-                    ['nimbus_warehouse_id' => $w['id']],
-                    [
-                        'name' => $w['name'] ?? 'Warehouse',
-                        'contact_name' => $w['contact_person'] ?? '',
-                        'phone' => $w['phone'] ?? '',
-                        'address' => $w['address'] ?? '',
-                        'pincode' => $w['pincode'] ?? '',
-                        'city' => $w['city'] ?? '',
-                        'state' => $w['state'] ?? '',
-                        'status' => true
-                    ]
-                );
-            }
-            $this->comment('Warehouses synced.');
-        }
-    }
-
     protected function syncStatuses()
     {
-        $activeShipments = Shipment::whereNotIn('status', ['delivered', 'cancelled', 'rto_delivered'])->get();
+        // Get all active shipments with AWB numbers that are not in terminal states
+        $activeShipments = Shipment::whereNotIn('status', ['delivered', 'cancelled', 'rto_delivered'])
+            ->whereNotNull('awb_number')
+            ->get();
 
-        foreach ($activeShipments as $shipment) {
-            $response = $this->nimbus->getTracking($shipment->awb_number);
-            
-            if ($response['status'] ?? false) {
-                $data = $response['data'] ?? [];
-                $newStatus = strtolower($data['status'] ?? $shipment->status);
+        if ($activeShipments->isEmpty()) {
+            $this->comment('No active shipments to sync.');
+            return;
+        }
 
-                // Update shipment
+        // Use Bulk Tracking API (up to 100 AWBs per call) — more efficient than one-by-one
+        $chunks = $activeShipments->chunk(100);
+
+        foreach ($chunks as $chunk) {
+            $awbs = $chunk->pluck('awb_number')->toArray();
+
+            $this->comment('Fetching tracking for ' . count($awbs) . ' AWBs...');
+
+            $response = $this->nimbus->trackBulk($awbs);
+
+            if (!($response['status'] ?? false)) {
+                Log::error('NimbusPost Bulk Track failed', ['response' => $response]);
+                $this->error('Bulk tracking API call failed. Check logs.');
+                continue;
+            }
+
+            // Index shipments by AWB for quick lookup
+            $shipmentsByAwb = $chunk->keyBy('awb_number');
+
+            foreach ($response['data'] ?? [] as $trackData) {
+                $awb = $trackData['awb_number'] ?? null;
+                if (!$awb) continue;
+
+                $shipment = $shipmentsByAwb->get($awb);
+                if (!$shipment) continue;
+
+                // NimbusPost bulk API returns full status strings like "pending pickup", "in transit"
+                $rawStatus    = $trackData['status'] ?? null;
+                $mappedStatus = $rawStatus ? $this->validator->mapNimbusStatus($rawStatus) : null;
+
+                if (!$mappedStatus) {
+                    $this->line("  AWB {$awb}: Unrecognized status '{$rawStatus}' — skipped.");
+                    Log::warning("SyncNimbusLogistics: Unrecognized status '{$rawStatus}' for AWB {$awb}");
+                    continue;
+                }
+
+                // Update shipment record
+                $oldStatus = $shipment->status;
                 $shipment->update([
-                    'status' => $newStatus,
-                    'delivered_at' => ($newStatus === 'delivered') ? now() : $shipment->delivered_at,
+                    'status'       => $mappedStatus,
+                    'delivered_at' => ($mappedStatus === 'delivered' && !$shipment->delivered_at) ? now() : $shipment->delivered_at,
                 ]);
 
                 // Update parent order
                 $order = $shipment->order;
                 if ($order) {
-                    $order->update(['status' => $newStatus, 'delivery_status' => $newStatus]);
-                    
-                    // Log to timeline if status changed
-                    if ($order->wasChanged('status')) {
-                        $order->logStatus("Sync: Status updated to " . ucfirst($newStatus) . " from NimbusPost.");
+                    $order->update([
+                        'status'          => $mappedStatus,
+                        'delivery_status' => $mappedStatus, // ✅ Use mapped status, not raw string
+                    ]);
+
+                    if ($oldStatus !== $mappedStatus) {
+                        if (method_exists($order, 'logStatus')) {
+                            $order->logStatus("Sync: Status updated from {$oldStatus} to {$mappedStatus} via NimbusPost polling.");
+                        }
+                        $this->line("  AWB {$awb}: {$oldStatus} → {$mappedStatus}");
                     }
                 }
 
-                // Sync tracking history
-                if (isset($data['history']) && is_array($data['history'])) {
-                    foreach ($data['history'] as $history) {
+                // Sync tracking history from NimbusPost
+                // Official history fields: status_code, location, event_time, message
+                if (isset($trackData['history']) && is_array($trackData['history'])) {
+                    foreach ($trackData['history'] as $event) {
+                        $eventTime   = $event['event_time'] ?? null;
+                        $statusCode  = $event['status_code'] ?? null;
+                        $location    = $event['location'] ?? null;
+                        $message     = $event['message'] ?? null;
+
+                        if (!$eventTime || !$statusCode) continue;
+
                         $shipment->trackings()->updateOrCreate(
                             [
-                                'activity' => $history['activity'],
-                                'event_at' => date('Y-m-d H:i:s', strtotime($history['date']))
+                                'activity' => $statusCode,
+                                'event_at' => date('Y-m-d H:i:s', strtotime($eventTime)),
                             ],
                             [
-                                'status' => $history['status'] ?? $newStatus,
-                                'location' => $history['location'] ?? null,
+                                'status'   => $this->validator->mapNimbusStatus($statusCode) ?? strtolower($statusCode),
+                                'location' => $location,
+                                'message'  => $message,
                             ]
                         );
                     }
                 }
             }
         }
+
         $this->comment('Shipment statuses synced.');
     }
 
     protected function syncNDR()
     {
-        // This can be expanded to create/update NDR records in a local table
         $response = $this->nimbus->getNDR();
         if ($response['status'] ?? false) {
-            // Logic to store NDR records locally if needed
-            $this->comment('NDR data fetched (Logic to store can be added).');
+            $count = count($response['data'] ?? []);
+            $this->comment("NDR data fetched: {$count} records.");
+            // Add NDR storage logic here if a local ndr table exists
+        } else {
+            $this->error('NDR fetch failed.');
         }
     }
 }

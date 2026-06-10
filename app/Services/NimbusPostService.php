@@ -256,7 +256,8 @@ class NimbusPostService
      */
     public function getTracking($awbNumber)
     {
-        return $this->request('get', '/shipments/track_awb/' . $awbNumber);
+        // Official NimbusPost endpoint: GET /v1/shipments/track/{awb}
+        return $this->request('get', '/shipments/track/' . $awbNumber);
     }
 
     /**

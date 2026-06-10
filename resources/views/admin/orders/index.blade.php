@@ -58,12 +58,17 @@
     },
     
     statusColors: {
-        'pending': 'bg-orange-50 text-orange-600 border-orange-100',
-        'processing': 'bg-blue-50 text-blue-600 border-blue-100',
-        'packed': 'bg-purple-50 text-purple-600 border-purple-100',
-        'shipped': 'bg-indigo-50 text-indigo-600 border-indigo-100',
-        'delivered': 'bg-emerald-50 text-emerald-600 border-emerald-100',
-        'cancelled': 'bg-rose-50 text-rose-600 border-rose-100'
+        'pending':              'bg-orange-50 text-orange-600 border-orange-100',
+        'processing':           'bg-blue-50 text-blue-600 border-blue-100',
+        'packed':               'bg-purple-50 text-purple-600 border-purple-100',
+        'shipped':              'bg-indigo-50 text-indigo-600 border-indigo-100',
+        'out_for_delivery':     'bg-sky-50 text-sky-600 border-sky-100',
+        'delivered':            'bg-emerald-50 text-emerald-600 border-emerald-100',
+        'failed_delivery':      'bg-amber-50 text-amber-600 border-amber-100',
+        'returned':             'bg-rose-50 text-rose-600 border-rose-100',
+        'cancelled':            'bg-red-50 text-red-600 border-red-100',
+        'cancellation_requested': 'bg-rose-50 text-rose-500 border-rose-100',
+        'lost':                 'bg-gray-50 text-gray-600 border-gray-100',
     },
 
     updateStatus(id, data, reload = true) {
@@ -377,7 +382,7 @@
                         <div>
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="font-bold text-slate-900 text-sm">#{{ $item->order_number ?? $item->id }}</span>
-                                <span :class="statusColors['{{ $item->status }}']" class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest border">{{ $item->status }}</span>
+                                <x-status-badge :status="$item->status" size="xs" />
                                 <div class="flex items-center gap-1">
                                     <div class="h-1.5 w-1.5 rounded-full {{ $item->payment_status === 'paid' ? 'bg-emerald-500' : 'bg-orange-500' }}"></div>
                                     <span class="text-[9px] font-bold uppercase {{ $item->payment_status === 'paid' ? 'text-emerald-600' : 'text-orange-600' }}">{{ $item->payment_status }}</span>
@@ -474,9 +479,12 @@
                             <span class="font-bold text-slate-900 text-sm">₹{{ number_format($item->total_amount) }}</span>
                         </td>
                         <td>
-                            <span :class="statusColors['{{ $item->status }}']" class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border">
-                                {{ $item->status }}
-                            </span>
+                            <x-status-badge :status="$item->status" size="sm" />
+                            @if($item->delivery_status && $item->delivery_status !== $item->status)
+                                <div class="mt-1">
+                                    <x-status-badge :status="$item->delivery_status" size="xs" />
+                                </div>
+                            @endif
                         </td>
                         <td>
                             <div class="flex items-center gap-2">
