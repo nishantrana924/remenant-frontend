@@ -414,10 +414,13 @@ class CheckoutController extends Controller
 
     public function track($orderNumber = null)
     {
+        // Accept order number from route param OR query string (search form uses ?order_number=)
+        $orderNumber = $orderNumber ?? request('order_number');
+
         $order = null;
         if ($orderNumber) {
-            $order = \App\Models\Order::with('orderItems.product')
-                ->where('order_number', $orderNumber)
+            $order = \App\Models\Order::with(['orderItems.product', 'shipment'])
+                ->where('order_number', trim($orderNumber))
                 ->where('user_id', auth()->id())
                 ->first();
         }

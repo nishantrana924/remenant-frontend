@@ -206,10 +206,13 @@
                                         <span class="font-semibold text-slate-900">#{{ $order->order_number }}</span>
                                     </div>
                                 </div>
-                                <div class="flex items-center">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <span class="px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 {{ $badgeClass }}">
                                         <i data-lucide="{{ $badgeIcon }}" class="h-3.5 w-3.5" stroke-width="2"></i> {{ $badgeText }}
                                     </span>
+                                    @if($isPaid)
+                                        <x-status-badge :status="$order->delivery_status ?? $order->status" size="sm" />
+                                    @endif
                                 </div>
                             </div>
                             
@@ -290,9 +293,8 @@
                                                 <span>Waiting for approval</span>
                                             </div>
                                         @else
-                                            <div class="mt-2 flex items-center gap-1.5 text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-md w-fit">
-                                                <i data-lucide="truck" class="h-3.5 w-3.5"></i>
-                                                <span>Expected Delivery: {{ $order->estimated_delivery_date ? \Carbon\Carbon::parse($order->estimated_delivery_date)->format('d M Y') : '10-12 working days' }}</span>
+                                            <div class="mt-2">
+                                                <x-status-badge :status="$order->delivery_status ?? $order->status" size="xs" />
                                             </div>
                                         @endif
 
