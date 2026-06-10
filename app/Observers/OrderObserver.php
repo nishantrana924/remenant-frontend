@@ -13,11 +13,8 @@ class OrderObserver
      */
     public function created(Order $order): void
     {
-        try {
-            \Illuminate\Support\Facades\Mail::to($order->email)->queue(new \App\Mail\OrderPlaced($order));
-        } catch (\Exception $e) {
-            Log::error("Failed to send order placed email for #{$order->order_number}: " . $e->getMessage());
-        }
+        // Do not send email on creation as payment is not yet confirmed.
+        // PaymentSuccessful email is sent via RazorpayWebhookController.
     }
 
     /**

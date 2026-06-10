@@ -335,6 +335,94 @@
                 }
             });
         }
+        
+        // Search Suggestions Logic
+        function initSearchSuggestions() {
+            const searchForms = document.querySelectorAll('[data-search-form]');
+            
+            searchForms.forEach(form => {
+                const input = form.querySelector('[data-search-input]');
+                const suggestionsContainer = form.querySelector('[data-search-suggestions]');
+                
+                if (!input || !suggestionsContainer) return;
+                
+                let timeout = null;
+                
+                input.addEventListener('input', function() {
+                    clearTimeout(timeout);
+                    const query = this.value.trim();
+                    
+                    if (query.length < 2) {
+                        suggestionsContainer.classList.add('hidden');
+                        return;
+                    }
+                    
+                    timeout = setTimeout(() => {
+                        fetch(`/products/search-suggestions?query=${encodeURIComponent(query)}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.length > 0) {
+                                    let html = '<div class="py-2">';
+                                    data.forEach(product => {
+                                        // Strip HTML tags from description and truncate
+                                        const tempDiv = document.createElement("div");
+                                        tempDiv.innerHTML = product.description || '';
+                                        const cleanDesc = tempDiv.textContent || tempDiv.innerText || "";
+                                        const shortDesc = cleanDesc.length > 60 ? cleanDesc.substring(0, 60) + '...' : cleanDesc;
+                                        const taglineOrDesc = product.tagline || shortDesc;
+                                        
+                                        html += `
+                                            <a href="/product/${product.slug}" class="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition border-b border-gray-50 last:border-0 text-left">
+                                                <img src="${product.image_url}" alt="${product.title}" class="h-12 w-12 rounded-lg object-cover bg-gray-100 shrink-0 border border-gray-200">
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="text-sm font-bold text-gray-900 truncate leading-tight">${product.title}</h4>
+                                                    <p class="text-xs text-gray-500 truncate mt-1">${taglineOrDesc}</p>
+                                                </div>
+                                            </a>
+                                        `;
+                                    });
+                                    html += `
+                                        <div class="px-4 py-3 border-t border-gray-100 text-center bg-gray-50">
+                                            <button type="submit" class="text-xs font-bold text-[color:var(--primary)] hover:underline flex items-center justify-center gap-1 w-full">
+                                                View all results for "${query}"
+                                                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                                            </button>
+                                        </div>
+                                    </div>`;
+                                    suggestionsContainer.innerHTML = html;
+                                    suggestionsContainer.classList.remove('hidden');
+                                    if(window.lucide) { window.lucide.createIcons(); }
+                                } else {
+                                    suggestionsContainer.innerHTML = `
+                                        <div class="px-4 py-6 text-center">
+                                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-50 mb-2">
+                                                <i data-lucide="search-x" class="w-6 h-6 text-gray-400"></i>
+                                            </div>
+                                            <p class="text-sm font-medium text-gray-900">No products found</p>
+                                            <p class="text-xs text-gray-500 mt-1">Try searching for something else.</p>
+                                        </div>
+                                    `;
+                                    suggestionsContainer.classList.remove('hidden');
+                                    if(window.lucide) { window.lucide.createIcons(); }
+                                }
+                            })
+                            .catch(err => console.error(err));
+                    }, 300);
+                });
+                
+                // Hide suggestions when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!form.contains(e.target)) {
+                        suggestionsContainer.classList.add('hidden');
+                    }
+                });
+            });
+        }
+        
+        initSearchSuggestions();
+        if (window.up) {
+            up.on('up:fragment:inserted', initSearchSuggestions);
+        }
     })();
 </script>
 

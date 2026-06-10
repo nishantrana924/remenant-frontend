@@ -256,7 +256,7 @@ class ProductController extends Controller
                   });
             })
             ->take(6)
-            ->get(['id', 'title', 'slug', 'image', 'price', 'tagline']);
+            ->get(['id', 'title', 'slug', 'image', 'price', 'tagline', 'description']);
 
         $products->transform(function($product) {
             $product->image_url = \App\Helpers\ImageHelper::getUrl($product->image, 'images/products');

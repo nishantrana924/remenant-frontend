@@ -145,6 +145,17 @@ class CheckoutController extends Controller
                     if ($coupon->usage_limit && $coupon->used_count >= $coupon->usage_limit) {
                         return redirect()->back()->with('error', 'Coupon usage limit has been reached.');
                     }
+
+                    if (auth()->check()) {
+                        $hasUsed = \App\Models\Order::where('user_id', auth()->id())
+                            ->where('coupon_code', $coupon->code)
+                            ->whereNotIn('status', ['cancelled', 'failed'])
+                            ->exists();
+
+                        if ($hasUsed) {
+                            return redirect()->back()->with('error', 'You have already used this coupon code.');
+                        }
+                    }
                     if ($coupon->min_order_amount && $subtotal < $coupon->min_order_amount) {
                         return redirect()->back()->with('error', "Minimum order amount for this coupon is ₹{$coupon->min_order_amount}.");
                     }

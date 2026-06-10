@@ -43,6 +43,17 @@ class CouponController extends Controller
             return response()->json(['success' => false, 'message' => 'Coupon usage limit has been reached.'], 422);
         }
 
+        if (auth()->check()) {
+            $hasUsed = \App\Models\Order::where('user_id', auth()->id())
+                ->where('coupon_code', $coupon->code)
+                ->whereNotIn('status', ['cancelled', 'failed'])
+                ->exists();
+
+            if ($hasUsed) {
+                return response()->json(['success' => false, 'message' => 'You have already used this coupon code.'], 422);
+            }
+        }
+
         if ($coupon->start_date && now()->lt($coupon->start_date)) {
             return response()->json(['success' => false, 'message' => 'This coupon is not yet active.'], 422);
         }
