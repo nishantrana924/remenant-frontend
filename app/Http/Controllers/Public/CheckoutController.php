@@ -427,6 +427,55 @@ class CheckoutController extends Controller
         return view('public.track', compact('order'));
     }
 
+    /**
+     * User submits a return request for a delivered order.
+     * Return shipping charge (₹100) will be deducted from refund.
+     */
+    public function requestReturn(Request $request, $orderNumber)
+    {
+        $order = \App\Models\Order::where('order_number', $orderNumber)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        // Eligibility checks
+        if ($order->payment_status !== 'paid') {
+            return back()->with('error', 'Only paid orders can be returned.');
+        }
+
+        if (!in_array($order->delivery_status, ['delivered', 'completed'])) {
+            return back()->with('error', 'Order must be delivered before requesting a return.');
+        }
+
+        if ($order->return_status !== 'none' && !empty($order->return_status)) {
+            return back()->with('error', 'A return request already exists for this order.');
+        }
+
+        // 30-day window check
+        if ($order->delivered_at) {
+            $daysSinceDelivery = \Carbon\Carbon::parse($order->delivered_at)->diffInDays(now());
+            if ($daysSinceDelivery > 30) {
+                return back()->with('error', 'Return window has expired (30 days from delivery).');
+            }
+        }
+
+        $request->validate([
+            'return_reason' => 'required|string|min:10|max:500',
+        ], [
+            'return_reason.required' => 'Please describe the reason for return.',
+            'return_reason.min'      => 'Please provide at least 10 characters for the reason.',
+        ]);
+
+        $order->update([
+            'return_status'       => 'requested',
+            'return_reason'       => $request->return_reason,
+            'return_requested_at' => now(),
+        ]);
+
+        $order->logStatus('Return requested by customer: ' . $request->return_reason, auth()->id());
+
+        return back()->with('success', 'Return request submitted! Our team will review it within 24–48 hours. Refund of ₹' . number_format($order->total_amount - 100) . ' will be processed after approval (₹100 return shipping charge deducted).');
+    }
+
     public function invoice($orderNumber)
     {
         $order = \App\Models\Order::with('orderItems.product')

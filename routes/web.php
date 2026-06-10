@@ -72,6 +72,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('my-orders');
     Route::post('/orders/{order}/cancel', [DashboardController::class, 'cancelOrder'])
         ->name('order.cancel');
+    Route::post('/orders/{order}/return-request', [CheckoutController::class, 'requestReturn'])
+        ->name('order.return-request');
 
     Route::get('/profile', function() { return redirect()->route('my-orders', ['tab' => 'profile']); })->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -115,6 +117,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('orders/{id}/approve-cancellation', [\App\Http\Controllers\Admin\OrderController::class, 'approveCancellation'])->name('orders.approve-cancellation');
     Route::post('orders/{id}/reject-cancellation', [\App\Http\Controllers\Admin\OrderController::class, 'rejectCancellation'])->name('orders.reject-cancellation');
     Route::post('orders/{id}/sync-refund', [\App\Http\Controllers\Admin\OrderController::class, 'syncRefund'])->name('orders.sync-refund');
+    Route::post('orders/{id}/approve-return', [\App\Http\Controllers\Admin\ReturnController::class, 'approveReturn'])->name('orders.approve-return');
+    Route::post('orders/{id}/reject-return', [\App\Http\Controllers\Admin\ReturnController::class, 'rejectReturn'])->name('orders.reject-return');
     Route::get('shipping', [\App\Http\Controllers\Admin\ShippingController::class, 'index'])->name('shipping.index');
     Route::get('refunds', [\App\Http\Controllers\Admin\RefundController::class, 'index'])->name('refunds.index');
     Route::get('admins', [\App\Http\Controllers\Admin\UserController::class, 'admins'])->name('admins.index');

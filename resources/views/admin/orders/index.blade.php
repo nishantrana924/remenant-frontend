@@ -549,15 +549,16 @@
     </div>
 
     <!-- Side Drawer Quick Preview -->
-    <div x-show="showDrawer" 
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="translate-x-full"
-         x-transition:enter-end="translate-x-0"
-         x-transition:leave="transition ease-in duration-300"
-         x-transition:leave-start="translate-x-0"
-         x-transition:leave-end="translate-x-full"
-         class="fixed inset-y-0 right-0 w-full sm:w-[400px] md:w-[450px] bg-white shadow-2xl z-[150] border-l border-slate-100 flex flex-col"
-         x-cloak>
+    <template x-teleport="body">
+        <div x-show="showDrawer" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="translate-x-full"
+             class="fixed inset-y-0 right-0 w-full sm:w-[400px] md:w-[450px] bg-white shadow-2xl z-[140] border-l border-slate-100 flex flex-col"
+             x-cloak>
         <div class="p-4 sm:p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
             <div>
                 <h3 class="text-base sm:text-lg font-bold text-slate-900" x-text="'Order #' + (selectedOrder ? (selectedOrder.order_number || selectedOrder.id) : '')"></h3>
@@ -701,13 +702,16 @@
             <a :href="'/admin/orders/' + (selectedOrder ? selectedOrder.id : '')" class="block w-full py-4 border-2 border-slate-100 rounded-2xl text-center text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] hover:bg-slate-50 transition-all">View Full Details</a>
         </div>
     </div>
+    </template>
     
     <!-- Drawer Overlay -->
-    <div x-show="showDrawer" @click="showDrawer = false" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[140]" x-cloak></div>
+    <template x-teleport="body">
+        <div x-show="showDrawer" @click="showDrawer = false" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[130]" x-cloak></div>
+    </template>
 
     <!-- Courier Selection Modal -->
     <template x-teleport="body">
-        <div x-show="showCourierModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div x-show="showCourierModal" x-cloak class="fixed inset-0 z-[160] flex items-center justify-center p-4">
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showCourierModal = false"></div>
             <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl p-8 overflow-hidden flex flex-col max-h-[90vh]">
                 <div class="flex items-center justify-between mb-6 shrink-0">
@@ -791,8 +795,9 @@
         </div>
     </template>
     <!-- Bulk Ship Modal -->
-    <div x-show="showBulkShipModal" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" x-transition.opacity>
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl overflow-hidden" @click.away="showBulkShipModal = false" x-transition.scale.95>
+    <template x-teleport="body">
+        <div x-show="showBulkShipModal" style="display: none;" class="fixed inset-0 z-[160] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" x-transition.opacity>
+            <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl overflow-hidden" @click.away="showBulkShipModal = false" x-transition.scale.95>
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h3 class="font-bold text-slate-900">Bulk Shipping</h3>
@@ -842,11 +847,12 @@
                 </button>
             </div>
         </div>
-    </div>
+    </template>
 
     <!-- Bulk Summary Modal -->
-    <div x-show="showBulkSummaryModal" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" x-transition.opacity>
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden" @click.away="showBulkSummaryModal = false" x-transition.scale.95>
+    <template x-teleport="body">
+        <div x-show="showBulkSummaryModal" style="display: none;" class="fixed inset-0 z-[160] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" x-transition.opacity>
+            <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden" @click.away="showBulkSummaryModal = false" x-transition.scale.95>
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h3 class="font-bold text-slate-900">Bulk Shipping Completed</h3>
@@ -910,6 +916,6 @@
                 <button @click="showBulkSummaryModal = false; location.reload()" class="flex-none px-6 py-3 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition-all">Done</button>
             </div>
         </div>
-    </div>
+    </template>
 </div>
 @endsection

@@ -101,10 +101,43 @@ class NimbusWebhookController extends Controller
             // 7. Process using DB Transaction & Row Locking
             DB::transaction(function () use ($awb, $mappedStatus, $webhookId, $request, $data) {
                 $order = Order::where('tracking_id', $awb)->lockForUpdate()->first();
+                $isReturn = false;
+
+                if (!$order) {
+                    $order = Order::where('return_awb', $awb)->lockForUpdate()->first();
+                    if ($order) {
+                        $isReturn = true;
+                    }
+                }
 
                 if (!$order) {
                     Log::channel('nimbus_security')->warning("No order found for AWB: {$awb}", ['awb' => $awb]);
                     return; // Graceful — don't cause NimbusPost to retry for unknown AWBs
+                }
+
+                if ($isReturn) {
+                    $newReturnStatus = null;
+                    if ($mappedStatus === 'shipped' || $mappedStatus === 'out_for_delivery') {
+                        $newReturnStatus = 'picked_up';
+                    } elseif ($mappedStatus === 'returned') {
+                        $newReturnStatus = 'completed';
+                    }
+
+                    if ($newReturnStatus && $order->return_status !== $newReturnStatus) {
+                        $oldReturnStatus = $order->return_status;
+                        $order->update([
+                            'return_status' => $newReturnStatus,
+                            'last_location' => $data['location'] ?? null,
+                        ]);
+
+                        if (method_exists($order, 'logStatus')) {
+                            $order->logStatus("Return shipment auto-updated to: {$newReturnStatus} (Nimbus Status: {$data['status']})");
+                        }
+
+                        $this->audit($webhookId, $request, 'success', "Updated order {$order->id} return_status from {$oldReturnStatus} to {$newReturnStatus}");
+                        Log::channel('nimbus_security')->info("Order #{$order->order_number} return_status updated to {$newReturnStatus} via webhook.");
+                    }
+                    return;
                 }
 
                 // Validate Status Transitions

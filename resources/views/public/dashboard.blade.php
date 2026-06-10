@@ -33,6 +33,9 @@
                 <button onclick="switchTab('orders', this)" class="mobile-nav-link whitespace-nowrap pb-3 border-b-2 px-1 text-sm font-medium transition-colors {{ $activeTab === 'orders' ? 'border-orange-500 text-orange-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}" data-tab="orders">
                     My Orders
                 </button>
+                <a href="{{ route('order.track') }}" class="mobile-nav-link whitespace-nowrap pb-3 border-b-2 px-1 text-sm font-medium transition-colors border-transparent text-slate-500 hover:text-slate-700">
+                    Track Order
+                </a>
                 <button onclick="switchTab('profile', this)" class="mobile-nav-link whitespace-nowrap pb-3 border-b-2 px-1 text-sm font-medium transition-colors {{ $activeTab === 'profile' ? 'border-orange-500 text-orange-600' : 'border-transparent text-slate-500 hover:text-slate-700' }}" data-tab="profile">
                     Profile Info
                 </button>
@@ -65,6 +68,10 @@
                         <i data-lucide="shopping-bag" class="h-4 w-4" stroke-width="1.5"></i>
                         <span class="text-sm font-medium">My Orders</span>
                     </button>
+                    <a href="{{ route('order.track') }}" class="nav-link w-full px-3 py-2.5 flex items-center gap-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                        <i data-lucide="truck" class="h-4 w-4" stroke-width="1.5"></i>
+                        <span class="text-sm font-medium">Track Order</span>
+                    </a>
                 </div>
                 
                 <!-- Group: Account -->
@@ -164,6 +171,15 @@
                             $isShipped = strtolower($order->delivery_status) === 'shipped';
                             $canCancel = !in_array(strtolower($order->delivery_status ?? ''), ['shipped', 'out_for_delivery', 'delivered', 'returned']) && !in_array(strtolower($order->status), ['shipped', 'out_for_delivery', 'delivered', 'returned', 'cancelled', 'cancellation_requested']);
                             
+                            // Return eligibility: delivered + paid + not already requested + within 30 days
+                            $returnStatus = $order->return_status ?? 'none';
+                            $canReturn = $isPaid
+                                && $isDelivered
+                                && $returnStatus === 'none'
+                                && ($order->delivered_at
+                                    ? \Carbon\Carbon::parse($order->delivered_at)->diffInDays(now()) <= 30
+                                    : \Carbon\Carbon::parse($order->updated_at)->diffInDays(now()) <= 30);
+                            
                             $firstItem = $order->orderItems->first();
                             $additionalCount = $order->orderItems->count() - 1;
                             $productImage = $firstItem && $firstItem->product ? \App\Helpers\ImageHelper::getUrl($firstItem->product->image, 'images/products') : 'https://ui-avatars.com/api/?name=P&background=f8fafc&color=64748b';
@@ -259,6 +275,26 @@
                                         @if($canCancel)
                                             <button type="button" onclick="openCancelModal('{{ $order->id }}', '{{ $order->order_number }}', '{{ $isPaid ? '1' : '0' }}')" class="w-full bg-white border border-slate-200 text-slate-600 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 hover:text-rose-600 hover:border-rose-200 transition-all">Cancel Order</button>
                                         @endif
+
+                                        @if($canReturn)
+                                            <button type="button" onclick="openReturnModal('{{ $order->order_number }}', '{{ $order->total_amount }}')"
+                                                class="w-full bg-white border border-blue-200 text-blue-700 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-50 hover:border-blue-300 transition-all flex items-center justify-center gap-1.5">
+                                                <i data-lucide="package-x" class="h-3.5 w-3.5"></i> Request Return
+                                            </button>
+                                        @elseif($returnStatus === 'requested')
+                                            <div class="w-full bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2.5 rounded-xl text-xs font-semibold text-center">
+                                                <i data-lucide="clock" class="h-3.5 w-3.5 inline mr-1"></i> Return Pending Review
+                                            </div>
+                                        @elseif($returnStatus === 'approved')
+                                            <div class="w-full bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-2.5 rounded-xl text-xs font-semibold text-center">
+                                                <i data-lucide="check-circle-2" class="h-3.5 w-3.5 inline mr-1"></i> Return Approved
+                                            </div>
+                                        @elseif($returnStatus === 'rejected')
+                                            <div class="w-full bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2.5 rounded-xl text-xs font-semibold text-center">
+                                                <i data-lucide="x-circle" class="h-3.5 w-3.5 inline mr-1"></i> Return Rejected
+                                            </div>
+                                        @endif
+
                                         <div class="flex items-center justify-between mt-1 px-1">
                                             <a href="{{ route('order.invoice', ['order' => $order->order_number]) }}" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5">
                                                 <i data-lucide="download" class="h-3.5 w-3.5"></i> Invoice
@@ -428,7 +464,7 @@
                                                     <a href="{{ route('order.invoice', ['order' => $order->order_number]) }}" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5">
                                                         <i data-lucide="download" class="h-3.5 w-3.5"></i> Invoice
                                                     </a>
-                                                    <a href="https://wa.me/919876543210?text=Help with Order #{{ $order->order_number }}" target="_blank" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5">
+                                                    <a href="https://wa.me/917567776796?text=Help with Order #{{ $order->order_number }}" target="_blank" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5">
                                                         <i data-lucide="life-buoy" class="h-3.5 w-3.5"></i> Help
                                                     </a>
                                                 </div>
@@ -1090,3 +1126,84 @@
 </div>
 @endpush
 @endsection
+
+{{-- ─── Return Request Modal ────────────────────────────────────────────────── --}}
+<div id="return-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-900">Request Return — <span id="return-modal-order-number" class="text-orange-600"></span></h3>
+            <button type="button" onclick="closeReturnModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <i data-lucide="x" class="h-5 w-5"></i>
+            </button>
+        </div>
+
+        {{-- Refund Preview Banner --}}
+        <div class="px-6 pt-5">
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3">
+                <i data-lucide="info" class="h-5 w-5 text-blue-500 shrink-0 mt-0.5"></i>
+                <div>
+                    <h4 class="text-sm font-semibold text-blue-900">Refund Preview</h4>
+                    <p class="text-xs text-blue-700 mt-1 leading-relaxed">
+                        Order Amount: <strong>₹<span id="return-order-amount"></span></strong><br>
+                        Return Shipping Charge: <strong>−₹100</strong><br>
+                        <span class="text-blue-900 font-bold text-sm">You will receive: ₹<span id="return-net-refund"></span></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <form id="return-form" method="POST" action="">
+            @csrf
+            <div class="p-6 space-y-4">
+                <div>
+                    <label for="return_reason" class="block text-sm font-medium text-slate-700 mb-1.5">
+                        Reason for Return <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea name="return_reason" id="return_reason" rows="4" required minlength="10" maxlength="500"
+                        placeholder="Please describe why you want to return this product (minimum 10 characters)..."
+                        class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
+                    <p class="text-xs text-slate-400 mt-1">e.g. Defective product, wrong item received, not as described...</p>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 flex gap-2">
+                    <i data-lucide="alert-triangle" class="h-4 w-4 text-amber-600 shrink-0 mt-0.5"></i>
+                    <p class="text-xs text-amber-700 leading-relaxed">
+                        Our team will review your request within <strong>24–48 hours</strong>. Once approved, a return pickup will be scheduled and ₹<span id="return-net-refund-2"></span> will be refunded to your original payment method within 5–7 business days.
+                    </p>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeReturnModal()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
+                <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/20 flex items-center gap-2">
+                    <i data-lucide="package-x" class="h-4 w-4"></i> Submit Return Request
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openReturnModal(orderNumber, totalAmount) {
+        const netRefund = Math.max(0, parseFloat(totalAmount) - 100).toFixed(0);
+        document.getElementById('return-modal-order-number').textContent = '#' + orderNumber;
+        document.getElementById('return-order-amount').textContent = parseFloat(totalAmount).toFixed(0);
+        document.getElementById('return-net-refund').textContent = netRefund;
+        document.getElementById('return-net-refund-2').textContent = netRefund;
+        document.getElementById('return-form').action = '/orders/' + orderNumber + '/return-request';
+        document.getElementById('return_reason').value = '';
+        document.getElementById('return-modal').classList.remove('hidden');
+        document.getElementById('return-modal').classList.add('flex');
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    function closeReturnModal() {
+        document.getElementById('return-modal').classList.add('hidden');
+        document.getElementById('return-modal').classList.remove('flex');
+    }
+
+    // Close on backdrop click
+    document.getElementById('return-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeReturnModal();
+    });
+</script>

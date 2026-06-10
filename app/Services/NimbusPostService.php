@@ -191,6 +191,25 @@ class NimbusPostService
     }
 
     /**
+     * Create a Reverse (Return) Pickup Shipment
+     * Customer's address = pickup point, Warehouse = delivery point
+     * NimbusPost tracking: PP → IT → RT-IT → RT-DL
+     */
+    public function createReverseShipment($payload)
+    {
+        // Force reverse order type — this is the key difference
+        $payload['order_type'] = 'reverse';
+        $payload['payment_type'] = 'prepaid'; // seller always pays for return pickup
+
+        if (isset($payload['request_auto_pickup'])) {
+            $payload['request_auto_pickup'] = $payload['request_auto_pickup'] ? 'yes' : 'no';
+        }
+
+        Log::info('NimbusPost: Creating REVERSE shipment', ['order_number' => $payload['order_number'] ?? 'N/A']);
+        return $this->request('post', '/shipments', $payload);
+    }
+
+    /**
      * Create a Hyperlocal shipment
      */
     public function createHyperlocalShipment($payload)
