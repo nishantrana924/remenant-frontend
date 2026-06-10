@@ -97,7 +97,7 @@
                                 <i data-lucide="send" class="w-4 h-4"></i>
                             </button>
                             @else
-                            <a href="{{ $order->shipment->label_url }}" target="_blank" class="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-black transition-all shadow-lg shadow-slate-100" title="Download Label">
+                            <a href="{{ route('admin.orders.nimbus-label', $order->id) }}" target="_blank" class="h-9 w-9 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-black transition-all shadow-lg shadow-slate-100" title="Download Label">
                                 <i data-lucide="printer" class="w-4 h-4"></i>
                             </a>
                             <button onclick="trackAWB('{{ $order->shipment->awb_number }}')" class="h-9 w-9 rounded-xl bg-white border border-slate-100 text-slate-400 flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm" title="Track Shipment">

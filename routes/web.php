@@ -114,6 +114,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('orders/{id}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::post('orders/{id}/approve-cancellation', [\App\Http\Controllers\Admin\OrderController::class, 'approveCancellation'])->name('orders.approve-cancellation');
     Route::post('orders/{id}/reject-cancellation', [\App\Http\Controllers\Admin\OrderController::class, 'rejectCancellation'])->name('orders.reject-cancellation');
+    Route::post('orders/{id}/sync-refund', [\App\Http\Controllers\Admin\OrderController::class, 'syncRefund'])->name('orders.sync-refund');
     Route::get('shipping', [\App\Http\Controllers\Admin\ShippingController::class, 'index'])->name('shipping.index');
     Route::get('refunds', [\App\Http\Controllers\Admin\RefundController::class, 'index'])->name('refunds.index');
     Route::get('admins', [\App\Http\Controllers\Admin\UserController::class, 'admins'])->name('admins.index');

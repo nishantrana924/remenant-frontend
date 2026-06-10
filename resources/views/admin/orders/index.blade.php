@@ -240,12 +240,12 @@
     }
 }">
     <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Order Management</h1>
-            <p class="text-sm text-slate-500 mt-1 font-medium">Manage fulfillment, logistics, and customer success</p>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Order Management</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5 font-medium">Manage fulfillment, logistics, and customer success</p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 flex-wrap">
             <template x-if="selectedItems.length > 0">
                 <div class="flex flex-col gap-2">
                     {{-- Selection Info Banner --}}
@@ -279,15 +279,15 @@
                     </div>
                 </div>
             </template>
-            <div class="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+            <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
                 <span class="h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
-                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-600">{{ $items->where('status', 'pending')->count() }} Awaiting Approval</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-600">{{ $items->where('status', 'pending')->count() }} Awaiting</span>
             </div>
         </div>
     </div>
 
     <!-- Filters & Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div class="saas-card p-4 flex items-center justify-between bg-white border-l-4 border-orange-500">
             <div>
                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Pending</p>
@@ -320,27 +320,28 @@
 
     <!-- Command Table -->
     <div class="saas-card p-0 overflow-hidden relative">
-        <div class="p-6 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4 bg-slate-50/30">
-            <div class="relative w-full md:w-96">
+        <div class="p-4 border-b border-slate-100 flex flex-col gap-3 bg-slate-50/30">
+            <div class="relative w-full">
                 <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                <input type="text" x-model="search" placeholder="Search Order #, Name, or Email..." class="saas-input pl-12">
+                <input type="text" x-model="search" placeholder="Search Order #, Name, Email..." class="saas-input pl-12">
             </div>
-            <div class="flex items-center gap-2">
-                <div class="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-sm overflow-x-auto whitespace-nowrap scrollbar-hide">
-                    <button @click="activeStatus = 'all'" :class="activeStatus === 'all' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all">All</button>
-                    <button @click="activeStatus = 'pending'" :class="activeStatus === 'pending' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all">Pending</button>
-                    <button @click="activeStatus = 'shipped'" :class="activeStatus === 'shipped' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all">Shipped</button>
-                    <button @click="activeStatus = 'cancellation_requested'" :class="activeStatus === 'cancellation_requested' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all">Cancel Req</button>
-                    <button @click="activeStatus = 'cancelled'" :class="activeStatus === 'cancelled' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all">Cancelled</button>
-                    <div class="w-px h-4 bg-slate-200 mx-1"></div>
-                    <button @click="activeStatus = 'refund_pending'" :class="activeStatus === 'refund_pending' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all hover:bg-rose-50 hover:text-rose-600">Ref: Pending</button>
-                    <button @click="activeStatus = 'refund_processing'" :class="activeStatus === 'refund_processing' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all hover:bg-rose-50 hover:text-rose-600">Ref: Processing</button>
-                    <button @click="activeStatus = 'refund_completed'" :class="activeStatus === 'refund_completed' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all hover:bg-emerald-50 hover:text-emerald-600">Ref: Completed</button>
-                    <button @click="activeStatus = 'refund_failed'" :class="activeStatus === 'refund_failed' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400'" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all hover:bg-rose-50 hover:text-rose-600">Ref: Failed</button>
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-sm overflow-x-auto whitespace-nowrap scrollbar-hide flex-1">
+                    <button @click="activeStatus = 'all'" :class="activeStatus === 'all' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shrink-0">All</button>
+                    <button @click="activeStatus = 'pending'" :class="activeStatus === 'pending' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shrink-0">Pending</button>
+                    <button @click="activeStatus = 'processing'" :class="activeStatus === 'processing' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shrink-0">Processing</button>
+                    <button @click="activeStatus = 'shipped'" :class="activeStatus === 'shipped' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shrink-0">Shipped</button>
+                    <button @click="activeStatus = 'cancellation_requested'" :class="activeStatus === 'cancellation_requested' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shrink-0">Cancel Req</button>
+                    <button @click="activeStatus = 'cancelled'" :class="activeStatus === 'cancelled' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400'" class="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shrink-0">Cancelled</button>
+                    <div class="w-px h-4 bg-slate-200 mx-0.5 shrink-0"></div>
+                    <button @click="activeStatus = 'refund_pending'" :class="activeStatus === 'refund_pending' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400'" class="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shrink-0">Ref:Pending</button>
+                    <button @click="activeStatus = 'refund_processing'" :class="activeStatus === 'refund_processing' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400'" class="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shrink-0">Ref:Processing</button>
+                    <button @click="activeStatus = 'refund_completed'" :class="activeStatus === 'refund_completed' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400'" class="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shrink-0">Ref:Done</button>
+                    <button @click="activeStatus = 'refund_failed'" :class="activeStatus === 'refund_failed' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400'" class="px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shrink-0">Ref:Failed</button>
                 </div>
-                <div class="relative">
+                <div class="relative shrink-0">
                     <i data-lucide="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400"></i>
-                    <input type="date" x-model="dateFilter" class="saas-input pl-9 py-1.5 text-[10px] font-bold uppercase tracking-widest border-slate-200 w-40">
+                    <input type="date" x-model="dateFilter" class="saas-input pl-9 py-1.5 text-[10px] font-bold uppercase tracking-widest border-slate-200 w-36 sm:w-40">
                     <template x-if="dateFilter">
                         <button @click="dateFilter = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-rose-500">
                             <i data-lucide="x" class="w-3 h-3"></i>
@@ -350,7 +351,71 @@
             </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- Mobile Card View -->
+        <div class="md:hidden divide-y divide-slate-100">
+            @foreach($items as $item)
+            <div class="p-4 transition-all"
+                x-show="(!search || '{{ strtolower($item->order_number ?? $item->id) }}'.includes(search.toLowerCase()) || '{{ strtolower($item->customer_name ?? $item->user->name ?? 'Guest') }}'.includes(search.toLowerCase())) && (activeStatus === 'all' || (activeStatus.startsWith('refund_') ? '{{ $item->refund_status }}' === activeStatus.replace('refund_', '') : '{{ $item->status }}' === activeStatus)) && (!dateFilter || '{{ $item->created_at->format('Y-m-d') }}' === dateFilter)"
+                :class="selectedItems.includes({{ $item->id }}) ? 'bg-orange-50' : 'bg-white hover:bg-orange-50/30'">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-start gap-3">
+                        <input type="checkbox"
+                            :checked="selectedItems.includes({{ $item->id }})"
+                            @change="
+                                if ($event.target.checked) {
+                                    if (selectedItems.length >= maxBulk) {
+                                        $event.target.checked = false;
+                                        window.toast('Maximum ' + maxBulk + ' orders can be selected at once.', 'error');
+                                    } else {
+                                        selectedItems = [...selectedItems, {{ $item->id }}];
+                                    }
+                                } else {
+                                    selectedItems = selectedItems.filter(id => id !== {{ $item->id }});
+                                }
+                            "
+                            class="mt-1 rounded border-slate-300 text-orange-500 focus:ring-orange-500">
+                        <div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-bold text-slate-900 text-sm">#{{ $item->order_number ?? $item->id }}</span>
+                                <span :class="statusColors['{{ $item->status }}']" class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest border">{{ $item->status }}</span>
+                                <div class="flex items-center gap-1">
+                                    <div class="h-1.5 w-1.5 rounded-full {{ $item->payment_status === 'paid' ? 'bg-emerald-500' : 'bg-orange-500' }}"></div>
+                                    <span class="text-[9px] font-bold uppercase {{ $item->payment_status === 'paid' ? 'text-emerald-600' : 'text-orange-600' }}">{{ $item->payment_status }}</span>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-0.5">{{ $item->created_at->format('M d, h:i A') }}</p>
+                            <p class="text-sm font-bold text-slate-800 mt-1">{{ $item->customer_name ?? $item->user->name ?? 'Guest' }}</p>
+                            <p class="text-[10px] text-slate-500">{{ $item->email }}</p>
+                            <p class="text-sm font-bold text-orange-600 mt-1">₹{{ number_format($item->total_amount) }}</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1.5 shrink-0">
+                        @if($item->status === 'pending')
+                        <button @click="updateStatus({{ $item->id }}, { status: 'processing', delivery_status: 'packed' })" class="h-8 px-3 rounded-lg bg-orange-600 text-white text-[10px] font-bold uppercase hover:bg-orange-700 transition-all">
+                            Approve
+                        </button>
+                        @elseif($item->status === 'processing' || $item->status === 'packed')
+                            @if(!$item->shipment || !$item->shipment->awb_number)
+                            <button @click="openCourierSelection({{ $item->id }}, {{ json_encode($item->calculated_dimensions) }})" class="h-8 px-3 rounded-lg bg-orange-600 text-white text-[10px] font-bold uppercase hover:bg-orange-700 transition-all flex items-center gap-1">
+                                <i data-lucide="rocket" class="w-3 h-3"></i> Ship
+                            </button>
+                            @else
+                            <a href="{{ route('admin.orders.nimbus-label', $item->id) }}" target="_blank" class="h-8 px-3 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 text-[10px] font-bold uppercase hover:bg-blue-100 transition-all flex items-center gap-1">
+                                <i data-lucide="printer" class="w-3 h-3"></i> Print
+                            </a>
+                            @endif
+                        @endif
+                        <button @click="selectedOrder = {{ $item->append('calculated_dimensions')->toJson() }}; showDrawer = true" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-orange-500 transition-all">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="hidden md:block overflow-x-auto">
             <table class="saas-table">
                 <thead>
                     <tr>
@@ -483,11 +548,11 @@
          x-transition:leave="transition ease-in duration-300"
          x-transition:leave-start="translate-x-0"
          x-transition:leave-end="translate-x-full"
-         class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-2xl z-[150] border-l border-slate-100 flex flex-col"
+         class="fixed inset-y-0 right-0 w-full sm:w-[400px] md:w-[450px] bg-white shadow-2xl z-[150] border-l border-slate-100 flex flex-col"
          x-cloak>
-        <div class="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+        <div class="p-4 sm:p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
             <div>
-                <h3 class="text-lg font-bold text-slate-900" x-text="'Order #' + (selectedOrder ? (selectedOrder.order_number || selectedOrder.id) : '')"></h3>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900" x-text="'Order #' + (selectedOrder ? (selectedOrder.order_number || selectedOrder.id) : '')"></h3>
                 <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1" x-text="selectedOrder ? new Date(selectedOrder.created_at).toLocaleString() : ''"></p>
             </div>
             <button @click="showDrawer = false" class="h-10 w-10 rounded-full hover:bg-rose-50 hover:text-rose-500 transition-all flex items-center justify-center">
@@ -495,7 +560,7 @@
             </button>
         </div>
         
-        <div class="flex-1 overflow-y-auto p-8 space-y-8">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
             <!-- Customer Card -->
             <div class="space-y-4">
                 <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Customer Info</h4>
@@ -580,6 +645,16 @@
                                     <p class="text-[10px] font-mono text-slate-600 break-all" x-text="selectedOrder.refund_arn || 'N/A'"></p>
                                 </div>
                             </div>
+                            
+                            <template x-if="selectedOrder.refund_status && selectedOrder.refund_status !== 'none' && selectedOrder.refund_status !== 'completed' && selectedOrder.refund_status !== 'failed' && selectedOrder.razorpay_refund_id">
+                                <div class="mt-4 pt-4 border-t border-rose-100">
+                                    <button @click="window.fastSubmit(`/admin/orders/${selectedOrder.id}/sync-refund`, { method: 'POST', success: (res) => { window.toast(res.message); setTimeout(() => location.reload(), 1000); }, error: (err) => window.toast(err.response?.data?.message || 'Failed to sync refund', 'error') })"
+                                            class="w-full py-3 bg-rose-600 text-white rounded-xl text-[10px] font-bold tracking-[0.1em] uppercase hover:bg-rose-700 transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-rose-100">
+                                        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+                                        Sync Refund Status from Razorpay
+                                    </button>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </div>

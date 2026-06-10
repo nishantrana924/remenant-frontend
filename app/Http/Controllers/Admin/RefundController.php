@@ -15,7 +15,7 @@ class RefundController extends Controller
             ->paginate(15);
             
         $stats = [
-            'pending_refunds' => Order::where('refund_status', 'requested')->count(),
+            'pending_refunds' => Order::whereIn('refund_status', ['pending', 'initiated', 'processing'])->count(),
             'total_refunded' => Order::where('refund_status', 'completed')->sum('refund_amount'),
         ];
 

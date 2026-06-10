@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Razorpay\Api\Api;
+use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
 {
@@ -244,101 +245,115 @@ class CheckoutController extends Controller
 
     public function verifyPayment(Request $request)
     {
-        $input = $request->all();
-        $api = new Api(config('services.razorpay.key_id'), config('services.razorpay.key_secret'));
+        try {
+            $input = $request->all();
+            $api = new Api(config('services.razorpay.key_id'), config('services.razorpay.key_secret'));
 
-        $success = true;
-        $error = "Payment Failed";
+            $success = true;
+            $error = "Payment Failed";
 
-        if (empty($input['razorpay_payment_id']) === false) {
-            try {
-                $attributes = [
-                    'razorpay_order_id'  => $input['razorpay_order_id'],
-                    'razorpay_payment_id'=> $input['razorpay_payment_id'],
-                    'razorpay_signature' => $input['razorpay_signature']
-                ];
-                $api->utility->verifyPaymentSignature($attributes);
-            } catch (\Exception $e) {
+            if (!empty($input['razorpay_payment_id']) && !empty($input['razorpay_order_id']) && !empty($input['razorpay_signature'])) {
+                try {
+                    $attributes = [
+                        'razorpay_order_id'  => $input['razorpay_order_id'],
+                        'razorpay_payment_id'=> $input['razorpay_payment_id'],
+                        'razorpay_signature' => $input['razorpay_signature']
+                    ];
+                    $api->utility->verifyPaymentSignature($attributes);
+                } catch (\Exception $e) {
+                    $success = false;
+                    $error = 'Razorpay Error : ' . $e->getMessage();
+                }
+            } else {
                 $success = false;
-                $error = 'Razorpay Error : ' . $e->getMessage();
+                $error = 'Payment details missing.';
             }
-        } else {
-            $success = false;
-            $error = 'Payment ID missing.';
-        }
 
-        if ($success === true) {
-            session()->forget('cart');
+            if ($success === true) {
+                session()->forget('cart');
 
-            $order = \App\Models\Order::where('razorpay_order_id', $input['razorpay_order_id'])->first();
+                $order = \App\Models\Order::where('razorpay_order_id', $input['razorpay_order_id'])->first();
 
-            if ($order && $order->payment_status !== 'paid') {
-                // 1. If order is already cancelled or failed, mark paid, set refund_status to pending and dispatch refund job
-                if (in_array($order->status, ['cancelled', 'failed'])) {
-                    $order->update([
-                        'payment_status'      => 'paid',
-                        'paid_at'             => now(),
-                        'razorpay_payment_id' => $input['razorpay_payment_id'],
-                        'razorpay_signature'  => $input['razorpay_signature'],
-                        'refund_status'       => 'pending',
-                        'refund_requested_at' => now(),
-                    ]);
-
-                    \App\Jobs\ProcessOrderRefundJob::dispatch($order->id);
-
-                    Log::info('verifyPayment: Cancelled/failed Order ' . $order->order_number . ' paid. Refund job dispatched.');
-                } else {
-                    // 2. Pre-flight stock check before marking processing
-                    $outOfStock = false;
-                    foreach ($order->orderItems as $item) {
-                        $product = \App\Models\Product::find($item->product_id);
-                        if (!$product || $product->stock < $item->quantity) {
-                            $outOfStock = true;
-                            break;
-                        }
-                    }
-
-                    if ($outOfStock) {
+                if ($order && $order->payment_status !== 'paid') {
+                    // 1. If order is already cancelled or failed, mark paid, set refund_status to pending and dispatch refund job
+                    if (in_array($order->status, ['cancelled', 'failed'])) {
                         $order->update([
                             'payment_status'      => 'paid',
                             'paid_at'             => now(),
                             'razorpay_payment_id' => $input['razorpay_payment_id'],
                             'razorpay_signature'  => $input['razorpay_signature'],
-                            'status'              => 'cancelled',
-                            'cancellation_reason' => 'System Auto-Cancel: Out of stock during verification',
                             'refund_status'       => 'pending',
                             'refund_requested_at' => now(),
                         ]);
 
                         \App\Jobs\ProcessOrderRefundJob::dispatch($order->id);
 
-                        Log::warn('verifyPayment: Order ' . $order->order_number . ' paid but out of stock. Refund job dispatched.');
+                        Log::info('verifyPayment: Cancelled/failed Order ' . $order->order_number . ' paid. Refund job dispatched.');
                     } else {
-                        // Normal successful flow
-                        $order->update([
-                            'payment_status'      => 'paid',
-                            'paid_at'             => now(),
-                            'status'              => 'processing',
-                            'razorpay_payment_id' => $input['razorpay_payment_id'],
-                            'razorpay_signature'  => $input['razorpay_signature'],
-                        ]);
+                        // 2. Pre-flight stock check before marking processing
+                        $outOfStock = false;
+                        foreach ($order->orderItems as $item) {
+                            $product = \App\Models\Product::find($item->product_id);
+                            if (!$product || $product->stock < $item->quantity) {
+                                $outOfStock = true;
+                                break;
+                            }
+                        }
 
-                        Log::info('verifyPayment: Order ' . $order->order_number . ' marked paid via signature verification.');
+                        if ($outOfStock) {
+                            $order->update([
+                                'payment_status'      => 'paid',
+                                'paid_at'             => now(),
+                                'razorpay_payment_id' => $input['razorpay_payment_id'],
+                                'razorpay_signature'  => $input['razorpay_signature'],
+                                'status'              => 'cancelled',
+                                'cancellation_reason' => 'System Auto-Cancel: Out of stock during verification',
+                                'refund_status'       => 'pending',
+                                'refund_requested_at' => now(),
+                            ]);
+
+                            \App\Jobs\ProcessOrderRefundJob::dispatch($order->id);
+
+                            Log::warning('verifyPayment: Order ' . $order->order_number . ' paid but out of stock. Refund job dispatched.');
+                        } else {
+                            // Normal successful flow
+                            $order->update([
+                                'payment_status'      => 'paid',
+                                'paid_at'             => now(),
+                                'status'              => 'processing',
+                                'razorpay_payment_id' => $input['razorpay_payment_id'],
+                                'razorpay_signature'  => $input['razorpay_signature'],
+                            ]);
+
+                            Log::info('verifyPayment: Order ' . $order->order_number . ' marked paid via signature verification.');
+                        }
                     }
                 }
+
+                if ($order) {
+                    session(['payment_verified_for_order' => $order->order_number]);
+                    return redirect()->route('checkout.success', ['order' => $order->order_number])
+                        ->with('success', 'Payment processed!');
+                }
+
+                return redirect()->route('home')->with('success', 'Payment received!');
             }
 
-            if ($order) {
-                session(['payment_verified_for_order' => $order->order_number]);
-                return redirect()->route('checkout.success', ['order' => $order->order_number])
-                    ->with('success', 'Payment processed!');
+            // Fallback route handling if signature validation failed
+            $fallbackOrderNumber = !empty($input['razorpay_order_id']) 
+                ? (\App\Models\Order::where('razorpay_order_id', $input['razorpay_order_id'])->value('order_number'))
+                : ($request->order_number ?? null);
+
+            if ($fallbackOrderNumber) {
+                return redirect()->route('checkout.payment', ['order' => $fallbackOrderNumber])
+                    ->with('error', $error);
             }
 
-            return redirect()->route('home')->with('success', 'Payment received!');
+            return redirect()->route('checkout')->with('error', $error);
+        } catch (\Exception $e) {
+            Log::error('verifyPayment crash: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return redirect()->route('checkout')->with('error', 'Something went wrong during payment verification. Please contact support.');
         }
-
-        return redirect()->route('checkout.payment', ['order' => $request->order_number])
-            ->with('error', $error);
     }
 
     public function success($orderNumber)
