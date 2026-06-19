@@ -10,6 +10,33 @@ use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
+    public function general()
+    {
+        $settings = [
+            'top_marquee_active' => SiteSetting::getValue('top_marquee_active', '1'),
+            'top_marquee_items' => json_decode(SiteSetting::getValue('top_marquee_items', '["Get our Exclusive Best Sellers!", "Free delivery over ₹999", "New arrivals every week"]'), true) ?? ["Get our Exclusive Best Sellers!", "Free delivery over ₹999", "New arrivals every week"],
+        ];
+
+        return view('admin.settings.general', compact('settings'));
+    }
+
+    public function updateGeneral(Request $request)
+    {
+        SiteSetting::setValue('top_marquee_active', $request->has('top_marquee_active') ? '1' : '0');
+        
+        $marqueeItems = [];
+        if ($request->has('marquee_items')) {
+            foreach ($request->marquee_items as $item) {
+                if (!empty(trim($item))) {
+                    $marqueeItems[] = trim($item);
+                }
+            }
+        }
+        SiteSetting::setValue('top_marquee_items', json_encode($marqueeItems));
+
+        return redirect()->back()->with('success', 'General settings updated successfully.');
+    }
+
     public function invoice()
     {
         $settings = [

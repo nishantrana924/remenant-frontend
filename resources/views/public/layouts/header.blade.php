@@ -3,26 +3,34 @@
 @endphp
 
 @if (request()->routeIs('home'))
-    <!-- Top promo bar (NOT sticky) -->
-    <div class="bg-[var(--secondary)] text-white">
-        <div class="mx-auto flex max-w-[1600px] items-center px-4 py-3 text-sm sm:px-6 lg:px-12">
-            <div class="marquee flex-1">
-                <div class="marquee__track">
-                    <span class="marquee__item font-semibold">Get our Exclusive Best Sellers!</span>
-                    <span class="marquee__sep">•</span>
-                    <span class="marquee__item font-semibold">Free delivery over ₹999</span>
-                    <span class="marquee__sep">•</span>
-                    <span class="marquee__item font-semibold">New arrivals every week</span>
-                    <span class="marquee__sep">•</span>
-                    <span class="marquee__item font-semibold">Get our Exclusive Best Sellers!</span>
-                    <span class="marquee__sep">•</span>
-                    <span class="marquee__item font-semibold">Free delivery over ₹999</span>
-                    <span class="marquee__sep">•</span>
-                    <span class="marquee__item font-semibold">New arrivals every week</span>
+    @php
+        $marqueeActive = \App\Models\SiteSetting::getValue('top_marquee_active', '1') === '1';
+        $marqueeItemsJson = \App\Models\SiteSetting::getValue('top_marquee_items', json_encode([
+            "Get our Exclusive Best Sellers!",
+            "Free delivery over ₹999",
+            "New arrivals every week"
+        ]));
+        $marqueeItems = json_decode($marqueeItemsJson, true);
+        if (!is_array($marqueeItems)) $marqueeItems = [];
+    @endphp
+
+    @if ($marqueeActive && count($marqueeItems) > 0)
+        <!-- Top promo bar (NOT sticky) -->
+        <div class="bg-[var(--secondary)] text-white">
+            <div class="mx-auto flex max-w-[1600px] items-center px-4 py-3 text-sm sm:px-6 lg:px-12">
+                <div class="marquee flex-1">
+                    <div class="marquee__track">
+                        @for ($i = 0; $i < 4; $i++)
+                            @foreach ($marqueeItems as $item)
+                                <span class="marquee__item font-semibold">{{ $item }}</span>
+                                <span class="marquee__sep">•</span>
+                            @endforeach
+                        @endfor
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 @endif
 
 <!-- Main header (sticky) -->

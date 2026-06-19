@@ -103,6 +103,11 @@
                 <p class="sidebar-text px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Settings</p>
             </div>
 
+            <a href="{{ route('admin.settings.general') }}" class="nav-item {{ request()->is('admin/settings/general*') ? 'active-nav-item' : '' }}" up-alias="/admin/settings/general*" up-target="#main-content, #admin-nav">
+                <i data-lucide="settings-2" class="w-4 h-4 mr-3"></i>
+                <span class="sidebar-text">General</span>
+            </a>
+
             <a href="{{ route('admin.settings.shipping') }}" class="nav-item {{ request()->is('admin/settings/shipping*') ? 'active-nav-item' : '' }}" up-alias="/admin/settings/shipping*" up-target="#main-content, #admin-nav">
                 <i data-lucide="package" class="w-4 h-4 mr-3"></i>
                 <span class="sidebar-text">Shipping</span>
