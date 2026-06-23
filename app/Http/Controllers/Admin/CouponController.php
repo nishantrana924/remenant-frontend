@@ -37,6 +37,7 @@ class CouponController extends Controller
         ]);
 
         $validated['is_active'] = $request->has('is_active');
+        $validated['min_order_amount'] = $validated['min_order_amount'] ?? 0;
         
         Coupon::create($validated);
 
@@ -67,6 +68,7 @@ class CouponController extends Controller
         $validated['is_active'] = $request->has('is_active');
         $validated['product_ids'] = $request->input('product_ids', []);
         $validated['category_ids'] = $request->input('category_ids', []);
+        $validated['min_order_amount'] = $validated['min_order_amount'] ?? 0;
 
         $coupon->update($validated);
 
