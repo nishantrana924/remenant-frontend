@@ -165,6 +165,11 @@
                                         $totalMrp += $item['mrp'] * $item['quantity'];
                                     }
                                     $totalDiscount = $totalMrp - $totalPrice;
+                                    
+                                    $shippingCharge = (int) \App\Models\SiteSetting::getValue('shipping_charge', 99);
+                                    $freeThreshold = (int) \App\Models\SiteSetting::getValue('free_shipping_threshold', 449);
+                                    $shipping = $totalPrice > $freeThreshold ? 0 : $shippingCharge;
+                                    $finalTotal = $totalPrice + $shipping;
                                 @endphp
                                 <div class="flex justify-between items-center text-sm">
                                     <span id="cart-items-count" class="text-gray-600">Price ({{ count($cart) }} items)</span>
@@ -176,20 +181,14 @@
                                 </div>
                                 <div class="flex justify-between items-center text-sm">
                                     <span class="text-gray-600">Delivery Charges</span>
-                                    @if($shipping == 0)
-                                        <span id="cart-shipping-display" class="text-green-600 font-bold uppercase text-[10px]">Free</span>
-                                    @else
-                                        <span id="cart-shipping-display" class="text-gray-900 font-bold">₹{{ number_format($shipping) }}</span>
-                                    @endif
-                                </div>
-                                @if($shipping > 0)
-                                <div class="text-[10px] text-gray-400 font-medium -mt-2">
-                                    Add ₹{{ number_format($freeThreshold - collect($cart)->sum(fn($i) => $i['price'] * $i['quantity'])) }} more for free delivery
+                                    <span id="cart-shipping" class="text-green-600 font-bold uppercase text-[10px]">
+                                        {{ $shipping == 0 ? 'Free' : '₹' . number_format($shipping) }}
+                                    </span>
                                 </div>
                                 @endif
                                 <div class="border-t border-dashed border-gray-200 pt-5 flex justify-between items-center">
                                     <span class="text-lg font-black text-gray-900">Total Amount</span>
-                                    <span id="cart-final-total" class="text-lg font-black text-gray-900">₹{{ number_format($totalPrice + $shipping) }}</span>
+                                    <span id="cart-final-total" class="text-lg font-black text-gray-900">₹{{ number_format($finalTotal) }}</span>
                                 </div>
                                 <div class="bg-green-50 rounded-lg p-3 flex items-center gap-2 text-green-700">
                                     <i data-lucide="badge-check" class="w-4 h-4"></i>
@@ -286,6 +285,7 @@
                 $('#cart-items-count').text(`Price (${totals.count} items)`);
                 $('#cart-mrp-total').text(`₹${totals.subtotal}`);
                 $('#cart-discount-total').text(`- ₹${totals.discount}`);
+                $('#cart-shipping').text(totals.shipping);
                 $('#cart-final-total').text(`₹${totals.total}`);
                 $('#cart-savings-amount').text(`₹${totals.discount}`);
                 // Update shipping display dynamically

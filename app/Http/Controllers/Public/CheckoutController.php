@@ -54,6 +54,9 @@ class CheckoutController extends Controller
         }
 
         $subtotal = collect($items)->sum(fn($item) => $item['price'] * $item['quantity']);
+        $mrpTotal = collect($items)->sum(fn($item) => ($item['mrp'] ?? $item['price']) * $item['quantity']);
+        $productDiscount = $mrpTotal - $subtotal;
+        
         $shippingCharge     = (int) \App\Models\SiteSetting::getValue('shipping_charge', 99);
         $freeThreshold      = (int) \App\Models\SiteSetting::getValue('free_shipping_threshold', 449);
         $shipping = $subtotal > $freeThreshold ? 0 : $shippingCharge;
@@ -61,7 +64,7 @@ class CheckoutController extends Controller
 
         $addresses = auth()->check() ? auth()->user()->addresses : [];
 
-        return view('public.checkout', compact('items', 'subtotal', 'shipping', 'total', 'buyNowProduct', 'addresses'));
+        return view('public.checkout', compact('items', 'subtotal', 'mrpTotal', 'productDiscount', 'shipping', 'shippingCharge', 'freeThreshold', 'total', 'buyNowProduct', 'addresses'));
     }
 
     public function store(Request $request)

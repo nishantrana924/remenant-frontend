@@ -195,8 +195,14 @@
                                     </a>
                                     <div class="flex items-center justify-between mt-1">
                                         <div>
-                                            <p class="text-[9px] font-bold text-slate-400 uppercase truncate">₹{{ number_format($item['price']) }} <span id="qty-multiplier-text" class="{{ isset($buyNowProduct) ? '' : 'hidden' }}">x <span id="item-qty-text">{{ $item['quantity'] }}</span></span></p>
-                                            <p class="text-sm font-black text-slate-900">₹<span id="item-total-price">{{ number_format($item['price'] * $item['quantity']) }}</span></p>
+                                            <p class="text-[9px] font-bold text-slate-400 uppercase truncate">
+                                                @if(isset($item['mrp']) && $item['mrp'] > $item['price'])
+                                                    <span class="line-through mr-1">₹{{ number_format($item['mrp']) }}</span>
+                                                @endif
+                                                <span class="{{ (isset($item['mrp']) && $item['mrp'] > $item['price']) ? 'text-slate-500' : '' }}">₹{{ number_format($item['price']) }}</span>
+                                                <span id="qty-multiplier-text" class="{{ isset($buyNowProduct) ? '' : 'hidden' }} ml-1">x <span id="item-qty-text">{{ $item['quantity'] }}</span></span>
+                                            </p>
+                                            <p class="text-sm font-black text-slate-900 mt-0.5">₹<span id="item-total-price">{{ number_format($item['price'] * $item['quantity']) }}</span></p>
                                         </div>
                                         @if(isset($buyNowProduct))
                                         <div class="flex items-center gap-2 bg-white ring-1 ring-slate-200 rounded-lg p-1">
@@ -308,12 +314,17 @@
 
                     <!-- Totals -->
                     <div class="space-y-3 pt-6 border-t border-slate-100" id="totals-section">
+                        <span id="subtotal-val" class="hidden">{{ $subtotal }}</span>
                         <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
                             <span>Subtotal</span>
-                            <span class="text-slate-900 font-black">₹<span id="subtotal-val">{{ number_format($subtotal) }}</span></span>
+                            <span class="text-slate-900 font-black">₹<span id="mrp-total-val">{{ number_format($mrpTotal) }}</span></span>
+                        </div>
+                        <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400" id="product-discount-row" style="{{ $productDiscount > 0 ? 'display: flex;' : 'display: none;' }}">
+                            <span class="text-emerald-600">Product Discount</span>
+                            <span class="text-emerald-600 font-black">- ₹<span id="product-discount-val">{{ number_format($productDiscount) }}</span></span>
                         </div>
                         <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400" id="discount-row" style="display: none;">
-                            <span class="text-emerald-600">Discount (<span id="coupon-display"></span>)</span>
+                            <span class="text-emerald-600">Coupon Discount (<span id="coupon-display"></span>)</span>
                             <span class="text-emerald-600 font-black">- ₹<span id="discount-val">0</span></span>
                         </div>
                         <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
@@ -485,14 +496,25 @@
 
         // Recalculate Subtotal
         const price = {{ isset($buyNowProduct) ? $buyNowProduct->price : 0 }};
+        const mrp = {{ isset($buyNowProduct) && $buyNowProduct->mrp > 0 ? $buyNowProduct->mrp : (isset($buyNowProduct) ? $buyNowProduct->price * 1.5 : 0) }};
         const subtotal = price * newQty;
+        const mrpTotal = mrp * newQty;
+        const productDiscount = mrpTotal - subtotal;
         
         document.querySelectorAll('#item-total-price').forEach(el => el.innerText = subtotal.toLocaleString());
         const subtotalVal = document.getElementById('subtotal-val');
-        if (subtotalVal) subtotalVal.innerText = subtotal.toLocaleString();
+        if (subtotalVal) subtotalVal.innerText = subtotal;
+        
+        const mrpTotalVal = document.getElementById('mrp-total-val');
+        if (mrpTotalVal) mrpTotalVal.innerText = mrpTotal.toLocaleString();
+        
+        const productDiscountVal = document.getElementById('product-discount-val');
+        const productDiscountRow = document.getElementById('product-discount-row');
+        if (productDiscountVal) productDiscountVal.innerText = productDiscount.toLocaleString();
+        if (productDiscountRow) productDiscountRow.style.display = productDiscount > 0 ? 'flex' : 'none';
 
         // Recalculate Shipping
-        let shipping = subtotal > 999 ? 0 : 99;
+        let shipping = subtotal > {{ $freeThreshold }} ? 0 : {{ $shippingCharge }};
         const shippingVal = document.getElementById('shipping-val');
         if (shippingVal) {
             shippingVal.innerText = shipping === 0 ? 'Free' : '₹' + shipping.toLocaleString();
