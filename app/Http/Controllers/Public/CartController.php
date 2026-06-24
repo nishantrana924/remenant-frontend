@@ -11,7 +11,13 @@ class CartController extends Controller
     public function index()
     {
         $cart = session()->get('cart', []);
-        return view('public.cart', compact('cart'));
+
+        $totalPrice    = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
+        $shippingCharge    = (int) \App\Models\SiteSetting::getValue('shipping_charge', 99);
+        $freeThreshold     = (int) \App\Models\SiteSetting::getValue('free_shipping_threshold', 449);
+        $shipping = $totalPrice > $freeThreshold ? 0 : $shippingCharge;
+
+        return view('public.cart', compact('cart', 'shipping', 'shippingCharge', 'freeThreshold'));
     }
 
     public function add(Request $request, $id)
@@ -93,19 +99,26 @@ class CartController extends Controller
         $cart = session()->get('cart', []);
         $totalPrice = 0;
         $totalMrp = 0;
-        
+
         foreach ($cart as $item) {
             $totalPrice += $item['price'] * $item['quantity'];
             $totalMrp += ($item['mrp'] ?? $item['price']) * $item['quantity'];
         }
-        
+
         $totalDiscount = $totalMrp - $totalPrice;
-        
+
+        $shippingCharge = (int) \App\Models\SiteSetting::getValue('shipping_charge', 99);
+        $freeThreshold  = (int) \App\Models\SiteSetting::getValue('free_shipping_threshold', 449);
+        $shipping       = $totalPrice > $freeThreshold ? 0 : $shippingCharge;
+
         return [
-            'subtotal' => number_format($totalPrice),
-            'total' => number_format($totalPrice),
-            'discount' => number_format($totalDiscount),
-            'count' => count($cart)
+            'subtotal'  => number_format($totalPrice),
+            'total'     => number_format($totalPrice + $shipping),
+            'discount'  => number_format($totalDiscount),
+            'shipping'  => $shipping,
+            'shipping_formatted' => $shipping === 0 ? 'Free' : '₹' . number_format($shipping),
+            'free_threshold' => $freeThreshold,
+            'count'     => count($cart)
         ];
     }
 }

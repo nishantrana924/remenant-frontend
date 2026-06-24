@@ -242,10 +242,11 @@
                                 this.msg = 'Applying...';
                                 
                                 const rawSubtotalText = document.getElementById('subtotal-val').innerText.replace(/,/g, '');
+                                const subtotal = parseFloat(rawSubtotalText) || 0;
                                 const payload = {
                                     code: this.coupon,
                                     product_id: parseInt('{{ isset($buyNowProduct) ? $buyNowProduct->id : (count($items) > 0 ? collect($items)->first()['id'] : 0) }}'),
-                                    amount: parseFloat(rawSubtotalText)
+                                    amount: subtotal
                                 };
 
                                 axios.post('{{ route('coupons.apply') }}', payload, {
@@ -257,9 +258,14 @@
                                     this.msg = res.data.message;
                                     
                                     const discount = parseFloat(res.data.discount || 0);
-                                    const subtotal = parseFloat(rawSubtotalText);
-                                    // Shipping is dynamically calculated based on new subtotal
-                                    let shipping = subtotal > 999 ? 0 : 99;
+                                    
+                                    // Read actual shipping from the DOM — do NOT hardcode threshold
+                                    const shippingEl = document.getElementById('shipping-val');
+                                    let shipping = 0;
+                                    if (shippingEl) {
+                                        const shippingText = shippingEl.innerText.replace(/[₹,]/g, '').trim();
+                                        shipping = (shippingText === 'Free' || shippingText === '') ? 0 : (parseFloat(shippingText) || 0);
+                                    }
                                     
                                     // Update UI Safely
                                     const discountRow = document.getElementById('discount-row');
@@ -270,8 +276,10 @@
 
                                     if (discountRow) discountRow.style.display = 'flex';
                                     if (couponDisp) couponDisp.innerText = res.data.code;
-                                    if (discountVal) discountVal.innerText = discount.toLocaleString();
-                                    if (totalVal) totalVal.innerText = (subtotal + shipping - discount).toLocaleString();
+                                    if (discountVal) discountVal.innerText = discount.toLocaleString('en-IN');
+                                    
+                                    const newTotal = subtotal + shipping - discount;
+                                    if (totalVal) totalVal.innerText = newTotal.toLocaleString('en-IN');
                                     if (hiddenInput) hiddenInput.value = res.data.code;
                                     
                                     const appliedHidden = document.getElementById('coupon-applied-hidden');
