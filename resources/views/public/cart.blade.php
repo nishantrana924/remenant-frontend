@@ -185,7 +185,6 @@
                                         {{ $shipping == 0 ? 'Free' : '₹' . number_format($shipping) }}
                                     </span>
                                 </div>
-                                @endif
                                 <div class="border-t border-dashed border-gray-200 pt-5 flex justify-between items-center">
                                     <span class="text-lg font-black text-gray-900">Total Amount</span>
                                     <span id="cart-final-total" class="text-lg font-black text-gray-900">₹{{ number_format($finalTotal) }}</span>
@@ -288,16 +287,6 @@
                 $('#cart-shipping').text(totals.shipping);
                 $('#cart-final-total').text(`₹${totals.total}`);
                 $('#cart-savings-amount').text(`₹${totals.discount}`);
-                // Update shipping display dynamically
-                const shippingEl = $('#cart-shipping-display');
-                if (shippingEl.length && totals.shipping_formatted !== undefined) {
-                    shippingEl.text(totals.shipping_formatted);
-                    if (totals.shipping === 0) {
-                        shippingEl.removeClass('text-gray-900').addClass('text-green-600 uppercase text-[10px]');
-                    } else {
-                        shippingEl.removeClass('text-green-600 uppercase text-[10px]').addClass('text-gray-900');
-                    }
-                }
             }
 
             $('.btn-increase').off('click').on('click', function () {
